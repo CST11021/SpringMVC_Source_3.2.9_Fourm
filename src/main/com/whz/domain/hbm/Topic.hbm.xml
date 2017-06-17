@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping >
+	<class name="com.whz.domain.Topic" table="t_topic">
+		<id name="topicId" column="topic_id"><generator class="identity" /></id>
+		<property name="topicTitle" column="topic_title" />
+		<property name="createTime" column="create_time" type="date" />
+		<property name="lastPost" column="last_post" type="date"/>
+		<property name="views" column="topic_views" />
+		<property name="replies" column="topic_replies"/>
+		<property name="digest" column="digest"/>
+        <property name="boardId" column="board_id"/>
+        <many-to-one name="user" class="com.whz.domain.User" column="user_id"/>
+        <one-to-one name="mainPost" class="com.whz.domain.MainPost"  cascade="none"/>
+		<!--cascade 可选的属性值：-->
+		<!--none:在保存、删除修改对象的时候，不考虑其附属物的操作-->
+		<!--save-update:在保存、更新当前对象时，级联保存、更新附属物。-->
+		<!--delete:在删除当前对象时，级联删除附属物。-->
+		<!--all: 包含save-update和delete的操作-->
+		<!--delete-orphan:删除和当前对象解除关系的附属对象。-->
+	</class>
+</hibernate-mapping>

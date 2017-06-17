@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+
+  <personDossier tagColumn="SFZH">
+	<resource>M_HZ_CZRKJBXX</resource>
+  </personDossier>
+
+  <appclient>
+      <client id="10001" name="测试应用" unitName="福建厦门" ipAddress="127.0.0.1" frequency="1000" isLimit="Y" clientType="I"/>
+  </appclient>
+
+</config>

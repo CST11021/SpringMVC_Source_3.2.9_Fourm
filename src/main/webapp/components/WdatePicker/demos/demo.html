@@ -1,0 +1,40 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>时间控件演示</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="../../components-init.js"></script>
+<script type="text/javascript">
+$importComponents(["wdatepicker"]);
+$importComponents(["syntax"]);
+</script>
+</head>
+<body>
+	<p class="source" style="margin-top:10px;">
+		<input id="webDate" type="text" />
+	</p>
+	<script type="text/javascript" class="source">
+		//普通日期输入控件
+		$(document).ready(function(){
+			$("#webDate").datePicker(
+			{dateFormat : '%Y年%M月%D日 %h时%m分%s秒',
+			 showTime : true});
+		});
+	</script>
+	<p class="source" style="margin-top:10px;">
+		<input id="dateStart" type="text" />
+		&nbsp;至&nbsp;
+		<input id="dateEnd" type="text" />
+	</p>
+	<script type="text/javascript" class="source">
+		//范围日期控件
+		$(document).ready(function(){
+			$.dateRangePicker({
+				maxDate : "dateEnd",
+				minDate : "dateStart",
+				dateFormat : "%Y年%M月%D日",
+				showTime : false
+			})
+		});
+	</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!--
+ 默认命名空间：xmlns="http://www.springframework.org/schema/beans",它没有空间名，用于Spring Bean的定义
+ xsi命名空间：xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance",这个命名空间用于为每个文档中命名空间指定相依的Schema样式文件，是标准组织定义的标准命名空间
+ xsi、p、content、mvc这些为命名空间别名，别名后面对应的是空间的全限定名，别名和全限定名都可以自定义命名，习惯上使用官方网站目录作为全限定名。
+	文档中如果没有指定命名空间名，如<bean/>，则该命名空间为文档默认命名空间。
+
+ schemaLocation：为每个命名空间指定具体的Schema文件：
+ 	命名空间使用全限定名，每个组织机构在发布Schema文件后，都会为该Schema文件提供一个引用的URL地址，
+ 	一般只用这个URL地址指定命名空间对应的Schema文件。命名空间名称和对应的Schema文件地址之间使用空间或回车分隔，不同的命名空间之间也使用这种分隔方法。
+ -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:p="http://www.springframework.org/schema/p"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/mvc
+           http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<!-- 自动扫描 base-package包或子包下的所有java文件，如果扫描到有@Component @Controller @Service等这些注解的类，则把这些类注册为bean -->
+	<context:component-scan base-package="com.whz.web" />
+	
+	<!-- 启动Spring MVC的注解功能，完成请求和注解POJO的映射 -->
+	<!--<mvc:annotation-driven /> 会自动注册DefaultAnnotationHandlerMapping与AnnotationMethodHandlerAdapter 两个bean,是spring MVC为@Controllers分发请求所必须的。-->
+	<!--并提供了：数据绑定支持，@NumberFormatannotation支持，@DateTimeFormat支持，@Valid支持，读写XML的支持（JAXB），读写JSON的支持（Jackson）。-->
+	<mvc:annotation-driven/>
+
+	<!-- 对模型视图名称的解析，在请求时模型视图名称添加前后缀 -->
+	<!--这里使用JSP试图技术，JSP使用InternalResourceViewResolver作为视图解析器，InternalResourceViewResolver默认使用InternalResourceView作为视图实现类-->
+	<!--如果JSP文件使用了JSTL国际化功能（即使用JSTL的<fmt:message/>等标签时），则需要使用JstlView替换默认的视图实现类，需添加如下配置：
+	 p:viewClass=”org.springframework.web.servlet.view.JstlView”-->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+		p:prefix="/WEB-INF/jsp/" p:suffix=".jsp" />
+
+	<!--使用Spring的文件上传功能，需要在上下文中配置MultipartResolver。-->
+	<!--p:maxUploadSize="5242880" 上传文件大小限制、单位为字节，这里表示5MB-->
+	<!--p:uploadTempDir="upload/temp" 上传文件的临时路径-->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"
+		p:defaultEncoding="utf-8"/>
+
+	<!--详见第5章 Spring容器高级主题-->
+	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource"
+		p:basename="i18n/messages" />
+
+    <!--详见第十五章 异常处理 WEB异常解析处理-->
+	<bean id="exceptionResolver" class="com.whz.web.controller.ForumHandlerExceptionResolver">
+		<property name="defaultErrorView">
+			<value>fail</value>
+		</property>
+		<property name="exceptionMappings">
+			<props>
+				<prop key="java.lang.RuntimeException">fail</prop>
+			</props>
+		</property>
+	</bean>
+</beans>  

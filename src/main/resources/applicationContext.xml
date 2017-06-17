@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+    <!-- 数据访问层配置 -->
+    <import resource="classpath:/baobaotao-dao.xml" />
+     <!--服务层配置 -->
+    <import resource="classpath:/baobaotao-service.xml" />
+
+    <!--配置解析：system.properties-->
+    <bean id="systemPropertyService" class="com.whz.support.PropertyFileParserHelper">
+        <property name="locations">
+            <list>
+                <value>classpath:system.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <!--配置系统启动时从数据库初始化系统参数-->
+    <bean id="systemParameterService" class="com.whz.service.SystemParameterService" init-method="init">
+        <property name="clazz">
+            <value>com.whz.constant.SystemParamter</value>
+        </property>
+    </bean>
+
+    <!--配置解析：config.xml-->
+    <bean id="configService" class="com.whz.service.ConfigServices" init-method="init" >
+        <property name="configLocation">
+            <value>classpath:config.xml</value>
+        </property>
+    </bean>
+
+    <!--ApplicationContextHolder帮助类，必须在配置一个Bean-->
+    <bean id="ApplicationContextHolder" class="com.whz.support.ApplicationContextHolder"></bean>
+
+</beans>
+  
