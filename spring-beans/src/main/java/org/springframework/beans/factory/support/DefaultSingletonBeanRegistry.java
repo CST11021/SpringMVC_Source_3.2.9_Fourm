@@ -22,7 +22,7 @@ import org.springframework.core.SimpleAliasRegistry;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-// 默认的单例 Bean 注册实现类
+// 默认的单例 Bean 注册实现
 public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements SingletonBeanRegistry {
 
 	protected final Log logger = LogFactory.getLog(getClass());
