@@ -163,8 +163,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 		//步骤四： 这里的情况是bean是一个原型bean，或是一个未被加载的单例bean，并且这个bean不是工厂bean
 		else {
-			// Fail if we're already creating this bean instance:
-			// We're assumably within a circular reference.
+			// Fail if we're already creating this bean instance:We're assumably within a circular reference.
 			// 这里判断是否是原型bean，和是否存在循环依赖，如果原型模式存在循环依赖，则抛出异常，原型模式不允许循环依赖
 			if (isPrototypeCurrentlyInCreation(beanName)) {
 				throw new BeanCurrentlyInCreationException(beanName);
@@ -173,6 +172,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			//步骤五：
 			// 这里对IOC容器里的BeanDefinition是否存在进行检查，检查是否能在当前的BeanFactory中取到我们需要的bean。如果在当前的工厂中取不到，
 			// 则到双亲BeanFactory中去取；如果当前的双亲工厂取不到，那就顺着双亲BeanFactory链一直向上查找
+
 			// 如果BeanDefinitionMap中也就是在所有已经加载的类中不包括beanName则尝试从ParentBeanFactory中检测，
 			// containsBeanDefinition它是在检测当前加载的xml文件中是否包含BeanName对应的配置，如果不包含就到parentBeanFactory去尝试去获取bean了
 			BeanFactory parentBeanFactory = getParentBeanFactory();
