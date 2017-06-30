@@ -13,6 +13,25 @@ public class TestBean {
     @Setter
     private String testStr = "testStr";
 
+    private String[] value;
+    private String[] params;
+
+    public String[] getValue() {
+        return value;
+    }
+
+    public void setValue(String[] value) {
+        this.value = value;
+    }
+
+    public String[] getParams() {
+        return params;
+    }
+
+    public void setParams(String[] params) {
+        this.params = params;
+    }
+
     public void test() {
         try {
             Thread.sleep(3000);

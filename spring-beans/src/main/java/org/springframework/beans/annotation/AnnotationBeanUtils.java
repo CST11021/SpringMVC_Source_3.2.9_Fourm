@@ -27,36 +27,19 @@ import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringValueResolver;
 
-/**
- * General utility methods for working with annotations in JavaBeans style.
- *
- * @author Rob Harrop
- * @author Juergen Hoeller
- * @since 2.0
- */
+// 注解bean工具类，用于将注解的属性值复制到对应的目标bean
 public abstract class AnnotationBeanUtils {
 
-	/**
-	 * Copy the properties of the supplied {@link Annotation} to the supplied target bean.
-	 * Any properties defined in {@code excludedProperties} will not be copied.
-	 * @param ann the annotation to copy from
-	 * @param bean the bean instance to copy to
-	 * @param excludedProperties the names of excluded properties, if any
-	 * @see org.springframework.beans.BeanWrapper
-	 */
 	public static void copyPropertiesToBean(Annotation ann, Object bean, String... excludedProperties) {
 		copyPropertiesToBean(ann, bean, null, excludedProperties);
 	}
 
 	/**
-	 * Copy the properties of the supplied {@link Annotation} to the supplied target bean.
-	 * Any properties defined in {@code excludedProperties} will not be copied.
-	 * <p>A specified value resolver may resolve placeholders in property values, for example.
-	 * @param ann the annotation to copy from
-	 * @param bean the bean instance to copy to
-	 * @param valueResolver a resolve to post-process String property values (may be {@code null})
-	 * @param excludedProperties the names of excluded properties, if any
-	 * @see org.springframework.beans.BeanWrapper
+	 * 将注解提供的属性值复制到目标Bean中，例如，注解提供了一个value属性，则将该属性复制到目标的value属性中
+	 * @param ann
+	 * @param bean 目标bean，需提供Setter方法
+	 * @param valueResolver 指定的值的解析器可能解决属性值的占位符
+	 * @param excludedProperties excludedproperties 中定义的属性不可复制
 	 */
 	public static void copyPropertiesToBean(Annotation ann, Object bean, StringValueResolver valueResolver, String... excludedProperties) {
 		Set<String> excluded =  new HashSet<String>(Arrays.asList(excludedProperties));
