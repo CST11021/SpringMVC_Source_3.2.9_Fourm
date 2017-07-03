@@ -19,6 +19,8 @@ package org.springframework.core.type;
 import java.lang.reflect.Modifier;
 import java.util.LinkedHashSet;
 
+import com.whz.domain.User;
+import org.junit.Test;
 import org.springframework.util.Assert;
 
 /**
@@ -32,19 +34,20 @@ public class StandardClassMetadata implements ClassMetadata {
 
 	private final Class introspectedClass;
 
-
-	/**
-	 * Create a new StandardClassMetadata wrapper for the given Class.
-	 * @param introspectedClass the Class to introspect
-	 */
+	// 构造器
 	public StandardClassMetadata(Class introspectedClass) {
 		Assert.notNull(introspectedClass, "Class must not be null");
 		this.introspectedClass = introspectedClass;
 	}
 
-	/**
-	 * Return the underlying Class.
-	 */
+	public static class A {}
+	public static void main(String[] args){
+		A a = new A();
+		StandardClassMetadata metadata = new StandardClassMetadata(a.getClass());
+		System.out.println("");
+	}
+
+
 	public final Class getIntrospectedClass() {
 		return this.introspectedClass;
 	}
@@ -53,47 +56,37 @@ public class StandardClassMetadata implements ClassMetadata {
 	public String getClassName() {
 		return this.introspectedClass.getName();
 	}
-
 	public boolean isInterface() {
 		return this.introspectedClass.isInterface();
 	}
-
 	public boolean isAbstract() {
 		return Modifier.isAbstract(this.introspectedClass.getModifiers());
 	}
-
 	public boolean isConcrete() {
 		return !(isInterface() || isAbstract());
 	}
-
 	public boolean isFinal() {
 		return Modifier.isFinal(this.introspectedClass.getModifiers());
 	}
-
 	public boolean isIndependent() {
 		return (!hasEnclosingClass() ||
 				(this.introspectedClass.getDeclaringClass() != null &&
 						Modifier.isStatic(this.introspectedClass.getModifiers())));
 	}
-
 	public boolean hasEnclosingClass() {
 		return (this.introspectedClass.getEnclosingClass() != null);
 	}
-
 	public String getEnclosingClassName() {
 		Class enclosingClass = this.introspectedClass.getEnclosingClass();
 		return (enclosingClass != null ? enclosingClass.getName() : null);
 	}
-
 	public boolean hasSuperClass() {
 		return (this.introspectedClass.getSuperclass() != null);
 	}
-
 	public String getSuperClassName() {
 		Class superClass = this.introspectedClass.getSuperclass();
 		return (superClass != null ? superClass.getName() : null);
 	}
-
 	public String[] getInterfaceNames() {
 		Class[] ifcs = this.introspectedClass.getInterfaces();
 		String[] ifcNames = new String[ifcs.length];
@@ -102,7 +95,6 @@ public class StandardClassMetadata implements ClassMetadata {
 		}
 		return ifcNames;
 	}
-
 	public String[] getMemberClassNames() {
 		LinkedHashSet<String> memberClassNames = new LinkedHashSet<String>();
 		for (Class<?> nestedClass : this.introspectedClass.getDeclaredClasses()) {

@@ -22,8 +22,12 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.whz.web.controller.TestController;
+import org.jruby.RubyProcess;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * {@link AnnotationMetadata} implementation that uses standard reflection
@@ -38,31 +42,13 @@ public class StandardAnnotationMetadata extends StandardClassMetadata implements
 
 	private final boolean nestedAnnotationsAsMap;
 
-
-	/**
-	 * Create a new {@code StandardAnnotationMetadata} wrapper for the given Class.
-	 * @param introspectedClass the Class to introspect
-	 * @see #StandardAnnotationMetadata(Class, boolean)
-	 */
 	public StandardAnnotationMetadata(Class<?> introspectedClass) {
 		this(introspectedClass, false);
 	}
-
-	/**
-	 * Create a new {@link StandardAnnotationMetadata} wrapper for the given Class,
-	 * providing the option to return any nested annotations or annotation arrays in the
-	 * form of {@link AnnotationAttributes} instead of actual {@link Annotation} instances.
-	 * @param introspectedClass the Class to instrospect
-	 * @param nestedAnnotationsAsMap return nested annotations and annotation arrays as
-	 * {@link AnnotationAttributes} for compatibility with ASM-based
-	 * {@link AnnotationMetadata} implementations
-	 * @since 3.1.1
-	 */
 	public StandardAnnotationMetadata(Class<?> introspectedClass, boolean nestedAnnotationsAsMap) {
 		super(introspectedClass);
 		this.nestedAnnotationsAsMap = nestedAnnotationsAsMap;
 	}
-
 
 	public Set<String> getAnnotationTypes() {
 		Set<String> types = new LinkedHashSet<String>();
@@ -72,7 +58,6 @@ public class StandardAnnotationMetadata extends StandardClassMetadata implements
 		}
 		return types;
 	}
-
 	public Set<String> getMetaAnnotationTypes(String annotationType) {
 		Annotation[] anns = getIntrospectedClass().getAnnotations();
 		for (Annotation ann : anns) {
@@ -90,7 +75,6 @@ public class StandardAnnotationMetadata extends StandardClassMetadata implements
 		}
 		return null;
 	}
-
 	public boolean hasAnnotation(String annotationType) {
 		Annotation[] anns = getIntrospectedClass().getAnnotations();
 		for (Annotation ann : anns) {
@@ -100,7 +84,6 @@ public class StandardAnnotationMetadata extends StandardClassMetadata implements
 		}
 		return false;
 	}
-
 	public boolean hasMetaAnnotation(String annotationType) {
 		Annotation[] anns = getIntrospectedClass().getAnnotations();
 		for (Annotation ann : anns) {
@@ -118,7 +101,6 @@ public class StandardAnnotationMetadata extends StandardClassMetadata implements
 		}
 		return false;
 	}
-
 	public boolean isAnnotated(String annotationType) {
 		Annotation[] anns = getIntrospectedClass().getAnnotations();
 		for (Annotation ann : anns) {
@@ -133,11 +115,9 @@ public class StandardAnnotationMetadata extends StandardClassMetadata implements
 		}
 		return false;
 	}
-
 	public Map<String, Object> getAnnotationAttributes(String annotationType) {
 		return this.getAnnotationAttributes(annotationType, false);
 	}
-
 	public Map<String, Object> getAnnotationAttributes(String annotationType, boolean classValuesAsString) {
 		Annotation[] anns = getIntrospectedClass().getAnnotations();
 		for (Annotation ann : anns) {
@@ -156,7 +136,6 @@ public class StandardAnnotationMetadata extends StandardClassMetadata implements
 		}
 		return null;
 	}
-
 	public boolean hasAnnotatedMethods(String annotationType) {
 		Method[] methods = getIntrospectedClass().getDeclaredMethods();
 		for (Method method : methods) {
@@ -177,7 +156,6 @@ public class StandardAnnotationMetadata extends StandardClassMetadata implements
 		}
 		return false;
 	}
-
 	public Set<MethodMetadata> getAnnotatedMethods(String annotationType) {
 		Set<MethodMetadata> annotatedMethods = new LinkedHashSet<MethodMetadata>();
 		Method[] methods = getIntrospectedClass().getDeclaredMethods();
@@ -202,4 +180,54 @@ public class StandardAnnotationMetadata extends StandardClassMetadata implements
 		return annotatedMethods;
 	}
 
+	// 测试
+	public static void main(String[] args){
+		RequestMapping requestMapping = new RequestMapping(){
+
+			@Override
+			public Class<? extends Annotation> annotationType() {
+				return RequestMapping.class;
+			}
+
+			@Override
+			public String[] value() {
+				return new String[0];
+			}
+
+			@Override
+			public RequestMethod[] method() {
+				return new RequestMethod[0];
+			}
+
+			@Override
+			public String[] params() {
+				return new String[0];
+			}
+
+			@Override
+			public String[] headers() {
+				return new String[0];
+			}
+
+			@Override
+			public String[] consumes() {
+				return new String[0];
+			}
+
+			@Override
+			public String[] produces() {
+				return new String[0];
+			}
+		};
+
+		StandardAnnotationMetadata metadata = new StandardAnnotationMetadata(requestMapping.getClass());
+		StandardAnnotationMetadata metadata1 = new StandardAnnotationMetadata(TestController.class);
+		String ann = "org.springframework.stereotype.Controller";
+		String ann1 = "org.springframework.stereotype.Service";
+		String ann2 = "java.lang.annotation.Target";
+		String ann3 = "org.springframework.web.bind.annotation.RequestMapping";
+		metadata1.hasAnnotatedMethods(ann3);
+		System.out.println();
+
+	}
 }
