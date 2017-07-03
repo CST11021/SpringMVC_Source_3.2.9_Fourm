@@ -31,11 +31,7 @@ import org.springframework.core.type.AnnotationMetadata;
  */
 public interface AnnotatedBeanDefinition extends BeanDefinition {
 
-	/**
-	 * Obtain the annotation metadata (as well as basic class metadata)
-	 * for this bean definition's bean class.
-	 * @return the annotation metadata object (never {@code null})
-	 */
+	// 返回注解的元数据对象
 	AnnotationMetadata getMetadata();
 
 }

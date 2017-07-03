@@ -34,9 +34,8 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * Internal class for managing injection metadata.
- * Not intended for direct use in applications.
- *
+ * Internal class for managing injection metadata. Not intended for direct use in applications.
+ * 管理注入元数据的内部类。不打算在应用程序中直接使用。
  * <p>Used by {@link AutowiredAnnotationBeanPostProcessor},
  * {@link org.springframework.context.annotation.CommonAnnotationBeanPostProcessor} and
  * {@link org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor}.
@@ -47,18 +46,16 @@ import org.springframework.util.ReflectionUtils;
 public class InjectionMetadata {
 
 	private final Log logger = LogFactory.getLog(InjectionMetadata.class);
-
 	private final Class<?> targetClass;
-
 	private final Collection<InjectedElement> injectedElements;
-
 	private volatile Set<InjectedElement> checkedElements;
 
-
+	// 构造器
 	public InjectionMetadata(Class<?> targetClass, Collection<InjectedElement> elements) {
 		this.targetClass = targetClass;
 		this.injectedElements = elements;
 	}
+
 
 	public void checkConfigMembers(RootBeanDefinition beanDefinition) {
 		Set<InjectedElement> checkedElements = new LinkedHashSet<InjectedElement>(this.injectedElements.size());
@@ -74,7 +71,6 @@ public class InjectionMetadata {
 		}
 		this.checkedElements = checkedElements;
 	}
-
 	public void inject(Object target, String beanName, PropertyValues pvs) throws Throwable {
 		Collection<InjectedElement> elementsToIterate =
 				(this.checkedElements != null ? this.checkedElements : this.injectedElements);
@@ -93,18 +89,14 @@ public class InjectionMetadata {
 	public static boolean needsRefresh(InjectionMetadata metadata, Class<?> clazz) {
 		return (metadata == null || !metadata.targetClass.equals(clazz));
 	}
-
-
 	public static abstract class InjectedElement {
 
 		protected final Member member;
-
 		protected final boolean isField;
-
 		protected final PropertyDescriptor pd;
-
 		protected volatile Boolean skip;
 
+		// 构造器
 		protected InjectedElement(Member member, PropertyDescriptor pd) {
 			this.member = member;
 			this.isField = (member instanceof Field);
@@ -114,7 +106,6 @@ public class InjectionMetadata {
 		public final Member getMember() {
 			return this.member;
 		}
-
 		protected final Class<?> getResourceType() {
 			if (this.isField) {
 				return ((Field) this.member).getType();
@@ -126,25 +117,21 @@ public class InjectionMetadata {
 				return ((Method) this.member).getParameterTypes()[0];
 			}
 		}
-
 		protected final void checkResourceType(Class<?> resourceType) {
 			if (this.isField) {
 				Class<?> fieldType = ((Field) this.member).getType();
 				if (!(resourceType.isAssignableFrom(fieldType) || fieldType.isAssignableFrom(resourceType))) {
-					throw new IllegalStateException("Specified field type [" + fieldType +
-							"] is incompatible with resource type [" + resourceType.getName() + "]");
+					throw new IllegalStateException("Specified field type [" + fieldType + "] is incompatible with resource type [" + resourceType.getName() + "]");
 				}
 			}
 			else {
 				Class<?> paramType =
 						(this.pd != null ? this.pd.getPropertyType() : ((Method) this.member).getParameterTypes()[0]);
 				if (!(resourceType.isAssignableFrom(paramType) || paramType.isAssignableFrom(resourceType))) {
-					throw new IllegalStateException("Specified parameter type [" + paramType +
-							"] is incompatible with resource type [" + resourceType.getName() + "]");
+					throw new IllegalStateException("Specified parameter type [" + paramType + "] is incompatible with resource type [" + resourceType.getName() + "]");
 				}
 			}
 		}
-
 		/**
 		 * Either this or {@link #getResourceToInject} needs to be overridden.
 		 */
@@ -168,7 +155,6 @@ public class InjectionMetadata {
 				}
 			}
 		}
-
 		/**
 		 * Checks whether this injector's property needs to be skipped due to
 		 * an explicit property value having been specified. Also marks the
@@ -200,7 +186,6 @@ public class InjectionMetadata {
 				return false;
 			}
 		}
-
 		/**
 		 * Either this or {@link #inject} needs to be overridden.
 		 */
@@ -219,12 +204,10 @@ public class InjectionMetadata {
 			InjectedElement otherElement = (InjectedElement) other;
 			return this.member.equals(otherElement.member);
 		}
-
 		@Override
 		public int hashCode() {
 			return this.member.getClass().hashCode() * 29 + this.member.getName().hashCode();
 		}
-
 		@Override
 		public String toString() {
 			return getClass().getSimpleName() + " for " + this.member;

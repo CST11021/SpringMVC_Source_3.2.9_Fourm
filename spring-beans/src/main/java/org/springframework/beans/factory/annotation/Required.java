@@ -21,17 +21,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Marks a method (typically a JavaBean setter method) as being 'required': that is,
- * the setter method must be configured to be dependency-injected with a value.
- *
- * <p>Please do consult the javadoc for the {@link RequiredAnnotationBeanPostProcessor}
- * class (which, by default, checks for the presence of this annotation).
- *
- * @author Rob Harrop
- * @since 2.0
- * @see RequiredAnnotationBeanPostProcessor
- */
+// 如果任何带有@Required的属性未设置的话 将会抛出BeanInitializationException异常
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Required {

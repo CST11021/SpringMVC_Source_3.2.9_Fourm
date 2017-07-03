@@ -76,13 +76,14 @@ public class BeanFactoryAnnotationUtils {
 	 * @throws NoSuchBeanDefinitionException if no matching bean of type {@code T} found
 	 */
 	private static <T> T qualifiedBeanOfType(ConfigurableListableBeanFactory bf, Class<T> beanType, String qualifier) {
+		// 获取beanType类型的所有bean
 		Map<String, T> candidateBeans = BeanFactoryUtils.beansOfTypeIncludingAncestors(bf, beanType);
 		T matchingBean = null;
+
 		for (String beanName : candidateBeans.keySet()) {
 			if (isQualifierMatch(qualifier, beanName, bf)) {
 				if (matchingBean != null) {
-					throw new NoSuchBeanDefinitionException(qualifier, "No unique " + beanType.getSimpleName() +
-							" bean found for qualifier '" + qualifier + "'");
+					throw new NoSuchBeanDefinitionException(qualifier, "No unique " + beanType.getSimpleName() + " bean found for qualifier '" + qualifier + "'");
 				}
 				matchingBean = candidateBeans.get(beanName);
 			}
@@ -108,7 +109,8 @@ public class BeanFactoryAnnotationUtils {
 	private static boolean isQualifierMatch(String qualifier, String beanName, ConfigurableListableBeanFactory bf) {
 		if (bf.containsBean(beanName)) {
 			try {
-				BeanDefinition bd = bf.getMergedBeanDefinition(beanName);
+				BeanDefinition bd = bf.getMergedBeanDefinition(beanName);// 从工厂中获取这个Bean
+
 				if (bd instanceof AbstractBeanDefinition) {
 					AbstractBeanDefinition abd = (AbstractBeanDefinition) bd;
 					AutowireCandidateQualifier candidate = abd.getQualifier(Qualifier.class.getName());
@@ -126,6 +128,7 @@ public class BeanFactoryAnnotationUtils {
 						}
 					}
 				}
+
 			}
 			catch (NoSuchBeanDefinitionException ex) {
 				// ignore - can't compare qualifiers for a manually registered singleton object
