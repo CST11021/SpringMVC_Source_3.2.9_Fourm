@@ -18,23 +18,10 @@ package org.springframework.beans.factory.access;
 
 import org.springframework.beans.factory.BeanFactory;
 
-/**
- * Used to track a reference to a {@link BeanFactory} obtained through
- * a {@link BeanFactoryLocator}.
- *
- * <p>It is safe to call {@link #release()} multiple times, but
- * {@link #getFactory()} must not be called after calling release.
- *
- * @author Colin Sampaleanu
- * @see BeanFactoryLocator
- * @see org.springframework.context.access.ContextBeanFactoryReference
- */
+// BeanFactoryReference接口通常被BeanFactory实现，用于返回依赖的BeanFactory
 public interface BeanFactoryReference {
 
-	/**
-	 * Return the {@link BeanFactory} instance held by this reference.
-	 * @throws IllegalStateException if invoked after {@code release()} has been called
-	 */
+	// 返回依赖的BeanFactory
 	BeanFactory getFactory();
 
 	/**

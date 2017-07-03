@@ -270,40 +270,13 @@ import org.springframework.core.io.support.ResourcePatternUtils;
 public class SingletonBeanFactoryLocator implements BeanFactoryLocator {
 
 	private static final String DEFAULT_RESOURCE_LOCATION = "classpath*:beanRefFactory.xml";
-
 	protected static final Log logger = LogFactory.getLog(SingletonBeanFactoryLocator.class);
 
-	/** The keyed BeanFactory instances */
+
 	private static final Map<String, BeanFactoryLocator> instances = new HashMap<String, BeanFactoryLocator>();
-
-
-	/**
-	 * Returns an instance which uses the default "classpath*:beanRefFactory.xml",
-	 * as the name of the definition file(s). All resources returned by calling the
-	 * current thread context ClassLoader's {@code getResources} method with
-	 * this name will be combined to create a BeanFactory definition set.
-	 * @return the corresponding BeanFactoryLocator instance
-	 * @throws BeansException in case of factory loading failure
-	 */
 	public static BeanFactoryLocator getInstance() throws BeansException {
 		return getInstance(null);
 	}
-
-	/**
-	 * Returns an instance which uses the the specified selector, as the name of the
-	 * definition file(s). In the case of a name with a Spring 'classpath*:' prefix,
-	 * or with no prefix, which is treated the same, the current thread context
-	 * ClassLoader's {@code getResources} method will be called with this value
-	 * to get all resources having that name. These resources will then be combined to
-	 * form a definition. In the case where the name uses a Spring 'classpath:' prefix,
-	 * or a standard URL prefix, then only one resource file will be loaded as the
-	 * definition.
-	 * @param selector the name of the resource(s) which will be read and
-	 * combined to form the definition for the BeanFactoryLocator instance.
-	 * Any such files must form a valid BeanFactory definition.
-	 * @return the corresponding BeanFactoryLocator instance
-	 * @throws BeansException in case of factory loading failure
-	 */
 	public static BeanFactoryLocator getInstance(String selector) throws BeansException {
 		String resourceLocation = selector;
 		if (resourceLocation == null) {
@@ -332,23 +305,18 @@ public class SingletonBeanFactoryLocator implements BeanFactoryLocator {
 
 
 	// We map BeanFactoryGroup objects by String keys, and by the definition object.
+	// key是resourceLocation，value是BeanFactoryGroup
 	private final Map<String, BeanFactoryGroup> bfgInstancesByKey = new HashMap<String, BeanFactoryGroup>();
-
 	private final Map<BeanFactory, BeanFactoryGroup> bfgInstancesByObj = new HashMap<BeanFactory, BeanFactoryGroup>();
-
 	private final String resourceLocation;
 
 
-	/**
-	 * Constructor which uses the the specified name as the resource name
-	 * of the definition file(s).
-	 * @param resourceLocation the Spring resource location to use
-	 * (either a URL or a "classpath:" / "classpath*:" pseudo URL)
-	 */
+	// 构造器
 	protected SingletonBeanFactoryLocator(String resourceLocation) {
 		this.resourceLocation = resourceLocation;
 	}
 
+	// 指定factoryKey，返回这个key对应的BeanFactory的一个BeanFactoryReference，BeanFactoryReference用于返回依赖的BeanFactory
 	public BeanFactoryReference useBeanFactory(String factoryKey) throws BeansException {
 		synchronized (this.bfgInstancesByKey) {
 			BeanFactoryGroup bfg = this.bfgInstancesByKey.get(this.resourceLocation);
@@ -357,13 +325,11 @@ public class SingletonBeanFactoryLocator implements BeanFactoryLocator {
 				bfg.refCount++;
 			}
 			else {
-				// This group definition doesn't exist, we need to try to load it.
 				if (logger.isTraceEnabled()) {
-					logger.trace("Factory group with resource name [" + this.resourceLocation +
-							"] requested. Creating new instance.");
+					logger.trace("Factory group with resource name [" + this.resourceLocation + "] requested. Creating new instance.");
 				}
 
-				// Create the BeanFactory but don't initialize it.
+				// groupContext是根据这个resourceLocation 创建的一个BeanFactory，但不初始化这个工厂的bean实例
 				BeanFactory groupContext = createDefinition(this.resourceLocation, factoryKey);
 
 				// Record its existence now, before instantiating any singletons.
@@ -378,6 +344,7 @@ public class SingletonBeanFactoryLocator implements BeanFactoryLocator {
 				// mappings, the next time it will be found and simply have its
 				// reference count incremented.
 				try {
+					// 加载这个bean工厂的单例bean
 					initializeDefinition(groupContext);
 				}
 				catch (BeansException ex) {
@@ -406,22 +373,7 @@ public class SingletonBeanFactoryLocator implements BeanFactoryLocator {
 		}
 	}
 
-	/**
-	 * Actually creates definition in the form of a BeanFactory, given a resource name
-	 * which supports standard Spring resource prefixes ('classpath:', 'classpath*:', etc.)
-	 * This is split out as a separate method so that subclasses can override the actual
-	 * type used (to be an ApplicationContext, for example).
-	 * <p>The default implementation simply builds a
-	 * {@link org.springframework.beans.factory.support.DefaultListableBeanFactory}
-	 * and populates it using an
-	 * {@link org.springframework.beans.factory.xml.XmlBeanDefinitionReader}.
-	 * <p>This method should not instantiate any singletons. That function is performed
-	 * by {@link #initializeDefinition initializeDefinition()}, which should also be
-	 * overridden if this method is.
-	 * @param resourceLocation the resource location for this factory group
-	 * @param factoryKey the bean name of the factory to obtain
-	 * @return the corresponding BeanFactory reference
-	 */
+	// 指定配置文件创建一个BeanFactory
 	protected BeanFactory createDefinition(String resourceLocation, String factoryKey) {
 		DefaultListableBeanFactory factory = new DefaultListableBeanFactory();
 		XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(factory);
@@ -447,23 +399,14 @@ public class SingletonBeanFactoryLocator implements BeanFactoryLocator {
 		return factory;
 	}
 
-	/**
-	 * Instantiate singletons and do any other normal initialization of the factory.
-	 * Subclasses that override {@link #createDefinition createDefinition()} should
-	 * also override this method.
-	 * @param groupDef the factory returned by {@link #createDefinition createDefinition()}
-	 */
+	// 加载单例bean：调用useBeanFactory方法时会进行初始化
 	protected void initializeDefinition(BeanFactory groupDef) {
 		if (groupDef instanceof ConfigurableListableBeanFactory) {
 			((ConfigurableListableBeanFactory) groupDef).preInstantiateSingletons();
 		}
 	}
 
-	/**
-	 * Destroy definition in separate method so subclass may work with other definition types.
-	 * @param groupDef the factory returned by {@link #createDefinition createDefinition()}
-	 * @param selector the resource location for this factory group
-	 */
+	// 销毁groupDef 的单例Bean
 	protected void destroyDefinition(BeanFactory groupDef, String selector) {
 		if (groupDef instanceof ConfigurableBeanFactory) {
 			if (logger.isTraceEnabled()) {
@@ -475,24 +418,20 @@ public class SingletonBeanFactoryLocator implements BeanFactoryLocator {
 	}
 
 
-	/**
-	 * We track BeanFactory instances with this class.
-	 */
+	// 封装 definition 依赖的个数
 	private static class BeanFactoryGroup {
 
 		private BeanFactory definition;
 
+		// refCount：用来记录实例被外部引用的记数，当调用locator.useBeanFactory(parentContextKey)方法时，引用数就会加1，
+		// 当调用CountingBeanFactoryReference#release方法时，引用数就会减1，当它变成0时，Spring就会释放掉它占用的内存，
+		// 同时也会销毁掉它definition变量引用的BeanFactory。下次再调用locator.useBeanFactory(parentContextKey)就会重新
+		// 初始化BeanFactory。
 		private int refCount = 0;
 	}
-
-
-	/**
-	 * BeanFactoryReference implementation for this locator.
-	 */
+	// groupContextRef 依赖 beanFactory
 	private class CountingBeanFactoryReference implements BeanFactoryReference {
-
 		private BeanFactory beanFactory;
-
 		private BeanFactory groupContextRef;
 
 		public CountingBeanFactoryReference(BeanFactory beanFactory, BeanFactory groupContext) {
@@ -500,6 +439,7 @@ public class SingletonBeanFactoryLocator implements BeanFactoryLocator {
 			this.groupContextRef = groupContext;
 		}
 
+		// 返回依赖的BeanFactory
 		public BeanFactory getFactory() {
 			return this.beanFactory;
 		}

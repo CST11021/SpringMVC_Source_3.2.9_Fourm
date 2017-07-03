@@ -52,17 +52,7 @@ import org.springframework.beans.BeansException;
  */
 public interface BeanFactoryLocator {
 
-	/**
-	 * Use the {@link org.springframework.beans.factory.BeanFactory} (or derived
-	 * interface such as {@link org.springframework.context.ApplicationContext})
-	 * specified by the {@code factoryKey} parameter.
-	 * <p>The definition is possibly loaded/created as needed.
-	 * @param factoryKey a resource name specifying which {@code BeanFactory} the
-	 * {@code BeanFactoryLocator} must return for usage. The actual meaning of the
-	 * resource name is specific to the implementation of {@code BeanFactoryLocator}.
-	 * @return the {@code BeanFactory} instance, wrapped as a {@link BeanFactoryReference} object
-	 * @throws BeansException if there is an error loading or accessing the {@code BeanFactory}
-	 */
+	// 指定factoryKey，这个key对应一个BeanFactory实例，返回这个BeanFactory实例的一个BeanFactoryReference，BeanFactoryReference用于返回依赖的BeanFactory
 	BeanFactoryReference useBeanFactory(String factoryKey) throws BeansException;
 
 }
