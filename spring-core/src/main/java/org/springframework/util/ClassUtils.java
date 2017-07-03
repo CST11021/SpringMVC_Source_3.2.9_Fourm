@@ -951,22 +951,7 @@ public abstract class ClassUtils {
 		return className.replace('.', '/');
 	}
 
-	/**
-	 * Return a path suitable for use with {@code ClassLoader.getResource}
-	 * (also suitable for use with {@code Class.getResource} by prepending a
-	 * slash ('/') to the return value). Built by taking the package of the specified
-	 * class file, converting all dots ('.') to slashes ('/'), adding a trailing slash
-	 * if necessary, and concatenating the specified resource name to this.
-	 * <br/>As such, this function may be used to build a path suitable for
-	 * loading a resource file that is in the same package as a class file,
-	 * although {@link org.springframework.core.io.ClassPathResource} is usually
-	 * even more convenient.
-	 * @param clazz    the Class whose package will be used as the base
-	 * @param resourceName the resource name to append. A leading slash is optional.
-	 * @return the built-up resource path
-	 * @see ClassLoader#getResource
-	 * @see Class#getResource
-	 */
+	// 返回一个路径 = clazz所在位置 + “/” + resourceName
 	public static String addResourcePathToPackagePath(Class<?> clazz, String resourceName) {
 		Assert.notNull(resourceName, "Resource name must not be null");
 		if (!resourceName.startsWith("/")) {
