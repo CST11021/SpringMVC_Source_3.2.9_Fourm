@@ -28,17 +28,9 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.beans.factory.BeanFactory;
 
-/**
- * Unified EL {@code ELResolver} that delegates to a Spring BeanFactory,
- * resolving name references to Spring-defined beans.
- *
- * @author Juergen Hoeller
- * @since 2.5.2
- * @see org.springframework.web.jsf.el.SpringBeanFacesELResolver
- */
+// 通用EL的ELResolver，代理一个spring BeanFactory，将名称引用解析为spring定义的bean。
 public abstract class SpringBeanELResolver extends ELResolver {
 
-	/** Logger available to subclasses */
 	protected final Log logger = LogFactory.getLog(getClass());
 
 
@@ -112,11 +104,7 @@ public abstract class SpringBeanELResolver extends ELResolver {
 	}
 
 
-	/**
-	 * Retrieve the Spring BeanFactory to delegate bean name resolution to.
-	 * @param elContext the current ELContext
-	 * @return the Spring BeanFactory (never {@code null})
-	 */
+	// 返回被代理的BeanFactory
 	protected abstract BeanFactory getBeanFactory(ELContext elContext);
 
 }
