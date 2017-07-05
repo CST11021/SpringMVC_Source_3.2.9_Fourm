@@ -25,23 +25,14 @@ package org.springframework.beans;
  */
 public abstract class PropertyAccessorUtils {
 
-	/**
-	 * Return the actual property name for the given property path.
-	 * @param propertyPath the property path to determine the property name
-	 * for (can include property keys, for example for specifying a map entry)
-	 * @return the actual property name, without any key elements
-	 */
+	// 例如：map[key1] --> map
 	public static String getPropertyName(String propertyPath) {
 		int separatorIndex = (propertyPath.endsWith(PropertyAccessor.PROPERTY_KEY_SUFFIX) ?
 				propertyPath.indexOf(PropertyAccessor.PROPERTY_KEY_PREFIX_CHAR) : -1);
 		return (separatorIndex != -1 ? propertyPath.substring(0, separatorIndex) : propertyPath);
 	}
 
-	/**
-	 * Check whether the given property path indicates an indexed or nested property.
-	 * @param propertyPath the property path to check
-	 * @return whether the path indicates an indexed or nested property
-	 */
+	// 如果 propertyPath 含有"."或"[" 则返回true
 	public static boolean isNestedOrIndexedProperty(String propertyPath) {
 		if (propertyPath == null) {
 			return false;
@@ -57,32 +48,19 @@ public abstract class PropertyAccessorUtils {
 	}
 
 	/**
-	 * Determine the first nested property separator in the
-	 * given property path, ignoring dots in keys (like "map[my.key]").
-	 * @param propertyPath the property path to check
-	 * @return the index of the nested property separator, or -1 if none
+	 * 返回小数点的索引位置，小数点必须在字母后面，如果是在不合法的位置则返回-1，
+	 * map[my.key]] --> 6
+	 * .map[mykey]] --> -1
+	 * map[mykey].] --> -1
+	 * @param propertyPath
+	 * @return
 	 */
 	public static int getFirstNestedPropertySeparatorIndex(String propertyPath) {
 		return getNestedPropertySeparatorIndex(propertyPath, false);
 	}
-
-	/**
-	 * Determine the first nested property separator in the
-	 * given property path, ignoring dots in keys (like "map[my.key]").
-	 * @param propertyPath the property path to check
-	 * @return the index of the nested property separator, or -1 if none
-	 */
 	public static int getLastNestedPropertySeparatorIndex(String propertyPath) {
 		return getNestedPropertySeparatorIndex(propertyPath, true);
 	}
-
-	/**
-	 * Determine the first (or last) nested property separator in the
-	 * given property path, ignoring dots in keys (like "map[my.key]").
-	 * @param propertyPath the property path to check
-	 * @param last whether to return the last separator rather than the first
-	 * @return the index of the nested property separator, or -1 if none
-	 */
 	private static int getNestedPropertySeparatorIndex(String propertyPath, boolean last) {
 		boolean inKey = false;
 		int length = propertyPath.length();
@@ -116,9 +94,11 @@ public abstract class PropertyAccessorUtils {
 	 * @return whether the paths match
 	 */
 	public static boolean matchesProperty(String registeredPath, String propertyPath) {
+		// registeredPath 不以 propertyPath 开头返回false
 		if (!registeredPath.startsWith(propertyPath)) {
 			return false;
 		}
+		// 长度相等
 		if (registeredPath.length() == propertyPath.length()) {
 			return true;
 		}
@@ -129,14 +109,8 @@ public abstract class PropertyAccessorUtils {
 				registeredPath.length() - 1);
 	}
 
-	/**
-	 * Determine the canonical name for the given property path.
-	 * Removes surrounding quotes from map keys:<br>
-	 * {@code map['key']} -> {@code map[key]}<br>
-	 * {@code map["key"]} -> {@code map[key]}
-	 * @param propertyName the bean property path
-	 * @return the canonical representation of the property path
-	 */
+	// map['key'] -> map[key]
+	// map["key"] -> map[key]
 	public static String canonicalPropertyName(String propertyName) {
 		if (propertyName == null) {
 			return "";
@@ -163,14 +137,6 @@ public abstract class PropertyAccessorUtils {
 		}
 		return sb.toString();
 	}
-
-	/**
-	 * Determine the canonical names for the given property paths.
-	 * @param propertyNames the bean property paths (as array)
-	 * @return the canonical representation of the property paths
-	 * (as array of the same size)
-	 * @see #canonicalPropertyName(String)
-	 */
 	public static String[] canonicalPropertyNames(String[] propertyNames) {
 		if (propertyNames == null) {
 			return null;
