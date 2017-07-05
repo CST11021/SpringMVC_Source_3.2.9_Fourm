@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.springframework.util.Assert;
 
-// 定义了 Map<String, Object> 数据结果的对象
+// 定义了 Map<String, Object> 数据结构的对象
 @SuppressWarnings("serial")
 public abstract class AttributeAccessorSupport implements AttributeAccessor, Serializable {
 

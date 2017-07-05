@@ -341,28 +341,12 @@ public abstract class Assert {
 		}
 	}
 
-	/**
-	 * Assert that {@code superType.isAssignableFrom(subType)} is {@code true}.
-	 * <pre class="code">Assert.isAssignable(Number.class, myClass);</pre>
-	 * @param superType the super type to check
-	 * @param subType the sub type to check
-	 * @throws IllegalArgumentException if the classes are not assignable
-	 */
+	// 判断是subType是否为superType的对象
 	public static void isAssignable(Class<?> superType, Class<?> subType) {
 		isAssignable(superType, subType, "");
 	}
 
-	/**
-	 * Assert that {@code superType.isAssignableFrom(subType)} is {@code true}.
-	 * <pre class="code">Assert.isAssignable(Number.class, myClass);</pre>
-	 * @param superType the super type to check against
-	 * @param subType the sub type to check
-	 * @param message a message which will be prepended to the message produced by
-	 * the function itself, and which may be used to provide context. It should
-	 * normally end in a ": " or ". " so that the function generate message looks
-	 * ok when prepended to it.
-	 * @throws IllegalArgumentException if the classes are not assignable
-	 */
+	// 判断是subType是否为superType的对象
 	public static void isAssignable(Class<?> superType, Class<?> subType, String message) {
 		notNull(superType, "Type to check against must not be null");
 		if (subType == null || !superType.isAssignableFrom(subType)) {
