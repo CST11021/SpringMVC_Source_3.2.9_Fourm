@@ -46,53 +46,30 @@ import java.util.Set;
  * @see ReflectionUtils
  */
 public abstract class ClassUtils {
-
-	/** Suffix for array class names: "[]" */
+	// Suffix for array class names: "[]"
 	public static final String ARRAY_SUFFIX = "[]";
-
-	/** Prefix for internal array class names: "[" */
+	// Prefix for internal array class names: "["
 	private static final String INTERNAL_ARRAY_PREFIX = "[";
-
-	/** Prefix for internal non-primitive array class names: "[L" */
+	// Prefix for internal non-primitive array class names: "[L"
 	private static final String NON_PRIMITIVE_ARRAY_PREFIX = "[L";
-
-	/** The package separator character '.' */
+	// The package separator character '.'
 	private static final char PACKAGE_SEPARATOR = '.';
-
-	/** The inner class separator character '$' */
+	// 内部类生成的class会包含一个$
 	private static final char INNER_CLASS_SEPARATOR = '$';
-
-	/** The CGLIB class separator character "$$" */
+	// CGLIB生成的代理类会包含一个$$
 	public static final String CGLIB_CLASS_SEPARATOR = "$$";
-
-	/** The ".class" file suffix */
+	// The ".class" file suffix
 	public static final String CLASS_FILE_SUFFIX = ".class";
 
-
-	/**
-	 * Map with primitive wrapper type as key and corresponding primitive
-	 * type as value, for example: Integer.class -> int.class.
-	 */
+	// 原始类型对象到相应类型的映射，如：Integer.class -> int.class.
 	private static final Map<Class<?>, Class<?>> primitiveWrapperTypeMap = new HashMap<Class<?>, Class<?>>(8);
-
-	/**
-	 * Map with primitive type as key and corresponding wrapper
-	 * type as value, for example: int.class -> Integer.class.
-	 */
+	// for example: int.class -> Integer.class.
 	private static final Map<Class<?>, Class<?>> primitiveTypeToWrapperMap = new HashMap<Class<?>, Class<?>>(8);
 
-	/**
-	 * Map with primitive type name as key and corresponding primitive
-	 * type as value, for example: "int" -> "int.class".
-	 */
+	// "int" -> "int.class".
 	private static final Map<String, Class<?>> primitiveTypeNameMap = new HashMap<String, Class<?>>(32);
-
-	/**
-	 * Map with common "java.lang" class name as key and corresponding Class as value.
-	 * Primarily for efficient deserialization of remote invocations.
-	 */
+	// “java.lang”包下类名到相应的Class 映射
 	private static final Map<String, Class<?>> commonClassCache = new HashMap<String, Class<?>>(32);
-
 
 	static {
 		primitiveWrapperTypeMap.put(Boolean.class, boolean.class);
@@ -137,20 +114,7 @@ public abstract class ClassUtils {
 		}
 	}
 
-	/**
-	 * Return the default ClassLoader to use: typically the thread context
-	 * ClassLoader, if available; the ClassLoader that loaded the ClassUtils
-	 * class will be used as fallback.
-	 * <p>Call this method if you intend to use the thread context ClassLoader
-	 * in a scenario where you clearly prefer a non-null ClassLoader reference:
-	 * for example, for class path resource loading (but not necessarily for
-	 * {@code Class.forName}, which accepts a {@code null} ClassLoader
-	 * reference as well).
-	 * @return the default ClassLoader (only {@code null} if even the system
-	 * ClassLoader isn't accessible)
-	 * @see Thread#getContextClassLoader()
-	 * @see ClassLoader#getSystemClassLoader()
-	 */
+	// 获取这个ClassUtils的类加载器
 	public static ClassLoader getDefaultClassLoader() {
 		ClassLoader cl = null;
 		try {
@@ -174,14 +138,7 @@ public abstract class ClassUtils {
 		}
 		return cl;
 	}
-
-	/**
-	 * Override the thread context ClassLoader with the environment's bean ClassLoader
-	 * if necessary, i.e. if the bean ClassLoader is not equivalent to the thread
-	 * context ClassLoader already.
-	 * @param classLoaderToUse the actual ClassLoader to use for the thread context
-	 * @return the original thread context ClassLoader, or {@code null} if not overridden
-	 */
+	// 使用classLoaderToUse作用类加载器（覆盖原有默认的加载器）
 	public static ClassLoader overrideThreadContextClassLoader(ClassLoader classLoaderToUse) {
 		Thread currentThread = Thread.currentThread();
 		ClassLoader threadContextClassLoader = currentThread.getContextClassLoader();
@@ -194,25 +151,11 @@ public abstract class ClassUtils {
 		}
 	}
 
-	/**
-	 * Replacement for {@code Class.forName()} that also returns Class instances
-	 * for primitives (like "int") and array class names (like "String[]").
-	 * <p>Always uses the default class loader: that is, preferably the thread context
-	 * class loader, or the ClassLoader that loaded the ClassUtils class as fallback.
-	 * @param name the name of the Class
-	 * @return Class instance for the supplied name
-	 * @throws ClassNotFoundException if the class was not found
-	 * @throws LinkageError if the class file could not be loaded
-	 * @see Class#forName(String, boolean, ClassLoader)
-	 * @see #getDefaultClassLoader()
-	 * @deprecated as of Spring 3.0, in favor of specifying a ClassLoader explicitly:
-	 * see {@link #forName(String, ClassLoader)}
-	 */
+
 	@Deprecated
 	public static Class<?> forName(String name) throws ClassNotFoundException, LinkageError {
 		return forName(name, getDefaultClassLoader());
 	}
-
 	// 代替 Class.forName()，使用指定类加载器创建一个实例
 	public static Class<?> forName(String name, ClassLoader classLoader) throws ClassNotFoundException, LinkageError {
 		Assert.notNull(name, "Name must not be null");
@@ -268,20 +211,6 @@ public abstract class ClassUtils {
 		}
 	}
 
-	/**
-	 * Resolve the given class name into a Class instance. Supports
-	 * primitives (like "int") and array class names (like "String[]").
-	 * <p>This is effectively equivalent to the {@code forName}
-	 * method with the same arguments, with the only difference being
-	 * the exceptions thrown in case of class loading failure.
-	 * @param className the name of the Class
-	 * @param classLoader the class loader to use
-	 * (may be {@code null}, which indicates the default class loader)
-	 * @return Class instance for the supplied name
-	 * @throws IllegalArgumentException if the class name was not resolvable
-	 * (that is, the class could not be found or the class file could not be loaded)
-	 * @see #forName(String, ClassLoader)
-	 */
 	public static Class<?> resolveClassName(String className, ClassLoader classLoader) throws IllegalArgumentException {
 		try {
 			return forName(className, classLoader);
@@ -316,28 +245,12 @@ public abstract class ClassUtils {
 		return result;
 	}
 
-	/**
-	 * Determine whether the {@link Class} identified by the supplied name is present
-	 * and can be loaded. Will return {@code false} if either the class or
-	 * one of its dependencies is not present or cannot be loaded.
-	 * @param className the name of the class to check
-	 * @return whether the specified class is present
-	 * @deprecated as of Spring 2.5, in favor of {@link #isPresent(String, ClassLoader)}
-	 */
+
 	@Deprecated
 	public static boolean isPresent(String className) {
 		return isPresent(className, getDefaultClassLoader());
 	}
-
-	/**
-	 * Determine whether the {@link Class} identified by the supplied name is present
-	 * and can be loaded. Will return {@code false} if either the class or
-	 * one of its dependencies is not present or cannot be loaded.
-	 * @param className the name of the class to check
-	 * @param classLoader the class loader to use
-	 * (may be {@code null}, which indicates the default class loader)
-	 * @return whether the specified class is present
-	 */
+	// 判断这个className能否被加载
 	public static boolean isPresent(String className, ClassLoader classLoader) {
 		try {
 			forName(className, classLoader);
@@ -361,12 +274,7 @@ public abstract class ClassUtils {
 		return getUserClass(instance.getClass());
 	}
 
-	/**
-	 * Return the user-defined class for the given class: usually simply the given
-	 * class, but the original class in case of a CGLIB-generated subclass.
-	 * @param clazz the class to check
-	 * @return the user-defined class
-	 */
+	// 如果这个clazz是使用CGLIB生成的代理类，就返回这个类的父类
 	public static Class<?> getUserClass(Class<?> clazz) {
 		if (clazz != null && clazz.getName().contains(CGLIB_CLASS_SEPARATOR)) {
 			Class<?> superClass = clazz.getSuperclass();
@@ -377,12 +285,7 @@ public abstract class ClassUtils {
 		return clazz;
 	}
 
-	/**
-	 * Check whether the given class is cache-safe in the given context,
-	 * i.e. whether it is loaded by the given ClassLoader or a parent of it.
-	 * @param clazz the class to analyze
-	 * @param classLoader the ClassLoader to potentially cache metadata in
-	 */
+	// 在给定的上下文中检查给定的类是否是缓存安全的，即它是由给定的类加载器加载或是一个父类
 	public static boolean isCacheSafe(Class<?> clazz, ClassLoader classLoader) {
 		Assert.notNull(clazz, "Class must not be null");
 		ClassLoader target = clazz.getClassLoader();
@@ -402,13 +305,7 @@ public abstract class ClassUtils {
 		return false;
 	}
 
-
-	/**
-	 * Get the class name without the qualified package name.
-	 * @param className the className to get the short name for
-	 * @return the class name of the class without the package name
-	 * @throws IllegalArgumentException if the className is empty
-	 */
+	// 获取这个类名，剔除包名
 	public static String getShortName(String className) {
 		Assert.hasLength(className, "Class name must not be empty");
 		int lastDotIndex = className.lastIndexOf(PACKAGE_SEPARATOR);
@@ -420,36 +317,19 @@ public abstract class ClassUtils {
 		shortName = shortName.replace(INNER_CLASS_SEPARATOR, PACKAGE_SEPARATOR);
 		return shortName;
 	}
-
-	/**
-	 * Get the class name without the qualified package name.
-	 * @param clazz the class to get the short name for
-	 * @return the class name of the class without the package name
-	 */
 	public static String getShortName(Class<?> clazz) {
 		return getShortName(getQualifiedName(clazz));
 	}
-
-	/**
-	 * Return the short string name of a Java class in uncapitalized JavaBeans
-	 * property format. Strips the outer class name in case of an inner class.
-	 * @param clazz the class
-	 * @return the short name rendered in a standard JavaBeans property format
-	 * @see java.beans.Introspector#decapitalize(String)
-	 */
+	// 获取这个类名，剔除包名(首字母小写)
 	public static String getShortNameAsProperty(Class<?> clazz) {
 		String shortName = ClassUtils.getShortName(clazz);
 		int dotIndex = shortName.lastIndexOf('.');
 		shortName = (dotIndex != -1 ? shortName.substring(dotIndex + 1) : shortName);
+		// decapitalize方法：首字母小写
 		return Introspector.decapitalize(shortName);
 	}
 
-	/**
-	 * Determine the name of the class file, relative to the containing
-	 * package: e.g. "String.class"
-	 * @param clazz the class
-	 * @return the file name of the ".class" file
-	 */
+	// 例如：String.class
 	public static String getClassFileName(Class<?> clazz) {
 		Assert.notNull(clazz, "Class must not be null");
 		String className = clazz.getName();
@@ -457,37 +337,18 @@ public abstract class ClassUtils {
 		return className.substring(lastDotIndex + 1) + CLASS_FILE_SUFFIX;
 	}
 
-	/**
-	 * Determine the name of the package of the given class,
-	 * e.g. "java.lang" for the {@code java.lang.String} class.
-	 * @param clazz the class
-	 * @return the package name, or the empty String if the class
-	 * is defined in the default package
-	 */
+	// 获取所在的包名
 	public static String getPackageName(Class<?> clazz) {
 		Assert.notNull(clazz, "Class must not be null");
 		return getPackageName(clazz.getName());
 	}
-
-	/**
-	 * Determine the name of the package of the given fully-qualified class name,
-	 * e.g. "java.lang" for the {@code java.lang.String} class name.
-	 * @param fqClassName the fully-qualified class name
-	 * @return the package name, or the empty String if the class
-	 * is defined in the default package
-	 */
 	public static String getPackageName(String fqClassName) {
 		Assert.notNull(fqClassName, "Class name must not be null");
 		int lastDotIndex = fqClassName.lastIndexOf(PACKAGE_SEPARATOR);
 		return (lastDotIndex != -1 ? fqClassName.substring(0, lastDotIndex) : "");
 	}
 
-	/**
-	 * Return the qualified name of the given class: usually simply
-	 * the class name, but component type class name + "[]" for arrays.
-	 * @param clazz the class
-	 * @return the qualified name of the class
-	 */
+	// 返回clazz.getName()，如果clazz是数组，则添加[]后缀
 	public static String getQualifiedName(Class<?> clazz) {
 		Assert.notNull(clazz, "Class must not be null");
 		if (clazz.isArray()) {
@@ -497,13 +358,6 @@ public abstract class ClassUtils {
 			return clazz.getName();
 		}
 	}
-
-	/**
-	 * Build a nice qualified name for an array:
-	 * component type class name + "[]".
-	 * @param clazz the array class
-	 * @return a qualified name for the array class
-	 */
 	private static String getQualifiedNameForArray(Class<?> clazz) {
 		StringBuilder result = new StringBuilder();
 		while (clazz.isArray()) {
@@ -513,25 +367,12 @@ public abstract class ClassUtils {
 		result.insert(0, clazz.getName());
 		return result.toString();
 	}
-
-	/**
-	 * Return the qualified name of the given method, consisting of
-	 * fully qualified interface/class name + "." + method name.
-	 * @param method the method
-	 * @return the qualified name of the method
-	 */
 	public static String getQualifiedMethodName(Method method) {
 		Assert.notNull(method, "Method must not be null");
 		return method.getDeclaringClass().getName() + "." + method.getName();
 	}
 
-	/**
-	 * Return a descriptive name for the given object's type: usually simply
-	 * the class name, but component type class name + "[]" for arrays,
-	 * and an appended list of implemented interfaces for JDK proxies.
-	 * @param value the value to introspect
-	 * @return the qualified name of the class
-	 */
+	// 返回这个value的类型
 	public static String getDescriptiveType(Object value) {
 		if (value == null) {
 			return null;
@@ -557,39 +398,17 @@ public abstract class ClassUtils {
 		}
 	}
 
-	/**
-	 * Check whether the given class matches the user-specified type name.
-	 * @param clazz the class to check
-	 * @param typeName the type name to match
-	 */
+	// 判断是否匹配
 	public static boolean matchesTypeName(Class<?> clazz, String typeName) {
 		return (typeName != null &&
 				(typeName.equals(clazz.getName()) || typeName.equals(clazz.getSimpleName()) ||
 				(clazz.isArray() && typeName.equals(getQualifiedNameForArray(clazz)))));
 	}
 
-
-	/**
-	 * Determine whether the given class has a public constructor with the given signature.
-	 * <p>Essentially translates {@code NoSuchMethodException} to "false".
-	 * @param clazz the clazz to analyze
-	 * @param paramTypes the parameter types of the method
-	 * @return whether the class has a corresponding constructor
-	 * @see Class#getMethod
-	 */
+	// 判断是否有指定参数的构造器
 	public static boolean hasConstructor(Class<?> clazz, Class<?>... paramTypes) {
 		return (getConstructorIfAvailable(clazz, paramTypes) != null);
 	}
-
-	/**
-	 * Determine whether the given class has a public constructor with the given signature,
-	 * and return it if available (else return {@code null}).
-	 * <p>Essentially translates {@code NoSuchMethodException} to {@code null}.
-	 * @param clazz the clazz to analyze
-	 * @param paramTypes the parameter types of the method
-	 * @return the constructor, or {@code null} if not found
-	 * @see Class#getConstructor
-	 */
 	public static <T> Constructor<T> getConstructorIfAvailable(Class<T> clazz, Class<?>... paramTypes) {
 		Assert.notNull(clazz, "Class must not be null");
 		try {
@@ -600,33 +419,10 @@ public abstract class ClassUtils {
 		}
 	}
 
-	/**
-	 * Determine whether the given class has a public method with the given signature.
-	 * <p>Essentially translates {@code NoSuchMethodException} to "false".
-	 * @param clazz the clazz to analyze
-	 * @param methodName the name of the method
-	 * @param paramTypes the parameter types of the method
-	 * @return whether the class has a corresponding method
-	 * @see Class#getMethod
-	 */
+	// 判断是否有指定的方法
 	public static boolean hasMethod(Class<?> clazz, String methodName, Class<?>... paramTypes) {
 		return (getMethodIfAvailable(clazz, methodName, paramTypes) != null);
 	}
-
-	/**
-	 * Determine whether the given class has a public method with the given signature,
-	 * and return it if available (else throws an {@code IllegalStateException}).
-	 * <p>In case of any signature specified, only returns the method if there is a
-	 * unique candidate, i.e. a single public method with the specified name.
-	 * <p>Essentially translates {@code NoSuchMethodException} to {@code IllegalStateException}.
-	 * @param clazz the clazz to analyze
-	 * @param methodName the name of the method
-	 * @param paramTypes the parameter types of the method
-	 * (may be {@code null} to indicate any signature)
-	 * @return the method (never {@code null})
-	 * @throws IllegalStateException if the method has not been found
-	 * @see Class#getMethod
-	 */
 	public static Method getMethod(Class<?> clazz, String methodName, Class<?>... paramTypes) {
 		Assert.notNull(clazz, "Class must not be null");
 		Assert.notNull(methodName, "Method name must not be null");
@@ -657,20 +453,6 @@ public abstract class ClassUtils {
 			}
 		}
 	}
-
-	/**
-	 * Determine whether the given class has a public method with the given signature,
-	 * and return it if available (else return {@code null}).
-	 * <p>In case of any signature specified, only returns the method if there is a
-	 * unique candidate, i.e. a single public method with the specified name.
-	 * <p>Essentially translates {@code NoSuchMethodException} to {@code null}.
-	 * @param clazz the clazz to analyze
-	 * @param methodName the name of the method
-	 * @param paramTypes the parameter types of the method
-	 * (may be {@code null} to indicate any signature)
-	 * @return the method, or {@code null} if not found
-	 * @see Class#getMethod
-	 */
 	public static Method getMethodIfAvailable(Class<?> clazz, String methodName, Class<?>... paramTypes) {
 		Assert.notNull(clazz, "Class must not be null");
 		Assert.notNull(methodName, "Method name must not be null");
@@ -697,13 +479,7 @@ public abstract class ClassUtils {
 		}
 	}
 
-	/**
-	 * Return the number of methods with a given name (with any argument types),
-	 * for the given class and/or its superclasses. Includes non-public methods.
-	 * @param clazz	the clazz to check
-	 * @param methodName the name of the method
-	 * @return the number of methods with the given name
-	 */
+	// 判断方法的重载个数
 	public static int getMethodCountForName(Class<?> clazz, String methodName) {
 		Assert.notNull(clazz, "Class must not be null");
 		Assert.notNull(methodName, "Method name must not be null");
@@ -724,14 +500,7 @@ public abstract class ClassUtils {
 		return count;
 	}
 
-	/**
-	 * Does the given class or one of its superclasses at least have one or more
-	 * methods with the supplied name (with any argument types)?
-	 * Includes non-public methods.
-	 * @param clazz	the clazz to check
-	 * @param methodName the name of the method
-	 * @return whether there is at least one method with the given name
-	 */
+	// 判断是否至少存在一个methodName的方法
 	public static boolean hasAtLeastOneMethodWithName(Class<?> clazz, String methodName) {
 		Assert.notNull(clazz, "Class must not be null");
 		Assert.notNull(methodName, "Method name must not be null");
@@ -830,60 +599,29 @@ public abstract class ClassUtils {
 		}
 	}
 
-
-	/**
-	 * Check if the given class represents a primitive wrapper,
-	 * i.e. Boolean, Byte, Character, Short, Integer, Long, Float, or Double.
-	 * @param clazz the class to check
-	 * @return whether the given class is a primitive wrapper class
-	 */
+	// 判断是否为原始类型
 	public static boolean isPrimitiveWrapper(Class<?> clazz) {
 		Assert.notNull(clazz, "Class must not be null");
 		return primitiveWrapperTypeMap.containsKey(clazz);
 	}
-
-	/**
-	 * Check if the given class represents a primitive (i.e. boolean, byte,
-	 * char, short, int, long, float, or double) or a primitive wrapper
-	 * (i.e. Boolean, Byte, Character, Short, Integer, Long, Float, or Double).
-	 * @param clazz the class to check
-	 * @return whether the given class is a primitive or primitive wrapper class
-	 */
 	public static boolean isPrimitiveOrWrapper(Class<?> clazz) {
 		Assert.notNull(clazz, "Class must not be null");
 		return (clazz.isPrimitive() || isPrimitiveWrapper(clazz));
 	}
-
-	/**
-	 * Check if the given class represents an array of primitives,
-	 * i.e. boolean, byte, char, short, int, long, float, or double.
-	 * @param clazz the class to check
-	 * @return whether the given class is a primitive array class
-	 */
+	// 原始类型的数组形式
 	public static boolean isPrimitiveArray(Class<?> clazz) {
 		Assert.notNull(clazz, "Class must not be null");
 		return (clazz.isArray() && clazz.getComponentType().isPrimitive());
 	}
-
-	/**
-	 * Check if the given class represents an array of primitive wrappers,
-	 * i.e. Boolean, Byte, Character, Short, Integer, Long, Float, or Double.
-	 * @param clazz the class to check
-	 * @return whether the given class is a primitive wrapper array class
-	 */
 	public static boolean isPrimitiveWrapperArray(Class<?> clazz) {
 		Assert.notNull(clazz, "Class must not be null");
 		return (clazz.isArray() && isPrimitiveWrapper(clazz.getComponentType()));
 	}
 
-	/**
-	 * Resolve the given class if it is a primitive class,
-	 * returning the corresponding primitive wrapper type instead.
-	 * @param clazz the class to check
-	 * @return the original class, or a primitive wrapper for the original primitive type
-	 */
+	// 如果是原始类型，则返回原始类型对象，如：Integer.class
 	public static Class<?> resolvePrimitiveIfNecessary(Class<?> clazz) {
 		Assert.notNull(clazz, "Class must not be null");
+		// isPrimitive():判断class是否表示一个基本类型，有9个预定义的基本类型，包括八种原始类型和 void。
 		return (clazz.isPrimitive() && clazz != void.class? primitiveTypeToWrapperMap.get(clazz) : clazz);
 	}
 
@@ -931,21 +669,11 @@ public abstract class ClassUtils {
 	}
 
 
-	/**
-	 * Convert a "/"-based resource path to a "."-based fully qualified class name.
-	 * @param resourcePath the resource path pointing to a class
-	 * @return the corresponding fully qualified class name
-	 */
+	// 将资源路径转为类路径
 	public static String convertResourcePathToClassName(String resourcePath) {
 		Assert.notNull(resourcePath, "Resource path must not be null");
 		return resourcePath.replace('/', '.');
 	}
-
-	/**
-	 * Convert a "."-based fully qualified class name to a "/"-based resource path.
-	 * @param className the fully qualified class name
-	 * @return the corresponding resource path, pointing to the class
-	 */
 	public static String convertClassNameToResourcePath(String className) {
 		Assert.notNull(className, "Class name must not be null");
 		return className.replace('.', '/');
@@ -960,20 +688,7 @@ public abstract class ClassUtils {
 		return classPackageAsResourcePath(clazz) + resourceName;
 	}
 
-	/**
-	 * Given an input class object, return a string which consists of the
-	 * class's package name as a pathname, i.e., all dots ('.') are replaced by
-	 * slashes ('/'). Neither a leading nor trailing slash is added. The result
-	 * could be concatenated with a slash and the name of a resource and fed
-	 * directly to {@code ClassLoader.getResource()}. For it to be fed to
-	 * {@code Class.getResource} instead, a leading slash would also have
-	 * to be prepended to the returned value.
-	 * @param clazz the input class. A {@code null} value or the default
-	 * (empty) package will result in an empty string ("") being returned.
-	 * @return a path which represents the package name
-	 * @see ClassLoader#getResource
-	 * @see Class#getResource
-	 */
+	// 以资源路径的形式返回这个clazz
 	public static String classPackageAsResourcePath(Class<?> clazz) {
 		if (clazz == null) {
 			return "";
@@ -987,28 +702,11 @@ public abstract class ClassUtils {
 		return packageName.replace('.', '/');
 	}
 
-	/**
-	 * Build a String that consists of the names of the classes/interfaces
-	 * in the given array.
-	 * <p>Basically like {@code AbstractCollection.toString()}, but stripping
-	 * the "class "/"interface " prefix before every class name.
-	 * @param classes a Collection of Class objects (may be {@code null})
-	 * @return a String of form "[com.foo.Bar, com.foo.Baz]"
-	 * @see java.util.AbstractCollection#toString()
-	 */
+
 	public static String classNamesToString(Class... classes) {
 		return classNamesToString(Arrays.asList(classes));
 	}
-
-	/**
-	 * Build a String that consists of the names of the classes/interfaces
-	 * in the given collection.
-	 * <p>Basically like {@code AbstractCollection.toString()}, but stripping
-	 * the "class "/"interface " prefix before every class name.
-	 * @param classes a Collection of Class objects (may be {@code null})
-	 * @return a String of form "[com.foo.Bar, com.foo.Baz]"
-	 * @see java.util.AbstractCollection#toString()
-	 */
+	// 返回这个集合的字符串形式，如："[com.foo.Bar, com.foo.Baz]"
 	public static String classNamesToString(Collection<Class> classes) {
 		if (CollectionUtils.isEmpty(classes)) {
 			return "[]";
@@ -1025,13 +723,7 @@ public abstract class ClassUtils {
 		return sb.toString();
 	}
 
-	/**
-	 * Copy the given Collection into a Class array.
-	 * The Collection must contain Class elements only.
-	 * @param collection the Collection to copy
-	 * @return the Class array ({@code null} if the passed-in
-	 * Collection was {@code null})
-	 */
+	// 将集合转为数组
 	public static Class<?>[] toClassArray(Collection<Class<?>> collection) {
 		if (collection == null) {
 			return null;
@@ -1039,73 +731,25 @@ public abstract class ClassUtils {
 		return collection.toArray(new Class<?>[collection.size()]);
 	}
 
-	/**
-	 * Return all interfaces that the given instance implements as array,
-	 * including ones implemented by superclasses.
-	 * @param instance the instance to analyze for interfaces
-	 * @return all interfaces that the given instance implements as array
-	 */
+	// 返回这个类实现的所有接口
 	public static Class<?>[] getAllInterfaces(Object instance) {
 		Assert.notNull(instance, "Instance must not be null");
 		return getAllInterfacesForClass(instance.getClass());
 	}
-
-	/**
-	 * Return all interfaces that the given class implements as array,
-	 * including ones implemented by superclasses.
-	 * <p>If the class itself is an interface, it gets returned as sole interface.
-	 * @param clazz the class to analyze for interfaces
-	 * @return all interfaces that the given object implements as array
-	 */
 	public static Class<?>[] getAllInterfacesForClass(Class<?> clazz) {
 		return getAllInterfacesForClass(clazz, null);
 	}
-
-	/**
-	 * Return all interfaces that the given class implements as array,
-	 * including ones implemented by superclasses.
-	 * <p>If the class itself is an interface, it gets returned as sole interface.
-	 * @param clazz the class to analyze for interfaces
-	 * @param classLoader the ClassLoader that the interfaces need to be visible in
-	 * (may be {@code null} when accepting all declared interfaces)
-	 * @return all interfaces that the given object implements as array
-	 */
 	public static Class<?>[] getAllInterfacesForClass(Class<?> clazz, ClassLoader classLoader) {
 		Set<Class> ifcs = getAllInterfacesForClassAsSet(clazz, classLoader);
 		return ifcs.toArray(new Class[ifcs.size()]);
 	}
-
-	/**
-	 * Return all interfaces that the given instance implements as Set,
-	 * including ones implemented by superclasses.
-	 * @param instance the instance to analyze for interfaces
-	 * @return all interfaces that the given instance implements as Set
-	 */
 	public static Set<Class> getAllInterfacesAsSet(Object instance) {
 		Assert.notNull(instance, "Instance must not be null");
 		return getAllInterfacesForClassAsSet(instance.getClass());
 	}
-
-	/**
-	 * Return all interfaces that the given class implements as Set,
-	 * including ones implemented by superclasses.
-	 * <p>If the class itself is an interface, it gets returned as sole interface.
-	 * @param clazz the class to analyze for interfaces
-	 * @return all interfaces that the given object implements as Set
-	 */
 	public static Set<Class> getAllInterfacesForClassAsSet(Class clazz) {
 		return getAllInterfacesForClassAsSet(clazz, null);
 	}
-
-	/**
-	 * Return all interfaces that the given class implements as Set,
-	 * including ones implemented by superclasses.
-	 * <p>If the class itself is an interface, it gets returned as sole interface.
-	 * @param clazz the class to analyze for interfaces
-	 * @param classLoader the ClassLoader that the interfaces need to be visible in
-	 * (may be {@code null} when accepting all declared interfaces)
-	 * @return all interfaces that the given object implements as Set
-	 */
 	public static Set<Class> getAllInterfacesForClassAsSet(Class clazz, ClassLoader classLoader) {
 		Assert.notNull(clazz, "Class must not be null");
 		if (clazz.isInterface() && isVisible(clazz, classLoader)) {
@@ -1137,15 +781,7 @@ public abstract class ClassUtils {
 		return Proxy.getProxyClass(classLoader, interfaces);
 	}
 
-	/**
-	 * Determine the common ancestor of the given classes, if any.
-	 * @param clazz1 the class to introspect
-	 * @param clazz2 the other class to introspect
-	 * @return the common ancestor (i.e. common superclass, one interface
-	 * extending the other), or {@code null} if none found. If any of the
-	 * given classes is {@code null}, the other class will be returned.
-	 * @since 3.2.6
-	 */
+	// 如果A extends B 则返回A，或返回它们的共同父类
 	public static Class<?> determineCommonAncestor(Class<?> clazz1, Class<?> clazz2) {
 		if (clazz1 == null) {
 			return clazz2;
@@ -1170,12 +806,7 @@ public abstract class ClassUtils {
 		return ancestor;
 	}
 
-	/**
-	 * Check whether the given class is visible in the given ClassLoader.
-	 * @param clazz the class to check (typically an interface)
-	 * @param classLoader the ClassLoader to check against (may be {@code null},
-	 * in which case this method will always return {@code true})
-	 */
+	// 检查给定的类在给定的类加载器是否可见
 	public static boolean isVisible(Class<?> clazz, ClassLoader classLoader) {
 		if (classLoader == null) {
 			return true;
@@ -1191,27 +822,13 @@ public abstract class ClassUtils {
 		}
 	}
 
-	/**
-	 * Check whether the given object is a CGLIB proxy.
-	 * @param object the object to check
-	 * @see org.springframework.aop.support.AopUtils#isCglibProxy(Object)
-	 */
+	// 判断是否为CGLIB生成的代理类
 	public static boolean isCglibProxy(Object object) {
 		return ClassUtils.isCglibProxyClass(object.getClass());
 	}
-
-	/**
-	 * Check whether the specified class is a CGLIB-generated class.
-	 * @param clazz the class to check
-	 */
 	public static boolean isCglibProxyClass(Class<?> clazz) {
 		return (clazz != null && isCglibProxyClassName(clazz.getName()));
 	}
-
-	/**
-	 * Check whether the specified class name is a CGLIB-generated class.
-	 * @param className the class name to check
-	 */
 	public static boolean isCglibProxyClassName(String className) {
 		return (className != null && className.contains(CGLIB_CLASS_SEPARATOR));
 	}
