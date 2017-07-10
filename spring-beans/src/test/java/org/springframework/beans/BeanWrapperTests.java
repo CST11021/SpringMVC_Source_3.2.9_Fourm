@@ -16,6 +16,7 @@
 
 package org.springframework.beans;
 
+import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditorSupport;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -69,6 +70,22 @@ import static org.junit.Assert.*;
  * @author Dave Syer
  */
 public final class BeanWrapperTests {
+
+
+	@Test
+	public void test() {
+
+		TestBean t = new TestBean("name");
+		BeanWrapper wrapper = new BeanWrapperImpl(t);
+		Object obj = wrapper.getWrappedInstance();
+		Class cla = wrapper.getWrappedClass();
+		PropertyDescriptor[] ps = wrapper.getPropertyDescriptors();
+		PropertyDescriptor p = wrapper.getPropertyDescriptor("name");
+		boolean flag = wrapper.isAutoGrowNestedPaths();
+		int limit = wrapper.getAutoGrowCollectionLimit();
+
+		System.out.print("");
+	}
 
 	@Test
 	public void testNullNestedTypeDescriptor() {
@@ -1608,23 +1625,18 @@ public final class BeanWrapperTests {
 
 	@SuppressWarnings("unused")
 	private static class Foo {
-
 		private List list;
-
 		private List<Map> listOfMaps;
 
 		public List getList() {
 			return list;
 		}
-
 		public void setList(List list) {
 			this.list = list;
 		}
-
 		public List<Map> getListOfMaps() {
 			return listOfMaps;
 		}
-
 		public void setListOfMaps(List<Map> listOfMaps) {
 			this.listOfMaps = listOfMaps;
 		}

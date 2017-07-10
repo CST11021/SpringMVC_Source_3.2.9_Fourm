@@ -85,34 +85,20 @@ import org.springframework.util.StringUtils;
  * @see PropertyEditorRegistrySupport
  */
 public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWrapper {
-
-	/**
-	 * We'll create a lot of these objects, so we don't want a new logger every time.
-	 */
 	private static final Log logger = LogFactory.getLog(BeanWrapperImpl.class);
 
-
-	/** The wrapped object */
+	// 表示被包装的对象
 	private Object object;
-
 	private String nestedPath = "";
-
 	private Object rootObject;
 
-	/**
-	 * The security context used for invoking the property methods
-	 */
+	// 表示调用属性方法的安全上下文
 	private AccessControlContext acc;
 
-	/**
-	 * Cached introspections results for this object, to prevent encountering
-	 * the cost of JavaBeans introspection every time.
-	 */
+	// 换成这个对象的结果
 	private CachedIntrospectionResults cachedIntrospectionResults;
 
-	/**
-	 * Map with cached nested BeanWrappers: nested path -> BeanWrapper instance.
-	 */
+	// Map with cached nested BeanWrappers: nested path -> BeanWrapper instance.
 	private Map<String, BeanWrapperImpl> nestedBeanWrappers;
 
 	private boolean autoGrowNestedPaths = false;
@@ -120,65 +106,28 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
 	private int autoGrowCollectionLimit = Integer.MAX_VALUE;
 
 
-	/**
-	 * Create new empty BeanWrapperImpl. Wrapped instance needs to be set afterwards.
-	 * Registers default editors.
-	 * @see #setWrappedInstance
-	 */
+
 	public BeanWrapperImpl() {
 		this(true);
 	}
-
-	/**
-	 * Create new empty BeanWrapperImpl. Wrapped instance needs to be set afterwards.
-	 * @param registerDefaultEditors whether to register default editors
-	 * (can be suppressed if the BeanWrapper won't need any type conversion)
-	 * @see #setWrappedInstance
-	 */
 	public BeanWrapperImpl(boolean registerDefaultEditors) {
 		if (registerDefaultEditors) {
 			registerDefaultEditors();
 		}
 		this.typeConverterDelegate = new TypeConverterDelegate(this);
 	}
-
-	/**
-	 * Create new BeanWrapperImpl for the given object.
-	 * @param object object wrapped by this BeanWrapper
-	 */
 	public BeanWrapperImpl(Object object) {
 		registerDefaultEditors();
 		setWrappedInstance(object);
 	}
-
-	/**
-	 * Create new BeanWrapperImpl, wrapping a new instance of the specified class.
-	 * @param clazz class to instantiate and wrap
-	 */
 	public BeanWrapperImpl(Class<?> clazz) {
 		registerDefaultEditors();
 		setWrappedInstance(BeanUtils.instantiateClass(clazz));
 	}
-
-	/**
-	 * Create new BeanWrapperImpl for the given object,
-	 * registering a nested path that the object is in.
-	 * @param object object wrapped by this BeanWrapper
-	 * @param nestedPath the nested path of the object
-	 * @param rootObject the root object at the top of the path
-	 */
 	public BeanWrapperImpl(Object object, String nestedPath, Object rootObject) {
 		registerDefaultEditors();
 		setWrappedInstance(object, nestedPath, rootObject);
 	}
-
-	/**
-	 * Create new BeanWrapperImpl for the given object,
-	 * registering a nested path that the object is in.
-	 * @param object object wrapped by this BeanWrapper
-	 * @param nestedPath the nested path of the object
-	 * @param superBw the containing BeanWrapper (must not be {@code null})
-	 */
 	private BeanWrapperImpl(Object object, String nestedPath, BeanWrapperImpl superBw) {
 		setWrappedInstance(object, nestedPath, superBw.getWrappedInstance());
 		setExtractOldValueForEditor(superBw.isExtractOldValueForEditor());
@@ -189,26 +138,13 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
 	}
 
 
-	//---------------------------------------------------------------------
-	// Implementation of BeanWrapper interface
-	//---------------------------------------------------------------------
 
-	/**
-	 * Switch the target object, replacing the cached introspection results only
-	 * if the class of the new object is different to that of the replaced object.
-	 * @param object the new target object
-	 */
+	// Implementation of BeanWrapper interface
+
+	// 设置被包装的object，替换缓存的introspection results
 	public void setWrappedInstance(Object object) {
 		setWrappedInstance(object, "", null);
 	}
-
-	/**
-	 * Switch the target object, replacing the cached introspection results only
-	 * if the class of the new object is different to that of the replaced object.
-	 * @param object the new target object
-	 * @param nestedPath the nested path of the object
-	 * @param rootObject the root object at the top of the path
-	 */
 	public void setWrappedInstance(Object object, String nestedPath, Object rootObject) {
 		Assert.notNull(object, "Bean object must not be null");
 		this.object = object;
@@ -222,99 +158,50 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
 	public final Object getWrappedInstance() {
 		return this.object;
 	}
-
 	public final Class<?> getWrappedClass() {
 		return (this.object != null ? this.object.getClass() : null);
 	}
 
-	/**
-	 * Return the nested path of the object wrapped by this BeanWrapper.
-	 */
 	public final String getNestedPath() {
 		return this.nestedPath;
 	}
 
-	/**
-	 * Return the root object at the top of the path of this BeanWrapper.
-	 * @see #getNestedPath
-	 */
+	// 在返回该BeanWrapper的路径上的根对象。
 	public final Object getRootInstance() {
 		return this.rootObject;
 	}
-
-	/**
-	 * Return the class of the root object at the top of the path of this BeanWrapper.
-	 * @see #getNestedPath
-	 */
 	public final Class<?> getRootClass() {
 		return (this.rootObject != null ? this.rootObject.getClass() : null);
 	}
 
-	/**
-	 * Set whether this BeanWrapper should attempt to "auto-grow" a nested path that contains a null value.
-	 * <p>If "true", a null path location will be populated with a default object value and traversed
-	 * instead of resulting in a {@link NullValueInNestedPathException}. Turning this flag on also
-	 * enables auto-growth of collection elements when accessing an out-of-bounds index.
-	 * <p>Default is "false" on a plain BeanWrapper.
-	 */
 	public void setAutoGrowNestedPaths(boolean autoGrowNestedPaths) {
 		this.autoGrowNestedPaths = autoGrowNestedPaths;
 	}
-
-	/**
-	 * Return whether "auto-growing" of nested paths has been activated.
-	 */
 	public boolean isAutoGrowNestedPaths() {
 		return this.autoGrowNestedPaths;
 	}
 
-	/**
-	 * Specify a limit for array and collection auto-growing.
-	 * <p>Default is unlimited on a plain BeanWrapper.
-	 */
 	public void setAutoGrowCollectionLimit(int autoGrowCollectionLimit) {
 		this.autoGrowCollectionLimit = autoGrowCollectionLimit;
 	}
-
-	/**
-	 * Return the limit for array and collection auto-growing.
-	 */
 	public int getAutoGrowCollectionLimit() {
 		return this.autoGrowCollectionLimit;
 	}
 
-	/**
-	 * Set the security context used during the invocation of the wrapped instance methods.
-	 * Can be null.
-	 */
 	public void setSecurityContext(AccessControlContext acc) {
 		this.acc = acc;
 	}
-
-	/**
-	 * Return the security context used during the invocation of the wrapped instance methods.
-	 * Can be null.
-	 */
 	public AccessControlContext getSecurityContext() {
 		return this.acc;
 	}
 
-	/**
-	 * Set the class to introspect.
-	 * Needs to be called when the target object changes.
-	 * @param clazz the class to introspect
-	 */
+	// 设置 cachedIntrospectionResults 在目标对象改变的时候会被调用
 	protected void setIntrospectionClass(Class<?> clazz) {
 		if (this.cachedIntrospectionResults != null &&
 				!clazz.equals(this.cachedIntrospectionResults.getBeanClass())) {
 			this.cachedIntrospectionResults = null;
 		}
 	}
-
-	/**
-	 * Obtain a lazily initializted CachedIntrospectionResults instance
-	 * for the wrapped object.
-	 */
 	private CachedIntrospectionResults getCachedIntrospectionResults() {
 		Assert.state(this.object != null, "BeanWrapper does not hold a bean instance");
 		if (this.cachedIntrospectionResults == null) {
@@ -323,11 +210,10 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
 		return this.cachedIntrospectionResults;
 	}
 
-
+	// 获取属性描述器
 	public PropertyDescriptor[] getPropertyDescriptors() {
 		return getCachedIntrospectionResults().getPropertyDescriptors();
 	}
-
 	public PropertyDescriptor getPropertyDescriptor(String propertyName) throws BeansException {
 		PropertyDescriptor pd = getPropertyDescriptorInternal(propertyName);
 		if (pd == null) {
@@ -336,15 +222,6 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
 		}
 		return pd;
 	}
-
-	/**
-	 * Internal version of {@link #getPropertyDescriptor}:
-	 * Returns {@code null} if not found rather than throwing an exception.
-	 * @param propertyName the property to obtain the descriptor for
-	 * @return the property descriptor for the specified property,
-	 * or {@code null} if not found
-	 * @throws BeansException in case of introspection failure
-	 */
 	protected PropertyDescriptor getPropertyDescriptorInternal(String propertyName) throws BeansException {
 		Assert.notNull(propertyName, "Property name must not be null");
 		BeanWrapperImpl nestedBw = getBeanWrapperForPropertyPath(propertyName);
@@ -377,7 +254,6 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
 		}
 		return null;
 	}
-
 	public TypeDescriptor getPropertyTypeDescriptor(String propertyName) throws BeansException {
 		try {
 			BeanWrapperImpl nestedBw = getBeanWrapperForPropertyPath(propertyName);
@@ -402,10 +278,12 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
 		return null;
 	}
 
+	// 判断是否有get方法
 	public boolean isReadableProperty(String propertyName) {
 		try {
 			PropertyDescriptor pd = getPropertyDescriptorInternal(propertyName);
 			if (pd != null) {
+				// 判断这个属性对应的属性描述器是否有getter方法
 				if (pd.getReadMethod() != null) {
 					return true;
 				}
@@ -421,7 +299,7 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
 		}
 		return false;
 	}
-
+	// 判断是否有set方法
 	public boolean isWritableProperty(String propertyName) {
 		try {
 			PropertyDescriptor pd = getPropertyDescriptorInternal(propertyName);
@@ -442,8 +320,7 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
 		return false;
 	}
 
-	private Object convertIfNecessary(String propertyName, Object oldValue, Object newValue, Class<?> requiredType,
-			TypeDescriptor td) throws TypeMismatchException {
+	private Object convertIfNecessary(String propertyName, Object oldValue, Object newValue, Class<?> requiredType, TypeDescriptor td) throws TypeMismatchException {
 		try {
 			return this.typeConverterDelegate.convertIfNecessary(propertyName, oldValue, newValue, requiredType, td);
 		}
@@ -469,16 +346,6 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
 		}
 	}
 
-	/**
-	 * Convert the given value for the specified property to the latter's type.
-	 * <p>This method is only intended for optimizations in a BeanFactory.
-	 * Use the {@code convertIfNecessary} methods for programmatic conversion.
-	 * @param value the value to convert
-	 * @param propertyName the target property
-	 * (note that nested or indexed properties are not supported here)
-	 * @return the new value, possibly the result of type conversion
-	 * @throws TypeMismatchException if type conversion failed
-	 */
 	public Object convertForProperty(Object value, String propertyName) throws TypeMismatchException {
 		PropertyDescriptor pd = getCachedIntrospectionResults().getPropertyDescriptor(propertyName);
 		if (pd == null) {
@@ -487,9 +354,7 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
 		}
 		return convertForProperty(propertyName, null, value, new TypeDescriptor(property(pd)));
 	}
-
-	private Object convertForProperty(String propertyName, Object oldValue, Object newValue, TypeDescriptor td)
-			throws TypeMismatchException {
+	private Object convertForProperty(String propertyName, Object oldValue, Object newValue, TypeDescriptor td) throws TypeMismatchException {
 
 		return convertIfNecessary(propertyName, oldValue, newValue, td.getType(), td);
 	}
@@ -500,9 +365,8 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
 	}
 
 
-	//---------------------------------------------------------------------
+
 	// Implementation methods
-	//---------------------------------------------------------------------
 
 	/**
 	 * Get the last component of the path. Also works if not nested.
@@ -518,12 +382,12 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
 	}
 
 	/**
-	 * Recursively navigate to return a BeanWrapper for the nested property path.
+	 * Recursively navigate to return a BeanWrapper for the nested property path.	// 递归浏览返回的嵌套属性路径BeanWrapper
 	 * @param propertyPath property property path, which may be nested
 	 * @return a BeanWrapper for the target bean
 	 */
 	protected BeanWrapperImpl getBeanWrapperForPropertyPath(String propertyPath) {
-		int pos = PropertyAccessorUtils.getFirstNestedPropertySeparatorIndex(propertyPath);
+		int pos = PropertyAccessorUtils.getFirstNestedPropertySeparatorIndex(propertyPath);// 返回嵌套属性path的第一个分割符索引
 		// Handle nested properties recursively.
 		if (pos > -1) {
 			String nestedProperty = propertyPath.substring(0, pos);
@@ -635,23 +499,13 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
 		}
 	}
 
-	/**
-	 * Create a new nested BeanWrapper instance.
-	 * <p>Default implementation creates a BeanWrapperImpl instance.
-	 * Can be overridden in subclasses to create a BeanWrapperImpl subclass.
-	 * @param object object wrapped by this BeanWrapper
-	 * @param nestedPath the nested path of the object
-	 * @return the nested BeanWrapper instance
-	 */
+
+	// 创建一个新的嵌套BeanWrapper实例
 	protected BeanWrapperImpl newNestedBeanWrapper(Object object, String nestedPath) {
 		return new BeanWrapperImpl(object, nestedPath, this);
 	}
 
-	/**
-	 * Parse the given property name into the corresponding property name tokens.
-	 * @param propertyName the property name to parse
-	 * @return representation of the parsed property tokens
-	 */
+	// 根据指定的propertyName 返回对应的 PropertyTokenHolder对象
 	private PropertyTokenHolder getPropertyNameTokens(String propertyName) {
 		PropertyTokenHolder tokens = new PropertyTokenHolder();
 		String actualName = null;
@@ -688,17 +542,50 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
 	}
 
 
-	//---------------------------------------------------------------------
 	// Implementation of PropertyAccessor interface
-	//---------------------------------------------------------------------
+	private Object growArrayIfNecessary(Object array, int index, String name) {
+		if (!this.autoGrowNestedPaths) {
+			return array;
+		}
+		int length = Array.getLength(array);
+		if (index >= length && index < this.autoGrowCollectionLimit) {
+			Class<?> componentType = array.getClass().getComponentType();
+			Object newArray = Array.newInstance(componentType, index + 1);
+			System.arraycopy(array, 0, newArray, 0, length);
+			for (int i = length; i < Array.getLength(newArray); i++) {
+				Array.set(newArray, i, newValue(componentType, name));
+			}
+			// TODO this is not efficient because conversion may create a copy ... set directly because we know it is assignable.
+			setPropertyValue(name, newArray);
+			return getPropertyValue(name);
+		}
+		else {
+			return array;
+		}
+	}
+	private void growCollectionIfNecessary(Collection<Object> collection, int index, String name, PropertyDescriptor pd, int nestingLevel) {
 
+		if (!this.autoGrowNestedPaths) {
+			return;
+		}
+		int size = collection.size();
+		if (index >= size && index < this.autoGrowCollectionLimit) {
+			Class<?> elementType = GenericCollectionTypeResolver.getCollectionReturnType(pd.getReadMethod(), nestingLevel);
+			if (elementType != null) {
+				for (int i = collection.size(); i < index + 1; i++) {
+					collection.add(newValue(elementType, name));
+				}
+			}
+		}
+	}
+
+	// 获取属性值
 	@Override
 	public Object getPropertyValue(String propertyName) throws BeansException {
 		BeanWrapperImpl nestedBw = getBeanWrapperForPropertyPath(propertyName);
 		PropertyTokenHolder tokens = getPropertyNameTokens(getFinalPath(nestedBw, propertyName));
 		return nestedBw.getPropertyValue(tokens);
 	}
-
     @SuppressWarnings("unchecked")
 	private Object getPropertyValue(PropertyTokenHolder tokens) throws BeansException {
 		String propertyName = tokens.canonicalName;
@@ -831,58 +718,20 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
 		}
 	}
 
-	private Object growArrayIfNecessary(Object array, int index, String name) {
-		if (!this.autoGrowNestedPaths) {
-			return array;
-		}
-		int length = Array.getLength(array);
-		if (index >= length && index < this.autoGrowCollectionLimit) {
-			Class<?> componentType = array.getClass().getComponentType();
-			Object newArray = Array.newInstance(componentType, index + 1);
-			System.arraycopy(array, 0, newArray, 0, length);
-			for (int i = length; i < Array.getLength(newArray); i++) {
-				Array.set(newArray, i, newValue(componentType, name));
-			}
-			// TODO this is not efficient because conversion may create a copy ... set directly because we know it is assignable.
-			setPropertyValue(name, newArray);
-			return getPropertyValue(name);
-		}
-		else {
-			return array;
-		}
-	}
-
-	private void growCollectionIfNecessary(Collection<Object> collection, int index, String name,
-			PropertyDescriptor pd, int nestingLevel) {
-
-		if (!this.autoGrowNestedPaths) {
-			return;
-		}
-		int size = collection.size();
-		if (index >= size && index < this.autoGrowCollectionLimit) {
-			Class<?> elementType = GenericCollectionTypeResolver.getCollectionReturnType(pd.getReadMethod(), nestingLevel);
-			if (elementType != null) {
-				for (int i = collection.size(); i < index + 1; i++) {
-					collection.add(newValue(elementType, name));
-				}
-			}
-		}
-	}
-
+	// 设置属性值，这个属性可以是一个嵌套的path字符串，如：listOfMaps[0]['luckyNumber']
+	// 比如一个 List<Map> listOfMaps;的类属性，我们可以通过setPropertyValue("listOfMaps[0]['luckyNumber']", "9");为其设置属性值
 	@Override
 	public void setPropertyValue(String propertyName, Object value) throws BeansException {
 		BeanWrapperImpl nestedBw;
 		try {
-			nestedBw = getBeanWrapperForPropertyPath(propertyName);
+			nestedBw = getBeanWrapperForPropertyPath(propertyName);// 根据这个 propertyName 获取一个BeanWrapper
 		}
 		catch (NotReadablePropertyException ex) {
-			throw new NotWritablePropertyException(getRootClass(), this.nestedPath + propertyName,
-					"Nested property in path '" + propertyName + "' does not exist", ex);
+			throw new NotWritablePropertyException(getRootClass(), this.nestedPath + propertyName, "Nested property in path '" + propertyName + "' does not exist", ex);
 		}
 		PropertyTokenHolder tokens = getPropertyNameTokens(getFinalPath(nestedBw, propertyName));
 		nestedBw.setPropertyValue(tokens, new PropertyValue(propertyName, value));
 	}
-
 	@Override
 	public void setPropertyValue(PropertyValue pv) throws BeansException {
 		PropertyTokenHolder tokens = (PropertyTokenHolder) pv.resolvedTokens;
@@ -906,7 +755,6 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
 			setPropertyValue(tokens, pv);
 		}
 	}
-
 	@SuppressWarnings("unchecked")
 	private void setPropertyValue(PropertyTokenHolder tokens, PropertyValue pv) throws BeansException {
 		String propertyName = tokens.canonicalName;
@@ -1155,6 +1003,13 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
 		}
 	}
 
+	// Inner class for internal use：比如：propertyName是listOfMaps[0]['luckyNumber']，则它对应的PropertyTokenHolder是
+	private static class PropertyTokenHolder {
+		public String canonicalName;// listOfMaps[0]['luckyNumber']
+		public String actualName;// listOfMaps
+		public String[] keys;// {"0","luckyNumber"}
+	}
+
 
 	@Override
 	public String toString() {
@@ -1166,20 +1021,6 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
 			sb.append(": no wrapped object set");
 		}
 		return sb.toString();
-	}
-
-
-	//---------------------------------------------------------------------
-	// Inner class for internal use
-	//---------------------------------------------------------------------
-
-	private static class PropertyTokenHolder {
-
-		public String canonicalName;
-
-		public String actualName;
-
-		public String[] keys;
 	}
 
 }

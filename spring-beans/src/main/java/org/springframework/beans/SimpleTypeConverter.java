@@ -37,4 +37,10 @@ public class SimpleTypeConverter extends TypeConverterSupport {
 		registerDefaultEditors();
 	}
 
+	public static void main(String[] args) {
+
+		TypeConverter converter = new SimpleTypeConverter();
+
+	}
+
 }

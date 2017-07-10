@@ -29,6 +29,19 @@ import org.junit.Test;
 public final class PropertyAccessorUtilsTests {
 
 	@Test
+	public void testGetPropertyName() {
+		String str = PropertyAccessorUtils.getPropertyName("map[key1]");
+		int index = PropertyAccessorUtils.getLastNestedPropertySeparatorIndex("map[my.key]]");
+		System.out.println(index);
+		index = PropertyAccessorUtils.getLastNestedPropertySeparatorIndex(".map[mykey]]");
+		System.out.println(index);
+		index = PropertyAccessorUtils.getLastNestedPropertySeparatorIndex("map[mykey.]]");
+		System.out.println(index);
+		index = PropertyAccessorUtils.getLastNestedPropertySeparatorIndex("map[mykey]].");
+		System.out.println(index);
+	}
+
+	@Test
 	public void testCanonicalPropertyName() {
 		assertEquals("map", PropertyAccessorUtils.canonicalPropertyName("map"));
 		assertEquals("map[key1]", PropertyAccessorUtils.canonicalPropertyName("map[key1]"));
