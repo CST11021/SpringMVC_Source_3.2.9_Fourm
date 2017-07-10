@@ -189,7 +189,6 @@ public class SingletonBeanFactoryLocatorTests {
 
 
 class TestBean {
-
 	private String name;
 	private List<?> list;
 	private Object objRef;

@@ -18,10 +18,12 @@ package org.springframework.beans;
 
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.whz.domain.User;
 import org.junit.Test;
 
 import org.springframework.beans.factory.BeanFactory;
@@ -43,6 +45,15 @@ import static org.junit.Assert.*;
  * @since 19.05.2003
  */
 public final class BeanUtilsTests {
+
+
+
+	@Test
+	public void test() {
+//		AA a = new AA();
+		AA aa = BeanUtils.instantiateClass(AA.class);
+		System.out.println();
+	}
 
 	@Test
 	public void testInstantiateClass() {

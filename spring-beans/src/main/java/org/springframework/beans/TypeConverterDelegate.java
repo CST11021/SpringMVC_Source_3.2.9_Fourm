@@ -36,46 +36,22 @@ import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
-/**
- * Internal helper class for converting property values to target types.
- *
- * <p>Works on a given {@link PropertyEditorRegistrySupport} instance.
- * Used as a delegate by {@link BeanWrapperImpl} and {@link SimpleTypeConverter}.
- *
- * @author Juergen Hoeller
- * @author Rob Harrop
- * @author Dave Syer
- * @since 2.0
- * @see BeanWrapperImpl
- * @see SimpleTypeConverter
- */
+// spring类型转换器的真正实现类，所有的类型转换器都基于此类
 class TypeConverterDelegate {
 
 	private static final Log logger = LogFactory.getLog(TypeConverterDelegate.class);
 
 	private final PropertyEditorRegistrySupport propertyEditorRegistry;
-
 	private final Object targetObject;
 
 
-	/**
-	 * Create a new TypeConverterDelegate for the given editor registry.
-	 * @param propertyEditorRegistry the editor registry to use
-	 */
 	public TypeConverterDelegate(PropertyEditorRegistrySupport propertyEditorRegistry) {
 		this(propertyEditorRegistry, null);
 	}
-
-	/**
-	 * Create a new TypeConverterDelegate for the given editor registry and bean instance.
-	 * @param propertyEditorRegistry the editor registry to use
-	 * @param targetObject the target object to work on (as context that can be passed to editors)
-	 */
 	public TypeConverterDelegate(PropertyEditorRegistrySupport propertyEditorRegistry, Object targetObject) {
 		this.propertyEditorRegistry = propertyEditorRegistry;
 		this.targetObject = targetObject;
 	}
-
 
 	/**
 	 * Convert the value to the specified required type.
@@ -87,8 +63,7 @@ class TypeConverterDelegate {
 	 * @return the new value, possibly the result of type conversion
 	 * @throws IllegalArgumentException if type conversion failed
 	 */
-	public <T> T convertIfNecessary(Object newValue, Class<T> requiredType, MethodParameter methodParam)
-			throws IllegalArgumentException {
+	public <T> T convertIfNecessary(Object newValue, Class<T> requiredType, MethodParameter methodParam) throws IllegalArgumentException {
 
 		return convertIfNecessary(null, null, newValue, requiredType,
 				(methodParam != null ? new TypeDescriptor(methodParam) : TypeDescriptor.valueOf(requiredType)));
@@ -104,8 +79,7 @@ class TypeConverterDelegate {
 	 * @return the new value, possibly the result of type conversion
 	 * @throws IllegalArgumentException if type conversion failed
 	 */
-	public <T> T convertIfNecessary(Object newValue, Class<T> requiredType, Field field)
-			throws IllegalArgumentException {
+	public <T> T convertIfNecessary(Object newValue, Class<T> requiredType, Field field) throws IllegalArgumentException {
 
 		return convertIfNecessary(null, null, newValue, requiredType,
 				(field != null ? new TypeDescriptor(field) : TypeDescriptor.valueOf(requiredType)));
@@ -121,9 +95,7 @@ class TypeConverterDelegate {
 	 * @return the new value, possibly the result of type conversion
 	 * @throws IllegalArgumentException if type conversion failed
 	 */
-	public <T> T convertIfNecessary(
-			String propertyName, Object oldValue, Object newValue, Class<T> requiredType)
-			throws IllegalArgumentException {
+	public <T> T convertIfNecessary(String propertyName, Object oldValue, Object newValue, Class<T> requiredType) throws IllegalArgumentException {
 
 		return convertIfNecessary(propertyName, oldValue, newValue, requiredType, TypeDescriptor.valueOf(requiredType));
 	}
@@ -141,8 +113,7 @@ class TypeConverterDelegate {
 	 * @throws IllegalArgumentException if type conversion failed
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> T convertIfNecessary(String propertyName, Object oldValue, Object newValue,
-			Class<T> requiredType, TypeDescriptor typeDescriptor) throws IllegalArgumentException {
+	public <T> T convertIfNecessary(String propertyName, Object oldValue, Object newValue, Class<T> requiredType, TypeDescriptor typeDescriptor) throws IllegalArgumentException {
 
 		Object convertedValue = newValue;
 
@@ -495,8 +466,7 @@ class TypeConverterDelegate {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Collection convertToTypedCollection(
-			Collection original, String propertyName, Class<?> requiredType, TypeDescriptor typeDescriptor) {
+	private Collection convertToTypedCollection(Collection original, String propertyName, Class<?> requiredType, TypeDescriptor typeDescriptor) {
 
 		if (!Collection.class.isAssignableFrom(requiredType)) {
 			return original;
@@ -577,8 +547,7 @@ class TypeConverterDelegate {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Map convertToTypedMap(
-			Map original, String propertyName, Class<?> requiredType, TypeDescriptor typeDescriptor) {
+	private Map convertToTypedMap(Map original, String propertyName, Class<?> requiredType, TypeDescriptor typeDescriptor) {
 
 		if (!Map.class.isAssignableFrom(requiredType)) {
 			return original;
