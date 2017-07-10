@@ -36,11 +36,11 @@ public class SingletonBeanFactoryLocatorTests {
 
 	@Test
 	public void testBasicFunctionality() {
-		SingletonBeanFactoryLocator facLoc = new SingletonBeanFactoryLocator(
-				"classpath*:" + ClassUtils.addResourcePathToPackagePath(CLASS, REF1_XML));
+		SingletonBeanFactoryLocator facLoc = new SingletonBeanFactoryLocator("classpath*:" + ClassUtils.addResourcePathToPackagePath(CLASS, REF1_XML));
 
 		basicFunctionalityTest(facLoc);
 	}
+
 
 	/**
 	 * Worker method so subclass can use it too.
@@ -191,49 +191,25 @@ public class SingletonBeanFactoryLocatorTests {
 class TestBean {
 
 	private String name;
-
 	private List<?> list;
-
 	private Object objRef;
 
-	/**
-	 * @return Returns the name.
-	 */
+	// getter and setter ...
 	public String getName() {
 		return name;
 	}
-
-	/**
-	 * @param name The name to set.
-	 */
 	public void setName(String name) {
 		this.name = name;
 	}
-
-	/**
-	 * @return Returns the list.
-	 */
 	public List<?> getList() {
 		return list;
 	}
-
-	/**
-	 * @param list The list to set.
-	 */
 	public void setList(List<?> list) {
 		this.list = list;
 	}
-
-	/**
-	 * @return Returns the object.
-	 */
 	public Object getObjRef() {
 		return objRef;
 	}
-
-	/**
-	 * @param object The object to set.
-	 */
 	public void setObjRef(Object object) {
 		this.objRef = object;
 	}
