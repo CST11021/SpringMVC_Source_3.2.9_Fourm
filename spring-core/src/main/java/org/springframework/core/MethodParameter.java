@@ -29,33 +29,17 @@ import java.util.Map;
 
 import org.springframework.util.Assert;
 
-/**
- * Helper class that encapsulates the specification of a method parameter, i.e.
- * a Method or Constructor plus a parameter index and a nested type index for
- * a declared generic type. Useful as a specification object to pass along.
- *
- * @author Juergen Hoeller
- * @author Rob Harrop
- * @author Andy Clement
- * @since 2.0
- * @see GenericCollectionTypeResolver
- */
+
+// 一个辅助类，封装了方法的参数的一些信息，如：所在方法，所在类的构造器，参数类型，参数索引位置，参数名称等信息
 public class MethodParameter {
 
 	private final Method method;
-
 	private final Constructor<?> constructor;
-
 	private final int parameterIndex;
-
 	private Class<?> parameterType;
-
 	private Type genericParameterType;
-
 	private Annotation[] parameterAnnotations;
-
 	private ParameterNameDiscoverer parameterNameDiscoverer;
-
 	private String parameterName;
 
 	private int nestingLevel = 1;
@@ -66,25 +50,9 @@ public class MethodParameter {
 	Map<TypeVariable, Type> typeVariableMap;
 
 
-	/**
-	 * Create a new MethodParameter for the given method, with nesting level 1.
-	 * @param method the Method to specify a parameter for
-	 * @param parameterIndex the index of the parameter
-	 */
 	public MethodParameter(Method method, int parameterIndex) {
 		this(method, parameterIndex, 1);
 	}
-
-	/**
-	 * Create a new MethodParameter for the given method.
-	 * @param method the Method to specify a parameter for
-	 * @param parameterIndex the index of the parameter
-	 * (-1 for the method return type; 0 for the first method parameter,
-	 * 1 for the second method parameter, etc)
-	 * @param nestingLevel the nesting level of the target type
-	 * (typically 1; e.g. in case of a List of Lists, 1 would indicate the
-	 * nested List, whereas 2 would indicate the element of the nested List)
-	 */
 	public MethodParameter(Method method, int parameterIndex, int nestingLevel) {
 		Assert.notNull(method, "Method must not be null");
 		this.method = method;
@@ -92,24 +60,9 @@ public class MethodParameter {
 		this.nestingLevel = nestingLevel;
 		this.constructor = null;
 	}
-
-	/**
-	 * Create a new MethodParameter for the given constructor, with nesting level 1.
-	 * @param constructor the Constructor to specify a parameter for
-	 * @param parameterIndex the index of the parameter
-	 */
 	public MethodParameter(Constructor<?> constructor, int parameterIndex) {
 		this(constructor, parameterIndex, 1);
 	}
-
-	/**
-	 * Create a new MethodParameter for the given constructor.
-	 * @param constructor the Constructor to specify a parameter for
-	 * @param parameterIndex the index of the parameter
-	 * @param nestingLevel the nesting level of the target type
-	 * (typically 1; e.g. in case of a List of Lists, 1 would indicate the
-	 * nested List, whereas 2 would indicate the element of the nested List)
-	 */
 	public MethodParameter(Constructor<?> constructor, int parameterIndex, int nestingLevel) {
 		Assert.notNull(constructor, "Constructor must not be null");
 		this.constructor = constructor;
@@ -117,12 +70,6 @@ public class MethodParameter {
 		this.nestingLevel = nestingLevel;
 		this.method = null;
 	}
-
-	/**
-	 * Copy constructor, resulting in an independent MethodParameter object
-	 * based on the same metadata and cache state that the original object was in.
-	 * @param original the original MethodParameter object to copy from
-	 */
 	public MethodParameter(MethodParameter original) {
 		Assert.notNull(original, "Original must not be null");
 		this.method = original.method;
@@ -139,51 +86,24 @@ public class MethodParameter {
 	}
 
 
-	/**
-	 * Return the wrapped Method, if any.
-	 * <p>Note: Either Method or Constructor is available.
-	 * @return the Method, or {@code null} if none
-	 */
+
 	public Method getMethod() {
 		return this.method;
 	}
-
-	/**
-	 * Return the wrapped Constructor, if any.
-	 * <p>Note: Either Method or Constructor is available.
-	 * @return the Constructor, or {@code null} if none
-	 */
 	public Constructor<?> getConstructor() {
 		return this.constructor;
 	}
 
-	/**
-	 * Returns the wrapped member.
-	 * @return the Method or Constructor as Member
-	 */
+	// Member对象可以用于表示一个类型成员，包括字段、方法或构造器等，这样可以使用java的反射机制获取它的访问权限
 	private Member getMember() {
 		return (this.method != null ? this.method : this.constructor);
 	}
-
-	/**
-	 * Returns the wrapped annotated element.
-	 * @return the Method or Constructor as AnnotatedElement
-	 */
 	private AnnotatedElement getAnnotatedElement() {
 		return (this.method != null ? this.method : this.constructor);
 	}
-
-	/**
-	 * Return the class that declares the underlying Method or Constructor.
-	 */
 	public Class<?> getDeclaringClass() {
 		return getMember().getDeclaringClass();
 	}
-
-	/**
-	 * Return the index of the method/constructor parameter.
-	 * @return the parameter index (never negative)
-	 */
 	public int getParameterIndex() {
 		return this.parameterIndex;
 	}
@@ -424,7 +344,6 @@ public class MethodParameter {
 		}
 		return false;
 	}
-
 	@Override
 	public int hashCode() {
 		return (getMember().hashCode() * 31 + this.parameterIndex);

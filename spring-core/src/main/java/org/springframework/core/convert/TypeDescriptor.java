@@ -31,7 +31,7 @@ import org.springframework.util.ObjectUtils;
 
 /**
  * Context about a type to convert from or to.
- *
+ * 有关一个类型转换的上下文
  * @author Keith Donald
  * @author Andy Clement
  * @author Juergen Hoeller
@@ -66,43 +66,19 @@ public class TypeDescriptor implements Serializable {
 		typeDescriptorCache.put(String.class, new TypeDescriptor(String.class));
 	}
 
-
 	private final Class<?> type;
-
 	private final TypeDescriptor elementTypeDescriptor;
-
 	private final TypeDescriptor mapKeyTypeDescriptor;
-
 	private final TypeDescriptor mapValueTypeDescriptor;
-
 	private final Annotation[] annotations;
 
 
-	/**
-	 * Create a new type descriptor from a {@link MethodParameter}.
-	 * <p>Use this constructor when a source or target conversion point is a
-	 * constructor parameter, method parameter, or method return value.
-	 * @param methodParameter the method parameter
-	 */
 	public TypeDescriptor(MethodParameter methodParameter) {
 		this(new ParameterDescriptor(methodParameter));
 	}
-
-	/**
-	 * Create a new type descriptor from a {@link Field}.
-	 * <p>Use this constructor when a source or target conversion point is a field.
-	 * @param field the field
-	 */
 	public TypeDescriptor(Field field) {
 		this(new FieldDescriptor(field));
 	}
-
-	/**
-	 * Create a new type descriptor from a {@link Property}.
-	 * <p>Use this constructor when a source or target conversion point is a
-	 * property on a Java class.
-	 * @param property the property
-	 */
 	public TypeDescriptor(Property property) {
 		this(new BeanPropertyDescriptor(property));
 	}
