@@ -68,11 +68,11 @@
     </dependency>
 
       <!-- https://mvnrepository.com/artifact/org.springframework/spring-aop -->
-      <dependency>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-aop</artifactId>
-          <version>3.2.9.RELEASE</version>
-      </dependency>
+      <!--<dependency>-->
+          <!--<groupId>org.springframework</groupId>-->
+          <!--<artifactId>spring-aop</artifactId>-->
+          <!--<version>3.2.9.RELEASE</version>-->
+      <!--</dependency>-->
 
 
     <dependency>
@@ -476,6 +476,11 @@
   </dependencies>
   <build>
     <finalName>SpringMVC_Source_3.2.9_Fourm</finalName>
+      <resources>
+          <resource>
+              <directory>src/main</directory>
+          </resource>
+      </resources>
     <plugins>
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>

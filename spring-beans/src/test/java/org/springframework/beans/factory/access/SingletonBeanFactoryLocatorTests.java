@@ -36,11 +36,11 @@ public class SingletonBeanFactoryLocatorTests {
 
 	@Test
 	public void testBasicFunctionality() {
-		SingletonBeanFactoryLocator facLoc = new SingletonBeanFactoryLocator(
-				"classpath*:" + ClassUtils.addResourcePathToPackagePath(CLASS, REF1_XML));
+		SingletonBeanFactoryLocator facLoc = new SingletonBeanFactoryLocator("classpath*:" + ClassUtils.addResourcePathToPackagePath(CLASS, REF1_XML));
 
 		basicFunctionalityTest(facLoc);
 	}
+
 
 	/**
 	 * Worker method so subclass can use it too.
