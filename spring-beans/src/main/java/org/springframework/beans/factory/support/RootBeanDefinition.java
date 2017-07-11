@@ -40,16 +40,17 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	boolean isFactoryMethodUnique = false;
 	final Object constructorArgumentLock = new Object();
 
-	/** Package-visible field for caching the resolved constructor or factory method */
+	// 表示bean实例创建时要使用的构造器
 	Object resolvedConstructorOrFactoryMethod;
 
-	/** Package-visible field that marks the constructor arguments as resolved */
+	// 标识是否已经知道使用哪个构造器来进行实例化了
 	boolean constructorArgumentsResolved = false;
 
-	/** Package-visible field for caching fully resolved constructor arguments */
+	// 表示bean实例化时需要的构造器参数
 	Object[] resolvedConstructorArguments;
 
-	/** Package-visible field for caching partly prepared constructor arguments */
+	// 表示缓存中的构造器参数，它与resolvedConstructorArguments的区别是，resolvedConstructorArguments是最终实例化时要用的参数，
+	// 如给定方法的构造函数A(int ,int)则通过此方法后就会把配置中的("1","1")转化为(1,1)，缓存中的值可能是原始值也可能是最终值
 	Object[] preparedConstructorArguments;
 
 	final Object postProcessingLock = new Object();

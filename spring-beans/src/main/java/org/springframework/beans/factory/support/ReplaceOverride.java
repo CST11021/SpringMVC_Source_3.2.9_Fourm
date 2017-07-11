@@ -23,7 +23,7 @@ import java.util.List;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
-
+// 解析Bean标签的replaced-method 属性，如果配置了这个属性，则会一个 ReplaceOverride 对象
 public class ReplaceOverride extends MethodOverride {
 
 	private final String methodReplacerBeanName;

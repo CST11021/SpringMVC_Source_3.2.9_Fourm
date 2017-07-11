@@ -57,24 +57,12 @@ import org.springframework.util.StringUtils;
 class BeanDefinitionValueResolver {
 
 	private final AbstractBeanFactory beanFactory;
-
 	private final String beanName;
-
 	private final BeanDefinition beanDefinition;
-
 	private final TypeConverter typeConverter;
 
-
-	/**
-	 * Create a BeanDefinitionValueResolver for the given BeanFactory and BeanDefinition.
-	 * @param beanFactory the BeanFactory to resolve against
-	 * @param beanName the name of the bean that we work on
-	 * @param beanDefinition the BeanDefinition of the bean that we work on
-	 * @param typeConverter the TypeConverter to use for resolving TypedStringValues
-	 */
-	public BeanDefinitionValueResolver(
-			AbstractBeanFactory beanFactory, String beanName, BeanDefinition beanDefinition, TypeConverter typeConverter) {
-
+	// 构造器
+	public BeanDefinitionValueResolver(AbstractBeanFactory beanFactory, String beanName, BeanDefinition beanDefinition, TypeConverter typeConverter) {
 		this.beanFactory = beanFactory;
 		this.beanName = beanName;
 		this.beanDefinition = beanDefinition;
@@ -101,18 +89,17 @@ class BeanDefinitionValueResolver {
 	 * @return the resolved object
 	 */
 	public Object resolveValueIfNecessary(Object argName, Object value) {
-		// We must check each value to see whether it requires a runtime reference
-		// to another bean to be resolved.
+		// 这个value它可能指向另一个bean，需要在运行时被解析，比如：ref属性
 		if (value instanceof RuntimeBeanReference) {
 			RuntimeBeanReference ref = (RuntimeBeanReference) value;
+			// 返回这个ref指向的bean
 			return resolveReference(argName, ref);
 		}
 		else if (value instanceof RuntimeBeanNameReference) {
 			String refName = ((RuntimeBeanNameReference) value).getBeanName();
 			refName = String.valueOf(evaluate(refName));
 			if (!this.beanFactory.containsBean(refName)) {
-				throw new BeanDefinitionStoreException(
-						"Invalid bean name '" + refName + "' in bean reference for " + argName);
+				throw new BeanDefinitionStoreException("Invalid bean name '" + refName + "' in bean reference for " + argName);
 			}
 			return refName;
 		}
@@ -308,22 +295,22 @@ class BeanDefinitionValueResolver {
 		return actualInnerBeanName;
 	}
 
-	/**
-	 * Resolve a reference to another bean in the factory.
-	 */
+	// 解析这个指向其他bean的引用，argName是参数名，ref表示配置的信息如：ref属性配置，它指向另一个bean
 	private Object resolveReference(Object argName, RuntimeBeanReference ref) {
 		try {
+			// 从RuntimeBeanReference取得reference名字，这个RuntimeBeanReference是在载入BeanDefinition时，根据配置生成的
 			String refName = ref.getBeanName();
 			refName = String.valueOf(evaluate(refName));
+			// 如果ref是在双亲IOC容器中，那就到双亲IOC容器中去取
 			if (ref.isToParent()) {
 				if (this.beanFactory.getParentBeanFactory() == null) {
 					throw new BeanCreationException(
 							this.beanDefinition.getResourceDescription(), this.beanName,
-							"Can't resolve reference to bean '" + refName +
-							"' in parent factory: no parent factory available");
+							"Can't resolve reference to bean '" + refName + "' in parent factory: no parent factory available");
 				}
 				return this.beanFactory.getParentBeanFactory().getBean(refName);
 			}
+			// 在当前IOC容器中去获取Bean，这里会触发一个getBean的过程，如果依赖注入没有发生，这里会触发相应的依赖注入发生
 			else {
 				Object bean = this.beanFactory.getBean(refName);
 				this.beanFactory.registerDependentBean(refName, this.beanName);
@@ -331,8 +318,7 @@ class BeanDefinitionValueResolver {
 			}
 		}
 		catch (BeansException ex) {
-			throw new BeanCreationException(
-					this.beanDefinition.getResourceDescription(), this.beanName,
+			throw new BeanCreationException(this.beanDefinition.getResourceDescription(), this.beanName,
 					"Cannot resolve reference to bean '" + ref.getBeanName() + "' while setting " + argName, ex);
 		}
 	}

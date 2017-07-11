@@ -41,7 +41,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	//用来保存当前所有已注册的bean(即：单例bean的注册表)
 	private final Set<String> registeredSingletons = new LinkedHashSet<String>(64);
 
-	//目前正在创建中的单例bean的名称的集合
+	//目前正在创建中的单例bean的名称的集合，创建单例Bean前都会把bean放到这里，并在单例bean创建结束后移除（请看beforeSingletonCreation()和afterSingletonCreation()方法）
 	private final Map<String, Boolean> singletonsCurrentlyInCreation = new ConcurrentHashMap<String, Boolean>(16);
 	//** Names of beans currently excluded from in creation checks (using a ConcurrentHashMap as a Set) */
 	private final Map<String, Boolean> inCreationCheckExclusions = new ConcurrentHashMap<String, Boolean>(16);
@@ -163,12 +163,13 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					if (recordSuppressedExceptions) {
 						this.suppressedExceptions = null;
 					}
-					// 单例创建之后的回调,默认的实现标志单例不要在创建了。
+					// 单例bean创建之后的回调,默认的实现标志单例不要在创建了。
 					afterSingletonCreation(beanName);
 				}
-				// 注册创建后的单例
+				// 单例bean创建完后要注册这个单例
 				addSingleton(beanName, singletonObject);
 			}
+			// 如果单例已经被注册，则直接返回这个单例对象
 			return (singletonObject != NULL_OBJECT ? singletonObject : null);
 		}
 	}
@@ -236,8 +237,9 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		return this.singletonsCurrentlyInCreation.containsKey(beanName);
 	}
 
-	// 在这个bean被创建前调用这个方法
+	// 在这个单例bean被创建前会调用这个方法
 	protected void beforeSingletonCreation(String beanName) {
+		// 创建单例bean前，如果 inCreationCheckExclusions 里面没有这个这个bean，则把bean加入到 singletonsCurrentlyInCreation
 		if (!this.inCreationCheckExclusions.containsKey(beanName) &&
 				this.singletonsCurrentlyInCreation.put(beanName, Boolean.TRUE) != null) {
 			throw new BeanCurrentlyInCreationException(beanName);
@@ -245,6 +247,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 	// 在这个bean被创建后调用这个方法
 	protected void afterSingletonCreation(String beanName) {
+		// 创建完单例bean后，如果 inCreationCheckExclusions 里面没有这个这个bean，则把这个bean从 singletonsCurrentlyInCreation 移除
 		if (!this.inCreationCheckExclusions.containsKey(beanName) &&
 				!this.singletonsCurrentlyInCreation.remove(beanName)) {
 			throw new IllegalStateException("Singleton '" + beanName + "' isn't currently in creation");

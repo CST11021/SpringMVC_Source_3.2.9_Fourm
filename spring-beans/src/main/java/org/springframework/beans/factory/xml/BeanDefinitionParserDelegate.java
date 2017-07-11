@@ -395,10 +395,13 @@ public class BeanDefinitionParserDelegate {
 			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
 
 			parseMetaElements(ele, bd);
+			// lookup-method
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
+			// replaced-method
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
 
 			parseConstructorArgElements(ele, bd);
+			// 解析property标签
 			parsePropertyElements(ele, bd);
 			parseQualifierElements(ele, bd);
 
@@ -560,7 +563,7 @@ public class BeanDefinitionParserDelegate {
 		return node.getLocalName();
 	}
 
-	// Parse lookup-override sub-elements of the given bean element.
+	// 解析 lookup-override 这个属性
 	public void parseLookupOverrideSubElements(Element beanEle, MethodOverrides overrides) {
 		NodeList nl = beanEle.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
@@ -575,7 +578,7 @@ public class BeanDefinitionParserDelegate {
 			}
 		}
 	}
-	//  Parse replaced-method sub-elements of the given bean element.
+	// 解析 replaced-method 这个属性
 	public void parseReplacedMethodSubElements(Element beanEle, MethodOverrides overrides) {
 		NodeList nl = beanEle.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {

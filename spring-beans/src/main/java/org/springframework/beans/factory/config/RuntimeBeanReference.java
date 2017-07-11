@@ -19,68 +19,43 @@ package org.springframework.beans.factory.config;
 import org.springframework.util.Assert;
 
 /**
- * Immutable placeholder class used for a property value object when it's
- * a reference to another bean in the factory, to be resolved at runtime.
+ * Immutable placeholder class used for a property value object when it's a reference to another bean in the factory, to be resolved at runtime.
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @see BeanDefinition#getPropertyValues()
  * @see org.springframework.beans.factory.BeanFactory#getBean
  */
+// 当占位符类用于属性值的对象时，它指向工厂中另一个bean的引用，并在运行时被解析的。
 public class RuntimeBeanReference implements BeanReference {
 
+	// 这个运行时bean引用指向的bean名称
 	private final String beanName;
-
+	// 表示这个指向的bean是否在双亲容器中
 	private final boolean toParent;
-
+	// 表示这个bean的配置源（即这个bean是在哪个文件中定义的）,可能返回null
 	private Object source;
 
 
-	/**
-	 * Create a new RuntimeBeanReference to the given bean name,
-	 * without explicitly marking it as reference to a bean in
-	 * the parent factory.
-	 * @param beanName name of the target bean
-	 */
 	public RuntimeBeanReference(String beanName) {
 		this(beanName, false);
 	}
-
-	/**
-	 * Create a new RuntimeBeanReference to the given bean name,
-	 * with the option to mark it as reference to a bean in
-	 * the parent factory.
-	 * @param beanName name of the target bean
-	 * @param toParent whether this is an explicit reference to
-	 * a bean in the parent factory
-	 */
 	public RuntimeBeanReference(String beanName, boolean toParent) {
 		Assert.hasText(beanName, "'beanName' must not be empty");
 		this.beanName = beanName;
 		this.toParent = toParent;
 	}
 
-
+	// getter and setter ...
 	public String getBeanName() {
 		return this.beanName;
 	}
-
-	/**
-	 * Return whether this is an explicit reference to a bean
-	 * in the parent factory.
-	 */
 	public boolean isToParent() {
 		return this.toParent;
 	}
-
-	/**
-	 * Set the configuration source {@code Object} for this metadata element.
-	 * <p>The exact type of the object will depend on the configuration mechanism used.
-	 */
 	public void setSource(Object source) {
 		this.source = source;
 	}
-
 	public Object getSource() {
 		return this.source;
 	}
@@ -97,14 +72,12 @@ public class RuntimeBeanReference implements BeanReference {
 		RuntimeBeanReference that = (RuntimeBeanReference) other;
 		return (this.beanName.equals(that.beanName) && this.toParent == that.toParent);
 	}
-
 	@Override
 	public int hashCode() {
 		int result = this.beanName.hashCode();
 		result = 29 * result + (this.toParent ? 1 : 0);
 		return result;
 	}
-
 	@Override
 	public String toString() {
 		return '<' + getBeanName() + '>';

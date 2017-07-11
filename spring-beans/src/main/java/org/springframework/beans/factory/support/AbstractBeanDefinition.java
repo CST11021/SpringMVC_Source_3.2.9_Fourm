@@ -66,7 +66,9 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	private boolean lenientConstructorResolution = true;
 	private ConstructorArgumentValues constructorArgumentValues;
 	private MutablePropertyValues propertyValues;
+	// 该类其实是对lookup-method、replace-method 配置的一个封装
 	private MethodOverrides methodOverrides = new MethodOverrides();
+	// 对应 factory-bean 配置
 	private String factoryBeanName;
 	private String factoryMethodName;
 	private String initMethodName;
@@ -214,8 +216,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 			throw new IllegalStateException("No bean class specified on bean definition");
 		}
 		if (!(beanClassObject instanceof Class)) {
-			throw new IllegalStateException(
-					"Bean class name [" + beanClassObject + "] has not been resolved into an actual Class");
+			throw new IllegalStateException("Bean class name [" + beanClassObject + "] has not been resolved into an actual Class");
 		}
 		return (Class<?>) beanClassObject;
 	}
@@ -233,12 +234,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 		}
 	}
 
-	/**
-	 * Determine the class of the wrapped bean, resolving it from a specified class name if necessary. Will also reload a specified Class from its name when called with the bean class already resolved.
-	 * @param classLoader the ClassLoader to use for resolving a (potential) class name
-	 * @return the resolved bean class
-	 * @throws ClassNotFoundException if the class name could be resolved
-	 */
+	// 返回这个bean的类型
 	public Class<?> resolveBeanClass(ClassLoader classLoader) throws ClassNotFoundException {
 		String className = getBeanClassName();
 		if (className == null) {
@@ -294,13 +290,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 		return this.autowireMode;
 	}
 
-	/**
-	 * Return the resolved autowire code,
-	 * (resolving AUTOWIRE_AUTODETECT to AUTOWIRE_CONSTRUCTOR or AUTOWIRE_BY_TYPE).
-	 * @see #AUTOWIRE_AUTODETECT
-	 * @see #AUTOWIRE_CONSTRUCTOR
-	 * @see #AUTOWIRE_BY_TYPE
-	 */
+
+	// 返回使用哪种形式的注入，如：AUTOWIRE_AUTODETECT、AUTOWIRE_CONSTRUCTOR、AUTOWIRE_BY_TYPE等
 	public int getResolvedAutowireMode() {
 		if (this.autowireMode == AUTOWIRE_AUTODETECT) {
 			// Work out whether to apply setter autowiring or constructor autowiring.
@@ -517,13 +508,9 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 		}
 	}
 
-	/**
-	 * Validate and prepare the method overrides defined for this bean.
-	 * Checks for existence of a method with the specified name.
-	 * @throws BeanDefinitionValidationException in case of validation failure
-	 */
+
+	// 检查是否有配置 lookup-method 和 replace-method 覆盖方法，并判断这个覆盖方法是否存在
 	public void prepareMethodOverrides() throws BeanDefinitionValidationException {
-		// Check that lookup methods exists.
 		MethodOverrides methodOverrides = getMethodOverrides();
 		if (!methodOverrides.isEmpty()) {
 			for (MethodOverride mo : methodOverrides.getOverrides()) {
@@ -531,19 +518,10 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 			}
 		}
 	}
-
-	/**
-	 * Validate and prepare the given method override.
-	 * Checks for existence of a method with the specified name,
-	 * marking it as not overloaded if none found.
-	 * @param mo the MethodOverride object to validate
-	 * @throws BeanDefinitionValidationException in case of validation failure
-	 */
 	protected void prepareMethodOverride(MethodOverride mo) throws BeanDefinitionValidationException {
 		int count = ClassUtils.getMethodCountForName(getBeanClass(), mo.getMethodName());
 		if (count == 0) {
-			throw new BeanDefinitionValidationException(
-					"Invalid method override: no method with name '" + mo.getMethodName() +
+			throw new BeanDefinitionValidationException("Invalid method override: no method with name '" + mo.getMethodName() +
 					"' on class [" + getBeanClassName() + "]");
 		}
 		else if (count == 1) {

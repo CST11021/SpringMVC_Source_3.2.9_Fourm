@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
-// 表示在同一IOC上下文中查找对象的方法的重写
+// 表示在同一IOC上下文中查找对象的方法的重写，对应配置文件中<bean>标签中的那个lookup-override 配置
 public class LookupOverride extends MethodOverride {
 
 	private final String beanName;

@@ -37,7 +37,7 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	void setBeanExpressionResolver(BeanExpressionResolver resolver);
 	BeanExpressionResolver getBeanExpressionResolver();
 
-	// 类型转化器
+	// 类型转换器
 	void setConversionService(ConversionService conversionService);
 	ConversionService getConversionService();
 

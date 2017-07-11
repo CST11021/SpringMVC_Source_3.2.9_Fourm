@@ -56,6 +56,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 
 
 	ConstructorArgumentValues getConstructorArgumentValues();
+	// 用于保存配置的property标签信息
 	MutablePropertyValues getPropertyValues();
 	String getDescription();
 	String getResourceDescription();

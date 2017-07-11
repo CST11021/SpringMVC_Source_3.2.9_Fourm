@@ -5,8 +5,8 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
-
-// 表示bean的一系列方法覆盖设置，如果bean有配置方法覆盖，Spring IOC容器将在运行时重写。
+// 该类其实是对lookup-method、replace-method 配置的一个封装
+// 表示bean的一系列方法覆盖设置，如果bean有配置方法覆盖，Spring IOC容器将在运行时重写
 public class MethodOverrides {
 
 	private final Set<MethodOverride> overrides = new HashSet<MethodOverride>(0);

@@ -66,41 +66,39 @@ import org.springframework.util.StringUtils;
  * @see #instantiateUsingFactoryMethod
  * @see AbstractAutowireCapableBeanFactory
  */
+// 构造函数解析器，Spring实例化bean前需要先判断使用哪个构造函数去实例化这个bean，该类就是用于解析要使用的构造器的
+// Spring在根据参数及类型去判断使用哪个构造函数是一个比较消耗性能的步骤，所以采用缓存机制，如果已经解析过则不需要重复解析，而是直接从 RootBeanDefinition 中 resolvedConstructorOrFactoryMethod 缓存的值去取
 class ConstructorResolver {
 
 	private static final String CONSTRUCTOR_PROPERTIES_CLASS_NAME = "java.beans.ConstructorProperties";
-
 	private static final boolean constructorPropertiesAnnotationAvailable =
 			ClassUtils.isPresent(CONSTRUCTOR_PROPERTIES_CLASS_NAME, ConstructorResolver.class.getClassLoader());
-
 	private final AbstractAutowireCapableBeanFactory beanFactory;
 
-
-	/**
-	 * Create a new ConstructorResolver for the given factory and instantiation strategy.
-	 * @param beanFactory the BeanFactory to work with
-	 */
+	// 构造器
 	public ConstructorResolver(AbstractAutowireCapableBeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 	}
 
 
+
+
+
 	/**
-	 * "autowire constructor" (with constructor arguments by type) behavior.
-	 * Also applied if explicit constructor argument values are specified,
-	 * matching all remaining arguments with beans from the bean factory.
-	 * <p>This corresponds to constructor injection: In this mode, a Spring
-	 * bean factory is able to host components that expect constructor-based
-	 * dependency resolution.
-	 * @param beanName the name of the bean
-	 * @param mbd the merged bean definition for the bean
-	 * @param chosenCtors chosen candidate constructors (or {@code null} if none)
-	 * @param explicitArgs argument values passed in programmatically via the getBean method,
-	 * or {@code null} if none (-> use constructor argument values from bean definition)
-	 * @return a BeanWrapper for the new instance
+	 * 该方法中包括以下几部分：
+	 *
+	 * 1、构造函数参数的确定
+	 * 如果传入的参数expliitArgs不为空，那便可以直接确定参数，因为explicitArgs参数是在调用Bean的时候用户指定的，在BeanFactory接口中存在这样的方法：
+	 * Object getBean(String name, Object... args);
+	 * 在获取bean的时候，用户不但可以指定bean的名称还可以指定bean的所对应类的构造函数或工厂方法的方法参数，主要用于静态工厂方法的调用，而这里是需要给定完全匹配的参数的，
+	 * 所以，便可以判断，如果传入参数explicitArgs不为空，则可以确定构造函数参数就是它。
+	 *
+	 * 参照 《Spring源码深度解析》的109页。。。
+	 *
+	 *
 	 */
-	public BeanWrapper autowireConstructor(
-			final String beanName, final RootBeanDefinition mbd, Constructor<?>[] chosenCtors, final Object[] explicitArgs) {
+	// 使用指定构造器自动注入
+	public BeanWrapper autowireConstructor(final String beanName, final RootBeanDefinition mbd, Constructor<?>[] chosenCtors, final Object[] explicitArgs) {
 
 		BeanWrapperImpl bw = new BeanWrapperImpl();
 		this.beanFactory.initBeanWrapper(bw);
@@ -109,39 +107,52 @@ class ConstructorResolver {
 		ArgumentsHolder argsHolderToUse = null;
 		Object[] argsToUse = null;
 
+
+
+		// 如果getBean方法调用的时候，有指定方法参数那么直接使用
 		if (explicitArgs != null) {
 			argsToUse = explicitArgs;
 		}
+		// 如果在getBean方法时候没有指定则尝试从配置文件中解析
 		else {
 			Object[] argsToResolve = null;
 			synchronized (mbd.constructorArgumentLock) {
+				// 尝试从缓存中获取
 				constructorToUse = (Constructor<?>) mbd.resolvedConstructorOrFactoryMethod;
 				if (constructorToUse != null && mbd.constructorArgumentsResolved) {
-					// Found a cached constructor...
+					// 从缓存中取
 					argsToUse = mbd.resolvedConstructorArguments;
 					if (argsToUse == null) {
+						// 配置构造函数参数
 						argsToResolve = mbd.preparedConstructorArguments;
 					}
 				}
 			}
+			// 如果缓存中存在
 			if (argsToResolve != null) {
+				// 解析参数类型，如给定方法的构造函数A(int ,int)则通过此方法后就会把配置中的("1","1")转化为(1,1)，缓存中的值可能是原始值也可能是最终值
 				argsToUse = resolvePreparedArguments(beanName, mbd, bw, constructorToUse, argsToResolve);
 			}
 		}
 
-		if (constructorToUse == null) {
-			// Need to resolve the constructor.
-			boolean autowiring = (chosenCtors != null ||
-					mbd.getResolvedAutowireMode() == RootBeanDefinition.AUTOWIRE_CONSTRUCTOR);
-			ConstructorArgumentValues resolvedValues = null;
 
+
+		// 缓存中没有构造器
+		if (constructorToUse == null) {
+			// 获取自动装配的类型
+			boolean autowiring = (chosenCtors != null || mbd.getResolvedAutowireMode() == RootBeanDefinition.AUTOWIRE_CONSTRUCTOR);
+
+			ConstructorArgumentValues resolvedValues = null;
 			int minNrOfArgs;
 			if (explicitArgs != null) {
 				minNrOfArgs = explicitArgs.length;
 			}
 			else {
+				// 提取配置文件中的配置的构造函数参数
 				ConstructorArgumentValues cargs = mbd.getConstructorArgumentValues();
+				// 用于承载解析后的构造参数的值
 				resolvedValues = new ConstructorArgumentValues();
+				// 解析参数个数
 				minNrOfArgs = resolveConstructorArguments(beanName, mbd, bw, cargs, resolvedValues);
 			}
 
@@ -155,10 +166,11 @@ class ConstructorResolver {
 				}
 				catch (Throwable ex) {
 					throw new BeanCreationException(mbd.getResourceDescription(), beanName,
-							"Resolution of declared constructors on bean Class [" + beanClass.getName() +
-									"] from ClassLoader [" + beanClass.getClassLoader() + "] failed", ex);
+							"Resolution of declared constructors on bean Class [" + beanClass.getName() + "] from ClassLoader [" + beanClass.getClassLoader() + "] failed", ex);
 				}
 			}
+
+			// 排序给定的构造函数，public构造函数优先参数数量降序、非public构造函数参数数量降序
 			AutowireUtils.sortConstructors(candidates);
 			int minTypeDiffWeight = Integer.MAX_VALUE;
 			Set<Constructor<?>> ambiguousConstructors = null;
@@ -169,29 +181,33 @@ class ConstructorResolver {
 				Class<?>[] paramTypes = candidate.getParameterTypes();
 
 				if (constructorToUse != null && argsToUse.length > paramTypes.length) {
-					// Already found greedy constructor that can be satisfied ->
-					// do not look any further, there are only less greedy constructors left.
+					// 如果已经找到选用的构造函数或者需要的参数个数小于当前的构造函数参数个数则终止，以内已经按照参数个数降序排列
 					break;
 				}
 				if (paramTypes.length < minNrOfArgs) {
+					//参数个数不相等
 					continue;
 				}
 
 				ArgumentsHolder argsHolder;
 				if (resolvedValues != null) {
+					//有参数则根据值构造对应参数类型的参数
 					try {
 						String[] paramNames = null;
 						if (constructorPropertiesAnnotationAvailable) {
+							//注释上获取参数名称
 							paramNames = ConstructorPropertiesChecker.evaluate(candidate, paramTypes.length);
 						}
 						if (paramNames == null) {
+							//获取参数名称探索器
 							ParameterNameDiscoverer pnd = this.beanFactory.getParameterNameDiscoverer();
 							if (pnd != null) {
+								//获取指定构造函数的参数名称
 								paramNames = pnd.getParameterNames(candidate);
 							}
 						}
-						argsHolder = createArgumentArray(
-								beanName, mbd, resolvedValues, bw, paramTypes, paramNames, candidate, autowiring);
+						//根据名称和数据类型创建参数持有者
+						argsHolder = createArgumentArray(beanName, mbd, resolvedValues, bw, paramTypes, paramNames, candidate, autowiring);
 					}
 					catch (UnsatisfiedDependencyException ex) {
 						if (this.beanFactory.logger.isTraceEnabled()) {
@@ -221,12 +237,14 @@ class ConstructorResolver {
 					if (paramTypes.length != explicitArgs.length) {
 						continue;
 					}
+					//构造函数没有参数的情况
 					argsHolder = new ArgumentsHolder(explicitArgs);
 				}
 
+				//探测是否有不确定性的构造函数存在，例如不同构造函数的参数为父子关系
 				int typeDiffWeight = (mbd.isLenientConstructorResolution() ?
 						argsHolder.getTypeDifferenceWeight(paramTypes) : argsHolder.getAssignabilityWeight(paramTypes));
-				// Choose this constructor if it represents the closest match.
+				// 如果他代表着当前最接近的匹配则选择作为构造函数
 				if (typeDiffWeight < minTypeDiffWeight) {
 					constructorToUse = candidate;
 					argsHolderToUse = argsHolder;
@@ -256,6 +274,7 @@ class ConstructorResolver {
 			}
 
 			if (explicitArgs == null) {
+				//将解析的构造函数加入缓存
 				argsHolderToUse.storeCache(mbd, constructorToUse);
 			}
 		}
@@ -268,8 +287,7 @@ class ConstructorResolver {
 				final Object[] argumentsToUse = argsToUse;
 				beanInstance = AccessController.doPrivileged(new PrivilegedAction<Object>() {
 					public Object run() {
-						return beanFactory.getInstantiationStrategy().instantiate(
-								mbd, beanName, beanFactory, ctorToUse, argumentsToUse);
+						return beanFactory.getInstantiationStrategy().instantiate(mbd, beanName, beanFactory, ctorToUse, argumentsToUse);
 					}
 				}, beanFactory.getAccessControlContext());
 			}
@@ -278,6 +296,7 @@ class ConstructorResolver {
 						mbd, beanName, this.beanFactory, constructorToUse, argsToUse);
 			}
 
+			//将构建的实例加入BeanWrapper中
 			bw.setWrappedInstance(beanInstance);
 			return bw;
 		}
@@ -343,23 +362,8 @@ class ConstructorResolver {
 		}
 	}
 
-	/**
-	 * Instantiate the bean using a named factory method. The method may be static, if the
-	 * bean definition parameter specifies a class, rather than a "factory-bean", or
-	 * an instance variable on a factory object itself configured using Dependency Injection.
-	 * <p>Implementation requires iterating over the static or instance methods with the
-	 * name specified in the RootBeanDefinition (the method may be overloaded) and trying
-	 * to match with the parameters. We don't have the types attached to constructor args,
-	 * so trial and error is the only way to go here. The explicitArgs array may contain
-	 * argument values passed in programmatically via the corresponding getBean method.
-	 * @param beanName the name of the bean
-	 * @param mbd the merged bean definition for the bean
-	 * @param explicitArgs argument values passed in programmatically via the getBean
-	 * method, or {@code null} if none (-> use constructor argument values from bean definition)
-	 * @return a BeanWrapper for the new instance
-	 */
-	public BeanWrapper instantiateUsingFactoryMethod(
-			final String beanName, final RootBeanDefinition mbd, final Object[] explicitArgs) {
+	// 使用工厂bean创建一个bean实例，并返回一个BeanWrapper
+	public BeanWrapper instantiateUsingFactoryMethod(final String beanName, final RootBeanDefinition mbd, final Object[] explicitArgs) {
 
 		BeanWrapperImpl bw = new BeanWrapperImpl();
 		this.beanFactory.initBeanWrapper(bw);
@@ -368,16 +372,15 @@ class ConstructorResolver {
 		Class<?> factoryClass;
 		boolean isStatic;
 
+		// 获取factory-bean 配置的工厂bean
 		String factoryBeanName = mbd.getFactoryBeanName();
 		if (factoryBeanName != null) {
 			if (factoryBeanName.equals(beanName)) {
-				throw new BeanDefinitionStoreException(mbd.getResourceDescription(), beanName,
-						"factory-bean reference points back to the same bean definition");
+				throw new BeanDefinitionStoreException(mbd.getResourceDescription(), beanName, "factory-bean reference points back to the same bean definition");
 			}
 			factoryBean = this.beanFactory.getBean(factoryBeanName);
 			if (factoryBean == null) {
-				throw new BeanCreationException(mbd.getResourceDescription(), beanName,
-						"factory-bean '" + factoryBeanName + "' returned null");
+				throw new BeanCreationException(mbd.getResourceDescription(), beanName, "factory-bean '" + factoryBeanName + "' returned null");
 			}
 			factoryClass = factoryBean.getClass();
 			isStatic = false;
@@ -385,8 +388,7 @@ class ConstructorResolver {
 		else {
 			// It's a static factory method on the bean class.
 			if (!mbd.hasBeanClass()) {
-				throw new BeanDefinitionStoreException(mbd.getResourceDescription(), beanName,
-						"bean definition declares neither a bean class nor a factory-bean reference");
+				throw new BeanDefinitionStoreException(mbd.getResourceDescription(), beanName, "bean definition declares neither a bean class nor a factory-bean reference");
 			}
 			factoryBean = null;
 			factoryClass = mbd.getBeanClass();
@@ -609,14 +611,13 @@ class ConstructorResolver {
 	 * This may involve looking up other beans.
 	 * This method is also used for handling invocations of static factory methods.
 	 */
-	private int resolveConstructorArguments(
-			String beanName, RootBeanDefinition mbd, BeanWrapper bw,
-			ConstructorArgumentValues cargs, ConstructorArgumentValues resolvedValues) {
+	private int resolveConstructorArguments(String beanName, RootBeanDefinition mbd, BeanWrapper bw, ConstructorArgumentValues cargs, ConstructorArgumentValues resolvedValues) {
 
+		// 获取这个BeanFactory的类型转换器
 		TypeConverter converter = (this.beanFactory.getCustomTypeConverter() != null ?
 				this.beanFactory.getCustomTypeConverter() : bw);
-		BeanDefinitionValueResolver valueResolver =
-				new BeanDefinitionValueResolver(this.beanFactory, beanName, mbd, converter);
+
+		BeanDefinitionValueResolver valueResolver = new BeanDefinitionValueResolver(this.beanFactory, beanName, mbd, converter);
 
 		int minNrOfArgs = cargs.getArgumentCount();
 
@@ -665,8 +666,13 @@ class ConstructorResolver {
 	 * given the resolved constructor argument values.
 	 */
 	private ArgumentsHolder createArgumentArray(
-			String beanName, RootBeanDefinition mbd, ConstructorArgumentValues resolvedValues,
-			BeanWrapper bw, Class<?>[] paramTypes, String[] paramNames, Object methodOrCtor,
+			String beanName,
+			RootBeanDefinition mbd,
+			ConstructorArgumentValues resolvedValues,
+			BeanWrapper bw,
+			Class<?>[] paramTypes,
+			String[] paramNames,
+			Object methodOrCtor,
 			boolean autowiring) throws UnsatisfiedDependencyException {
 
 		String methodType = (methodOrCtor instanceof Constructor ? "constructor" : "factory method");
@@ -766,11 +772,8 @@ class ConstructorResolver {
 		return args;
 	}
 
-	/**
-	 * Resolve the prepared arguments stored in the given bean definition.
-	 */
-	private Object[] resolvePreparedArguments(
-			String beanName, RootBeanDefinition mbd, BeanWrapper bw, Member methodOrCtor, Object[] argsToResolve) {
+	// 解析参数类型，如给定方法的构造函数A(int ,int)则通过此方法后就会把配置中的("1","1")转化为(1,1)，缓存中的值可能是原始值也可能是最终值
+	private Object[] resolvePreparedArguments(String beanName, RootBeanDefinition mbd, BeanWrapper bw, Member methodOrCtor, Object[] argsToResolve) {
 
 		Class<?>[] paramTypes = (methodOrCtor instanceof Method ?
 				((Method) methodOrCtor).getParameterTypes() : ((Constructor<?>) methodOrCtor).getParameterTypes());
@@ -811,8 +814,7 @@ class ConstructorResolver {
 	/**
 	 * Template method for resolving the specified argument which is supposed to be autowired.
 	 */
-	protected Object resolveAutowiredArgument(
-			MethodParameter param, String beanName, Set<String> autowiredBeanNames, TypeConverter typeConverter) {
+	protected Object resolveAutowiredArgument(MethodParameter param, String beanName, Set<String> autowiredBeanNames, TypeConverter typeConverter) {
 
 		return this.beanFactory.resolveDependency(
 				new DependencyDescriptor(param, true), beanName, autowiredBeanNames, typeConverter);
@@ -886,8 +888,7 @@ class ConstructorResolver {
 	/**
 	 * Marker for autowired arguments in a cached argument array.
  	 */
-	private static class AutowiredArgumentMarker {
-	}
+	private static class AutowiredArgumentMarker {}
 
 
 	/**

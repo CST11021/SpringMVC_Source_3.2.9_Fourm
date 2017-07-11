@@ -86,7 +86,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	private BeanExpressionResolver beanExpressionResolver;
 	// 应用于这个 bean工厂的属性编辑器的类型转换器
 	private ConversionService conversionService;
-	// 自定义的 PropertyEditorRegistrar
+	// 自定义的 PropertyEditorRegistrar（PropertyEditorRegistrar接口用于注册自定义属性编辑器）
 	private final Set<PropertyEditorRegistrar> propertyEditorRegistrars = new LinkedHashSet<PropertyEditorRegistrar>(4);
 	// 自定义TypeConverter使用，覆盖默认的属性机制
 	private TypeConverter typeConverter;
@@ -222,12 +222,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					sharedInstance = getSingleton(beanName, new ObjectFactory<Object>() {
 						public Object getObject() throws BeansException {
 							try {
+								// 创建单例bean的真正实现
 								return createBean(beanName, mbd, args);
 							}
 							catch (BeansException ex) {
-								// Explicitly remove instance from singleton cache: It might have been put there
-								// eagerly by the creation process, to allow for circular reference resolution.
-								// Also remove any beans that received a temporary reference to the bean.
 								destroySingleton(beanName);
 								throw ex;
 							}
@@ -582,47 +580,36 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		}
 		this.parentBeanFactory = parentBeanFactory;
 	}
-
 	public void setBeanClassLoader(ClassLoader beanClassLoader) {
 		this.beanClassLoader = (beanClassLoader != null ? beanClassLoader : ClassUtils.getDefaultClassLoader());
 	}
-
 	public ClassLoader getBeanClassLoader() {
 		return this.beanClassLoader;
 	}
-
 	public void setTempClassLoader(ClassLoader tempClassLoader) {
 		this.tempClassLoader = tempClassLoader;
 	}
-
 	public ClassLoader getTempClassLoader() {
 		return this.tempClassLoader;
 	}
-
 	public void setCacheBeanMetadata(boolean cacheBeanMetadata) {
 		this.cacheBeanMetadata = cacheBeanMetadata;
 	}
-
 	public boolean isCacheBeanMetadata() {
 		return this.cacheBeanMetadata;
 	}
-
 	public void setBeanExpressionResolver(BeanExpressionResolver resolver) {
 		this.beanExpressionResolver = resolver;
 	}
-
 	public BeanExpressionResolver getBeanExpressionResolver() {
 		return this.beanExpressionResolver;
 	}
-
 	public void setConversionService(ConversionService conversionService) {
 		this.conversionService = conversionService;
 	}
-
 	public ConversionService getConversionService() {
 		return this.conversionService;
 	}
-
 	public void addPropertyEditorRegistrar(PropertyEditorRegistrar registrar) {
 		Assert.notNull(registrar, "PropertyEditorRegistrar must not be null");
 		this.propertyEditorRegistrars.add(registrar);
@@ -710,10 +697,6 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		return this.beanPostProcessors.size();
 	}
 
-	/**
-	 * Return the list of BeanPostProcessors that will get applied
-	 * to beans created with this factory.
-	 */
 	public List<BeanPostProcessor> getBeanPostProcessors() {
 		return this.beanPostProcessors;
 	}
@@ -952,33 +935,19 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		return beanName;
 	}
 
-	/**
-	 * Initialize the given BeanWrapper with the custom editors registered
-	 * with this factory. To be called for BeanWrappers that will create
-	 * and populate bean instances.
-	 * <p>The default implementation delegates to {@link #registerCustomEditors}.
-	 * Can be overridden in subclasses.
-	 * @param bw the BeanWrapper to initialize
-	 */
+	// 给这个BeanWrapper 设置类型转换器，并设置自定义属性编辑器
 	protected void initBeanWrapper(BeanWrapper bw) {
 		bw.setConversionService(getConversionService());
 		registerCustomEditors(bw);
 	}
 
-	/**
-	 * Initialize the given PropertyEditorRegistry with the custom editors
-	 * that have been registered with this BeanFactory.
-	 * <p>To be called for BeanWrappers that will create and populate bean
-	 * instances, and for SimpleTypeConverter used for constructor argument
-	 * and factory method type conversion.
-	 * @param registry the PropertyEditorRegistry to initialize
-	 */
+	// 注册自定义的属性编辑器
 	protected void registerCustomEditors(PropertyEditorRegistry registry) {
-		PropertyEditorRegistrySupport registrySupport =
-				(registry instanceof PropertyEditorRegistrySupport ? (PropertyEditorRegistrySupport) registry : null);
+		PropertyEditorRegistrySupport registrySupport = (registry instanceof PropertyEditorRegistrySupport ? (PropertyEditorRegistrySupport) registry : null);
 		if (registrySupport != null) {
 			registrySupport.useConfigValueEditors();
 		}
+
 		if (!this.propertyEditorRegistrars.isEmpty()) {
 			for (PropertyEditorRegistrar registrar : this.propertyEditorRegistrars) {
 				try {
@@ -1155,20 +1124,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		this.mergedBeanDefinitions.remove(beanName);
 	}
 
-	/**
-	 * Resolve the bean class for the specified bean definition,
-	 * resolving a bean class name into a Class reference (if necessary)
-	 * and storing the resolved Class in the bean definition for further use.
-	 * @param mbd the merged bean definition to determine the class for
-	 * @param beanName the name of the bean (for error handling purposes)
-	 * @param typesToMatch the types to match in case of internal type matching purposes
-	 * (also signals that the returned {@code Class} will never be exposed to application code)
-	 * @return the resolved bean class (or {@code null} if none)
-	 * @throws CannotLoadBeanClassException if we failed to load the class
-	 */
+	// 返回这个bean的类型
 	protected Class<?> resolveBeanClass(final RootBeanDefinition mbd, String beanName, final Class<?>... typesToMatch) throws CannotLoadBeanClassException {
 		try {
+			// 判断这个bean的beanClass是否是类类型
 			if (mbd.hasBeanClass()) {
+				// 返回这个bean的类型
 				return mbd.getBeanClass();
 			}
 			if (System.getSecurityManager() != null) {
@@ -1194,6 +1155,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		}
 	}
 
+	// 返回这个bean的类型
 	private Class<?> doResolveBeanClass(RootBeanDefinition mbd, Class<?>... typesToMatch) throws ClassNotFoundException {
 		if (!ObjectUtils.isEmpty(typesToMatch)) {
 			ClassLoader tempClassLoader = getTempClassLoader();
@@ -1460,20 +1422,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	protected abstract BeanDefinition getBeanDefinition(String beanName) throws BeansException;
 
-	/**
-	 * Create a bean instance for the given bean definition.
-	 * The bean definition will already have been merged with the parent
-	 * definition in case of a child definition.
-	 * <p>All the other methods in this class invoke this method, although
-	 * beans may be cached after being instantiated by this method. All bean
-	 * instantiation within this class is performed by this method.
-	 * @param beanName the name of the bean
-	 * @param mbd the merged bean definition for the bean
-	 * @param args arguments to use if creating a prototype using explicit arguments to a
-	 * static factory method. This parameter must be {@code null} except in this case.
-	 * @return a new instance of the bean
-	 * @throws BeanCreationException if the bean could not be created
-	 */
+	// 创建单例Bean的模板方法，抽象方法留给子类去实现
 	protected abstract Object createBean(String beanName, RootBeanDefinition mbd, Object[] args) throws BeanCreationException;
 
 }

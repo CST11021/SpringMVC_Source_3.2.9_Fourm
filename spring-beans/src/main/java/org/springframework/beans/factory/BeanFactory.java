@@ -19,6 +19,7 @@ public interface BeanFactory {
 	Object getBean(String name) throws BeansException;
 	<T> T getBean(String name, Class<T> requiredType) throws BeansException;
 	<T> T getBean(Class<T> requiredType) throws BeansException;
+	// 按名字和显示声明的参数来创建实例，注意显示声明的参数是用来创建原型的
 	Object getBean(String name, Object... args) throws BeansException;
 
 	// 判断是否包含指定id的bean
