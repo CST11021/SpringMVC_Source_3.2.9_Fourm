@@ -31,53 +31,15 @@ import org.springframework.beans.factory.BeanFactory;
  * @author Rod Johnson
  * @since 1.1
  */
+
+// Spring会根据不同的策略来创建bean实例
 public interface InstantiationStrategy {
 
-	/**
-	 * Return an instance of the bean with the given name in this factory.
-	 * @param beanDefinition the bean definition
-	 * @param beanName name of the bean when it's created in this context.
-	 * The name can be {@code null} if we're autowiring a bean that
-	 * doesn't belong to the factory.
-	 * @param owner owning BeanFactory
-	 * @return a bean instance for this bean definition
-	 * @throws BeansException if the instantiation failed
-	 */
-	Object instantiate(RootBeanDefinition beanDefinition, String beanName, BeanFactory owner)
-			throws BeansException;
-
-	/**
-	 * Return an instance of the bean with the given name in this factory,
-	 * creating it via the given constructor.
-	 * @param beanDefinition the bean definition
-	 * @param beanName name of the bean when it's created in this context.
-	 * The name can be {@code null} if we're autowiring a bean
-	 * that doesn't belong to the factory.
-	 * @param owner owning BeanFactory
-	 * @param ctor the constructor to use
-	 * @param args the constructor arguments to apply
-	 * @return a bean instance for this bean definition
-	 * @throws BeansException if the instantiation failed
-	 */
-	Object instantiate(RootBeanDefinition beanDefinition, String beanName, BeanFactory owner,
-			Constructor<?> ctor, Object[] args) throws BeansException;
-
-	/**
-	 * Return an instance of the bean with the given name in this factory,
-	 * creating it via the given factory method.
-	 * @param beanDefinition bean definition
-	 * @param beanName name of the bean when it's created in this context.
-	 * The name can be {@code null} if we're autowiring a bean
-	 * that doesn't belong to the factory.
-	 * @param owner owning BeanFactory
-	 * @param factoryBean the factory bean instance to call the factory method on,
-	 * or {@code null} in case of a static factory method
-	 * @param factoryMethod the factory method to use
-	 * @param args the factory method arguments to apply
-	 * @return a bean instance for this bean definition
-	 * @throws BeansException if the instantiation failed
-	 */
-	Object instantiate(RootBeanDefinition beanDefinition, String beanName, BeanFactory owner,
-			Object factoryBean, Method factoryMethod, Object[] args) throws BeansException;
+	// 在owner工厂中返回一个带有给定名称的bean的实例
+	Object instantiate(RootBeanDefinition beanDefinition, String beanName, BeanFactory owner) throws BeansException;
+	// 使用指定构造器和参数实例化bean
+	Object instantiate(RootBeanDefinition beanDefinition, String beanName, BeanFactory owner, Constructor<?> ctor, Object[] args) throws BeansException;
+	// 使用工厂方法实例化bean
+	Object instantiate(RootBeanDefinition beanDefinition, String beanName, BeanFactory owner, Object factoryBean, Method factoryMethod, Object[] args) throws BeansException;
 
 }

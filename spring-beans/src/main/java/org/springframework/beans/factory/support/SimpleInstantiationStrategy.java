@@ -40,26 +40,26 @@ import org.springframework.util.StringUtils;
  * @author Juergen Hoeller
  * @since 1.1
  */
+// 在BeanFactory中使用的简单对象实例化策略。
+//SimpleInstantiationStrategy是spring用来生成bean对象的默认类，他提供了两种实例java对象的方法。
+//一种是通过BeanUtils，他使用JDK的反射功能，一种是通过cglib来生成的
 public class SimpleInstantiationStrategy implements InstantiationStrategy {
 
 	private static final ThreadLocal<Method> currentlyInvokedFactoryMethod = new ThreadLocal<Method>();
 
 
-	/**
-	 * Return the factory method currently being invoked or {@code null} if none.
-	 * <p>Allows factory method implementations to determine whether the current
-	 * caller is the container itself as opposed to user code.
-	 */
+	// 返回一个当前被调用的工厂方法对象
 	public static Method getCurrentlyInvokedFactoryMethod() {
 		return currentlyInvokedFactoryMethod.get();
 	}
-
-
 	public Object instantiate(RootBeanDefinition beanDefinition, String beanName, BeanFactory owner) {
 		// Don't override the class with CGLIB if no overrides.
+		// 如果没有方法覆盖 lookup-override 和 replaced-method
+		// 如果有需要覆盖或者动态替换的方法则当然需要使用cglib进行动态代理，因为可以在创建代理的同事将动态方法织入类中，但如果没有需要动态改变的方法，为了方便直接反射就可以了
 		if (beanDefinition.getMethodOverrides().isEmpty()) {
 			Constructor<?> constructorToUse;
 			synchronized (beanDefinition.constructorArgumentLock) {
+				//这里取指定的构造器或生产对象的工厂方法来对bean进行实例化
 				constructorToUse = (Constructor<?>) beanDefinition.resolvedConstructorOrFactoryMethod;
 				if (constructorToUse == null) {
 					final Class<?> clazz = beanDefinition.getBeanClass();
@@ -84,29 +84,16 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 					}
 				}
 			}
+			// 通过BeanUtils进行实例化，这个BeanUtils的实例化通过Constructor来实例化bean，
+			// 在beanUtils中可以到具体的调用ctor.newInstance(args)
 			return BeanUtils.instantiateClass(constructorToUse);
 		}
 		else {
-			// Must generate CGLIB subclass.
+			// 使用cglib实例化对象
 			return instantiateWithMethodInjection(beanDefinition, beanName, owner);
 		}
 	}
-
-	/**
-	 * Subclasses can override this method, which is implemented to throw
-	 * UnsupportedOperationException, if they can instantiate an object with
-	 * the Method Injection specified in the given RootBeanDefinition.
-	 * Instantiation should use a no-arg constructor.
-	 */
-	protected Object instantiateWithMethodInjection(
-			RootBeanDefinition beanDefinition, String beanName, BeanFactory owner) {
-
-		throw new UnsupportedOperationException(
-				"Method Injection not supported in SimpleInstantiationStrategy");
-	}
-
-	public Object instantiate(RootBeanDefinition beanDefinition, String beanName, BeanFactory owner,
-			final Constructor<?> ctor, Object[] args) {
+	public Object instantiate(RootBeanDefinition beanDefinition, String beanName, BeanFactory owner, final Constructor<?> ctor, Object[] args) {
 
 		if (beanDefinition.getMethodOverrides().isEmpty()) {
 			if (System.getSecurityManager() != null) {
@@ -124,22 +111,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 			return instantiateWithMethodInjection(beanDefinition, beanName, owner, ctor, args);
 		}
 	}
-
-	/**
-	 * Subclasses can override this method, which is implemented to throw
-	 * UnsupportedOperationException, if they can instantiate an object with
-	 * the Method Injection specified in the given RootBeanDefinition.
-	 * Instantiation should use the given constructor and parameters.
-	 */
-	protected Object instantiateWithMethodInjection(RootBeanDefinition beanDefinition,
-			String beanName, BeanFactory owner, Constructor<?> ctor, Object[] args) {
-
-		throw new UnsupportedOperationException(
-				"Method Injection not supported in SimpleInstantiationStrategy");
-	}
-
-	public Object instantiate(RootBeanDefinition beanDefinition, String beanName, BeanFactory owner,
-			Object factoryBean, final Method factoryMethod, Object[] args) {
+	public Object instantiate(RootBeanDefinition beanDefinition, String beanName, BeanFactory owner, Object factoryBean, final Method factoryMethod, Object[] args) {
 
 		try {
 			if (System.getSecurityManager() != null) {
@@ -169,18 +141,25 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 			}
 		}
 		catch (IllegalArgumentException ex) {
-			throw new BeanDefinitionStoreException(
-					"Illegal arguments to factory method [" + factoryMethod + "]; " +
-					"args: " + StringUtils.arrayToCommaDelimitedString(args));
+			throw new BeanDefinitionStoreException("Illegal arguments to factory method [" + factoryMethod + "]; " + "args: " + StringUtils.arrayToCommaDelimitedString(args));
 		}
 		catch (IllegalAccessException ex) {
-			throw new BeanDefinitionStoreException(
-					"Cannot access factory method [" + factoryMethod + "]; is it public?");
+			throw new BeanDefinitionStoreException("Cannot access factory method [" + factoryMethod + "]; is it public?");
 		}
 		catch (InvocationTargetException ex) {
-			throw new BeanDefinitionStoreException(
-					"Factory method [" + factoryMethod + "] threw exception", ex.getTargetException());
+			throw new BeanDefinitionStoreException("Factory method [" + factoryMethod + "] threw exception", ex.getTargetException());
 		}
 	}
+
+	// 使用无参构造器来实例化，使用给定的RootBeanDefinition中指定的方法注入一个实例化对象，默认抛出一个异常，子类可以覆盖这个方法。
+	protected Object instantiateWithMethodInjection(RootBeanDefinition beanDefinition, String beanName, BeanFactory owner) {
+		throw new UnsupportedOperationException("Method Injection not supported in SimpleInstantiationStrategy");
+	}
+	// 使用给定的RootBeanDefinition中指定的方法注入一个实例化对象，默认抛出一个异常，子类可以覆盖这个方法。
+	protected Object instantiateWithMethodInjection(RootBeanDefinition beanDefinition, String beanName, BeanFactory owner, Constructor<?> ctor, Object[] args) {
+		throw new UnsupportedOperationException("Method Injection not supported in SimpleInstantiationStrategy");
+	}
+
+
 
 }

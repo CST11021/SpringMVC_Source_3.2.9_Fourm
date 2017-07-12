@@ -60,8 +60,7 @@ public class LocalVariableTableParameterNameDiscoverer implements ParameterNameD
 	private static final Map<Member, String[]> NO_DEBUG_INFO_MAP = Collections.emptyMap();
 
 	// the cache uses a nested index (value is a map) to keep the top level cache relatively small in size
-	private final Map<Class<?>, Map<Member, String[]>> parameterNamesCache =
-			new ConcurrentHashMap<Class<?>, Map<Member, String[]>>(32);
+	private final Map<Class<?>, Map<Member, String[]>> parameterNamesCache = new ConcurrentHashMap<Class<?>, Map<Member, String[]>>(32);
 
 
 	public String[] getParameterNames(Method method) {

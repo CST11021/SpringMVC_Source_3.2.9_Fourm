@@ -87,15 +87,41 @@ class ConstructorResolver {
 	/**
 	 * 该方法中包括以下几部分：
 	 *
-	 * 1、构造函数参数的确定
-	 * 如果传入的参数expliitArgs不为空，那便可以直接确定参数，因为explicitArgs参数是在调用Bean的时候用户指定的，在BeanFactory接口中存在这样的方法：
-	 * Object getBean(String name, Object... args);
-	 * 在获取bean的时候，用户不但可以指定bean的名称还可以指定bean的所对应类的构造函数或工厂方法的方法参数，主要用于静态工厂方法的调用，而这里是需要给定完全匹配的参数的，
-	 * 所以，便可以判断，如果传入参数explicitArgs不为空，则可以确定构造函数参数就是它。
+	 * 一、构造函数参数的确定
 	 *
-	 * 参照 《Spring源码深度解析》的109页。。。
+		 * 1、根据expliitArgs 参数判断
+		 * 		如果传入的参数 expliitArgs 不为空，那便可以直接确定参数，因为explicitArgs参数是在调用Bean的时候用户指定的，在BeanFactory接口中存在这样的方法：
+		 * Object getBean(String name, Object... args);
+		 * 在获取bean的时候，用户不但可以指定bean的名称还可以指定bean的所对应类的构造函数或工厂方法的方法参数，主要用于静态工厂方法的调用，而这里是需要给定完全匹配的参数的，
+		 * 所以，便可以判断，如果传入参数explicitArgs不为空，则可以确定构造函数参数就是它。
+		 *
+		 * 2、缓存中获取
+		 * 		除此之外，确定参数的办法如果之前已经分析过，也就是说构造函数参数已经记录在缓存中，那么便可以直接拿来使用。而且，这里要提到的是，
+		 * 在缓存中缓存的可能是参数的最终类型也可能是参数的初始化类型，例如：构造函数要求的是int类型，但是原始的参数值可能是String类型的“1”，那么即使在缓存中得到了参数，
+		 * 也需要经过类型转换器的过滤一确保参数类型与对应的构造函数参数类型完全对应。
+		 *
+		 * 3、配置文件获取
+		 * 		如果不能根据传入的参数explicitArgs确定构造函数的参数也无法再缓存中得到相关信息，那么只能开始新一轮的分析了。分析从获取配置文件中配置的构造函数信息开始，
+		 * 经过之前的分析，我们知道，Spring中配置文件中的信息经过转换都会通过BeanDefinition实例承载，也就是参数mbd中包含，那么可以通过调用mbd.getConstructorArgumentValues()
+		 * 来获取配置的构造函数信息。有配置中的信息便可以获取对应的参数值信息了，获取参数值的信息包括直接指定值，如：直接指定构造函数中某个值为原始类型String类型，
+		 * 或者是一个对其他bean的引用，而这一处理委托给resolveConstructorArguments方法，并返回能解析到的参数的个数。
 	 *
-	 *
+	 * 二、构造函数的确定
+
+	 			经过第一步已经确定构造函数的参数，接下来的任务就是根据构造函数参数在所有构造函数中锁定对应的构造函数，而匹配的方法就是根据参数个数匹配，
+	 		所以在匹配之前需要先对构造函数按照public构造函数优先参数数量降序、非public构造函数参数数量降序。这样可在遍历的情况下迅速判断排在后面的构造函数参数个数是否符合条件。
+	 			由于在配置文件中不是唯一限制使用参数位置索引的方式去创建，同样还支持指定参数名称进行设定参数值的情况，如<constructor-arg name="aa">，
+	 		那么这种情况就需要首先确定构造函数中的参数名称。
+	 			获取参数名称可以有两种方式，一种是通过注解的方式直接获取，另一种就是使用Spring中提供的工具类ParameternameDiscoverer来获取。
+	 		构造函数、参数名称、参数类型、参数值都确定后就可以锁定构造函数以及转换对应的参数类型了。
+
+
+	 	三、根据确定的构造函数转换对应的参数类型。
+	 	四、构造函数不确定性的验证
+	 		当然，有时候即使构造函数、参数名称、参数类型、参数值都确定后也不一定会直接锁定构造函数，不同构造函数的参数为父子关系，所以Spring在最后又做了一次验证。
+	 	五、根据实例化策略以及得到的构造函数及构造函数参数实例化Bean。
+
+	 	参照 《Spring源码深度解析》的109页。。。
 	 */
 	// 使用指定构造器自动注入
 	public BeanWrapper autowireConstructor(final String beanName, final RootBeanDefinition mbd, Constructor<?>[] chosenCtors, final Object[] explicitArgs) {
@@ -292,8 +318,7 @@ class ConstructorResolver {
 				}, beanFactory.getAccessControlContext());
 			}
 			else {
-				beanInstance = this.beanFactory.getInstantiationStrategy().instantiate(
-						mbd, beanName, this.beanFactory, constructorToUse, argsToUse);
+				beanInstance = this.beanFactory.getInstantiationStrategy().instantiate(mbd, beanName, this.beanFactory, constructorToUse, argsToUse);
 			}
 
 			//将构建的实例加入BeanWrapper中
@@ -366,6 +391,7 @@ class ConstructorResolver {
 	public BeanWrapper instantiateUsingFactoryMethod(final String beanName, final RootBeanDefinition mbd, final Object[] explicitArgs) {
 
 		BeanWrapperImpl bw = new BeanWrapperImpl();
+		// 初始化BeanWrapper：给这个BeanWrapper 设置类型转换器，并设置自定义属性编辑器
 		this.beanFactory.initBeanWrapper(bw);
 
 		Object factoryBean;
@@ -374,6 +400,8 @@ class ConstructorResolver {
 
 		// 获取factory-bean 配置的工厂bean
 		String factoryBeanName = mbd.getFactoryBeanName();
+
+		// 有配置 factory-bean
 		if (factoryBeanName != null) {
 			if (factoryBeanName.equals(beanName)) {
 				throw new BeanDefinitionStoreException(mbd.getResourceDescription(), beanName, "factory-bean reference points back to the same bean definition");
@@ -585,14 +613,12 @@ class ConstructorResolver {
 				final Object[] args = argsToUse;
 				beanInstance = AccessController.doPrivileged(new PrivilegedAction<Object>() {
 					public Object run() {
-						return beanFactory.getInstantiationStrategy().instantiate(
-								mbd, beanName, beanFactory, fb, factoryMethod, args);
+						return beanFactory.getInstantiationStrategy().instantiate(mbd, beanName, beanFactory, fb, factoryMethod, args);
 					}
 				}, beanFactory.getAccessControlContext());
 			}
 			else {
-				beanInstance = beanFactory.getInstantiationStrategy().instantiate(
-						mbd, beanName, beanFactory, factoryBean, factoryMethodToUse, argsToUse);
+				beanInstance = beanFactory.getInstantiationStrategy().instantiate(mbd, beanName, beanFactory, factoryBean, factoryMethodToUse, argsToUse);
 			}
 
 			if (beanInstance == null) {

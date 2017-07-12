@@ -33,61 +33,44 @@ import org.springframework.cglib.proxy.NoOp;
 
 /**
  * Default object instantiation strategy for use in BeanFactories.
- * Uses CGLIB to generate subclasses dynamically if methods need to be
- * overridden by the container, to implement Method Injection.
+ * Uses CGLIB to generate subclasses dynamically if methods need to be overridden by the container, to implement Method Injection.
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @since 1.1
  */
+// 使用CGLIB动态生成子类如果方法需要由容器覆盖，实现方法注入
 public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationStrategy {
 
-	/**
-	 * Index in the CGLIB callback array for passthrough behavior,
-	 * in which case the subclass won't override the original class.
-	 */
+
+	// 在CGLIB回调数组中对passthrough行为进行索引，在这种情况下，子类不会覆盖原来的类。
 	private static final int PASSTHROUGH = 0;
 
-	/**
-	 * Index in the CGLIB callback array for a method that should
-	 * be overridden to provide method lookup.
-	 */
+	// 在CGLIB回调数组中的索引，该数组应该被覆盖以提供方法查找。
 	private static final int LOOKUP_OVERRIDE = 1;
 
-	/**
-	 * Index in the CGLIB callback array for a method that should
-	 * be overridden using generic Methodreplacer functionality.
-	 */
+	// CGLIB回调数组中的索引，该方法应该使用通用的方法-dreplacer功能来覆盖。
 	private static final int METHOD_REPLACER = 2;
 
 
 	@Override
-	protected Object instantiateWithMethodInjection(
-			RootBeanDefinition beanDefinition, String beanName, BeanFactory owner) {
-
-		// Must generate CGLIB subclass.
+	protected Object instantiateWithMethodInjection(RootBeanDefinition beanDefinition, String beanName, BeanFactory owner) {
+		// 必须生成CGLIB子类。
 		return new CglibSubclassCreator(beanDefinition, owner).instantiate(null, null);
 	}
-
 	@Override
-	protected Object instantiateWithMethodInjection(
-			RootBeanDefinition beanDefinition, String beanName, BeanFactory owner,
-			Constructor<?> ctor, Object[] args) {
-
+	protected Object instantiateWithMethodInjection(RootBeanDefinition beanDefinition, String beanName, BeanFactory owner, Constructor<?> ctor, Object[] args) {
 		return new CglibSubclassCreator(beanDefinition, owner).instantiate(ctor, args);
 	}
 
 
-	/**
-	 * An inner class created for historical reasons to avoid external CGLIB dependency
-	 * in Spring versions earlier than 3.2.
-	 */
+	// 出于历史原因而创建的内部类，以避免在Spring版本中出现的外部CGLIB依赖于3.2。
+	// 如果用户没有使用replace或者lookup的配置方法，那么直接使用反射的方式，简单快捷，
+	// 但是如果使用了这两个特性，在直接使用反射的方式创建实例就不妥了，因为需要将这两个配置提供的功能切入进去，
+	// 所以就必须要使用动态代理的方式将包括两个特性所对应的逻辑的拦截增强器设置进去，这样才可以保证在调用方法的时候会被相应的拦截器增强，返回值为包含拦截器的代理实例。
 	private static class CglibSubclassCreator {
-
 		private static final Log logger = LogFactory.getLog(CglibSubclassCreator.class);
-
 		private final RootBeanDefinition beanDefinition;
-
 		private final BeanFactory owner;
 
 		public CglibSubclassCreator(RootBeanDefinition beanDefinition, BeanFactory owner) {
@@ -117,11 +100,8 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 
 			return (ctor != null ? enhancer.create(ctor.getParameterTypes(), args) : enhancer.create());
 		}
-
-
 		/**
-		 * Class providing hashCode and equals methods required by CGLIB to
-		 * ensure that CGLIB doesn't generate a distinct class per bean.
+		 * Class providing hashCode and equals methods required by CGLIB to ensure that CGLIB doesn't generate a distinct class per bean.
 		 * Identity is based on class and bean definition.
 		 */
 		private class CglibIdentitySupport {
@@ -144,11 +124,8 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 				return beanDefinition.hashCode();
 			}
 		}
-
-
 		/**
-		 * CGLIB MethodInterceptor to override methods, replacing them with an
-		 * implementation that returns a bean looked up in the container.
+		 * CGLIB MethodInterceptor to override methods, replacing them with an implementation that returns a bean looked up in the container.
 		 */
 		private class LookupOverrideMethodInterceptor extends CglibIdentitySupport implements MethodInterceptor {
 
@@ -158,11 +135,8 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 				return owner.getBean(lo.getBeanName());
 			}
 		}
-
-
 		/**
-		 * CGLIB MethodInterceptor to override methods, replacing them with a call
-		 * to a generic MethodReplacer.
+		 * CGLIB MethodInterceptor to override methods, replacing them with a call to a generic MethodReplacer.
 		 */
 		private class ReplaceOverrideMethodInterceptor extends CglibIdentitySupport implements MethodInterceptor {
 
@@ -173,8 +147,6 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 				return mr.reimplement(obj, method, args);
 			}
 		}
-
-
 		/**
 		 * CGLIB object to filter method interception behavior.
 		 */

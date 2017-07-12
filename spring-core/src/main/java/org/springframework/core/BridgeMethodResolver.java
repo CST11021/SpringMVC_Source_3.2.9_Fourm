@@ -57,10 +57,14 @@ public abstract class BridgeMethodResolver {
 	 * @return the original method (either the bridged method or the passed-in method
 	 * if no more specific one could be found)
 	 */
+	// 查找提供的桥接方法的原始方法
 	public static Method findBridgedMethod(Method bridgeMethod) {
+		// 通过Method.isBridge()方法来判断一个方法是否是桥接方法
+		// 当父类是泛型，而子类不是泛型时，如果子类重写了父类的方法，那么子类实际上会有两个同名的方法，则子类的这个方法则是桥接方法。
 		if (bridgeMethod == null || !bridgeMethod.isBridge()) {
 			return bridgeMethod;
 		}
+
 		// Gather all methods with matching name and parameter size.
 		List<Method> candidateMethods = new ArrayList<Method>();
 		Method[] methods = ReflectionUtils.getAllDeclaredMethods(bridgeMethod.getDeclaringClass());
