@@ -38,8 +38,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * Utility class that contains various methods useful for the implementation of
- * autowire-capable bean factories.
+ * Utility class that contains various methods useful for the implementation of autowire-capable bean factories.
  *
  * @author Juergen Hoeller
  * @author Mark Fisher
@@ -49,13 +48,7 @@ import org.springframework.util.ClassUtils;
  */
 abstract class AutowireUtils {
 
-	/**
-	 * Sort the given constructors, preferring public constructors and "greedy" ones with
-	 * a maximum number of arguments. The result will contain public constructors first,
-	 * with decreasing number of arguments, then non-public constructors, again with
-	 * decreasing number of arguments.
-	 * @param constructors the constructor array to sort
-	 */
+	// 给这些构造函数排序：public优先参数数量降序，然后是非public参数数量降序
 	public static void sortConstructors(Constructor<?>[] constructors) {
 		Arrays.sort(constructors, new Comparator<Constructor<?>>() {
 			public int compare(Constructor<?> c1, Constructor<?> c2) {
@@ -71,13 +64,7 @@ abstract class AutowireUtils {
 		});
 	}
 
-	/**
-	 * Sort the given factory methods, preferring public methods and "greedy" ones
-	 * with a maximum of arguments. The result will contain public methods first,
-	 * with decreasing number of arguments, then non-public methods, again with
-	 * decreasing number of arguments.
-	 * @param factoryMethods the factory method array to sort
-	 */
+	// 给这些方法排序：public优先参数数量降序，然后是非public参数数量降序
 	public static void sortFactoryMethods(Method[] factoryMethods) {
 		Arrays.sort(factoryMethods, new Comparator<Method>() {
 			public int compare(Method fm1, Method fm2) {
@@ -93,34 +80,25 @@ abstract class AutowireUtils {
 		});
 	}
 
-	/**
-	 * Determine whether the given bean property is excluded from dependency checks.
-	 * <p>This implementation excludes properties defined by CGLIB.
-	 * @param pd the PropertyDescriptor of the bean property
-	 * @return whether the bean property is excluded
-	 */
+	// 确定给定的bean属性是否被排除在依赖项检查之外。这个实现不包括CGLIB定义的属性。
 	public static boolean isExcludedFromDependencyCheck(PropertyDescriptor pd) {
+		// 如果该属性不可写，则返回false
 		Method wm = pd.getWriteMethod();
 		if (wm == null) {
 			return false;
 		}
+		// 这个属性的set方法，不是一个由CGLIB生成的方法返回false
 		if (!wm.getDeclaringClass().getName().contains("$$")) {
-			// Not a CGLIB method so it's OK.
 			return false;
 		}
-		// It was declared by CGLIB, but we might still want to autowire it
-		// if it was actually declared by the superclass.
+
+		// wm方法是由CGLIB声明的，但是如果他是在父类中定义的，我们仍然可以使用autowire注入
 		Class<?> superclass = wm.getDeclaringClass().getSuperclass();
+		// 如果该wm所在类的父类没有定义该方法，则返回true
 		return !ClassUtils.hasMethod(superclass, wm.getName(), wm.getParameterTypes());
 	}
 
-	/**
-	 * Return whether the setter method of the given bean property is defined
-	 * in any of the given interfaces.
-	 * @param pd the PropertyDescriptor of the bean property
-	 * @param interfaces the Set of interfaces (Class objects)
-	 * @return whether the setter method is defined by an interface
-	 */
+	// 判断这个属性的set方法是否被定义在接口中
 	public static boolean isSetterDefinedInInterface(PropertyDescriptor pd, Set<Class<?>> interfaces) {
 		Method setter = pd.getWriteMethod();
 		if (setter != null) {
@@ -135,19 +113,12 @@ abstract class AutowireUtils {
 		return false;
 	}
 
-	/**
-	 * Resolve the given autowiring value against the given required type,
-	 * e.g. an {@link ObjectFactory} value to its actual object result.
-	 * @param autowiringValue the value to resolve
-	 * @param requiredType the type to assign the result to
-	 * @return the resolved value
-	 */
+	// 将这个autowiringValue 解析为对应的requiredType 类型返回
 	public static Object resolveAutowiringValue(Object autowiringValue, Class<?> requiredType) {
 		if (autowiringValue instanceof ObjectFactory && !requiredType.isInstance(autowiringValue)) {
 			ObjectFactory<?> factory = (ObjectFactory<?>) autowiringValue;
 			if (autowiringValue instanceof Serializable && requiredType.isInterface()) {
-				autowiringValue = Proxy.newProxyInstance(requiredType.getClassLoader(),
-						new Class<?>[] {requiredType}, new ObjectFactoryDelegatingInvocationHandler(factory));
+				autowiringValue = Proxy.newProxyInstance(requiredType.getClassLoader(), new Class<?>[] {requiredType}, new ObjectFactoryDelegatingInvocationHandler(factory));
 			}
 			else {
 				return factory.getObject();
@@ -156,49 +127,22 @@ abstract class AutowireUtils {
 		return autowiringValue;
 	}
 
-	/**
-	 * Determine the target type for the generic return type of the given
-	 * <em>generic factory method</em>, where formal type variables are declared
-	 * on the given method itself.
-	 * <p>For example, given a factory method with the following signature,
-	 * if {@code resolveReturnTypeForFactoryMethod()} is invoked with the reflected
-	 * method for {@code creatProxy()} and an {@code Object[]} array containing
-	 * {@code MyService.class}, {@code resolveReturnTypeForFactoryMethod()} will
-	 * infer that the target return type is {@code MyService}.
-	 * <pre class="code">{@code public static <T> T createProxy(Class<T> clazz)}</pre>
-	 * <h4>Possible Return Values</h4>
-	 * <ul>
-	 * <li>the target return type, if it can be inferred</li>
-	 * <li>the {@linkplain Method#getReturnType() standard return type}, if
-	 * the given {@code method} does not declare any {@linkplain
-	 * Method#getTypeParameters() formal type variables}</li>
-	 * <li>the {@linkplain Method#getReturnType() standard return type}, if the
-	 * target return type cannot be inferred (e.g., due to type erasure)</li>
-	 * <li>{@code null}, if the length of the given arguments array is shorter
-	 * than the length of the {@linkplain
-	 * Method#getGenericParameterTypes() formal argument list} for the given
-	 * method</li>
-	 * </ul>
-	 * @param method the method to introspect (never {@code null})
-	 * @param args the arguments that will be supplied to the method when it is
-	 * invoked (never {@code null})
-	 * @param classLoader the ClassLoader to resolve class names against, if necessary
-	 * (never {@code null})
-	 * @return the resolved target return type, the standard return type, or {@code null}
-	 * @since 3.2.5
-	 */
+	// 返回这个方法的返回类型
 	public static Class<?> resolveReturnTypeForFactoryMethod(Method method, Object[] args, ClassLoader classLoader) {
 		Assert.notNull(method, "Method must not be null");
 		Assert.notNull(args, "Argument array must not be null");
 		Assert.notNull(classLoader, "ClassLoader must not be null");
 
+		// 获取method方法的参数类型对象数组
 		TypeVariable<Method>[] declaredTypeVariables = method.getTypeParameters();
+		// 获取mothod方法返回类型的type对象
 		Type genericReturnType = method.getGenericReturnType();
+		// 获取method方法的参数类型对象数组
 		Type[] methodParameterTypes = method.getGenericParameterTypes();
 		Assert.isTrue(args.length == methodParameterTypes.length, "Argument array does not match parameter count");
 
-		// Ensure that the type variable (e.g., T) is declared directly on the method
-		// itself (e.g., via <T>), not on the enclosing class or interface.
+		// Ensure that the type variable (e.g., T) is declared directly on the method itself (e.g., via <T>), not on the enclosing class or interface.
+		// 确保类型变量(例如:T)是直接在方法本身上声明的(例如:via <T>)，而不是在封闭的类或接口上
 		boolean locallyDeclaredTypeVariableMatchesReturnType = false;
 		for (TypeVariable<Method> currentTypeVariable : declaredTypeVariables) {
 			if (currentTypeVariable.equals(genericReturnType)) {
@@ -221,8 +165,7 @@ abstract class AutowireUtils {
 							return typedValue.resolveTargetType(classLoader);
 						}
 						catch (ClassNotFoundException ex) {
-							throw new IllegalStateException("Failed to resolve value type [" +
-									typedValue.getTargetTypeName() + "] for factory method argument", ex);
+							throw new IllegalStateException("Failed to resolve value type [" + typedValue.getTargetTypeName() + "] for factory method argument", ex);
 						}
 					}
 					// Only consider argument type if it is a simple value...
@@ -275,9 +218,7 @@ abstract class AutowireUtils {
 	}
 
 
-	/**
-	 * Reflective InvocationHandler for lazy access to the current target object.
-	 */
+	// Reflective InvocationHandler for lazy access to the current target object.
 	@SuppressWarnings("serial")
 	private static class ObjectFactoryDelegatingInvocationHandler implements InvocationHandler, Serializable {
 

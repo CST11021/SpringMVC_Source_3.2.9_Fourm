@@ -35,51 +35,35 @@ public class AutowireUtilsTests {
 	@Test
 	public void genericMethodReturnTypes() {
 		Method notParameterized = ReflectionUtils.findMethod(MyTypeWithMethods.class, "notParameterized", new Class[]{});
-		assertEquals(String.class,
-				AutowireUtils.resolveReturnTypeForFactoryMethod(notParameterized, new Object[]{}, getClass().getClassLoader()));
+		assertEquals(String.class, AutowireUtils.resolveReturnTypeForFactoryMethod(notParameterized, new Object[]{}, getClass().getClassLoader()));
 
-		Method notParameterizedWithArguments = ReflectionUtils.findMethod(MyTypeWithMethods.class, "notParameterizedWithArguments",
-				new Class[] { Integer.class, Boolean.class });
-		assertEquals(String.class,
-				AutowireUtils.resolveReturnTypeForFactoryMethod(notParameterizedWithArguments, new Object[] { 99, true }, getClass().getClassLoader()));
+		Method notParameterizedWithArguments = ReflectionUtils.findMethod(MyTypeWithMethods.class, "notParameterizedWithArguments", new Class[] { Integer.class, Boolean.class });
+		assertEquals(String.class, AutowireUtils.resolveReturnTypeForFactoryMethod(notParameterizedWithArguments, new Object[] { 99, true }, getClass().getClassLoader()));
 
 		Method createProxy = ReflectionUtils.findMethod(MyTypeWithMethods.class, "createProxy", new Class[] { Object.class });
-		assertEquals(String.class,
-				AutowireUtils.resolveReturnTypeForFactoryMethod(createProxy, new Object[] { "foo" }, getClass().getClassLoader()));
+		assertEquals(String.class, AutowireUtils.resolveReturnTypeForFactoryMethod(createProxy, new Object[] { "foo" }, getClass().getClassLoader()));
 
-		Method createNamedProxyWithDifferentTypes = ReflectionUtils.findMethod(MyTypeWithMethods.class, "createNamedProxy",
-				new Class[] { String.class, Object.class });
-		assertEquals(Long.class,
-				AutowireUtils.resolveReturnTypeForFactoryMethod(createNamedProxyWithDifferentTypes, new Object[] { "enigma", 99L }, getClass().getClassLoader()));
+		Method createNamedProxyWithDifferentTypes = ReflectionUtils.findMethod(MyTypeWithMethods.class, "createNamedProxy", new Class[] { String.class, Object.class });
+		assertEquals(Long.class, AutowireUtils.resolveReturnTypeForFactoryMethod(createNamedProxyWithDifferentTypes, new Object[] { "enigma", 99L }, getClass().getClassLoader()));
 
-		Method createNamedProxyWithDuplicateTypes = ReflectionUtils.findMethod(MyTypeWithMethods.class, "createNamedProxy",
-				new Class[] { String.class, Object.class });
-		assertEquals(String.class,
-				AutowireUtils.resolveReturnTypeForFactoryMethod(createNamedProxyWithDuplicateTypes, new Object[] { "enigma", "foo" }, getClass().getClassLoader()));
+		Method createNamedProxyWithDuplicateTypes = ReflectionUtils.findMethod(MyTypeWithMethods.class, "createNamedProxy", new Class[] { String.class, Object.class });
+		assertEquals(String.class, AutowireUtils.resolveReturnTypeForFactoryMethod(createNamedProxyWithDuplicateTypes, new Object[] { "enigma", "foo" }, getClass().getClassLoader()));
 
 		Method createMock = ReflectionUtils.findMethod(MyTypeWithMethods.class, "createMock", new Class[] { Class.class });
-		assertEquals(Runnable.class,
-				AutowireUtils.resolveReturnTypeForFactoryMethod(createMock, new Object[] { Runnable.class }, getClass().getClassLoader()));
-		assertEquals(Runnable.class,
-				AutowireUtils.resolveReturnTypeForFactoryMethod(createMock, new Object[] { Runnable.class.getName() }, getClass().getClassLoader()));
+		assertEquals(Runnable.class, AutowireUtils.resolveReturnTypeForFactoryMethod(createMock, new Object[] { Runnable.class }, getClass().getClassLoader()));
+		assertEquals(Runnable.class, AutowireUtils.resolveReturnTypeForFactoryMethod(createMock, new Object[] { Runnable.class.getName() }, getClass().getClassLoader()));
 
-		Method createNamedMock = ReflectionUtils.findMethod(MyTypeWithMethods.class, "createNamedMock", new Class[] { String.class,
-				Class.class });
-		assertEquals(Runnable.class,
-				AutowireUtils.resolveReturnTypeForFactoryMethod(createNamedMock, new Object[] { "foo", Runnable.class }, getClass().getClassLoader()));
+		Method createNamedMock = ReflectionUtils.findMethod(MyTypeWithMethods.class, "createNamedMock", new Class[] { String.class, Class.class });
+		assertEquals(Runnable.class, AutowireUtils.resolveReturnTypeForFactoryMethod(createNamedMock, new Object[] { "foo", Runnable.class }, getClass().getClassLoader()));
 
-		Method createVMock = ReflectionUtils.findMethod(MyTypeWithMethods.class, "createVMock",
-				new Class[] { Object.class, Class.class });
-		assertEquals(Runnable.class,
-				AutowireUtils.resolveReturnTypeForFactoryMethod(createVMock, new Object[] { "foo", Runnable.class }, getClass().getClassLoader()));
+		Method createVMock = ReflectionUtils.findMethod(MyTypeWithMethods.class, "createVMock", new Class[] { Object.class, Class.class });
+		assertEquals(Runnable.class, AutowireUtils.resolveReturnTypeForFactoryMethod(createVMock, new Object[] { "foo", Runnable.class }, getClass().getClassLoader()));
 
 		// Ideally we would expect String.class instead of Object.class, but
 		// resolveReturnTypeForFactoryMethod() does not currently support this form of
 		// look-up.
-		Method extractValueFrom = ReflectionUtils.findMethod(MyTypeWithMethods.class, "extractValueFrom",
-				new Class[] { MyInterfaceType.class });
-		assertEquals(Object.class,
-				AutowireUtils.resolveReturnTypeForFactoryMethod(extractValueFrom, new Object[] { new MySimpleInterfaceType() }, getClass().getClassLoader()));
+		Method extractValueFrom = ReflectionUtils.findMethod(MyTypeWithMethods.class, "extractValueFrom", new Class[] { MyInterfaceType.class });
+		assertEquals(Object.class, AutowireUtils.resolveReturnTypeForFactoryMethod(extractValueFrom, new Object[] { new MySimpleInterfaceType() }, getClass().getClassLoader()));
 
 		// Ideally we would expect Boolean.class instead of Object.class, but this
 		// information is not available at run-time due to type erasure.
@@ -91,11 +75,8 @@ public class AutowireUtilsTests {
 	}
 
 
-	public interface MyInterfaceType<T> {
-	}
-
-	public class MySimpleInterfaceType implements MyInterfaceType<String> {
-	}
+	public interface MyInterfaceType<T> {}
+	public class MySimpleInterfaceType implements MyInterfaceType<String> {}
 
 	public static class MyTypeWithMethods<T> {
 
