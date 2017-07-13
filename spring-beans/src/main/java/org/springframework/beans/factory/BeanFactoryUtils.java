@@ -43,10 +43,7 @@ import org.springframework.util.StringUtils;
  */
 public abstract class BeanFactoryUtils {
 
-	/**
-	 * Separator for generated bean names. If a class name or parent name is not
-	 * unique, "#1", "#2" etc will be appended, until the name becomes unique.
-	 */
+	// 自动生成的beanName的分隔符，使用"#1", "#2"等后缀是beanName唯一
 	public static final String GENERATED_BEAN_NAME_SEPARATOR = "#";
 
 
@@ -55,13 +52,7 @@ public abstract class BeanFactoryUtils {
 		return (name != null && name.startsWith(BeanFactory.FACTORY_BEAN_PREFIX));
 	}
 
-	/**
-	 * Return the actual bean name, stripping out the factory dereference
-	 * prefix (if any, also stripping repeated factory prefixes if found).
-	 * @param name the name of the bean
-	 * @return the transformed name
-	 * @see BeanFactory#FACTORY_BEAN_PREFIX
-	 */
+	// 返回实际的bean名称，去掉工厂的前缀(如果有的话，也可以去掉重复的工厂前缀)。
 	public static String transformedBeanName(String name) {
 		Assert.notNull(name, "'name' must not be null");
 		String beanName = name;
@@ -71,68 +62,29 @@ public abstract class BeanFactoryUtils {
 		return beanName;
 	}
 
-	/**
-	 * Return whether the given name is a bean name which has been generated
-	 * by the default naming strategy (containing a "#..." part).
-	 * @param name the name of the bean
-	 * @return whether the given name is a generated bean name
-	 * @see #GENERATED_BEAN_NAME_SEPARATOR
-	 * @see org.springframework.beans.factory.support.BeanDefinitionReaderUtils#generateBeanName
-	 * @see org.springframework.beans.factory.support.DefaultBeanNameGenerator
-	 */
+	// 判断这个name是否是有spring自动生成的beanName
 	public static boolean isGeneratedBeanName(String name) {
 		return (name != null && name.contains(GENERATED_BEAN_NAME_SEPARATOR));
 	}
 
-	/**
-	 * Extract the "raw" bean name from the given (potentially generated) bean name,
-	 * excluding any "#..." suffixes which might have been added for uniqueness.
-	 * @param name the potentially generated bean name
-	 * @return the raw bean name
-	 * @see #GENERATED_BEAN_NAME_SEPARATOR
-	 */
+	// 获取原始的beanName，比如：test#1 --> test
 	public static String originalBeanName(String name) {
 		Assert.notNull(name, "'name' must not be null");
 		int separatorIndex = name.indexOf(GENERATED_BEAN_NAME_SEPARATOR);
 		return (separatorIndex != -1 ? name.substring(0, separatorIndex) : name);
 	}
 
-
-	/**
-	 * Count all beans in any hierarchy in which this factory participates.
-	 * Includes counts of ancestor bean factories.
-	 * <p>Beans that are "overridden" (specified in a descendant factory
-	 * with the same name) are only counted once.
-	 * @param lbf the bean factory
-	 * @return count of beans including those defined in ancestor factories
-	 */
+	// 返回这个bean工厂中bean的个数
 	public static int countBeansIncludingAncestors(ListableBeanFactory lbf) {
 		return beanNamesIncludingAncestors(lbf).length;
 	}
 
-	/**
-	 * Return all bean names in the factory, including ancestor factories.
-	 * @param lbf the bean factory
-	 * @return the array of matching bean names, or an empty array if none
-	 * @see #beanNamesForTypeIncludingAncestors
-	 */
+	// 返回这个lbf工厂中所有的bean
 	public static String[] beanNamesIncludingAncestors(ListableBeanFactory lbf) {
 		return beanNamesForTypeIncludingAncestors(lbf, Object.class);
 	}
 
-
-	/**
-	 * Get all bean names for the given type, including those defined in ancestor
-	 * factories. Will return unique names in case of overridden bean definitions.
-	 * <p>Does consider objects created by FactoryBeans, which means that FactoryBeans
-	 * will get initialized. If the object created by the FactoryBean doesn't match,
-	 * the raw FactoryBean itself will be matched against the type.
-	 * <p>This version of {@code beanNamesForTypeIncludingAncestors} automatically
-	 * includes prototypes and FactoryBeans.
-	 * @param lbf the bean factory
-	 * @param type the type that beans must match
-	 * @return the array of matching bean names, or an empty array if none
-	 */
+	// 返回这个lbf工厂中，所有type的bean
 	public static String[] beanNamesForTypeIncludingAncestors(ListableBeanFactory lbf, Class<?> type) {
 		Assert.notNull(lbf, "ListableBeanFactory must not be null");
 		String[] result = lbf.getBeanNamesForType(type);
@@ -153,7 +105,6 @@ public abstract class BeanFactoryUtils {
 		}
 		return result;
 	}
-
 	/**
 	 * Get all bean names for the given type, including those defined in ancestor
 	 * factories. Will return unique names in case of overridden bean definitions.
@@ -171,11 +122,12 @@ public abstract class BeanFactoryUtils {
 	 * "factory-bean" reference) for the type check. Note that FactoryBeans need to be
 	 * eagerly initialized to determine their type: So be aware that passing in "true"
 	 * for this flag will initialize FactoryBeans and "factory-bean" references.
+	 * 是否要初始化lazy-init单例对象和由FactoryBeans创建的对象(或者是带有“工厂bean”引用的工厂方法)来进行类型检查。
+	 * 注意，factorybean需要被急切地初始化以确定它们的类型:因此请注意，传入这个标志的“true”将初始化factorybean和“工厂bean”引用。
 	 * @param type the type that beans must match
 	 * @return the array of matching bean names, or an empty array if none
 	 */
-	public static String[] beanNamesForTypeIncludingAncestors(
-			ListableBeanFactory lbf, Class<?> type, boolean includeNonSingletons, boolean allowEagerInit) {
+	public static String[] beanNamesForTypeIncludingAncestors(ListableBeanFactory lbf, Class<?> type, boolean includeNonSingletons, boolean allowEagerInit) {
 
 		Assert.notNull(lbf, "ListableBeanFactory must not be null");
 		String[] result = lbf.getBeanNamesForType(type, includeNonSingletons, allowEagerInit);
@@ -221,7 +173,6 @@ public abstract class BeanFactoryUtils {
 		}
 		return result;
 	}
-
 	/**
 	 * Return all beans of the given type or subtypes, also picking up beans defined in
 	 * ancestor bean factories if the current bean factory is a HierarchicalBeanFactory.
@@ -248,9 +199,7 @@ public abstract class BeanFactoryUtils {
 	 * @return the Map of matching bean instances, or an empty Map if none
 	 * @throws BeansException if a bean could not be created
 	 */
-	public static <T> Map<String, T> beansOfTypeIncludingAncestors(
-			ListableBeanFactory lbf, Class<T> type, boolean includeNonSingletons, boolean allowEagerInit)
-			throws BeansException {
+	public static <T> Map<String, T> beansOfTypeIncludingAncestors(ListableBeanFactory lbf, Class<T> type, boolean includeNonSingletons, boolean allowEagerInit) throws BeansException {
 
 		Assert.notNull(lbf, "ListableBeanFactory must not be null");
 		Map<String, T> result = new LinkedHashMap<String, T>(4);
@@ -270,7 +219,6 @@ public abstract class BeanFactoryUtils {
 		}
 		return result;
 	}
-
 
 	/**
 	 * Return a single bean of the given type or subtypes, also picking up beans
@@ -294,13 +242,11 @@ public abstract class BeanFactoryUtils {
 	 * @throws NoUniqueBeanDefinitionException if more than one bean of the given type was found
 	 * @throws BeansException if the bean could not be created
 	 */
-	public static <T> T beanOfTypeIncludingAncestors(ListableBeanFactory lbf, Class<T> type)
-			throws BeansException {
+	public static <T> T beanOfTypeIncludingAncestors(ListableBeanFactory lbf, Class<T> type) throws BeansException {
 
 		Map<String, T> beansOfType = beansOfTypeIncludingAncestors(lbf, type);
 		return uniqueBean(type, beansOfType);
 	}
-
 	/**
 	 * Return a single bean of the given type or subtypes, also picking up beans
 	 * defined in ancestor bean factories if the current bean factory is a
@@ -330,10 +276,7 @@ public abstract class BeanFactoryUtils {
 	 * @throws NoUniqueBeanDefinitionException if more than one bean of the given type was found
 	 * @throws BeansException if the bean could not be created
 	 */
-	public static <T> T beanOfTypeIncludingAncestors(
-			ListableBeanFactory lbf, Class<T> type, boolean includeNonSingletons, boolean allowEagerInit)
-			throws BeansException {
-
+	public static <T> T beanOfTypeIncludingAncestors(ListableBeanFactory lbf, Class<T> type, boolean includeNonSingletons, boolean allowEagerInit) throws BeansException {
 		Map<String, T> beansOfType = beansOfTypeIncludingAncestors(lbf, type, includeNonSingletons, allowEagerInit);
 		return uniqueBean(type, beansOfType);
 	}
@@ -359,7 +302,6 @@ public abstract class BeanFactoryUtils {
 		Map<String, T> beansOfType = lbf.getBeansOfType(type);
 		return uniqueBean(type, beansOfType);
 	}
-
 	/**
 	 * Return a single bean of the given type or subtypes, not looking in ancestor
 	 * factories. Useful convenience method when we expect a single bean and
@@ -384,23 +326,14 @@ public abstract class BeanFactoryUtils {
 	 * @throws NoUniqueBeanDefinitionException if more than one bean of the given type was found
 	 * @throws BeansException if the bean could not be created
 	 */
-	public static <T> T beanOfType(
-			ListableBeanFactory lbf, Class<T> type, boolean includeNonSingletons, boolean allowEagerInit)
-			throws BeansException {
+	public static <T> T beanOfType(ListableBeanFactory lbf, Class<T> type, boolean includeNonSingletons, boolean allowEagerInit) throws BeansException {
 
 		Assert.notNull(lbf, "ListableBeanFactory must not be null");
 		Map<String, T> beansOfType = lbf.getBeansOfType(type, includeNonSingletons, allowEagerInit);
 		return uniqueBean(type, beansOfType);
 	}
 
-	/**
-	 * Extract a unique bean for the given type from the given Map of matching beans.
-	 * @param type type of bean to match
-	 * @param matchingBeans all matching beans found
-	 * @return the unique bean instance
-	 * @throws NoSuchBeanDefinitionException if no bean of the given type was found
-	 * @throws NoUniqueBeanDefinitionException if more than one bean of the given type was found
-	 */
+	// 从给定的匹配bean的映射中提取一个惟一的bean
 	private static <T> T uniqueBean(Class<T> type, Map<String, T> matchingBeans) {
 		int nrFound = matchingBeans.size();
 		if (nrFound == 1) {
