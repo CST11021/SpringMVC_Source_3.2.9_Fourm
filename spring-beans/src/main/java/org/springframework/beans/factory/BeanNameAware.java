@@ -16,23 +16,10 @@
 
 package org.springframework.beans.factory;
 
-/**
- * Interface to be implemented by beans that want to be aware of their
- * bean name in a bean factory. Note that it is not usually recommended
- * that an object depend on its bean name, as this represents a potentially
- * brittle dependence on external configuration, as well as a possibly
- * unnecessary dependence on a Spring API.
- *
- * <p>For a list of all bean lifecycle methods, see the
- * {@link BeanFactory BeanFactory javadocs}.
- *
- * @author Juergen Hoeller
- * @author Chris Beams
- * @since 01.11.2003
- * @see BeanClassLoaderAware
- * @see BeanFactoryAware
- * @see InitializingBean
- */
+
+// 当bean需要获取自身在容器中的id/name时，是可以实现该接口，这个接口的入参就是bean的名称，有容器自动注入
+// 该接口是用来被bean实现的，实现该接口可以自动注入该bean在这个Spring容器的beanName
+// 注意，通常不建议对象依赖于它的bean名称，因为这代表了对外部配置的潜在的脆弱依赖，以及对Spring API的不必要依赖。
 public interface BeanNameAware extends Aware {
 
 	/**

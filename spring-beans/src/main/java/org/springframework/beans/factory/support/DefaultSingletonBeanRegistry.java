@@ -254,16 +254,6 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		}
 	}
 
-
-	/**
-	 * Add the given bean to the list of disposable beans in this registry.
-	 * <p>Disposable beans usually correspond to registered singletons,
-	 * matching the bean name but potentially being a different instance
-	 * (for example, a DisposableBean adapter for a singleton that does not
-	 * naturally implement Spring's DisposableBean interface).
-	 * @param beanName the name of the bean
-	 * @param bean the bean instance
-	 */
 	// 一次性bean注册，存放在disponsableBeans集合中
 	public void registerDisposableBean(String beanName, DisposableBean bean) {
 		synchronized (this.disposableBeans) {
@@ -369,8 +359,6 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 			this.singletonsCurrentlyInDestruction = false;
 		}
 	}
-
-
 	public void destroySingleton(String beanName) {
 		// Remove a registered singleton of the given name, if any.
 		removeSingleton(beanName);

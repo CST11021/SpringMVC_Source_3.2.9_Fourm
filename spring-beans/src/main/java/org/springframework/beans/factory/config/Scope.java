@@ -56,6 +56,7 @@ import org.springframework.beans.factory.ObjectFactory;
  * @see org.springframework.web.context.request.RequestScope
  * @see org.springframework.web.context.request.SessionScope
  */
+// Spring的作用域接口，如果你想把自己的自定义作用域集成到Spring容器中，需要实现该接口。
 public interface Scope {
 
 	/**

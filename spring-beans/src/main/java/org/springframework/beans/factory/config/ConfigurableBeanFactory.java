@@ -71,9 +71,11 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	void addBeanPostProcessor(BeanPostProcessor beanPostProcessor);
 	int getBeanPostProcessorCount();
 
-	// 作用域定义
+	// 注册自定义的作用域
 	void registerScope(String scopeName, Scope scope);
+	// 获取或有注册的作用域
 	String[] getRegisteredScopeNames();
+	// 根据名称获取对应的作用域对象
 	Scope getRegisteredScope(String scopeName);
 
 	// 访问权限控制

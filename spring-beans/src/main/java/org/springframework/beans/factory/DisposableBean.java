@@ -16,29 +16,13 @@
 
 package org.springframework.beans.factory;
 
-/**
- * Interface to be implemented by beans that want to release resources
- * on destruction. A BeanFactory is supposed to invoke the destroy
- * method if it disposes a cached singleton. An application context
- * is supposed to dispose all of its singletons on close.
- *
- * <p>An alternative to implementing DisposableBean is specifying a custom
- * destroy-method, for example in an XML bean definition.
- * For a list of all bean lifecycle methods, see the BeanFactory javadocs.
- *
- * @author Juergen Hoeller
- * @since 12.08.2003
- * @see org.springframework.beans.factory.support.RootBeanDefinition#getDestroyMethodName
- * @see org.springframework.context.ConfigurableApplicationContext#close
- */
+
+// bean在销毁的时候要释放资源，需要实现该接口。
+// 如果处理一个缓存的单例对象，那么一个BeanFactory应该调用销毁方法。
+// 应用程序上下文应该在关闭的情况下处理所有的单例。
 public interface DisposableBean {
 
-	/**
-	 * Invoked by a BeanFactory on destruction of a singleton.
-	 * @throws Exception in case of shutdown errors.
-	 * Exceptions will get logged but not rethrown to allow
-	 * other beans to release their resources too.
-	 */
+	// 该方法在单例对象被销毁的时候，会被BeanFactory调用
 	void destroy() throws Exception;
 
 }

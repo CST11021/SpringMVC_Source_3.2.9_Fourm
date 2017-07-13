@@ -175,10 +175,9 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 		this.isFactoryMethodUnique = true;
 	}
 
-	/**
-	 * Check whether the given candidate qualifies as a factory method.
-	 */
+	// 检查 candidate 是否可以作为工厂方法
 	public boolean isFactoryMethod(Method candidate) {
+		// 判断依据是该方法名称是否是对应 factory-method 配置的名称
 		return (candidate != null && candidate.getName().equals(getFactoryMethodName()));
 	}
 

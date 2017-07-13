@@ -64,12 +64,14 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	private final Map<String, AutowireCandidateQualifier> qualifiers = new LinkedHashMap<String, AutowireCandidateQualifier>(0);
 	private boolean nonPublicAccessAllowed = true;
 	private boolean lenientConstructorResolution = true;
+	// 表示实例化bean的时候，要使用的构造函数的参数
 	private ConstructorArgumentValues constructorArgumentValues;
 	private MutablePropertyValues propertyValues;
 	// 该类其实是对lookup-method、replace-method 配置的一个封装
 	private MethodOverrides methodOverrides = new MethodOverrides();
 	// 对应 factory-bean 配置
 	private String factoryBeanName;
+	// 对应 factory-method 配置
 	private String factoryMethodName;
 	private String initMethodName;
 	private String destroyMethodName;

@@ -117,21 +117,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 	// 表示创建bean实例的策略
 	private InstantiationStrategy instantiationStrategy = new CglibSubclassingInstantiationStrategy();
-
 	// 方法参数名的解析器策略
 	private ParameterNameDiscoverer parameterNameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
-
 	// 是否自动尝试解析bean之间的循环引用
 	private boolean allowCircularReferences = true;
-
 	// 是否在循环引用的情况下使用原始bean实例，即使注入的bean最终被包装了。
 	private boolean allowRawInjectionDespiteWrapping = false;
-
 	// 使用一个Set对象来存放在依赖检查和自动装配时要忽略的依赖类型，比如：String.默认为空
 	private final Set<Class<?>> ignoredDependencyTypes = new HashSet<Class<?>>();
 	// 存放要忽略的依赖接口
 	private final Set<Class<?>> ignoredDependencyInterfaces = new HashSet<Class<?>>();
-
 	//** Cache of unfinished FactoryBean instances: FactoryBean name --> BeanWrapper */
 	private final Map<String, BeanWrapper> factoryBeanInstanceCache = new ConcurrentHashMap<String, BeanWrapper>(16);
 	//** Cache of filtered PropertyDescriptors: bean Class -> PropertyDescriptor array */
@@ -149,25 +144,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		setParentBeanFactory(parentBeanFactory);
 	}
 
-	// getter and setter ...
-	public void setInstantiationStrategy(InstantiationStrategy instantiationStrategy) {
-		this.instantiationStrategy = instantiationStrategy;
-	}
-	protected InstantiationStrategy getInstantiationStrategy() {
-		return this.instantiationStrategy;
-	}
-	public void setParameterNameDiscoverer(ParameterNameDiscoverer parameterNameDiscoverer) {
-		this.parameterNameDiscoverer = parameterNameDiscoverer;
-	}
-	protected ParameterNameDiscoverer getParameterNameDiscoverer() {
-		return this.parameterNameDiscoverer;
-	}
-	public void setAllowCircularReferences(boolean allowCircularReferences) {
-		this.allowCircularReferences = allowCircularReferences;
-	}
-	public void setAllowRawInjectionDespiteWrapping(boolean allowRawInjectionDespiteWrapping) {
-		this.allowRawInjectionDespiteWrapping = allowRawInjectionDespiteWrapping;
-	}
+
 
 	// 设置忽略自动装配的类型
 	public void ignoreDependencyType(Class<?> type) {
@@ -309,7 +286,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 	// Implementation of relevant AbstractBeanFactory template methods 实现AbstractBeanFactory里一些模板方法
 
-	// 创建单例Bean的实现，真正的实现方法请看doCreateBean()方法
+	// ------------------------- 创建单例Bean的实现，真正的实现方法请看doCreateBean()方法 ------------------------------------------------------------
+
 	@Override
 	protected Object createBean(final String beanName, final RootBeanDefinition mbd, final Object[] args) throws BeanCreationException {
 		//////////////////////步骤一：根据设置的class属性或者根据className来解析Class
@@ -351,18 +329,18 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		return beanInstance;
 	}
 	protected Object doCreateBean(final String beanName, final RootBeanDefinition mbd, final Object[] args) {
-		// Instantiate the bean.
-		BeanWrapper instanceWrapper = null;
+
 		//////////////////////步骤一：如果单例则需要首先清除缓存
+		BeanWrapper instanceWrapper = null;
 		if (mbd.isSingleton()) {
-			//如果是singleton，先把缓存中的同名bean清除
+			// 如果是singleton，先把缓存中的同名bean清除
 			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
 		}
 
 
 		////////////////////////步骤二：实例化bean，将 BeanDefinition 转换为 BeanWrapper（将实例化一个Bean实例然后在包装成BeanWrapper对象）
 		if (instanceWrapper == null) {
-			//这里是创建bean的地方，由createBeanInstance方法来完成，根据指定bean使用对应的策略创建新的实例，如：工厂方法、构造函数自动注入、简单初始化
+			// 这里是创建bean的地方，由createBeanInstance方法来完成，根据指定bean使用相应的策略（如：工厂方法、构造函数自动注入、简单初始化）创建实例
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
 		final Object bean = (instanceWrapper != null ? instanceWrapper.getWrappedInstance() : null);
@@ -420,7 +398,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 
 		//////////////////////步骤六：循环依赖检查：
-		//在Spring中解决循环依赖只对单例有效，而对于prototype的bean，Spring没有好的解决办法，唯一要做的就是抛出异常。在这个步骤里会检查已经加载的bean是否已经出现了依赖循环，并判断是否需要抛出异常
+		// 在Spring中解决循环依赖只对单例有效，而对于prototype的bean，Spring没有好的解决办法，唯一要做的就是抛出异常。
+		// 在这个步骤里会检查已经加载的bean是否已经出现了依赖循环，并判断是否需要抛出异常
 		if (earlySingletonExposure) {
 			Object earlySingletonReference = getSingleton(beanName, false);
 			//earlySingletonReference只有在检测到有循环依赖的情况下才会不为空
@@ -464,6 +443,102 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		//////////////////////步骤八：完成创建并返回
 		return exposedObject;
 	}
+	// 创建一个bean实例，并返回这个bean的BeanWrapper对象
+	protected BeanWrapper createBeanInstance(String beanName, RootBeanDefinition mbd, Object[] args) {
+		// 返回这个bean的类型
+		Class<?> beanClass = resolveBeanClass(mbd, beanName);
+
+		if (beanClass != null && !Modifier.isPublic(beanClass.getModifiers()) && !mbd.isNonPublicAccessAllowed()) {
+			throw new BeanCreationException(mbd.getResourceDescription(), beanName, "Bean class isn't public, and non-public access not allowed: " + beanClass.getName());
+		}
+
+		// ①如果工厂方法不为空，则使用工厂方法初始化策略
+		if (mbd.getFactoryMethodName() != null)  {
+			// 如果在RootBeanDefinition中存在factoryMethodName属性，或者说在配置文件配置了factory-method，
+			// 那么Spring会尝试使用instantiateUsingFactoryMethod方法根据RootBeanDefinition中的配置生成bean实例
+			return instantiateUsingFactoryMethod(beanName, mbd, args);
+		}
+
+		// ②解析构造函数并进行构造函数的实例化
+		boolean resolved = false;// 标识是否已经知道使用哪个构造器来实例化
+		boolean autowireNecessary = false;
+		if (args == null) {
+			synchronized (mbd.constructorArgumentLock) {
+				// Spring在根据参数及类型去判断使用哪个构造函数是一个比较消耗性能的步骤，所以采用缓存机制，如果已经解析过则不需要重复解析，
+				// 而是直接从 RootBeanDefinition 中 resolvedConstructorOrFactoryMethod 缓存的值去取
+				if (mbd.resolvedConstructorOrFactoryMethod != null) {
+					// resolvedConstructorOrFactoryMethod 不为空表示已经知道使用哪个构造器来实例化了
+					resolved = true;
+					autowireNecessary = mbd.constructorArgumentsResolved;
+				}
+			}
+		}
+
+		// 如果已经解析过则使用解析好的构造函数方法不需要再次锁定
+		if (resolved) {
+			if (autowireNecessary) {
+				// 1、构造函数自动注入
+				return autowireConstructor(beanName, mbd, null, null);
+			}
+			else {
+				// 2、默认使用构造函数（无参）进行实例化
+				return instantiateBean(beanName, mbd);
+			}
+		}
+
+
+
+		// 如果程序走到这里，则表示还不知道使用哪个构造器来进行实例化，所以接下来需要根据参数解析的需要使用的构造函数
+		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
+		if (ctors != null ||
+				mbd.getResolvedAutowireMode() == RootBeanDefinition.AUTOWIRE_CONSTRUCTOR ||
+				mbd.hasConstructorArgumentValues() || !ObjectUtils.isEmpty(args))  {
+			//构造函数自动注入
+			return autowireConstructor(beanName, mbd, ctors, args);
+		}
+
+		// 默认使用构造函数（无参）进行实例化
+		return instantiateBean(beanName, mbd);
+	}
+
+
+	//---------------------------------------------- Spring 构造BeanWrapper时使用以下三种方式的一种--------------------------------------------
+	// 使用工厂bean创建一个bean实例，并返回一个BeanWrapper
+	protected BeanWrapper instantiateUsingFactoryMethod(String beanName, RootBeanDefinition mbd, Object[] explicitArgs) {
+		return new ConstructorResolver(this).instantiateUsingFactoryMethod(beanName, mbd, explicitArgs);
+	}
+	// 使用指定构造器自动注入
+	protected BeanWrapper autowireConstructor(String beanName, RootBeanDefinition mbd, Constructor<?>[] ctors, Object[] explicitArgs) {
+		return new ConstructorResolver(this).autowireConstructor(beanName, mbd, ctors, explicitArgs);
+	}
+	// 默认使用构造函数（无参）进行实例化：
+	// 此方法并没有什么实质性的逻辑，带有参数的实例构造中，Spring把精力都放在了构造函数以及参数的匹配上，
+	// 所以如果没有参数的话那将是非常简单的一件事，直接调用实例化策略进行实例化就可以了
+	protected BeanWrapper instantiateBean(final String beanName, final RootBeanDefinition mbd) {
+		try {
+			Object beanInstance;
+			final BeanFactory parent = this;
+			if (System.getSecurityManager() != null) {
+				beanInstance = AccessController.doPrivileged(new PrivilegedAction<Object>() {
+					public Object run() {
+						return getInstantiationStrategy().instantiate(mbd, beanName, parent);
+					}
+				}, getAccessControlContext());
+			}
+			else {
+				beanInstance = getInstantiationStrategy().instantiate(mbd, beanName, parent);
+			}
+			BeanWrapper bw = new BeanWrapperImpl(beanInstance);
+			initBeanWrapper(bw);
+			return bw;
+		}
+		catch (Throwable ex) {
+			throw new BeanCreationException(mbd.getResourceDescription(), beanName, "Instantiation of bean failed", ex);
+		}
+	}
+	//---------------------------------------------- Spring 构造BeanWrapper时使用以上三种方式的一种--------------------------------------------
+
+
 
 	@Override
 	protected Class<?> predictBeanType(String beanName, RootBeanDefinition mbd, Class<?>... typesToMatch) {
@@ -823,63 +898,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		return result;
 	}
 
-	// 创建一个bean实例，并返回这个bean的BeanWrapper对象
-	protected BeanWrapper createBeanInstance(String beanName, RootBeanDefinition mbd, Object[] args) {
-		// 返回这个bean的类型
-		Class<?> beanClass = resolveBeanClass(mbd, beanName);
 
-		if (beanClass != null && !Modifier.isPublic(beanClass.getModifiers()) && !mbd.isNonPublicAccessAllowed()) {
-			throw new BeanCreationException(mbd.getResourceDescription(), beanName, "Bean class isn't public, and non-public access not allowed: " + beanClass.getName());
-		}
-
-		// ①如果工厂方法不为空，则使用工厂方法初始化策略
-		if (mbd.getFactoryMethodName() != null)  {
-			// 如果在RootBeanDefinition中存在factoryMethodName属性，或者说在配置文件配置了factory-method，
-			// 那么Spring会尝试使用instantiateUsingFactoryMethod方法根据RootBeanDefinition中的配置生成bean实例
-			return instantiateUsingFactoryMethod(beanName, mbd, args);
-		}
-
-		// ②解析构造函数并进行构造函数的实例化
-		boolean resolved = false;// 标识是否已经知道使用哪个构造器来实例化
-		boolean autowireNecessary = false;
-		if (args == null) {
-			synchronized (mbd.constructorArgumentLock) {
-				// Spring在根据参数及类型去判断使用哪个构造函数是一个比较消耗性能的步骤，所以采用缓存机制，如果已经解析过则不需要重复解析，
-				// 而是直接从 RootBeanDefinition 中 resolvedConstructorOrFactoryMethod 缓存的值去取
-				if (mbd.resolvedConstructorOrFactoryMethod != null) {
-					// resolvedConstructorOrFactoryMethod 不为空表示已经知道使用哪个构造器来实例化了
-					resolved = true;
-					autowireNecessary = mbd.constructorArgumentsResolved;
-				}
-			}
-		}
-
-		// 如果已经解析过则使用解析好的构造函数方法不需要再次锁定
-		if (resolved) {
-			if (autowireNecessary) {
-				// 1、构造函数自动注入
-				return autowireConstructor(beanName, mbd, null, null);
-			}
-			else {
-				// 2、默认使用构造函数（无参）进行实例化
-				return instantiateBean(beanName, mbd);
-			}
-		}
-
-
-
-		// 如果程序走到这里，则表示还不知道使用哪个构造器来进行实例化，所以接下来需要根据参数解析的需要使用的构造函数
-		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
-		if (ctors != null ||
-				mbd.getResolvedAutowireMode() == RootBeanDefinition.AUTOWIRE_CONSTRUCTOR ||
-				mbd.hasConstructorArgumentValues() || !ObjectUtils.isEmpty(args))  {
-			//构造函数自动注入
-			return autowireConstructor(beanName, mbd, ctors, args);
-		}
-
-		// 默认使用构造函数（无参）进行实例化
-		return instantiateBean(beanName, mbd);
-	}
 
 	// 解析这个bean实例化时要使用的构造器
 	protected Constructor<?>[] determineConstructorsFromBeanPostProcessors(Class<?> beanClass, String beanName) throws BeansException {
@@ -897,42 +916,6 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		return null;
 	}
-
-	//---------------------------------------------- Spring 构造BeanWrapper时使用以下三种方式的一种--------------------------------------------
-	// 使用指定构造器自动注入
-	protected BeanWrapper autowireConstructor(String beanName, RootBeanDefinition mbd, Constructor<?>[] ctors, Object[] explicitArgs) {
-		return new ConstructorResolver(this).autowireConstructor(beanName, mbd, ctors, explicitArgs);
-	}
-	// 默认使用构造函数（无参）进行实例化：
-	// 此方法并没有什么实质性的逻辑，带有参数的实例构造中，Spring把精力都放在了构造函数以及参数的匹配上，
-	// 所以如果没有参数的话那将是非常简单的一件事，直接调用实例化策略进行实例化就可以了
-	protected BeanWrapper instantiateBean(final String beanName, final RootBeanDefinition mbd) {
-		try {
-			Object beanInstance;
-			final BeanFactory parent = this;
-			if (System.getSecurityManager() != null) {
-				beanInstance = AccessController.doPrivileged(new PrivilegedAction<Object>() {
-					public Object run() {
-						return getInstantiationStrategy().instantiate(mbd, beanName, parent);
-					}
-				}, getAccessControlContext());
-			}
-			else {
-				beanInstance = getInstantiationStrategy().instantiate(mbd, beanName, parent);
-			}
-			BeanWrapper bw = new BeanWrapperImpl(beanInstance);
-			initBeanWrapper(bw);
-			return bw;
-		}
-		catch (Throwable ex) {
-			throw new BeanCreationException(mbd.getResourceDescription(), beanName, "Instantiation of bean failed", ex);
-		}
-	}
-	// 使用工厂bean创建一个bean实例，并返回一个BeanWrapper
-	protected BeanWrapper instantiateUsingFactoryMethod(String beanName, RootBeanDefinition mbd, Object[] explicitArgs) {
-		return new ConstructorResolver(this).instantiateUsingFactoryMethod(beanName, mbd, explicitArgs);
-	}
-	//---------------------------------------------- Spring 构造BeanWrapper时使用以上三种方式的一种--------------------------------------------
 
 
 
@@ -1504,6 +1487,27 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 
+
+	// getter and setter ...
+	public void setInstantiationStrategy(InstantiationStrategy instantiationStrategy) {
+		this.instantiationStrategy = instantiationStrategy;
+	}
+	protected InstantiationStrategy getInstantiationStrategy() {
+		return this.instantiationStrategy;
+	}
+	public void setParameterNameDiscoverer(ParameterNameDiscoverer parameterNameDiscoverer) {
+		this.parameterNameDiscoverer = parameterNameDiscoverer;
+	}
+	protected ParameterNameDiscoverer getParameterNameDiscoverer() {
+		return this.parameterNameDiscoverer;
+	}
+	public void setAllowCircularReferences(boolean allowCircularReferences) {
+		this.allowCircularReferences = allowCircularReferences;
+	}
+	public void setAllowRawInjectionDespiteWrapping(boolean allowRawInjectionDespiteWrapping) {
+		this.allowRawInjectionDespiteWrapping = allowRawInjectionDespiteWrapping;
+	}
+
 	/**
 	 * Special DependencyDescriptor variant for Spring's good old autowire="byType" mode.
 	 * Always optional; never considering the parameter name for choosing a primary candidate.
@@ -1520,5 +1524,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			return null;
 		}
 	}
+
+
+
 
 }

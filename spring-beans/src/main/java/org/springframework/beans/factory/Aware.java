@@ -17,12 +17,10 @@
 package org.springframework.beans.factory;
 
 /**
- * Marker superinterface indicating that a bean is eligible to be
- * notified by the Spring container of a particular framework object
+ * Marker superinterface indicating that a bean is eligible to be notified by the Spring container of a particular framework object
  * through a callback-style method. Actual method signature is
  * determined by individual subinterfaces, but should typically
- * consist of just one void-returning method that accepts a single
- * argument.
+ * consist of just one void-returning method that accepts a single argument.
  *
  * <p>Note that merely implementing {@link Aware} provides no default
  * functionality. Rather, processing must be done explicitly, for example
@@ -34,6 +32,8 @@ package org.springframework.beans.factory;
  * @author Chris Beams
  * @since 3.1
  */
+// 一个标记接口，实现该接口的对象可以接受来自特定框架对象的一个回调方法，
+// 实际的方法签名是由单独的子接口决定的，但是通常只需要一个返回的方法就可以接受一个参数。
 public interface Aware {
 
 }

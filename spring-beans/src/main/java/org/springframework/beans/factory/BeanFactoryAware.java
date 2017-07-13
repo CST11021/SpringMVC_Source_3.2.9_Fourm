@@ -19,37 +19,60 @@ package org.springframework.beans.factory;
 import org.springframework.beans.BeansException;
 
 /**
- * Interface to be implemented by beans that wish to be aware of their
- * owning {@link BeanFactory}.
- *
- * <p>For example, beans can look up collaborating beans via the factory
- * (Dependency Lookup). Note that most beans will choose to receive references
- * to collaborating beans via corresponding bean properties or constructor
- * arguments (Dependency Injection).
- *
- * <p>For a list of all bean lifecycle methods, see the
- * {@link BeanFactory BeanFactory javadocs}.
- *
- * @author Rod Johnson
- * @author Chris Beams
- * @since 11.03.2003
- * @see BeanNameAware
- * @see BeanClassLoaderAware
- * @see InitializingBean
- * @see org.springframework.context.ApplicationContextAware
+ 在使用spring编程时，常常会遇到想根据bean的名称来获取相应的bean对象，这时候，就可以通过实现BeanFactoryAware来满足需求，代码很简单：
+ @Service
+ public class BeanFactoryHelper implements BeanFactoryAware {
+	 private static BeanFactory beanFactory;
+
+	 @Override
+	 public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+	 	this.beanFactory = beanFactory;
+	 }
+
+	 public static Object getBean(String beanName){
+		 if(beanFactory == null){
+	 		throw new NullPointerException("BeanFactory is null!");
+	 	 }
+	 　　return beanFactory.getBean(beanName);
+	 }
+ }
+
+ 还有一种方式是实现ApplicationContextAware接口，代码也很简单：
+ @Service
+ public class ApplicationContextHelper implements ApplicationContextAware {
+ 	private static ApplicationContext applicationContext;
+
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		this.applicationContext = applicationContext;
+	}
+
+ 	public static Object getBean(String beanName){
+ 		if(applicationContext == null){
+ 			throw new NullPointerException("ApplicationContext is null!");
+ 		}
+ 		return applicationContext.getBean(beanName);
+ 	}
+ }
+
+
+ 上面两种方法，只有容器启动的时候，才会把BeanFactory和ApplicationContext注入到自定义的helper类中，如果在本地junit测试的时候，如果需要根据bean的名称获取bean对象，
+ 则可以通过ClassPathXmlApplicationContext来获取一个ApplicationContext，代码如下：
+ @Test
+ public void test() throws SQLException {
+	 //通过从classpath中加载spring-mybatis.xml实现bean的获取
+	 ApplicationContext context = new ClassPathXmlApplicationContext("spring-mybatis.xml");
+	 IUserService userService = (IUserService) context.getBean("userService");
+
+	 User user = new User();
+	 user.setName("test");
+	 user.setAge(20);
+	 userService.addUser(user);
+ }
+
  */
 public interface BeanFactoryAware extends Aware {
 
-	/**
-	 * Callback that supplies the owning factory to a bean instance.
-	 * <p>Invoked after the population of normal bean properties
-	 * but before an initialization callback such as
-	 * {@link InitializingBean#afterPropertiesSet()} or a custom init-method.
-	 * @param beanFactory owning BeanFactory (never {@code null}).
-	 * The bean can immediately call methods on the factory.
-	 * @throws BeansException in case of initialization errors
-	 * @see BeanInitializationException
-	 */
 	void setBeanFactory(BeanFactory beanFactory) throws BeansException;
 
 }

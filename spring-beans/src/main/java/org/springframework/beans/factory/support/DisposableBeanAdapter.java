@@ -58,53 +58,32 @@ import org.springframework.util.ReflectionUtils;
  */
 @SuppressWarnings("serial")
 class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
-
-	private static final String CLOSE_METHOD_NAME = "close";
-
-	private static final String SHUTDOWN_METHOD_NAME = "shutdown";
-
 	private static final Log logger = LogFactory.getLog(DisposableBeanAdapter.class);
 
+	private static final String CLOSE_METHOD_NAME = "close";
+	private static final String SHUTDOWN_METHOD_NAME = "shutdown";
 	private static Class<?> closeableInterface;
 
 	static {
 		try {
-			closeableInterface = ClassUtils.forName("java.lang.AutoCloseable",
-					DisposableBeanAdapter.class.getClassLoader());
+			closeableInterface = ClassUtils.forName("java.lang.AutoCloseable", DisposableBeanAdapter.class.getClassLoader());
 		}
 		catch (ClassNotFoundException ex) {
 			closeableInterface = Closeable.class;
 		}
 	}
 
-
 	private final Object bean;
-
 	private final String beanName;
-
 	private final boolean invokeDisposableBean;
-
 	private final boolean nonPublicAccessAllowed;
-
 	private final AccessControlContext acc;
-
 	private String destroyMethodName;
-
 	private transient Method destroyMethod;
-
 	private List<DestructionAwareBeanPostProcessor> beanPostProcessors;
 
 
-	/**
-	 * Create a new DisposableBeanAdapter for the given bean.
-	 * @param bean the bean instance (never {@code null})
-	 * @param beanName the name of the bean
-	 * @param beanDefinition the merged bean definition
-	 * @param postProcessors the List of BeanPostProcessors
-	 * (potentially DestructionAwareBeanPostProcessor), if any
-	 */
-	public DisposableBeanAdapter(Object bean, String beanName, RootBeanDefinition beanDefinition,
-			List<BeanPostProcessor> postProcessors, AccessControlContext acc) {
+	public DisposableBeanAdapter(Object bean, String beanName, RootBeanDefinition beanDefinition, List<BeanPostProcessor> postProcessors, AccessControlContext acc) {
 
 		Assert.notNull(bean, "Disposable bean must not be null");
 		this.bean = bean;
@@ -138,12 +117,12 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
 		}
 		this.beanPostProcessors = filterPostProcessors(postProcessors);
 	}
-
-	/**
-	 * Create a new DisposableBeanAdapter for the given bean.
-	 */
-	private DisposableBeanAdapter(Object bean, String beanName, boolean invokeDisposableBean,
-			boolean nonPublicAccessAllowed, String destroyMethodName,
+	private DisposableBeanAdapter(
+			Object bean,
+			String beanName,
+			boolean invokeDisposableBean,
+			boolean nonPublicAccessAllowed,
+			String destroyMethodName,
 			List<DestructionAwareBeanPostProcessor> postProcessors) {
 
 		this.bean = bean;
@@ -210,7 +189,6 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
 		return filteredPostProcessors;
 	}
 
-
 	public void run() {
 		destroy();
 	}
@@ -261,7 +239,6 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
 		}
 	}
 
-
 	private Method determineDestroyMethod() {
 		try {
 			if (System.getSecurityManager() != null) {
@@ -281,18 +258,15 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
 		}
 	}
 
+	// 查找这个bean的销毁方法
 	private Method findDestroyMethod() {
 		return (this.nonPublicAccessAllowed ?
 				BeanUtils.findMethodWithMinimalParameters(this.bean.getClass(), this.destroyMethodName) :
 				BeanUtils.findMethodWithMinimalParameters(this.bean.getClass().getMethods(), this.destroyMethodName));
 	}
 
-	/**
-	 * Invoke the specified custom destroy method on the given bean.
-	 * <p>This implementation invokes a no-arg method if found, else checking
-	 * for a method with a single boolean argument (passing in "true",
-	 * assuming a "force" parameter), else logging an error.
-	 */
+	// 在给定的bean上调用指定的自定义销毁方法。
+	// 该实现中如果有无参的方法，将调用它，否则检查带有一个布尔参数的方法(传入“true”，假设一个“force”参数)，否则就 logging 一个 error
 	private void invokeCustomDestroyMethod(final Method destroyMethod) {
 		Class<?>[] paramTypes = destroyMethod.getParameterTypes();
 		final Object[] args = new Object[paramTypes.length];
@@ -300,8 +274,7 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
 			args[0] = Boolean.TRUE;
 		}
 		if (logger.isDebugEnabled()) {
-			logger.debug("Invoking destroy method '" + this.destroyMethodName +
-					"' on bean with name '" + this.beanName + "'");
+			logger.debug("Invoking destroy method '" + this.destroyMethodName + "' on bean with name '" + this.beanName + "'");
 		}
 		try {
 			if (System.getSecurityManager() != null) {
@@ -329,8 +302,7 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
 			}
 		}
 		catch (InvocationTargetException ex) {
-			String msg = "Invocation of destroy method '" + this.destroyMethodName +
-					"' failed on bean with name '" + this.beanName + "'";
+			String msg = "Invocation of destroy method '" + this.destroyMethodName + "' failed on bean with name '" + this.beanName + "'";
 			if (logger.isDebugEnabled()) {
 				logger.warn(msg, ex.getTargetException());
 			}
@@ -339,16 +311,11 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
 			}
 		}
 		catch (Throwable ex) {
-			logger.error("Couldn't invoke destroy method '" + this.destroyMethodName +
-					"' on bean with name '" + this.beanName + "'", ex);
+			logger.error("Couldn't invoke destroy method '" + this.destroyMethodName + "' on bean with name '" + this.beanName + "'", ex);
 		}
 	}
 
-
-	/**
-	 * Serializes a copy of the state of this class,
-	 * filtering out non-serializable BeanPostProcessors.
-	 */
+	// 序列化这个类的状态，过滤出非可串行化的 BeanPostProcessors
 	protected Object writeReplace() {
 		List<DestructionAwareBeanPostProcessor> serializablePostProcessors = null;
 		if (this.beanPostProcessors != null) {
@@ -363,12 +330,7 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
 				this.nonPublicAccessAllowed, this.destroyMethodName, serializablePostProcessors);
 	}
 
-
-	/**
-	 * Check whether the given bean has any kind of destroy method to call.
-	 * @param bean the bean instance
-	 * @param beanDefinition the corresponding bean definition
-	 */
+	// 检查给定的bean是否有任何类型的销毁方法调用。
 	public static boolean hasDestroyMethod(Object bean, RootBeanDefinition beanDefinition) {
 		if (bean instanceof DisposableBean || closeableInterface.isInstance(bean)) {
 			return true;

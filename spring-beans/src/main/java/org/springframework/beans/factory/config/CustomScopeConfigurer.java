@@ -25,54 +25,43 @@ import org.springframework.core.Ordered;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
-/**
- * Simple {@link BeanFactoryPostProcessor} implementation that registers
- * custom {@link Scope Scope(s)} with the containing {@link ConfigurableBeanFactory}.
- *
- * <p>Will register all of the supplied {@link #setScopes(java.util.Map) scopes}
- * with the {@link ConfigurableListableBeanFactory} that is passed to the
- * {@link #postProcessBeanFactory(ConfigurableListableBeanFactory)} method.
- *
- * <p>This class allows for <i>declarative</i> registration of custom scopes.
- * Alternatively, consider implementing a custom {@link BeanFactoryPostProcessor}
- * that calls {@link ConfigurableBeanFactory#registerScope} programmatically.
- *
- * @author Juergen Hoeller
- * @author Rick Evans
- * @since 2.0
- * @see ConfigurableBeanFactory#registerScope
- */
+// 除了直接编码调用 ConfigurableBeanFactory 的 registerScope 来注册 scope ，Spring还提供了一个专门用于
+// 统一注册自定义scope的 BeanFactoryPostProcessor 实现，即 CustomScopeConfigurer 。
+// 对于 ApplicationContext 来说，因为它可以自动识别并加载 BeanFactoryPostProcessor ，所以我们就可以直接在配置文件中，
+// 通过这个 CustomScopeConfigurer 注册来 ThreadScope ，如：
+
+// <bean class="org.springframework.beans.factory.config.CustomScopeConfigurer">
+//   <property name="scopes">
+//		<map>
+//			<entry key="thread" value="com.foo.ThreadScope"/>
+//		</map>
+//    </property>
+// </bean>
+//
+// 在以上工作全部完成之后，我们就可以在自己的bean定义中使用这个新增加到容器的自定义scope “thread ”了，
+// 如下代码演示了通常情况下“thread ”自定义scope的使用：
+//<bean id="beanName" class="..." scope="thread">
+//	<aop:scoped-proxy/>
+//</bean>
+
 public class CustomScopeConfigurer implements BeanFactoryPostProcessor, BeanClassLoaderAware, Ordered {
 
 	private Map<String, Object> scopes;
-
 	private int order = Ordered.LOWEST_PRECEDENCE;
-
 	private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
-
-	/**
-	 * Specify the custom scopes that are to be registered.
-	 * <p>The keys indicate the scope names (of type String); each value
-	 * is expected to be the corresponding custom {@link Scope} instance
-	 * or class name.
-	 */
 	public void setScopes(Map<String, Object> scopes) {
 		this.scopes = scopes;
 	}
-
 	public void setOrder(int order) {
 		this.order = order;
 	}
-
 	public int getOrder() {
 		return this.order;
 	}
-
 	public void setBeanClassLoader(ClassLoader beanClassLoader) {
 		this.beanClassLoader = beanClassLoader;
 	}
-
 
 	@SuppressWarnings("unchecked")
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {

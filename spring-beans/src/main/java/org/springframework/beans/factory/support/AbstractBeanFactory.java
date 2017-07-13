@@ -96,9 +96,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	private final List<StringValueResolver> embeddedValueResolvers = new LinkedList<StringValueResolver>();
 	// BeanPostProcessor的作用是bean实例化前后可以做一些其他处理
 	private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<BeanPostProcessor>();
-	// 判断是否有注册 instantiationawarebeanpostprocessors
+	// 判断是否有注册 InstantiationAwareBeanPostProcessor
 	private boolean hasInstantiationAwareBeanPostProcessors;
-	// 判断是否有注册 DestructionAwareBeanPostProcessors
+	// 判断是否有注册 DestructionAwareBeanPostProcessor
 	private boolean hasDestructionAwareBeanPostProcessors;
 	// Map from scope identifier String to corresponding Scope */
 	private final Map<String, Scope> scopes = new HashMap<String, Scope>(8);
@@ -711,12 +711,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		return this.hasInstantiationAwareBeanPostProcessors;
 	}
 
-	/**
-	 * Return whether this factory holds a DestructionAwareBeanPostProcessor
-	 * that will get applied to singleton beans on shutdown.
-	 * @see #addBeanPostProcessor
-	 * @see org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor
-	 */
+
+	// 判断工厂是否持有一个 DestructionAwareBeanPostProcessor 对象，在工厂shutdown的时候DestructionAwareBeanPostProcessor会应用于bean
 	protected boolean hasDestructionAwareBeanPostProcessors() {
 		return this.hasDestructionAwareBeanPostProcessors;
 	}
@@ -1345,16 +1341,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		return isAlias(beanName) || containsLocalBean(beanName) || hasDependentBean(beanName);
 	}
 
-	/**
-	 * Determine whether the given bean requires destruction on shutdown.
-	 * <p>The default implementation checks the DisposableBean interface as well as
-	 * a specified destroy method and registered DestructionAwareBeanPostProcessors.
-	 * @param bean the bean instance to check
-	 * @param mbd the corresponding bean definition
-	 * @see org.springframework.beans.factory.DisposableBean
-	 * @see AbstractBeanDefinition#getDestroyMethodName()
-	 * @see org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor
-	 */
+	// 判断给定的bean是否需要在关闭的时候销毁
 	protected boolean requiresDestruction(Object bean, RootBeanDefinition mbd) {
 		return (bean != null &&
 				(DisposableBeanAdapter.hasDestroyMethod(bean, mbd) || hasDestructionAwareBeanPostProcessors()));
@@ -1366,11 +1353,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		AccessControlContext acc = (System.getSecurityManager() != null ? getAccessControlContext() : null);
 		if (!mbd.isPrototype() && requiresDestruction(bean, mbd)) {
 			if (mbd.isSingleton()) {
-				//单例模式下注册需要销毁的bean，此方法中会处理实现DisposableBean的bean，并且对所有的bean使用DestructionAwareBeanPostProcessors处理
+				//单例模式下注册需要销毁的bean，此方法中会处理实现DisposableBean的bean，并且对所有的bean使用 DestructionAwareBeanPostProcessors 处理
 				registerDisposableBean(beanName, new DisposableBeanAdapter(bean, beanName, mbd, getBeanPostProcessors(), acc));
 			}
 			else {
-				// 自定义scope处理
+				// 自定义作用域处理
 				Scope scope = this.scopes.get(mbd.getScope());
 				if (scope == null) {
 					throw new IllegalStateException("No Scope registered for scope '" + mbd.getScope() + "'");
