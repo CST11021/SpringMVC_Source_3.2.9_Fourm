@@ -49,6 +49,7 @@ import org.springframework.util.ObjectUtils;
 public final class BeanFactoryUtilsTests {
 
 	private static final Class<?> CLASS = BeanFactoryUtilsTests.class;
+	// root.xml、middle.xml和leaf.xml表示从父容器到子容器的三个配置文件
 	private static final Resource ROOT_CONTEXT = qualifiedResource(CLASS, "root.xml");
 	private static final Resource MIDDLE_CONTEXT = qualifiedResource(CLASS, "middle.xml");
 	private static final Resource LEAF_CONTEXT = qualifiedResource(CLASS, "leaf.xml");

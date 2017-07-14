@@ -88,7 +88,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	private AutowireCandidateResolver autowireCandidateResolver = new SimpleAutowireCandidateResolver();
 	// 定义了依赖类型和其对应的自动绑定值的键值对集合
 	private final Map<Class<?>, Object> resolvableDependencies = new HashMap<Class<?>, Object>(16);
-	// 保存beanName -> BeanDefinition
+	// 解析完配置文件后，会将所有配置的bean信息缓存到这个map中，一般我们在XML中配置的bean都会以 GenericBeanDefinition 类型存放，
+	// 而使用@Controller、@Service和@Repository等注解的bean会以ScannedGenericBeanDefinition的类型存放，一些默认没有通过显示配置的bean会以RootBeanDefinition的类型缓存到这个map中
 	private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<String, BeanDefinition>(64);
 	//** Map of singleton and non-singleton bean names keyed by dependency type */
 	private final Map<Class<?>, String[]> allBeanNamesByType = new ConcurrentHashMap<Class<?>, String[]>(64);

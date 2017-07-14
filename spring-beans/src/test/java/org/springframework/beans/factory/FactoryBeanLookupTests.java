@@ -17,6 +17,7 @@
 package org.springframework.beans.factory;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
@@ -39,8 +40,21 @@ public class FactoryBeanLookupTests {
 	@Before
 	public void setUp() {
 		beanFactory = new DefaultListableBeanFactory();
-		new XmlBeanDefinitionReader((BeanDefinitionRegistry) beanFactory).loadBeanDefinitions(
-				new ClassPathResource("FactoryBeanLookupTests-context.xml", this.getClass()));
+		new XmlBeanDefinitionReader((BeanDefinitionRegistry) beanFactory).
+				loadBeanDefinitions(new ClassPathResource("FactoryBeanLookupTests-context.xml", this.getClass()));
+	}
+
+	@Test
+	public void factoryBeanObjectLookupByNameAndType() {
+		Foo foo = beanFactory.getBean("foo", Foo.class);
+		// 注意这里返回的是 Foo 对象实例
+		Foo foo1 = beanFactory.getBean("fooFactory", Foo.class);
+		Foo foo2 = beanFactory.getBean("fooFactory", Foo.class);
+		assertNotNull(foo1);
+		assertNotNull(foo2);
+		assertEquals(foo1,foo2);
+		Object fooFactory = beanFactory.getBean("&fooFactory");
+		assertThat(fooFactory, instanceOf(FooFactoryBean.class));
 	}
 
 	@Test
@@ -67,16 +81,16 @@ public class FactoryBeanLookupTests {
 		assertThat(fooFactory, instanceOf(Foo.class));
 	}
 
-	@Test
-	public void factoryBeanObjectLookupByNameAndType() {
-		Foo foo = beanFactory.getBean("fooFactory", Foo.class);
-		assertNotNull(foo);
-	}
+
 }
 
 class FooFactoryBean extends AbstractFactoryBean<Foo> {
 	@Override
 	protected Foo createInstance() throws Exception {
+		return new Foo();
+	}
+
+	public Foo create() {
 		return new Foo();
 	}
 

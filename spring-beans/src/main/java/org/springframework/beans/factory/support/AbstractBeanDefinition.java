@@ -58,6 +58,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	private boolean lazyInit = false;
 	private int autowireMode = AUTOWIRE_NO;
 	private int dependencyCheck = DEPENDENCY_CHECK_NONE;
+	// 表示这个依赖的所有bean
 	private String[] dependsOn;
 	private boolean autowireCandidate = true;
 	private boolean primary = false;
@@ -77,6 +78,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	private String destroyMethodName;
 	private boolean enforceInitMethod = true;
 	private boolean enforceDestroyMethod = true;
+	// 标识这个BeanDefinition是否是“合成”的（合成的意思：不是由应用程序本身定义的）
 	private boolean synthetic = false;
 	private int role = BeanDefinition.ROLE_APPLICATION;
 	private String description;

@@ -79,6 +79,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 			return doGetObjectFromFactoryBean(factory, beanName, shouldPostProcess);
 		}
 	}
+	// shouldPostProcess为true时，则给则个bean应用 applyBeanPostProcessorsAfterInitialization（bean实例化后的后处理器）
 	private Object doGetObjectFromFactoryBean(final FactoryBean<?> factory, final String beanName, final boolean shouldPostProcess) throws BeanCreationException {
 
 		Object object;
