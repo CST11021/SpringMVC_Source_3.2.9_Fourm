@@ -237,6 +237,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 								return createBean(beanName, mbd, args);
 							}
 							catch (BeansException ex) {
+								// 销毁这个单例bean
 								destroySingleton(beanName);
 								throw ex;
 							}
@@ -251,10 +252,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					// It's a prototype -> create a new instance.
 					Object prototypeInstance = null;
 					try {
+						// 标记这个原型bean正在创建中
 						beforePrototypeCreation(beanName);
 						prototypeInstance = createBean(beanName, mbd, args);
 					}
 					finally {
+						// 标记这个原型bean不在创建中
 						afterPrototypeCreation(beanName);
 					}
 					// 返回用户真正想要的bean，它可能是一个普通的bean，可能是一个工厂bean
@@ -849,12 +852,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				(curVal.equals(beanName) || (curVal instanceof Set && ((Set<?>) curVal).contains(beanName))));
 	}
 
-	/**
-	 * Callback before prototype creation.
-	 * <p>The default implementation register the prototype as currently in creation.
-	 * @param beanName the name of the prototype about to be created
-	 * @see #isPrototypeCurrentlyInCreation
-	 */
+	// 这个原型的bean创建前会调用该方法，默认的实现标志着原型正在创建中
 	@SuppressWarnings("unchecked")
 	protected void beforePrototypeCreation(String beanName) {
 		Object curVal = this.prototypesCurrentlyInCreation.get();
@@ -872,9 +870,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			beanNameSet.add(beanName);
 		}
 	}
-
-
-	// 这个原型的bean创建完后会调用该方法，默认的实现标志着原型不再在创建中
+	// 这个原型的bean创建完后会调用该方法，默认的实现标志着原型不在创建中
 	@SuppressWarnings("unchecked")
 	protected void afterPrototypeCreation(String beanName) {
 		Object curVal = this.prototypesCurrentlyInCreation.get();
@@ -1340,7 +1336,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		AccessControlContext acc = (System.getSecurityManager() != null ? getAccessControlContext() : null);
 		if (!mbd.isPrototype() && requiresDestruction(bean, mbd)) {
 			if (mbd.isSingleton()) {
-				//单例模式下注册需要销毁的bean，此方法中会处理实现DisposableBean的bean，并且对所有的bean使用 DestructionAwareBeanPostProcessors 处理
+				// 单例模式下注册需要销毁的bean，此方法中会处理实现DisposableBean的bean，并且对所有的bean使用 DestructionAwareBeanPostProcessors 处理
 				registerDisposableBean(beanName, new DisposableBeanAdapter(bean, beanName, mbd, getBeanPostProcessors(), acc));
 			}
 			else {

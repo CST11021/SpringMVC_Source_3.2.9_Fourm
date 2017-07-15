@@ -476,12 +476,70 @@
   </dependencies>
   <build>
     <finalName>SpringMVC_Source_3.2.9_Fourm</finalName>
+
+      <!--&lt;!&ndash;默认源代码目录&ndash;&gt;-->
+      <!--<sourceDirectory>src/main</sourceDirectory>-->
+      <!--&lt;!&ndash;默认测试源代码目录&ndash;&gt;-->
+      <!--<testSourceDirectory>src/test</testSourceDirectory>-->
+
+      <!--默认资源目录-->
       <resources>
           <resource>
-              <directory>src/main</directory>
+              <directory>src/main/resources</directory>
+          </resource>
+          <resource>
+              <directory>spring-beans/src/main/resources</directory>
           </resource>
       </resources>
+      <!--默认测试资源目录-->
+      <testResources>
+          <testResource>
+              <directory>spring-beans/src/test/resources</directory>
+          </testResource>
+      </testResources>
+
     <plugins>
+
+        <!--
+        在上面的配置中，<sourceDirectory>只能指定一个源代码目录，不能指定多个。使用 build-helper-maven-plugin 这个插件可以指定多个源代码目录、多个资源目录，用法如下：-->
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <version>1.1</version>
+
+            <executions>
+                <!-- 配置多个目录的源码 -->
+                <execution>
+                    <id>add-source</id>
+                    <phase>generate-sources</phase>
+                    <goals><goal>add-source</goal></goals>
+                    <configuration>
+                        <sources>
+                            <!-- 在此加入源文件夹 -->
+                            <source>src/main/java</source>
+                            <source>spring-beans/src/main/java</source>
+                            <source>spring-core/src/main/java</source>
+                        </sources>
+                    </configuration>
+                </execution>
+
+                <!-- 配置多个测试的源码路径 -->
+                <execution>
+                    <id>add-testSource</id>
+                    <phase>generate-test-sources</phase>
+                    <goals><goal>add-test-source</goal></goals>
+                    <configuration>
+                        <sources>
+                            <source>src/test/java</source>
+                            <source>spring-beans/src/test/java</source>
+                            <source>spring-core/src/test/java</source>
+                        </sources>
+                    </configuration>
+                </execution>
+
+            </executions>
+        </plugin>
+
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>

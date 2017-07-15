@@ -286,7 +286,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 	// Implementation of relevant AbstractBeanFactory template methods 实现AbstractBeanFactory里一些模板方法
 
-	// ------------------------- 创建单例Bean的实现，真正的实现方法请看doCreateBean()方法 ------------------------------------------------------------
+	// ------------------------- 实例化Bean的实现，真正的实现方法请看doCreateBean()方法 ------------------------------------------------------------
 
 	@Override
 	protected Object createBean(final String beanName, final RootBeanDefinition mbd, final Object[] args) throws BeanCreationException {
@@ -298,18 +298,18 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		resolveBeanClass(mbd, beanName);
 
 		//////////////////////步骤二：对Override属性进行标记及验证
-		// 检查是否有配置 lookup-method 和 replace-method 覆盖方法，并判断这个覆盖方法是否存在
 		try {
-			//在Spring中存在lookup-method和replace-method的，而这两个配置的加载其实就是将配置统一存放BeanDefinition中的methodOverride属性里，而这个函数的操作其实也就是针对这两个配置的
+			// 检查是否有配置 lookup-method 和 replace-method 覆盖方法，并判断这个覆盖方法是否存在
+			// 在Spring中存在 lookup-method 和 replace-method 的，而这两个配置的加载其实就是将配置统一存放到BeanDefinition中的methodOverride属性里，而这个函数的操作其实也就是针对这两个配置的
 			mbd.prepareMethodOverrides();
 		}
 		catch (BeanDefinitionValidationException ex) {
 			throw new BeanDefinitionStoreException(mbd.getResourceDescription(), beanName, "Validation of method overrides failed", ex);
 		}
 
-		//////////////////////步骤三：应用初始化前的后处理器，解析指定bean是否存在初始化前短路操作
+		//////////////////////步骤三：应用初始化前的后处理器，解析指定bean是否存在初始化前的短路操作
 		try {
-			// 给BeanPostProcessors一个机会来返回代理来替代真正的实例，如果bean配置了PostProcessor，那么这里返回的是一个proxy
+			// 给 BeanPostProcessors 一个机会来返回代理来替代真正的实例，如果bean配置了PostProcessor，那么这里返回的是一个proxy
 			Object bean = resolveBeforeInstantiation(beanName, mbd);
 			if (bean != null) {
 				return bean;
