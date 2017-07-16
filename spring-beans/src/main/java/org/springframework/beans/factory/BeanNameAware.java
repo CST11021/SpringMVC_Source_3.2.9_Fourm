@@ -17,7 +17,7 @@
 package org.springframework.beans.factory;
 
 
-// 当bean需要获取自身在容器中的id/name时，是可以实现该接口，这个接口的入参就是bean的名称，有容器自动注入
+// 当bean需要获取自身在容器中的id/name时，是可以实现该接口，这个接口的入参就是bean的名称，由容器自动注入
 // 该接口是用来被bean实现的，实现该接口可以自动注入该bean在这个Spring容器的beanName
 // 注意，通常不建议对象依赖于它的bean名称，因为这代表了对外部配置的潜在的脆弱依赖，以及对Spring API的不必要依赖。
 public interface BeanNameAware extends Aware {
