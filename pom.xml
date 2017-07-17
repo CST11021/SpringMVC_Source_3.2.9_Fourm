@@ -8,13 +8,13 @@
   <name>SpringMVC_Source_3.2.9_Fourm Maven Webapp</name>
   <url>http://maven.apache.org</url>
   <dependencies>
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
+      <!--junit-->
+      <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <version>3.8.1</version>
+          <scope>test</scope>
+      </dependency>
 
       <!-- https://mvnrepository.com/artifact/org.springframework/spring-test -->
       <dependency>
@@ -24,18 +24,17 @@
           <scope>test</scope>
       </dependency>
 
-
       <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-webmvc</artifactId>
-      <version>3.2.9.RELEASE</version>
-    </dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-webmvc</artifactId>
+          <version>3.2.9.RELEASE</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-      <version>3.2.9.RELEASE</version>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.springframework</groupId>-->
+      <!--<artifactId>spring-context</artifactId>-->
+      <!--<version>3.2.9.RELEASE</version>-->
+    <!--</dependency>-->
 
     <dependency>
       <groupId>org.springframework</groupId>
@@ -484,18 +483,14 @@
 
       <!--默认资源目录-->
       <resources>
-          <resource>
-              <directory>src/main/resources</directory>
-          </resource>
-          <resource>
-              <directory>spring-beans/src/main/resources</directory>
-          </resource>
+          <resource><directory>src/main/resources</directory></resource>
+          <resource><directory>spring-beans/src/main/resources</directory></resource>
+          <resource><directory>spring-context/src/main/resources</directory></resource>
       </resources>
       <!--默认测试资源目录-->
       <testResources>
-          <testResource>
-              <directory>spring-beans/src/test/resources</directory>
-          </testResource>
+          <testResource><directory>spring-context/src/test/resources</directory></testResource>
+          <testResource><directory>spring-beans/src/test/resources</directory></testResource>
           <testResource>
               <directory>src/test/java</directory>
               <includes>
@@ -525,6 +520,7 @@
                             <source>src/main/java</source>
                             <source>spring-beans/src/main/java</source>
                             <source>spring-core/src/main/java</source>
+                            <source>spring-context/src/main/java</source>
                         </sources>
                     </configuration>
                 </execution>
@@ -539,6 +535,7 @@
                             <source>src/test/java</source>
                             <source>spring-beans/src/test/java</source>
                             <source>spring-core/src/test/java</source>
+                            <!--<source>spring-context/src/test/java</source>-->
                         </sources>
                     </configuration>
                 </execution>
@@ -576,6 +573,15 @@
             <configuration>
                 <source>1.8</source>
                 <target>1.8</target>
+            </configuration>
+        </plugin>
+
+
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+                <skip>true</skip>
             </configuration>
         </plugin>
 
