@@ -32,6 +32,7 @@ import java.util.Arrays;
  * @author Chris Beams
  * @since 19.03.2004
  */
+// 主要用于框架内部使用
 public abstract class ObjectUtils {
 
 	private static final int INITIAL_HASH = 7;
@@ -221,9 +222,8 @@ public abstract class ObjectUtils {
 	}
 
 
-	//---------------------------------------------------------------------
-	// Convenience methods for content-based equality/hash-code handling
-	//---------------------------------------------------------------------
+
+	// equality/hash-code相关的方法
 
 	/**
 	 * Determine if the given objects are equal, returning {@code true}
@@ -498,9 +498,8 @@ public abstract class ObjectUtils {
 	}
 
 
-	//---------------------------------------------------------------------
-	// Convenience methods for toString output
-	//---------------------------------------------------------------------
+
+	// toString 输出相关方法
 
 	/**
 	 * Return a String representation of an object's overall identity.

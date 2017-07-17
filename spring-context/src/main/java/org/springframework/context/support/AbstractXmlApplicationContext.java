@@ -129,13 +129,13 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 	}
 
 	/**
-	 * Return an array of Resource objects, referring to the XML bean definition
-	 * files that this context should be built with.
+	 * Return an array of Resource objects, referring to the XML bean definition files that this context should be built with.
 	 * <p>The default implementation returns {@code null}. Subclasses can override
 	 * this to provide pre-built Resource objects rather than location Strings.
 	 * @return an array of Resource objects, or {@code null} if none
 	 * @see #getConfigLocations()
 	 */
+	// 返回一个资源对象数组，引用这个上下文应该构建的XML bean定义文件
 	protected Resource[] getConfigResources() {
 		return null;
 	}

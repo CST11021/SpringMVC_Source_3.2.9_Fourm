@@ -73,39 +73,38 @@ import org.springframework.util.ObjectUtils;
 // ApplicationContext接口的默认实现，即Spring容器抽象父类
 public abstract class AbstractApplicationContext extends DefaultResourceLoader implements ConfigurableApplicationContext, DisposableBean {
 
-	// Name of the MessageSource bean in the factory. If none is supplied, message resolution is delegated to the parent.
-	public static final String MESSAGE_SOURCE_BEAN_NAME = "messageSource";
-	// Name of the LifecycleProcessor bean in the factory. If none is supplied, a DefaultLifecycleProcessor is used.
-	public static final String LIFECYCLE_PROCESSOR_BEAN_NAME = "lifecycleProcessor";
-	// Name of the ApplicationEventMulticaster bean in the factory. If none is supplied, a default SimpleApplicationEventMulticaster is used.
-	public static final String APPLICATION_EVENT_MULTICASTER_BEAN_NAME = "applicationEventMulticaster";
+	protected final Log logger = LogFactory.getLog(getClass());
 
+	// 工厂中的MessageSource bean的名称。如果没有提供，则将消息解析委托给父容器。
+	public static final String MESSAGE_SOURCE_BEAN_NAME = "messageSource";
+	// 工厂中的 LifecycleProcessor（生命周期处理器）的bean名称。如果没有提供，默认使用 DefaultLifecycleProcessor 。
+	public static final String LIFECYCLE_PROCESSOR_BEAN_NAME = "lifecycleProcessor";
+	// ApplicationEventMulticaster bean在工厂的名称。如果没有提供,使用一个默认SimpleApplicationEventMulticaster。
+	public static final String APPLICATION_EVENT_MULTICASTER_BEAN_NAME = "applicationEventMulticaster";
 
 	static {
 		// Eagerly load the ContextClosedEvent class to avoid weird classloader issues on application shutdown in WebLogic 8.1. (Reported by Dustin Woods.)
+		// 加载 ContextClosedEvent 类，避免在WebLogic 8.1中应用程序关闭的奇怪类加载问题。
 		ContextClosedEvent.class.getName();
 	}
 
-	protected final Log logger = LogFactory.getLog(getClass());
 	// 以“org.springframework.context.support.AbstractApplicationContext + @ + 16进制哈希值串” 作为id
 	private String id = ObjectUtils.identityToString(this);
 	private String displayName = ObjectUtils.identityToString(this);
-
-	/** Parent context */
+	// 父容器
 	private ApplicationContext parent;
-
-	/** BeanFactoryPostProcessors to apply on refresh */
+	// beanfactorypostprocessor应用在刷新
 	private final List<BeanFactoryPostProcessor> beanFactoryPostProcessors = new ArrayList<BeanFactoryPostProcessor>();
-
 	//用于记录容器启动时间
 	private long startupDate;
 
-	//AtomicBoolean用于比较两个Boolean类型的值，如果一致，执行方法内的语句。其实就是一个if语句，值得注意的是比较和执行两个操作是作为一个原子性的事务操作，中间不会出现线程暂停的情况，主要为多线程的控制提供解决的方案。
-	private boolean active = false;//标记容器是否正在启动
-	private boolean closed = false;//标记容器是否是关闭状态
-
-	//** Synchronization monitor for the "active" flag
+	// 容器是否处于“活动”状态的同步监视器
 	private final Object activeMonitor = new Object();
+	//AtomicBoolean用于比较两个Boolean类型的值，如果一致，执行方法内的语句。其实就是一个if语句，值得注意的是比较和执行两个操作是作为一个原子性的事务操作，中间不会出现线程暂停的情况，主要为多线程的控制提供解决的方案。
+	private boolean active = false;// 标记容器是否正在启动
+	private boolean closed = false;// 标记容器是否是关闭状态
+
+
 	//** Synchronization monitor for the "refresh" and "destroy"
 	private final Object startupShutdownMonitor = new Object();
 	//** Reference to the JVM shutdown hook, if registered
@@ -125,7 +124,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	private ConfigurableEnvironment environment;
 
 
-
+	// 构造器
 	public AbstractApplicationContext() {
 		this.resourcePatternResolver = getResourcePatternResolver();
 	}
@@ -218,12 +217,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			}
 		}
 	}
-
 	public void addBeanFactoryPostProcessor(BeanFactoryPostProcessor beanFactoryPostProcessor) {
 		this.beanFactoryPostProcessors.add(beanFactoryPostProcessor);
 	}
-
-
 	/**
 	 * Return the list of BeanFactoryPostProcessors that will get applied
 	 * to the internal BeanFactory.
@@ -231,7 +227,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	public List<BeanFactoryPostProcessor> getBeanFactoryPostProcessors() {
 		return this.beanFactoryPostProcessors;
 	}
-
 	public void addApplicationListener(ApplicationListener<?> listener) {
 		if (this.applicationEventMulticaster != null) {
 			this.applicationEventMulticaster.addApplicationListener(listener);
@@ -240,14 +235,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			this.applicationListeners.add(listener);
 		}
 	}
-
 	/**
 	 * Return the list of statically specified ApplicationListeners.
 	 */
 	public Collection<ApplicationListener<?>> getApplicationListeners() {
 		return this.applicationListeners;
 	}
-
 	/**
 	 * Create and return a new {@link StandardEnvironment}.
 	 * <p>Subclasses may override this method in order to supply
@@ -256,7 +249,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	protected ConfigurableEnvironment createEnvironment() {
 		return new StandardEnvironment();
 	}
-
 
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
@@ -724,8 +716,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			this.active = false;
 		}
 	}
-
-
 	/**
 	 * Register a shutdown hook with the JVM runtime, closing this context
 	 * on JVM shutdown unless it has already been closed at that time.
@@ -746,7 +736,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			Runtime.getRuntime().addShutdownHook(this.shutdownHook);
 		}
 	}
-
 	/**
 	 * DisposableBean callback for destruction of this instance.
 	 * Only called when the ApplicationContext itself is running
@@ -760,7 +749,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	public void destroy() {
 		close();
 	}
-
 	/**
 	 * Close this application context, destroying all beans in its bean factory.
 	 * <p>Delegates to {@code doClose()} for the actual closing procedure.
@@ -783,7 +771,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			}
 		}
 	}
-
 	/**
 	 * Actually performs context closing: publishes a ContextClosedEvent and
 	 * destroys the singletons in the bean factory of this application context.
@@ -837,7 +824,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			}
 		}
 	}
-
 	/**
 	 * Template method for destroying all beans that this context manages.
 	 * The default implementation destroy all cached singletons in this context,
@@ -852,7 +838,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	protected void destroyBeans() {
 		getBeanFactory().destroySingletons();
 	}
-
 	/**
 	 * Template method which can be overridden to add context-specific shutdown work.
 	 * The default implementation is empty.
@@ -864,7 +849,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	protected void onClose() {
 		// For subclasses: do nothing by default.
 	}
-
 	public boolean isActive() {
 		synchronized (this.activeMonitor) {
 			return this.active;
@@ -872,108 +856,78 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	}
 
 
-	//---------------------------------------------------------------------
-	// Implementation of BeanFactory interface
-	//---------------------------------------------------------------------
-
+	// ------------------------------------------- Implementation of BeanFactory interface -------------------------------------------
 	public Object getBean(String name) throws BeansException {
 		return getBeanFactory().getBean(name);
 	}
-
 	public <T> T getBean(String name, Class<T> requiredType) throws BeansException {
 		return getBeanFactory().getBean(name, requiredType);
 	}
-
 	public <T> T getBean(Class<T> requiredType) throws BeansException {
 		return getBeanFactory().getBean(requiredType);
 	}
-
 	public Object getBean(String name, Object... args) throws BeansException {
 		return getBeanFactory().getBean(name, args);
 	}
-
 	public boolean containsBean(String name) {
 		return getBeanFactory().containsBean(name);
 	}
-
 	public boolean isSingleton(String name) throws NoSuchBeanDefinitionException {
 		return getBeanFactory().isSingleton(name);
 	}
-
 	public boolean isPrototype(String name) throws NoSuchBeanDefinitionException {
 		return getBeanFactory().isPrototype(name);
 	}
-
 	public boolean isTypeMatch(String name, Class<?> targetType) throws NoSuchBeanDefinitionException {
 		return getBeanFactory().isTypeMatch(name, targetType);
 	}
-
 	public Class<?> getType(String name) throws NoSuchBeanDefinitionException {
 		return getBeanFactory().getType(name);
 	}
-
 	public String[] getAliases(String name) {
 		return getBeanFactory().getAliases(name);
 	}
 
 
-	//---------------------------------------------------------------------
-	// Implementation of ListableBeanFactory interface
-	//---------------------------------------------------------------------
-
+	// ------------------------------------------- Implementation of ListableBeanFactory interface -------------------------------------------
 	public boolean containsBeanDefinition(String beanName) {
 		return getBeanFactory().containsBeanDefinition(beanName);
 	}
-
 	public int getBeanDefinitionCount() {
 		return getBeanFactory().getBeanDefinitionCount();
 	}
-
 	public String[] getBeanDefinitionNames() {
 		return getBeanFactory().getBeanDefinitionNames();
 	}
-
 	public String[] getBeanNamesForType(Class<?> type) {
 		return getBeanFactory().getBeanNamesForType(type);
 	}
-
 	public String[] getBeanNamesForType(Class<?> type, boolean includeNonSingletons, boolean allowEagerInit) {
 		return getBeanFactory().getBeanNamesForType(type, includeNonSingletons, allowEagerInit);
 	}
-
 	public <T> Map<String, T> getBeansOfType(Class<T> type) throws BeansException {
 		return getBeanFactory().getBeansOfType(type);
 	}
-
-	public <T> Map<String, T> getBeansOfType(Class<T> type, boolean includeNonSingletons, boolean allowEagerInit)
-			throws BeansException {
+	public <T> Map<String, T> getBeansOfType(Class<T> type, boolean includeNonSingletons, boolean allowEagerInit) throws BeansException {
 
 		return getBeanFactory().getBeansOfType(type, includeNonSingletons, allowEagerInit);
 	}
-
-	public Map<String, Object> getBeansWithAnnotation(Class<? extends Annotation> annotationType)
-			throws BeansException {
+	public Map<String, Object> getBeansWithAnnotation(Class<? extends Annotation> annotationType) throws BeansException {
 
 		return getBeanFactory().getBeansWithAnnotation(annotationType);
 	}
-
 	public <A extends Annotation> A findAnnotationOnBean(String beanName, Class<A> annotationType) {
 		return getBeanFactory().findAnnotationOnBean(beanName, annotationType);
 	}
 
 
-	//---------------------------------------------------------------------
-	// Implementation of HierarchicalBeanFactory interface
-	//---------------------------------------------------------------------
-
+	// ------------------------------------------- Implementation of HierarchicalBeanFactory interface -------------------------------------------
 	public BeanFactory getParentBeanFactory() {
 		return getParent();
 	}
-
 	public boolean containsLocalBean(String name) {
 		return getBeanFactory().containsLocalBean(name);
 	}
-
 	/**
 	 * Return the internal bean factory of the parent context if it implements
 	 * ConfigurableApplicationContext; else, return the parent context itself.
@@ -985,22 +939,16 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	}
 
 
-	//---------------------------------------------------------------------
-	// Implementation of MessageSource interface
-	//---------------------------------------------------------------------
-
+	// ------------------------------------------- Implementation of MessageSource interface -------------------------------------------
 	public String getMessage(String code, Object args[], String defaultMessage, Locale locale) {
 		return getMessageSource().getMessage(code, args, defaultMessage, locale);
 	}
-
 	public String getMessage(String code, Object args[], Locale locale) throws NoSuchMessageException {
 		return getMessageSource().getMessage(code, args, locale);
 	}
-
 	public String getMessage(MessageSourceResolvable resolvable, Locale locale) throws NoSuchMessageException {
 		return getMessageSource().getMessage(resolvable, locale);
 	}
-
 	/**
 	 * Return the internal MessageSource used by the context.
 	 * @return the internal MessageSource (never {@code null})
@@ -1013,7 +961,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		}
 		return this.messageSource;
 	}
-
 	/**
 	 * Return the internal message source of the parent context if it is an
 	 * AbstractApplicationContext too; else, return the parent context itself.
@@ -1024,38 +971,27 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	}
 
 
-	//---------------------------------------------------------------------
-	// Implementation of ResourcePatternResolver interface
-	//---------------------------------------------------------------------
-
+	// ------------------------------------------- Implementation of ResourcePatternResolver interface -------------------------------------------
 	public Resource[] getResources(String locationPattern) throws IOException {
 		return this.resourcePatternResolver.getResources(locationPattern);
 	}
 
 
-	//---------------------------------------------------------------------
-	// Implementation of Lifecycle interface
-	//---------------------------------------------------------------------
-
+	// ------------------------------------------- Implementation of Lifecycle interface -------------------------------------------
 	public void start() {
 		getLifecycleProcessor().start();
 		publishEvent(new ContextStartedEvent(this));
 	}
-
 	public void stop() {
 		getLifecycleProcessor().stop();
 		publishEvent(new ContextStoppedEvent(this));
 	}
-
 	public boolean isRunning() {
 		return getLifecycleProcessor().isRunning();
 	}
 
 
-	//---------------------------------------------------------------------
-	// Abstract methods that must be implemented by subclasses
-	//---------------------------------------------------------------------
-
+	// ------------------------------------------- Abstract methods that must be implemented by subclasses -------------------------------------------
 	/**
 	 * Subclasses must implement this method to perform the actual configuration load.
 	 * The method is invoked by {@link #refresh()} before any other initialization work.
@@ -1067,14 +1003,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * attempts are not supported
 	 */
 	protected abstract void refreshBeanFactory() throws BeansException, IllegalStateException;
-
 	/**
 	 * Subclasses must implement this method to release their internal bean factory.
 	 * This method gets invoked by {@link #close()} after all other shutdown work.
 	 * <p>Should never throw an exception but rather log shutdown failures.
 	 */
 	protected abstract void closeBeanFactory();
-
 	/**
 	 * Subclasses must return their internal bean factory here. They should implement the
 	 * lookup efficiently, so that it can be called repeatedly without a performance penalty.
@@ -1091,9 +1025,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	public abstract ConfigurableListableBeanFactory getBeanFactory() throws IllegalStateException;
 
 
-	/**
-	 * Return information about this context.
-	 */
+
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder(getDisplayName());
@@ -1143,7 +1076,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		}
 	}
 
-
 	/**
 	 * BeanPostProcessor that detects beans which implement the ApplicationListener interface.
 	 * This catches beans that can't reliably be detected by getBeanNamesForType.
@@ -1184,5 +1116,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			return bean;
 		}
 	}
+
+
+
 
 }
