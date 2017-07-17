@@ -113,17 +113,7 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	// 初始化之后执行BeanPostProcessors
 	Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName) throws BeansException;
 
-	/**
-	 * Resolve the specified dependency against the beans defined in this factory.
-	 * @param descriptor the descriptor for the dependency
-	 * @param beanName the name of the bean which declares the present dependency
-	 * @param autowiredBeanNames a Set that all names of autowired beans (used for
-	 * resolving the present dependency) are supposed to be added to
-	 * @param typeConverter the TypeConverter to use for populating arrays and
-	 * collections
-	 * @return the resolved object, or {@code null} if none found
-	 * @throws BeansException in dependency resolution failed
-	 */
+	// 根据工厂中定义的bean来解决指定的依赖项。
 	Object resolveDependency(DependencyDescriptor descriptor, String beanName, Set<String> autowiredBeanNames, TypeConverter typeConverter) throws BeansException;
 
 }

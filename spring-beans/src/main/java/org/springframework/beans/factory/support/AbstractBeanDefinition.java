@@ -27,7 +27,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	// scope 默认值为""，等同于单例状态
 	public static final String SCOPE_DEFAULT = "";
 
-	//不使用自动装配
+	//不使用自动装配(默认不使用自动装配)
 	public static final int AUTOWIRE_NO = AutowireCapableBeanFactory.AUTOWIRE_NO;
 	//通过名称自动装配
 	public static final int AUTOWIRE_BY_NAME = AutowireCapableBeanFactory.AUTOWIRE_BY_NAME;

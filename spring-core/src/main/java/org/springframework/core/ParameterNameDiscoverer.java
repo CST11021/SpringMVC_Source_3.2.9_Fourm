@@ -19,7 +19,7 @@ package org.springframework.core;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-// 用于获取方法和构造函数的参数名称的接口
+// 用于获取方法和构造函数的参数名称的接口（获取函数的所有参数名）
 public interface ParameterNameDiscoverer {
 
 	// 返回这个方法中的参数名

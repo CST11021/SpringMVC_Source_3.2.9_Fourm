@@ -31,6 +31,7 @@ import org.springframework.util.Assert;
 
 
 // 一个辅助类，封装了方法的参数的一些信息，如：所在方法，所在类的构造器，参数类型，参数索引位置，参数名称等信息
+// 注意一个MethodParameter 对象表示一个方法中的一个参数
 public class MethodParameter {
 
 	private final Method method;
@@ -39,12 +40,13 @@ public class MethodParameter {
 	private Class<?> parameterType;
 	private Type genericParameterType;
 	private Annotation[] parameterAnnotations;
+	// 该接口可获取函数的所有参数名
 	private ParameterNameDiscoverer parameterNameDiscoverer;
 	private String parameterName;
 
 	private int nestingLevel = 1;
 
-	/** Map from Integer level to Integer type index */
+	//** Map from Integer level to Integer type index */
 	Map<Integer, Integer> typeIndexesPerLevel;
 
 	Map<TypeVariable, Type> typeVariableMap;
@@ -108,17 +110,11 @@ public class MethodParameter {
 		return this.parameterIndex;
 	}
 
-	/**
-	 * Set a resolved (generic) parameter type.
-	 */
+
 	void setParameterType(Class<?> parameterType) {
 		this.parameterType = parameterType;
 	}
-
-	/**
-	 * Return the type of the method/constructor parameter.
-	 * @return the parameter type (never {@code null})
-	 */
+	// 返回这个方法的参数类型
 	public Class<?> getParameterType() {
 		if (this.parameterType == null) {
 			if (this.parameterIndex < 0) {
@@ -275,10 +271,8 @@ public class MethodParameter {
 		this.nestingLevel++;
 	}
 
-	/**
-	 * Decrease this parameter's nesting level.
-	 * @see #getNestingLevel()
-	 */
+
+	// 减少该参数的嵌套级别。
 	public void decreaseNestingLevel() {
 		getTypeIndexesPerLevel().remove(this.nestingLevel);
 		this.nestingLevel--;

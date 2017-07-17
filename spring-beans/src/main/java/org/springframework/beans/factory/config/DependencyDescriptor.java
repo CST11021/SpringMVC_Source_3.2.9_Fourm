@@ -31,9 +31,9 @@ import org.springframework.util.Assert;
 
 /**
  * Descriptor for a specific dependency that is about to be injected.
- * Wraps a constructor parameter, a method parameter or a field,
- * allowing unified access to their metadata.
- *
+ * 描述一个将要被注入的特定依赖的描述符。
+ * Wraps a constructor parameter, a method parameter or a field, allowing unified access to their metadata.
+ * 封装构造函数参数、方法参数或字段，允许对其元数据进行统一访问。
  * @author Juergen Hoeller
  * @since 2.5
  */
@@ -41,45 +41,21 @@ import org.springframework.util.Assert;
 public class DependencyDescriptor implements Serializable {
 
 	private transient MethodParameter methodParameter;
-
 	private transient Field field;
-
 	private Class<?> declaringClass;
-
 	private String methodName;
-
 	private Class[] parameterTypes;
-
 	private int parameterIndex;
-
 	private String fieldName;
-
 	private final boolean required;
-
 	private final boolean eager;
-
 	private int nestingLevel = 1;
-
 	private transient Annotation[] fieldAnnotations;
 
-
-	/**
-	 * Create a new descriptor for a method or constructor parameter.
-	 * Considers the dependency as 'eager'.
-	 * @param methodParameter the MethodParameter to wrap
-	 * @param required whether the dependency is required
-	 */
+	// 构造器
 	public DependencyDescriptor(MethodParameter methodParameter, boolean required) {
 		this(methodParameter, required, true);
 	}
-
-	/**
-	 * Create a new descriptor for a method or constructor parameter.
-	 * @param methodParameter the MethodParameter to wrap
-	 * @param required whether the dependency is required
-	 * @param eager whether this dependency is 'eager' in the sense of
-	 * eagerly resolving potential target beans for type matching
-	 */
 	public DependencyDescriptor(MethodParameter methodParameter, boolean required, boolean eager) {
 		Assert.notNull(methodParameter, "MethodParameter must not be null");
 		this.methodParameter = methodParameter;
@@ -95,24 +71,9 @@ public class DependencyDescriptor implements Serializable {
 		this.required = required;
 		this.eager = eager;
 	}
-
-	/**
-	 * Create a new descriptor for a field.
-	 * Considers the dependency as 'eager'.
-	 * @param field the field to wrap
-	 * @param required whether the dependency is required
-	 */
 	public DependencyDescriptor(Field field, boolean required) {
 		this(field, required, true);
 	}
-
-	/**
-	 * Create a new descriptor for a field.
-	 * @param field the field to wrap
-	 * @param required whether the dependency is required
-	 * @param eager whether this dependency is 'eager' in the sense of
-	 * eagerly resolving potential target beans for type matching
-	 */
 	public DependencyDescriptor(Field field, boolean required, boolean eager) {
 		Assert.notNull(field, "Field must not be null");
 		this.field = field;
@@ -121,11 +82,6 @@ public class DependencyDescriptor implements Serializable {
 		this.required = required;
 		this.eager = eager;
 	}
-
-	/**
-	 * Copy constructor.
-	 * @param original the original descriptor to create a copy from
-	 */
 	public DependencyDescriptor(DependencyDescriptor original) {
 		this.methodParameter = (original.methodParameter != null ? new MethodParameter(original.methodParameter) : null);
 		this.field = original.field;
@@ -141,44 +97,7 @@ public class DependencyDescriptor implements Serializable {
 	}
 
 
-	/**
-	 * Return the wrapped MethodParameter, if any.
-	 * <p>Note: Either MethodParameter or Field is available.
-	 * @return the MethodParameter, or {@code null} if none
-	 */
-	public MethodParameter getMethodParameter() {
-		return this.methodParameter;
-	}
-
-	/**
-	 * Return the wrapped Field, if any.
-	 * <p>Note: Either MethodParameter or Field is available.
-	 * @return the Field, or {@code null} if none
-	 */
-	public Field getField() {
-		return this.field;
-	}
-
-	/**
-	 * Return whether this dependency is required.
-	 */
-	public boolean isRequired() {
-		return this.required;
-	}
-
-	/**
-	 * Return whether this dependency is 'eager' in the sense of
-	 * eagerly resolving potential target beans for type matching.
-	 */
-	public boolean isEager() {
-		return this.eager;
-	}
-
-
-	/**
-	 * Increase this descriptor's nesting level.
-	 * @see MethodParameter#increaseNestingLevel()
-	 */
+	// 增加这个描述符的嵌套级别。
 	public void increaseNestingLevel() {
 		this.nestingLevel++;
 		if (this.methodParameter != null) {
@@ -186,30 +105,20 @@ public class DependencyDescriptor implements Serializable {
 		}
 	}
 
-	/**
-	 * Initialize parameter name discovery for the underlying method parameter, if any.
-	 * <p>This method does not actually try to retrieve the parameter name at
-	 * this point; it just allows discovery to happen when the application calls
-	 * {@link #getDependencyName()} (if ever).
-	 */
+	// 为这个 this.methodParameter 的 parameterNameDiscoverer 属性赋值
 	public void initParameterNameDiscovery(ParameterNameDiscoverer parameterNameDiscoverer) {
 		if (this.methodParameter != null) {
+			// 为这个methodParameter的parameterNameDiscoverer属性赋值
 			this.methodParameter.initParameterNameDiscovery(parameterNameDiscoverer);
 		}
 	}
 
-	/**
-	 * Determine the name of the wrapped parameter/field.
-	 * @return the declared name (never {@code null})
-	 */
+	// 返回包装参数/字段的名称
 	public String getDependencyName() {
 		return (this.field != null ? this.field.getName() : this.methodParameter.getParameterName());
 	}
 
-	/**
-	 * Determine the declared (non-generic) type of the wrapped parameter/field.
-	 * @return the declared type (never {@code null})
-	 */
+	// 返回包装参数/字段的声明(非泛型)类型
 	public Class<?> getDependencyType() {
 		if (this.field != null) {
 			if (this.nestingLevel > 1) {
@@ -237,39 +146,27 @@ public class DependencyDescriptor implements Serializable {
 		}
 	}
 
-	/**
-	 * Determine the generic element type of the wrapped Collection parameter/field, if any.
-	 * @return the generic type, or {@code null} if none
-	 */
+	// 返回封装的集合参数/字段的通用元素类型
 	public Class<?> getCollectionType() {
 		return (this.field != null ?
 				GenericCollectionTypeResolver.getCollectionFieldType(this.field, this.nestingLevel) :
 				GenericCollectionTypeResolver.getCollectionParameterType(this.methodParameter));
 	}
 
-	/**
-	 * Determine the generic key type of the wrapped Map parameter/field, if any.
-	 * @return the generic type, or {@code null} if none
-	 */
+	// 返回包装映射参数/字段的通用键类型
 	public Class<?> getMapKeyType() {
 		return (this.field != null ?
 				GenericCollectionTypeResolver.getMapKeyFieldType(this.field, this.nestingLevel) :
 				GenericCollectionTypeResolver.getMapKeyParameterType(this.methodParameter));
 	}
-
-	/**
-	 * Determine the generic value type of the wrapped Map parameter/field, if any.
-	 * @return the generic type, or {@code null} if none
-	 */
+	// 返回包装映射参数/字段的通用值类型
 	public Class<?> getMapValueType() {
 		return (this.field != null ?
 				GenericCollectionTypeResolver.getMapValueFieldType(this.field, this.nestingLevel) :
 				GenericCollectionTypeResolver.getMapValueParameterType(this.methodParameter));
 	}
 
-	/**
-	 * Obtain the annotations associated with the wrapped parameter/field, if any.
-	 */
+	// 获取与包装参数/字段相关的注解
 	public Annotation[] getAnnotations() {
 		if (this.field != null) {
 			if (this.fieldAnnotations == null) {
@@ -283,10 +180,7 @@ public class DependencyDescriptor implements Serializable {
 	}
 
 
-	//---------------------------------------------------------------------
 	// Serialization support
-	//---------------------------------------------------------------------
-
 	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
 		// Rely on default serialization; just initialize state after deserialization.
 		ois.defaultReadObject();
@@ -315,4 +209,19 @@ public class DependencyDescriptor implements Serializable {
 		}
 	}
 
+
+
+	// getter and setter ...
+	public MethodParameter getMethodParameter() {
+		return this.methodParameter;
+	}
+	public Field getField() {
+		return this.field;
+	}
+	public boolean isRequired() {
+		return this.required;
+	}
+	public boolean isEager() {
+		return this.eager;
+	}
 }

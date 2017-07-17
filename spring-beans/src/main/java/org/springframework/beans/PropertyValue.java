@@ -26,7 +26,7 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
 	//** Package-visible field for caching the resolved PropertyDescriptor */
 	volatile PropertyDescriptor resolvedDescriptor;
 
-
+	// 构造器
 	public PropertyValue(String name, Object value) {
 		this.name = name;
 		this.value = value;
@@ -56,6 +56,7 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
 		copyAttributesFrom(original);
 	}
 
+	// 是否进行了类型转换
 	public synchronized boolean isConverted() {
 		return this.converted;
 	}
@@ -68,20 +69,19 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
 		return original;
 	}
 
+	// getter and setter ...
 	public String getName() {
 		return this.name;
 	}
 	public Object getValue() {
 		return this.value;
 	}
-
 	public void setOptional(boolean optional) {
 		this.optional = optional;
 	}
 	public boolean isOptional() {
 		return this.optional;
 	}
-
 	public synchronized void setConvertedValue(Object value) {
 		this.converted = true;
 		this.convertedValue = value;

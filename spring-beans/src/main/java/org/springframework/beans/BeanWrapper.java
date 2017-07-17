@@ -22,6 +22,10 @@ import java.beans.PropertyDescriptor;
 // BeanWrapper是对Bean的包装，其接口中所定义的功能很简单包括设置获取被包装的对象，获取被包装bean的属性描述器，
 // 由于BeanWrapper接口是PropertyAccessor的子接口，因此其也可以设置以及访问被包装对象的属性值。
 // BeanWrapper大部分情况下是在spring ioc内部进行使用，通过BeanWrapper,spring ioc容器可以用统一的方式来访问bean的属性。用户很少需要直接使用BeanWrapper进行编程。
+
+// 有时候我们会在配置文件中使用如：p:brand="红旗CA72" 或<property name="" value=""/>的形式进行属性值注入，
+// Spring 在创建一个bean的BeanWrapper时，是通过调用该bean的构造器或工厂方法进行实例化的，这时候上面的那些属性值是还没有被注入到bean实例中，
+// BeanWrapper的作用就是根据BeanDefinition中的属性配置信息，对其进行注入
 public interface BeanWrapper extends ConfigurablePropertyAccessor {
 
 	// 返回由该对象包装的bean实例
