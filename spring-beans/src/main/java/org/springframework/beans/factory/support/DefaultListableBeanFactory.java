@@ -113,10 +113,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 
-	/**
-	 * Specify an id for serialization purposes, allowing this BeanFactory to be
-	 * deserialized from this id back into the BeanFactory object, if needed.
-	 */
+	//指定一个用于序列化的id，如果需要，可以将这个BeanFactory从这个id反序列化到BeanFactory对象中。
 	public void setSerializationId(String serializationId) {
 		if (serializationId != null) {
 			serializableFactories.put(serializationId, new WeakReference<DefaultListableBeanFactory>(this));
@@ -126,13 +123,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 		this.serializationId = serializationId;
 	}
-	/**
-	 * Set whether it should be allowed to override bean definitions by registering
-	 * a different definition with the same name, automatically replacing the former.
-	 * If not, an exception will be thrown. This also applies to overriding aliases.
-	 * <p>Default is "true".
-	 * @see #registerBeanDefinition
-	 */
+
+	// 设置是否允许同名的不同bean definition再次进行注册，默认为TRUE
 	public void setAllowBeanDefinitionOverriding(boolean allowBeanDefinitionOverriding) {
 		this.allowBeanDefinitionOverriding = allowBeanDefinitionOverriding;
 	}

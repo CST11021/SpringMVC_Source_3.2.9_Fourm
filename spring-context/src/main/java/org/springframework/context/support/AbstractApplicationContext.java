@@ -253,7 +253,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
 			// 1、准备刷新的上下文环境：例如对系统属性及环境变量的初始化及验证
-			// 在某种情况下项目的使用需要读取某些系统变量，而这个变量的设置很可能会影响着系统的正确性，那么 ClassPathXMLApplicationContext 为我们提供的这个准备函数就显得非常必要，他可以在Spring启动的时候提前对必须的变量存在性验证
+			// 在某种情况下项目的使用需要读取某些系统变量，而这个变量的设置很可能会影响着系统的正确性，
+			// 那么 ClassPathXMLApplicationContext 为我们提供的这个准备函数就显得非常必要，他可以在Spring启动的时候提前对必须的变量存在性验证
 			prepareRefresh();
 
 			// 2、初始化BeanFactory，执行obtainFreshBeanFactory()方法后ApplicationContext就拥有BeanFactory的功能
@@ -264,7 +265,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			prepareBeanFactory(beanFactory);
 
 			try {
-				// 4、子类覆盖方法做额外的处理
+				// 4、子类覆盖方法做额外的处理，默认空实现
 				postProcessBeanFactory(beanFactory);
 
 				// 5、激活各种BeanFactory处理器
@@ -307,8 +308,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	}
 	// 1、准备刷新的上下文环境：例如对系统属性及环境变量的初始化及验证
 	protected void prepareRefresh() {
+		// 记录容器开始时间，并将容器标志为正在启动的状态
 		this.startupDate = System.currentTimeMillis();
-
 		synchronized (this.activeMonitor) {
 			this.active = true;
 		}
@@ -317,10 +318,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			logger.info("Refreshing " + this);
 		}
 
-		// 空方法，留给子类覆盖
+		// 空方法，留给子类覆盖（比如添加一些必要的系统参数等）
 		initPropertySources();
 
-		// 验证需要的文件是否都已经放入到环境变量中
+		// 验证一些必要的参数或环境变量的是否已经添加
 		getEnvironment().validateRequiredProperties();
 	}
 	/**
@@ -342,9 +343,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	}
 	// 2、初始化BeanFactory，执行obtainFreshBeanFactory()方法后ApplicationContext就拥有BeanFactory的功能
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
-		//初始化BeanFactory，并进行XML文件读取，并将得到的BeanFactory实例赋值给记录在当前实体的属性中
+		// 初始化BeanFactory，并进行XML文件读取，并将得到的BeanFactory实例赋值给记录在当前实体的属性中
 		refreshBeanFactory();
-		//返回当前实体的BeanFactory属性
+		// 返回当前实体的BeanFactory属性
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
 		if (logger.isDebugEnabled()) {
 			logger.debug("Bean factory for " + getDisplayName() + ": " + beanFactory);
@@ -354,21 +355,25 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	// 3、对BeanFactory进行各种功能模式填充，@Qualifier和@Autowired应该是大家非常熟悉的注解，那么这两个注解正是在这一步骤中增加的支持。
 	//该方法主要功能：设置类加载器、添加SPEL表达式语言的处理器、设置属性编辑器、
 	protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
-		// Tell the internal bean factory to use the context's class loader etc.
+		// 告诉内部 beanFactory 使用上下文的类装载器
 		beanFactory.setBeanClassLoader(getClassLoader());
+		// 设置解析 BeanDefinition 的表达式解析器
 		beanFactory.setBeanExpressionResolver(new StandardBeanExpressionResolver());
+		// 添加属性编辑器
 		beanFactory.addPropertyEditorRegistrar(new ResourceEditorRegistrar(this, getEnvironment()));
 
-		// Configure the bean factory with context callbacks.
+		// 添加 BeanPostProcessor 后处理器
 		beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
+		// 设置一些忽略了自动装配依赖的接口
 		beanFactory.ignoreDependencyInterface(ResourceLoaderAware.class);
 		beanFactory.ignoreDependencyInterface(ApplicationEventPublisherAware.class);
 		beanFactory.ignoreDependencyInterface(MessageSourceAware.class);
 		beanFactory.ignoreDependencyInterface(ApplicationContextAware.class);
 		beanFactory.ignoreDependencyInterface(EnvironmentAware.class);
 
-		// BeanFactory interface not registered as resolvable type in a plain factory.
-		// MessageSource registered (and found for autowiring) as a bean.
+		// BeanFactory interface not registered as resolvable type in a plain factory. BeanFactory接口没有在普通工厂中注册为可解析类型。
+		// MessageSource registered (and found for autowiring) as a bean. 使用 autowire 的方式，将 MessageSource 作为bean注入
+		// 注册一个与依赖类型相对应的自动绑定值
 		beanFactory.registerResolvableDependency(BeanFactory.class, beanFactory);
 		beanFactory.registerResolvableDependency(ResourceLoader.class, this);
 		beanFactory.registerResolvableDependency(ApplicationEventPublisher.class, this);
@@ -381,7 +386,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			beanFactory.setTempClassLoader(new ContextTypeMatchClassLoader(beanFactory.getBeanClassLoader()));
 		}
 
-		// Register default environment beans.
+		// 注册默认环境（Environment）相关的bean
 		if (!beanFactory.containsLocalBean(ENVIRONMENT_BEAN_NAME)) {
 			beanFactory.registerSingleton(ENVIRONMENT_BEAN_NAME, getEnvironment());
 		}
@@ -400,9 +405,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		Set<String> processedBeans = new HashSet<String>();
 		if (beanFactory instanceof BeanDefinitionRegistry) {
 			BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
+
 			List<BeanFactoryPostProcessor> regularPostProcessors = new LinkedList<BeanFactoryPostProcessor>();
-			List<BeanDefinitionRegistryPostProcessor> registryPostProcessors =
-					new LinkedList<BeanDefinitionRegistryPostProcessor>();
+			List<BeanDefinitionRegistryPostProcessor> registryPostProcessors = new LinkedList<BeanDefinitionRegistryPostProcessor>();
 			for (BeanFactoryPostProcessor postProcessor : getBeanFactoryPostProcessors()) {
 				if (postProcessor instanceof BeanDefinitionRegistryPostProcessor) {
 					BeanDefinitionRegistryPostProcessor registryPostProcessor =
@@ -929,8 +934,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		return getBeanFactory().containsLocalBean(name);
 	}
 	/**
-	 * Return the internal bean factory of the parent context if it implements
-	 * ConfigurableApplicationContext; else, return the parent context itself.
+	 * Return the internal bean factory of the parent context if it implements ConfigurableApplicationContext; else, return the parent context itself.
+	 * 返回父上下文的内部bean工厂如果它实现了ConfigurableApplicationContext;返回父上下文中本身。
 	 * @see org.springframework.context.ConfigurableApplicationContext#getBeanFactory
 	 */
 	protected BeanFactory getInternalParentBeanFactory() {
@@ -992,16 +997,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
 
 	// ------------------------------------------- Abstract methods that must be implemented by subclasses -------------------------------------------
-	/**
-	 * Subclasses must implement this method to perform the actual configuration load.
-	 * The method is invoked by {@link #refresh()} before any other initialization work.
-	 * <p>A subclass will either create a new bean factory and hold a reference to it,
-	 * or return a single BeanFactory instance that it holds. In the latter case, it will
-	 * usually throw an IllegalStateException if refreshing the context more than once.
-	 * @throws BeansException if initialization of the bean factory failed
-	 * @throws IllegalStateException if already initialized and multiple refresh
-	 * attempts are not supported
-	 */
+
+	// 由子类实现，初始化一个 BeanFactory 给上层的 ApplicationContext 容器，该方法有 refresh() 调用，如果发现已经有一个 BeanFactory 实例了，则销毁全部的bean实例，并关闭容器，然后重新初始化一个BeanFactory
 	protected abstract void refreshBeanFactory() throws BeansException, IllegalStateException;
 	/**
 	 * Subclasses must implement this method to release their internal bean factory.
