@@ -220,10 +220,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	public void addBeanFactoryPostProcessor(BeanFactoryPostProcessor beanFactoryPostProcessor) {
 		this.beanFactoryPostProcessors.add(beanFactoryPostProcessor);
 	}
-	/**
-	 * Return the list of BeanFactoryPostProcessors that will get applied
-	 * to the internal BeanFactory.
-	 */
 	public List<BeanFactoryPostProcessor> getBeanFactoryPostProcessors() {
 		return this.beanFactoryPostProcessors;
 	}
@@ -408,10 +404,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
 			List<BeanFactoryPostProcessor> regularPostProcessors = new LinkedList<BeanFactoryPostProcessor>();
 			List<BeanDefinitionRegistryPostProcessor> registryPostProcessors = new LinkedList<BeanDefinitionRegistryPostProcessor>();
+			// 遍历 BeanFactoryPostProcessor
 			for (BeanFactoryPostProcessor postProcessor : getBeanFactoryPostProcessors()) {
 				if (postProcessor instanceof BeanDefinitionRegistryPostProcessor) {
-					BeanDefinitionRegistryPostProcessor registryPostProcessor =
-							(BeanDefinitionRegistryPostProcessor) postProcessor;
+					BeanDefinitionRegistryPostProcessor registryPostProcessor = (BeanDefinitionRegistryPostProcessor) postProcessor;
 					registryPostProcessor.postProcessBeanDefinitionRegistry(registry);
 					registryPostProcessors.add(registryPostProcessor);
 				}
@@ -419,10 +415,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 					regularPostProcessors.add(postProcessor);
 				}
 			}
-			Map<String, BeanDefinitionRegistryPostProcessor> beanMap =
-					beanFactory.getBeansOfType(BeanDefinitionRegistryPostProcessor.class, true, false);
-			List<BeanDefinitionRegistryPostProcessor> registryPostProcessorBeans =
-					new ArrayList<BeanDefinitionRegistryPostProcessor>(beanMap.values());
+
+			Map<String, BeanDefinitionRegistryPostProcessor> beanMap = beanFactory.getBeansOfType(BeanDefinitionRegistryPostProcessor.class, true, false);
+			List<BeanDefinitionRegistryPostProcessor> registryPostProcessorBeans = new ArrayList<BeanDefinitionRegistryPostProcessor>(beanMap.values());
 			OrderComparator.sort(registryPostProcessorBeans);
 			for (BeanDefinitionRegistryPostProcessor postProcessor : registryPostProcessorBeans) {
 				postProcessor.postProcessBeanDefinitionRegistry(registry);
@@ -437,13 +432,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			invokeBeanFactoryPostProcessors(getBeanFactoryPostProcessors(), beanFactory);
 		}
 
-		// Do not initialize FactoryBeans here: We need to leave all regular beans
-		// uninitialized to let the bean factory post-processors apply to them!
-		String[] postProcessorNames =
-				beanFactory.getBeanNamesForType(BeanFactoryPostProcessor.class, true, false);
+		// 不要在这里初始化factorybean:我们需要让所有的常规bean都没有初始化，以便对它们使用bean工厂的后处理程序
+		String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanFactoryPostProcessor.class, true, false);
 
-		// Separate between BeanFactoryPostProcessors that implement PriorityOrdered,
-		// Ordered, and the rest.
+		// 实现优先级排序
 		List<BeanFactoryPostProcessor> priorityOrderedPostProcessors = new ArrayList<BeanFactoryPostProcessor>();
 		List<String> orderedPostProcessorNames = new ArrayList<String>();
 		List<String> nonOrderedPostProcessorNames = new ArrayList<String>();

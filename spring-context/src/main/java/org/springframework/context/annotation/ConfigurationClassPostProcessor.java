@@ -82,44 +82,30 @@ import static org.springframework.context.annotation.AnnotationConfigUtils.*;
  * @author Juergen Hoeller
  * @since 3.0
  */
-public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPostProcessor,
-		Ordered, ResourceLoaderAware, BeanClassLoaderAware, EnvironmentAware {
-
-	private static final String IMPORT_AWARE_PROCESSOR_BEAN_NAME =
-			ConfigurationClassPostProcessor.class.getName() + ".importAwareProcessor";
-
-	private static final String IMPORT_REGISTRY_BEAN_NAME =
-			ConfigurationClassPostProcessor.class.getName() + ".importRegistry";
-
+public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPostProcessor, Ordered, ResourceLoaderAware, BeanClassLoaderAware, EnvironmentAware {
 
 	private final Log logger = LogFactory.getLog(getClass());
 
+	// importAwareProcessorBeanName
+	private static final String IMPORT_AWARE_PROCESSOR_BEAN_NAME = ConfigurationClassPostProcessor.class.getName() + ".importAwareProcessor";
+	// importRegistryBeanName
+	private static final String IMPORT_REGISTRY_BEAN_NAME = ConfigurationClassPostProcessor.class.getName() + ".importRegistry";
+
 	private SourceExtractor sourceExtractor = new PassThroughSourceExtractor();
-
 	private ProblemReporter problemReporter = new FailFastProblemReporter();
-
 	private Environment environment;
-
 	private ResourceLoader resourceLoader = new DefaultResourceLoader();
-
 	private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
-
 	private MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory();
-
 	private boolean setMetadataReaderFactoryCalled = false;
-
 	private final Set<Integer> registriesPostProcessed = new HashSet<Integer>();
-
 	private final Set<Integer> factoriesPostProcessed = new HashSet<Integer>();
-
 	private ConfigurationClassBeanDefinitionReader reader;
-
 	private boolean localBeanNameGeneratorSet = false;
 
-	/* using short class names as default bean names */
+	// 使用短类名作为默认bean名称
 	private BeanNameGenerator componentScanBeanNameGenerator = new AnnotationBeanNameGenerator();
-
-	/* using fully qualified class names as default bean names */
+	// 使用完全限定类名作为默认bean名称
 	private BeanNameGenerator importBeanNameGenerator = new AnnotationBeanNameGenerator() {
 		@Override
 		protected String buildDefaultBeanName(BeanDefinition definition) {
@@ -132,69 +118,33 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		return Ordered.HIGHEST_PRECEDENCE;
 	}
 
-	/**
-	 * Set the {@link SourceExtractor} to use for generated bean definitions
-	 * that correspond to {@link Bean} factory methods.
-	 */
+
+	// setter ...
 	public void setSourceExtractor(SourceExtractor sourceExtractor) {
 		this.sourceExtractor = (sourceExtractor != null ? sourceExtractor : new PassThroughSourceExtractor());
 	}
-
-	/**
-	 * Set the {@link ProblemReporter} to use.
-	 * <p>Used to register any problems detected with {@link Configuration} or {@link Bean}
-	 * declarations. For instance, an @Bean method marked as {@code final} is illegal
-	 * and would be reported as a problem. Defaults to {@link FailFastProblemReporter}.
-	 */
 	public void setProblemReporter(ProblemReporter problemReporter) {
 		this.problemReporter = (problemReporter != null ? problemReporter : new FailFastProblemReporter());
 	}
-
-	/**
-	 * Set the {@link MetadataReaderFactory} to use.
-	 * <p>Default is a {@link CachingMetadataReaderFactory} for the specified
-	 * {@linkplain #setBeanClassLoader bean class loader}.
-	 */
 	public void setMetadataReaderFactory(MetadataReaderFactory metadataReaderFactory) {
 		Assert.notNull(metadataReaderFactory, "MetadataReaderFactory must not be null");
 		this.metadataReaderFactory = metadataReaderFactory;
 		this.setMetadataReaderFactoryCalled = true;
 	}
-
-	/**
-	 * Set the {@link BeanNameGenerator} to be used when triggering component scanning
-	 * from {@link Configuration} classes and when registering {@link Import}'ed
-	 * configuration classes. The default is a standard {@link AnnotationBeanNameGenerator}
-	 * for scanned components (compatible with the default in {@link ClassPathBeanDefinitionScanner})
-	 * and a variant thereof for imported configuration classes (using unique fully-qualified
-	 * class names instead of standard component overriding).
-	 * <p>Note that this strategy does <em>not</em> apply to {@link Bean} methods.
-	 * <p>This setter is typically only appropriate when configuring the post-processor as
-	 * a standalone bean definition in XML, e.g. not using the dedicated
-	 * {@code AnnotationConfig*} application contexts or the {@code
-	 * <context:annotation-config>} element. Any bean name generator specified against
-	 * the application context will take precedence over any value set here.
-	 * @since 3.1.1
-	 * @see AnnotationConfigApplicationContext#setBeanNameGenerator(BeanNameGenerator)
-	 * @see AnnotationConfigUtils#CONFIGURATION_BEAN_NAME_GENERATOR
-	 */
 	public void setBeanNameGenerator(BeanNameGenerator beanNameGenerator) {
 		Assert.notNull(beanNameGenerator, "BeanNameGenerator must not be null");
 		this.localBeanNameGeneratorSet = true;
 		this.componentScanBeanNameGenerator = beanNameGenerator;
 		this.importBeanNameGenerator = beanNameGenerator;
 	}
-
 	public void setEnvironment(Environment environment) {
 		Assert.notNull(environment, "Environment must not be null");
 		this.environment = environment;
 	}
-
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		Assert.notNull(resourceLoader, "ResourceLoader must not be null");
 		this.resourceLoader = resourceLoader;
 	}
-
 	public void setBeanClassLoader(ClassLoader beanClassLoader) {
 		this.beanClassLoader = beanClassLoader;
 		if (!this.setMetadataReaderFactoryCalled) {
@@ -203,9 +153,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	}
 
 
-	/**
-	 * Derive further bean definitions from the configuration classes in the registry.
-	 */
+	// 从注册表中的配置类派生出更多的BeanDefinition
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
 		RootBeanDefinition iabpp = new RootBeanDefinition(ImportAwareBeanPostProcessor.class);
 		iabpp.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
@@ -213,22 +161,17 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 		int registryId = System.identityHashCode(registry);
 		if (this.registriesPostProcessed.contains(registryId)) {
-			throw new IllegalStateException(
-					"postProcessBeanDefinitionRegistry already called for this post-processor against " + registry);
+			throw new IllegalStateException("postProcessBeanDefinitionRegistry already called for this post-processor against " + registry);
 		}
 		if (this.factoriesPostProcessed.contains(registryId)) {
-			throw new IllegalStateException(
-					"postProcessBeanFactory already called for this post-processor against " + registry);
+			throw new IllegalStateException("postProcessBeanFactory already called for this post-processor against " + registry);
 		}
 		this.registriesPostProcessed.add(registryId);
 
 		processConfigBeanDefinitions(registry);
 	}
 
-	/**
-	 * Prepare the Configuration classes for servicing bean requests at runtime
-	 * by replacing them with CGLIB-enhanced subclasses.
-	 */
+	// 用于服务bean请求的配置类，在运行时被CGLIB 增强的子类替换
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		int factoryId = System.identityHashCode(beanFactory);
 		if (this.factoriesPostProcessed.contains(factoryId)) {
@@ -244,10 +187,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		enhanceConfigurationClasses(beanFactory);
 	}
 
-	/**
-	 * Build and validate a configuration model based on the registry of
-	 * {@link Configuration} classes.
-	 */
+	// 根据注册中心的注册表构建和验证配置模型
 	public void processConfigBeanDefinitions(BeanDefinitionRegistry registry) {
 		Set<BeanDefinitionHolder> configCandidates = new LinkedHashSet<BeanDefinitionHolder>();
 		for (String beanName : registry.getBeanDefinitionNames()) {
@@ -330,26 +270,32 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 	/**
 	 * Post-processes a BeanFactory in search of Configuration class BeanDefinitions;
+	 * 用于查找BeanDefinition配置类的一个Bean工厂后处理器
 	 * any candidates are then enhanced by a {@link ConfigurationClassEnhancer}.
+	 * 所有的候选类将被 ConfigurationClassEnhancer 增强
 	 * Candidate status is determined by BeanDefinition attribute metadata.
+	 * 候选状态由BeanDefinition属性元数据决定。
 	 * @see ConfigurationClassEnhancer
 	 */
+	// 增强这个 BeanFactory 中的所有 BeanDefinition
 	public void enhanceConfigurationClasses(ConfigurableListableBeanFactory beanFactory) {
+		// 保存这个beanFactory 的所有 BeanDefinition
 		Map<String, AbstractBeanDefinition> configBeanDefs = new LinkedHashMap<String, AbstractBeanDefinition>();
 		for (String beanName : beanFactory.getBeanDefinitionNames()) {
 			BeanDefinition beanDef = beanFactory.getBeanDefinition(beanName);
 			if (ConfigurationClassUtils.isFullConfigurationClass(beanDef)) {
 				if (!(beanDef instanceof AbstractBeanDefinition)) {
-					throw new BeanDefinitionStoreException("Cannot enhance @Configuration bean definition '" +
-							beanName + "' since it is not stored in an AbstractBeanDefinition subclass");
+					throw new BeanDefinitionStoreException("Cannot enhance @Configuration bean definition '" + beanName + "' since it is not stored in an AbstractBeanDefinition subclass");
 				}
 				configBeanDefs.put(beanName, (AbstractBeanDefinition) beanDef);
 			}
 		}
+
 		if (configBeanDefs.isEmpty()) {
-			// nothing to enhance -> return immediately
+			// 如果没有需要被增强的，则马上返回
 			return;
 		}
+
 		ConfigurationClassEnhancer enhancer = new ConfigurationClassEnhancer(beanFactory);
 		for (Map.Entry<String, AbstractBeanDefinition> entry : configBeanDefs.entrySet()) {
 			AbstractBeanDefinition beanDef = entry.getValue();
