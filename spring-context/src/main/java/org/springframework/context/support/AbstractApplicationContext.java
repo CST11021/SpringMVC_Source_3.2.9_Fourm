@@ -991,19 +991,17 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	// ------------------------------------------- Abstract methods that must be implemented by subclasses -------------------------------------------
 
 	// 由子类实现，初始化一个 BeanFactory 给上层的 ApplicationContext 容器，该方法有 refresh() 调用，如果发现已经有一个 BeanFactory 实例了，则销毁全部的bean实例，并关闭容器，然后重新初始化一个BeanFactory
+	// ------------------------------------------- 由子类实现的抽象方法 -------------------------------------------
+	// 创建一个BeanFactory 以供上层 ApplicationContext 使用
 	protected abstract void refreshBeanFactory() throws BeansException, IllegalStateException;
-	/**
-	 * Subclasses must implement this method to release their internal bean factory.
-	 * This method gets invoked by {@link #close()} after all other shutdown work.
-	 * <p>Should never throw an exception but rather log shutdown failures.
-	 */
 	protected abstract void closeBeanFactory();
 	/**
-	 * Subclasses must return their internal bean factory here. They should implement the
-	 * lookup efficiently, so that it can be called repeatedly without a performance penalty.
-	 * <p>Note: Subclasses should check whether the context is still active before
-	 * returning the internal bean factory. The internal factory should generally be
-	 * considered unavailable once the context has been closed.
+	 * Subclasses must return their internal bean factory here. They should implement the lookup efficiently, so that it can be called repeatedly without a performance penalty.
+	 * 子类必须返回它们的内部bean工厂。它们应该有效地实现查找，这样就可以在不执行性能损失的情况下反复调用它。
+	 * <p>Note: Subclasses should check whether the context is still active before returning the internal bean factory.
+	 * 在返回内部bean工厂之前，子类应该检查上下文是否仍然处于活动状态。
+	 * The internal factory should generally be considered unavailable once the context has been closed.
+	 * 一旦上下文关闭，内部工厂通常应该被认为不可用
 	 * @return this application context's internal bean factory (never {@code null})
 	 * @throws IllegalStateException if the context does not hold an internal bean factory yet
 	 * (usually if {@link #refresh()} has never been called) or if the context has been
@@ -1016,31 +1014,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
 
 
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder(getDisplayName());
-		sb.append(": startup date [").append(new Date(getStartupDate()));
-		sb.append("]; ");
-		ApplicationContext parent = getParent();
-		if (parent == null) {
-			sb.append("root of context hierarchy");
-		}
-		else {
-			sb.append("parent: ").append(parent.getDisplayName());
-		}
-		return sb.toString();
-	}
-
-
 	/**
-	 * BeanPostProcessor that logs an info message when a bean is created during
-	 * BeanPostProcessor instantiation, i.e. when a bean is not eligible for
-	 * getting processed by all BeanPostProcessors.
+	 * BeanPostProcessor that logs an info message when a bean is created during BeanPostProcessor instantiation,
+	 * 当在BeanPostProcessor实例化过程中创建一个bean时，BeanPostProcessor记录信息消息，
+	 * i.e. when a bean is not eligible for getting processed by all BeanPostProcessors.
+	 * 也就是说，当bean没有资格被所有的beanpost处理器进行处理时。
 	 */
 	private class BeanPostProcessorChecker implements BeanPostProcessor {
 
 		private final ConfigurableListableBeanFactory beanFactory;
-
 		private final int beanPostProcessorTargetCount;
 
 		public BeanPostProcessorChecker(ConfigurableListableBeanFactory beanFactory, int beanPostProcessorTargetCount) {
@@ -1051,7 +1033,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		public Object postProcessBeforeInitialization(Object bean, String beanName) {
 			return bean;
 		}
-
 		public Object postProcessAfterInitialization(Object bean, String beanName) {
 			if (bean != null && !(bean instanceof BeanPostProcessor) &&
 					this.beanFactory.getBeanPostProcessorCount() < this.beanPostProcessorTargetCount) {
@@ -1067,7 +1048,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
 	/**
 	 * BeanPostProcessor that detects beans which implement the ApplicationListener interface.
+	 * 用于检测实现ApplicationListener接口的bean的BeanPostProcessor。
 	 * This catches beans that can't reliably be detected by getBeanNamesForType.
+	 * 这捕获了无法可靠地通过getBeanNamesForType检测到的bean。
 	 */
 	private class ApplicationListenerDetector implements MergedBeanDefinitionPostProcessor {
 
@@ -1082,7 +1065,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		public Object postProcessBeforeInitialization(Object bean, String beanName) {
 			return bean;
 		}
-
 		public Object postProcessAfterInitialization(Object bean, String beanName) {
 			if (bean instanceof ApplicationListener) {
 				// potentially not detected as a listener by getBeanNamesForType retrieval
@@ -1108,5 +1090,18 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
 
 
-
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder(getDisplayName());
+		sb.append(": startup date [").append(new Date(getStartupDate()));
+		sb.append("]; ");
+		ApplicationContext parent = getParent();
+		if (parent == null) {
+			sb.append("root of context hierarchy");
+		}
+		else {
+			sb.append("parent: ").append(parent.getDisplayName());
+		}
+		return sb.toString();
+	}
 }

@@ -51,12 +51,15 @@ package org.springframework.core.env;
  * @see SystemEnvironmentPropertySource
  * @see org.springframework.web.context.support.StandardServletEnvironment
  */
+// 用于实现将 操作系统环境变量 和 jvm虚拟机系统环境变量 添加到Environment
 public class StandardEnvironment extends AbstractEnvironment {
 
 	/** System environment property source name: {@value} */
+	// 操作系统环境变量属性源的名称
 	public static final String SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME = "systemEnvironment";
 
 	/** JVM system properties property source name: {@value} */
+	// jvm虚拟机系统环境变量属性源的名称
 	public static final String SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME = "systemProperties";
 
 
@@ -75,7 +78,9 @@ public class StandardEnvironment extends AbstractEnvironment {
 	 */
 	@Override
 	protected void customizePropertySources(MutablePropertySources propertySources) {
+		// 追加虚拟机环境变量属性源
 		propertySources.addLast(new MapPropertySource(SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME, getSystemProperties()));
+		// 追加操作系统环境变量属性源
 		propertySources.addLast(new SystemEnvironmentPropertySource(SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, getSystemEnvironment()));
 	}
 

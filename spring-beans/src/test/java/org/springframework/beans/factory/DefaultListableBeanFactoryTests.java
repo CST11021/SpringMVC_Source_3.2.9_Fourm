@@ -66,12 +66,15 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.PropertiesBeanDefinitionReader;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.ConstructorDependenciesBean;
+import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.beans.propertyeditors.CustomNumberEditor;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.core.convert.support.GenericConversionService;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
 import org.springframework.tests.Assume;
 import org.springframework.tests.TestGroup;
@@ -106,6 +109,20 @@ public class DefaultListableBeanFactoryTests {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
+
+	@Test
+	public void test(){
+		//1、加载配置信息
+		ResourceLoader loader = new DefaultResourceLoader();
+		Resource resource = loader.getResource("classpath:org/springframework/beans/factory/BeanFactoryUtilsTests-leaf.xml");
+		//2、解析配置信息，将配置信息转为BeanDefinition，并构建IOC容器
+		BeanFactory beanFactory = new XmlBeanFactory(resource);
+		//3、Bean加载
+		TestBean bean = (TestBean)beanFactory.getBean("test3");
+		System.out.println(beanFactory.containsBean("test3"));
+		TestBean bean33 = (TestBean)beanFactory.getBean("test33");
+
+	}
 
 	@Test
 	public void testUnreferencedSingletonWasInstantiated() {

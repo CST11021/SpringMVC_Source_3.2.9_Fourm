@@ -36,9 +36,9 @@ import org.springframework.util.StringUtils;
  * @see #setConfigLocations
  * @see #getDefaultConfigLocations
  */
-public abstract class AbstractRefreshableConfigApplicationContext extends AbstractRefreshableApplicationContext
-		implements BeanNameAware, InitializingBean {
+public abstract class AbstractRefreshableConfigApplicationContext extends AbstractRefreshableApplicationContext implements BeanNameAware, InitializingBean {
 
+	// 用于保存容器的配置文件名称，如：applicationContext.xml
 	private String[] configLocations;
 
 	private boolean setIdCalled = false;
@@ -68,10 +68,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 		setConfigLocations(StringUtils.tokenizeToStringArray(location, CONFIG_LOCATION_DELIMITERS));
 	}
 
-	/**
-	 * Set the config locations for this application context.
-	 * <p>If not set, the implementation may use a default as appropriate.
-	 */
+	// 设置这个Spring容器的配置文件
 	public void setConfigLocations(String[] locations) {
 		if (locations != null) {
 			Assert.noNullElements(locations, "Config locations must not be null");
@@ -118,6 +115,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	 * @return the resolved file path
 	 * @see org.springframework.core.env.Environment#resolveRequiredPlaceholders(String)
 	 */
+	// 解析这个path路径，比如：将解析一些系统参数，相对路径等变量
 	protected String resolvePath(String path) {
 		return getEnvironment().resolveRequiredPlaceholders(path);
 	}
