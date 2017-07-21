@@ -345,9 +345,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		}
 		return beanFactory;
 	}
-	// 3、在实例化bean前，我们需要做一些准备工作，如：设置类装载器、BeanDefinition的解析器、注册属性编辑器等工作。
+	// 3、在实例化bean前，我们需要做一些准备工作，如：设置类装载器、BeanDefinition的解析器、添加SPEL表达式语言的处理器、注册属性编辑器等工作。
 	// 对BeanFactory进行各种功能模式填充，@Qualifier和@Autowired应该是大家非常熟悉的注解，那么这两个注解正是在这一步骤中增加的支持。
-	//该方法主要功能：设置类加载器、添加SPEL表达式语言的处理器、设置属性编辑器、
 	protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		// 告诉内部 beanFactory 使用上下文的类装载器
 		beanFactory.setBeanClassLoader(getClassLoader());

@@ -41,16 +41,12 @@ import org.springframework.core.NamedThreadLocal;
  */
 public abstract class LocaleContextHolder {
 
-	private static final ThreadLocal<LocaleContext> localeContextHolder =
-			new NamedThreadLocal<LocaleContext>("Locale context");
+	private static final ThreadLocal<LocaleContext> localeContextHolder = new NamedThreadLocal<LocaleContext>("Locale context");
 
-	private static final ThreadLocal<LocaleContext> inheritableLocaleContextHolder =
-			new NamedInheritableThreadLocal<LocaleContext>("Locale context");
+	private static final ThreadLocal<LocaleContext> inheritableLocaleContextHolder = new NamedInheritableThreadLocal<LocaleContext>("Locale context");
 
 
-	/**
-	 * Reset the LocaleContext for the current thread.
-	 */
+	// 重置当前线程的 LocaleContext
 	public static void resetLocaleContext() {
 		localeContextHolder.remove();
 		inheritableLocaleContextHolder.remove();

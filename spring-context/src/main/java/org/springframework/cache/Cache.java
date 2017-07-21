@@ -26,60 +26,31 @@ package org.springframework.cache;
  * @author Costin Leau
  * @since 3.1
  */
+// 一个公共的缓存操作接口
 public interface Cache {
 
-	/**
-	 * Return the cache name.
-	 */
+	// Return the cache name.
 	String getName();
 
-	/**
-	 * Return the the underlying native cache provider.
-	 */
+	// Return the the underlying native cache provider.
 	Object getNativeCache();
 
-	/**
-	 * Return the value to which this cache maps the specified key.
-	 * <p>Returns {@code null} if the cache contains no mapping for this key;
-	 * otherwise, the cached value (which may be {@code null} itself) will
-	 * be returned in a {@link ValueWrapper}.
-	 * @param key the key whose associated value is to be returned
-	 * @return the value to which this cache maps the specified key,
-	 * contained within a {@link ValueWrapper} which may also hold
-	 * a cached {@code null} value. A straight {@code null} being
-	 * returned means that the cache contains no mapping for this key.
-	 */
+	// 根据key获取一个缓存对象，并包装为 ValueWrapper 对象后返回
 	ValueWrapper get(Object key);
 
-	/**
-	 * Associate the specified value with the specified key in this cache.
-	 * <p>If the cache previously contained a mapping for this key, the old
-	 * value is replaced by the specified value.
-	 * @param key the key with which the specified value is to be associated
-	 * @param value the value to be associated with the specified key
-	 */
+	// 添加一个缓存对象
 	void put(Object key, Object value);
 
-	/**
-	 * Evict the mapping for this key from this cache if it is present.
-	 * @param key the key whose mapping is to be removed from the cache
-	 */
+	// 移除一个缓存对象
 	void evict(Object key);
 
-	/**
-	 * Remove all mappings from the cache.
-	 */
+	// 清楚所有缓存
 	void clear();
 
 
-	/**
-	 * A (wrapper) object representing a cache value.
-	 */
+	// 用于保存缓存对象的接口
 	interface ValueWrapper {
-
-		/**
-		 * Return the actual value in the cache.
-		 */
+		// 返回这个缓存中的真实值
 		Object get();
 	}
 

@@ -31,10 +31,7 @@ import java.util.Locale;
  */
 public interface LocaleContext {
 
-	/**
-	 * Return the current Locale, which can be fixed or determined dynamically,
-	 * depending on the implementation strategy.
-	 */
+	// 返回当前的一个 Locale 对象
 	Locale getLocale();
 
 }

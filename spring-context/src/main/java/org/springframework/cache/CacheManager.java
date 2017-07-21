@@ -27,17 +27,10 @@ import java.util.Collection;
  */
 public interface CacheManager {
 
-	/**
-	 * Return the cache associated with the given name.
-	 * @param name the cache identifier (must not be {@code null})
-	 * @return the associated cache, or {@code null} if none found
-	 */
+	// 根据这个name获取一个Cache对象，name参数不能为空
 	Cache getCache(String name);
 
-	/**
-	 * Return a collection of the cache names known by this manager.
-	 * @return the names of all caches known by the cache manager
-	 */
+	// 返回这个缓存管理器下的所有Cache对象的名称
 	Collection<String> getCacheNames();
 
 }
