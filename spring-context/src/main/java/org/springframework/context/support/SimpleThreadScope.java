@@ -46,17 +46,19 @@ import org.springframework.core.NamedThreadLocal;
  * @since 3.0
  * @see org.springframework.web.context.request.RequestScope
  */
+
+// Spring 中定义的一个线程作用域
 public class SimpleThreadScope implements Scope {
 
 	private static final Log logger = LogFactory.getLog(SimpleThreadScope.class);
 
-	private final ThreadLocal<Map<String, Object>> threadScope =
-			new NamedThreadLocal<Map<String, Object>>("SimpleThreadScope") {
-				@Override
-				protected Map<String, Object> initialValue() {
-					return new HashMap<String, Object>();
-				}
-			};
+	// 缓存当前线程作用域的下对象
+	private final ThreadLocal<Map<String, Object>> threadScope = new NamedThreadLocal<Map<String, Object>>("SimpleThreadScope") {
+		@Override
+		protected Map<String, Object> initialValue() {
+			return new HashMap<String, Object>();
+		}
+	};
 
 
 	public Object get(String name, ObjectFactory<?> objectFactory) {
@@ -69,11 +71,13 @@ public class SimpleThreadScope implements Scope {
 		return object;
 	}
 
+	// 从 threadScope 移除这个对象
 	public Object remove(String name) {
 		Map<String, Object> scope = this.threadScope.get();
 		return scope.remove(name);
 	}
 
+	// SimpleThreadScope 不支持销毁回调
 	public void registerDestructionCallback(String name, Runnable callback) {
 		logger.warn("SimpleThreadScope does not support destruction callbacks. " +
 				"Consider using RequestScope in a web environment.");
@@ -83,6 +87,7 @@ public class SimpleThreadScope implements Scope {
 		return null;
 	}
 
+	// 返回当前线程的名称
 	public String getConversationId() {
 		return Thread.currentThread().getName();
 	}

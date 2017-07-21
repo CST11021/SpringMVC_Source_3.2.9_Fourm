@@ -65,48 +65,25 @@ import org.springframework.context.ApplicationContextException;
 public abstract class AbstractRefreshableApplicationContext extends AbstractApplicationContext {
 
 	private Boolean allowBeanDefinitionOverriding;
-
 	private Boolean allowCircularReferences;
 
-	/** Bean factory for this context */
 	private DefaultListableBeanFactory beanFactory;
-
-	/** Synchronization monitor for the internal BeanFactory */
+	// 内部 BeanFactory 的同步监视器
 	private final Object beanFactoryMonitor = new Object();
 
 
-	/**
-	 * Create a new AbstractRefreshableApplicationContext with no parent.
-	 */
-	public AbstractRefreshableApplicationContext() {
-	}
-
-	/**
-	 * Create a new AbstractRefreshableApplicationContext with the given parent context.
-	 * @param parent the parent context
-	 */
+	public AbstractRefreshableApplicationContext() {}
 	public AbstractRefreshableApplicationContext(ApplicationContext parent) {
 		super(parent);
 	}
 
 
-	/**
-	 * Set whether it should be allowed to override bean definitions by registering
-	 * a different definition with the same name, automatically replacing the former.
-	 * If not, an exception will be thrown. Default is "true".
-	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowBeanDefinitionOverriding
-	 */
+	// 设置是否允许同名bean覆盖
 	public void setAllowBeanDefinitionOverriding(boolean allowBeanDefinitionOverriding) {
 		this.allowBeanDefinitionOverriding = allowBeanDefinitionOverriding;
 	}
 
-	/**
-	 * Set whether to allow circular references between beans - and automatically
-	 * try to resolve them.
-	 * <p>Default is "true". Turn this off to throw an exception when encountering
-	 * a circular reference, disallowing them completely.
-	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowCircularReferences
-	 */
+	// 设置是否允许循环依赖
 	public void setAllowCircularReferences(boolean allowCircularReferences) {
 		this.allowCircularReferences = allowCircularReferences;
 	}
@@ -156,10 +133,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 		}
 	}
 
-	/**
-	 * Determine whether this context currently holds a bean factory,
-	 * i.e. has been refreshed at least once and not been closed yet.
-	 */
+	// 判断该Spring容器是否已经持有内部的IOC容器
 	protected final boolean hasBeanFactory() {
 		synchronized (this.beanFactoryMonitor) {
 			return (this.beanFactory != null);
@@ -196,15 +170,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 		beanFactory.setAutowireCandidateResolver(new QualifierAnnotationAutowireCandidateResolver());
 	}
 
-	/**
-	 * Load bean definitions into the given bean factory, typically through delegating to one or more bean definition readers.
-	 * 将bean定义加载到给定的bean工厂中，通常是通过委托给一个或多个bean定义读取器。
-	 * @param beanFactory the bean factory to load bean definitions into
-	 * @throws BeansException if parsing of the bean definitions failed
-	 * @throws IOException if loading of bean definition files failed
-	 * @see org.springframework.beans.factory.support.PropertiesBeanDefinitionReader
-	 * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
-	 */
+	// 通过 XmlBeanDefinitionReader 将bean定义加载到给定的bean工厂中
 	protected abstract void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws BeansException, IOException;
 
 }

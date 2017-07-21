@@ -40,35 +40,19 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 
 	// 用于保存容器的配置文件名称，如：applicationContext.xml
 	private String[] configLocations;
-
+	// 标识是否已经为这个容器设置了id
 	private boolean setIdCalled = false;
 
 
-	/**
-	 * Create a new AbstractRefreshableConfigApplicationContext with no parent.
-	 */
-	public AbstractRefreshableConfigApplicationContext() {
-	}
-
-	/**
-	 * Create a new AbstractRefreshableConfigApplicationContext with the given parent context.
-	 * @param parent the parent context
-	 */
+	public AbstractRefreshableConfigApplicationContext() {}
 	public AbstractRefreshableConfigApplicationContext(ApplicationContext parent) {
 		super(parent);
 	}
 
-
-	/**
-	 * Set the config locations for this application context in init-param style,
-	 * i.e. with distinct locations separated by commas, semicolons or whitespace.
-	 * <p>If not set, the implementation may use a default as appropriate.
-	 */
+	// 设置这个Spring容器的配置文件
 	public void setConfigLocation(String location) {
 		setConfigLocations(StringUtils.tokenizeToStringArray(location, CONFIG_LOCATION_DELIMITERS));
 	}
-
-	// 设置这个Spring容器的配置文件
 	public void setConfigLocations(String[] locations) {
 		if (locations != null) {
 			Assert.noNullElements(locations, "Config locations must not be null");
@@ -82,28 +66,9 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 		}
 	}
 
-	/**
-	 * Return an array of resource locations, referring to the XML bean definition
-	 * files that this context should be built with. Can also include location
-	 * patterns, which will get resolved via a ResourcePatternResolver.
-	 * <p>The default implementation returns {@code null}. Subclasses can override
-	 * this to provide a set of resource locations to load bean definitions from.
-	 * @return an array of resource locations, or {@code null} if none
-	 * @see #getResources
-	 * @see #getResourcePatternResolver
-	 */
 	protected String[] getConfigLocations() {
 		return (this.configLocations != null ? this.configLocations : getDefaultConfigLocations());
 	}
-
-	/**
-	 * Return the default config locations to use, for the case where no
-	 * explicit config locations have been specified.
-	 * <p>The default implementation returns {@code null},
-	 * requiring explicit config locations.
-	 * @return an array of default config locations, if any
-	 * @see #setConfigLocations
-	 */
 	protected String[] getDefaultConfigLocations() {
 		return null;
 	}
@@ -127,10 +92,8 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 		this.setIdCalled = true;
 	}
 
-	/**
-	 * Sets the id of this context to the bean name by default,
-	 * for cases where the context instance is itself defined as a bean.
-	 */
+
+	// 如果这个Spring容器本身就定义为一个Bean的情况，那么默认spring容器的id为bean的名称
 	public void setBeanName(String name) {
 		if (!this.setIdCalled) {
 			super.setId(name);
@@ -138,11 +101,8 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 		}
 	}
 
-	/**
-	 * Triggers {@link #refresh()} if not refreshed in the concrete context's
-	 * constructor already.
-	 */
 	public void afterPropertiesSet() {
+		// isActive()用于判断当前容器是否处于启动状态
 		if (!isActive()) {
 			refresh();
 		}

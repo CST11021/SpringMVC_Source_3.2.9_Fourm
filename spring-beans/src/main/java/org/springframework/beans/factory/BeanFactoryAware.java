@@ -71,6 +71,13 @@ import org.springframework.beans.BeansException;
  }
 
  */
+
+
+
+
+
+
+// 容器启动的时候会调用setBeanFactory方法，将当前容器注入到实现该接口的类（比如A）中，这样A便拥有的容器的功能
 public interface BeanFactoryAware extends Aware {
 
 	void setBeanFactory(BeanFactory beanFactory) throws BeansException;

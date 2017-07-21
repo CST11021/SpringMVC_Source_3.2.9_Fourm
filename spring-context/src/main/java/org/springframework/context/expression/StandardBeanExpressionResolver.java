@@ -47,24 +47,18 @@ import org.springframework.util.StringUtils;
  */
 public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 
-	/** Default expression prefix: "#{" */
+	//** Default expression prefix: "#{" */
 	public static final String DEFAULT_EXPRESSION_PREFIX = "#{";
-
-	/** Default expression suffix: "}" */
+	//** Default expression suffix: "}" */
 	public static final String DEFAULT_EXPRESSION_SUFFIX = "}";
 
-
 	private String expressionPrefix = DEFAULT_EXPRESSION_PREFIX;
-
 	private String expressionSuffix = DEFAULT_EXPRESSION_SUFFIX;
 
 	private ExpressionParser expressionParser = new SpelExpressionParser();
 
 	private final Map<String, Expression> expressionCache = new ConcurrentHashMap<String, Expression>(256);
-
-	private final Map<BeanExpressionContext, StandardEvaluationContext> evaluationCache =
-			new ConcurrentHashMap<BeanExpressionContext, StandardEvaluationContext>(8);
-
+	private final Map<BeanExpressionContext, StandardEvaluationContext> evaluationCache = new ConcurrentHashMap<BeanExpressionContext, StandardEvaluationContext>(8);
 	private final ParserContext beanExpressionParserContext = new ParserContext() {
 		public boolean isTemplate() {
 			return true;
@@ -78,31 +72,18 @@ public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 	};
 
 
-	/**
-	 * Set the prefix that an expression string starts with.
-	 * The default is "#{".
-	 * @see #DEFAULT_EXPRESSION_PREFIX
-	 */
+	// 设置表达式前缀
 	public void setExpressionPrefix(String expressionPrefix) {
 		Assert.hasText(expressionPrefix, "Expression prefix must not be empty");
 		this.expressionPrefix = expressionPrefix;
 	}
-
-	/**
-	 * Set the suffix that an expression string ends with.
-	 * The default is "}".
-	 * @see #DEFAULT_EXPRESSION_SUFFIX
-	 */
+	// 设置表达式后缀
 	public void setExpressionSuffix(String expressionSuffix) {
 		Assert.hasText(expressionSuffix, "Expression suffix must not be empty");
 		this.expressionSuffix = expressionSuffix;
 	}
 
-	/**
-	 * Specify the EL parser to use for expression parsing.
-	 * <p>Default is a {@link org.springframework.expression.spel.standard.SpelExpressionParser},
-	 * compatible with standard Unified EL style expression syntax.
-	 */
+	// 设置EL表达式解析器
 	public void setExpressionParser(ExpressionParser expressionParser) {
 		Assert.notNull(expressionParser, "ExpressionParser must not be null");
 		this.expressionParser = expressionParser;
@@ -142,12 +123,6 @@ public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 			throw new BeanExpressionException("Expression parsing failed", ex);
 		}
 	}
-
-	/**
-	 * Template method for customizing the expression evaluation context.
-	 * <p>The default implementation is empty.
-	 */
-	protected void customizeEvaluationContext(StandardEvaluationContext evalContext) {
-	}
+	protected void customizeEvaluationContext(StandardEvaluationContext evalContext) {}
 
 }

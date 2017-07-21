@@ -27,9 +27,7 @@ import org.springframework.util.Assert;
 public class BeanExpressionContext {
 
 	private final ConfigurableBeanFactory beanFactory;
-
 	private final Scope scope;
-
 
 	public BeanExpressionContext(ConfigurableBeanFactory beanFactory, Scope scope) {
 		Assert.notNull(beanFactory, "BeanFactory must not be null");
@@ -37,20 +35,12 @@ public class BeanExpressionContext {
 		this.scope = scope;
 	}
 
-	public final ConfigurableBeanFactory getBeanFactory() {
-		return this.beanFactory;
-	}
-
-	public final Scope getScope() {
-		return this.scope;
-	}
-
-
+	// 判断容器中是否有指定的bean
 	public boolean containsObject(String key) {
 		return (this.beanFactory.containsBean(key) ||
 				(this.scope != null && this.scope.resolveContextualObject(key) != null));
 	}
-
+	// 返回容器中指定的bean
 	public Object getObject(String key) {
 		if (this.beanFactory.containsBean(key)) {
 			return this.beanFactory.getBean(key);
@@ -63,6 +53,13 @@ public class BeanExpressionContext {
 		}
 	}
 
+	// getter ...
+	public final ConfigurableBeanFactory getBeanFactory() {
+		return this.beanFactory;
+	}
+	public final Scope getScope() {
+		return this.scope;
+	}
 
 	@Override
 	public boolean equals(Object other) {
@@ -75,7 +72,6 @@ public class BeanExpressionContext {
 		BeanExpressionContext otherContext = (BeanExpressionContext) other;
 		return (this.beanFactory == otherContext.beanFactory && this.scope == otherContext.scope);
 	}
-
 	@Override
 	public int hashCode() {
 		return this.beanFactory.hashCode();
