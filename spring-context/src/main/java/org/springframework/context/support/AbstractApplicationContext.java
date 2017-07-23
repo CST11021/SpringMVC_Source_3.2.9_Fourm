@@ -170,6 +170,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	public long getStartupDate() {
 		return this.startupDate;
 	}
+	// 当完成ApplicationContext初始化的时候，要通过Spring中的重要事件发布机制来发出ContextRefreshedEvent事件，以保证对应的监听器可以做进一步的逻辑处理
 	public void publishEvent(ApplicationEvent event) {
 		Assert.notNull(event, "Event must not be null");
 		if (logger.isTraceEnabled()) {
@@ -604,16 +605,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			}
 		}
 	}
-	/**
-	 * Initialize the LifecycleProcessor.
-	 * Uses DefaultLifecycleProcessor if none defined in the context.
-	 * @see org.springframework.context.support.DefaultLifecycleProcessor
-	 */
+
+	// 为容器初始化一个beanName为lifecycleProcessor的生命周期处理器
 	protected void initLifecycleProcessor() {
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
 		if (beanFactory.containsLocalBean(LIFECYCLE_PROCESSOR_BEAN_NAME)) {
-			this.lifecycleProcessor =
-					beanFactory.getBean(LIFECYCLE_PROCESSOR_BEAN_NAME, LifecycleProcessor.class);
+			this.lifecycleProcessor = beanFactory.getBean(LIFECYCLE_PROCESSOR_BEAN_NAME, LifecycleProcessor.class);
 			if (logger.isDebugEnabled()) {
 				logger.debug("Using LifecycleProcessor [" + this.lifecycleProcessor + "]");
 			}
@@ -624,8 +621,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			this.lifecycleProcessor = defaultProcessor;
 			beanFactory.registerSingleton(LIFECYCLE_PROCESSOR_BEAN_NAME, this.lifecycleProcessor);
 			if (logger.isDebugEnabled()) {
-				logger.debug("Unable to locate LifecycleProcessor with name '" +
-						LIFECYCLE_PROCESSOR_BEAN_NAME +
+				logger.debug("Unable to locate LifecycleProcessor with name '" + LIFECYCLE_PROCESSOR_BEAN_NAME +
 						"': using default [" + this.lifecycleProcessor + "]");
 			}
 		}
@@ -688,7 +684,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	}
 	// 12、完成刷新过程，通知生命周期处理器lifecycleProcessor 刷新过程，同时发出ContextRefreshEvent通知别人
 	protected void finishRefresh() {
-		// Initialize lifecycle processor for this context.
+		// 当ApplicationContext 启动或停止时，他会通过LifecycleProcessor来与所有声明的bean的周期做状态更新，而在LifecycleProcessor的使用前首先需要初始化。
 		initLifecycleProcessor();
 
 		// Propagate refresh to lifecycle processor first.

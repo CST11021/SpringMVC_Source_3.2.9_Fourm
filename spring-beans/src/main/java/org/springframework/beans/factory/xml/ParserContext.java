@@ -38,12 +38,12 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
  */
 public final class ParserContext {
 
+	// 该对象可用于解析和注册bean
 	private final XmlReaderContext readerContext;
-
+	// 专门用于解析bean标签
 	private final BeanDefinitionParserDelegate delegate;
 
 	private BeanDefinition containingBeanDefinition;
-
 	private final Stack<ComponentDefinition> containingComponents = new Stack<ComponentDefinition>();
 
 
@@ -51,10 +51,7 @@ public final class ParserContext {
 		this.readerContext = readerContext;
 		this.delegate = delegate;
 	}
-
-	public ParserContext(XmlReaderContext readerContext, BeanDefinitionParserDelegate delegate,
-			BeanDefinition containingBeanDefinition) {
-
+	public ParserContext(XmlReaderContext readerContext, BeanDefinitionParserDelegate delegate, BeanDefinition containingBeanDefinition) {
 		this.readerContext = readerContext;
 		this.delegate = delegate;
 		this.containingBeanDefinition = containingBeanDefinition;
@@ -64,23 +61,21 @@ public final class ParserContext {
 	public final XmlReaderContext getReaderContext() {
 		return this.readerContext;
 	}
-
 	public final BeanDefinitionRegistry getRegistry() {
 		return this.readerContext.getRegistry();
 	}
-
 	public final BeanDefinitionParserDelegate getDelegate() {
 		return this.delegate;
 	}
-
 	public final BeanDefinition getContainingBeanDefinition() {
 		return this.containingBeanDefinition;
 	}
-
+	// 判断 containingBeanDefinition 是否为空
 	public final boolean isNested() {
 		return (this.containingBeanDefinition != null);
 	}
 
+	// 判断Spring中Bean的 lazy-init 配置属性是否默认为TRUE
 	public boolean isDefaultLazyInit() {
 		return BeanDefinitionParserDelegate.TRUE_VALUE.equals(this.delegate.getDefaults().getLazyInit());
 	}
@@ -116,6 +111,7 @@ public final class ParserContext {
 		}
 	}
 
+	// 注册这个bean组件
 	public void registerBeanComponent(BeanComponentDefinition component) {
 		BeanDefinitionReaderUtils.registerBeanDefinition(component, getRegistry());
 		registerComponent(component);

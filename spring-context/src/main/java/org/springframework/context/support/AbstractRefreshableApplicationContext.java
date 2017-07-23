@@ -167,6 +167,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 		if (this.allowCircularReferences != null) {
 			beanFactory.setAllowCircularReferences(this.allowCircularReferences);
 		}
+		// 用于@Qualifier和@Autowire
 		beanFactory.setAutowireCandidateResolver(new QualifierAnnotationAutowireCandidateResolver());
 	}
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+// 任何spring管理的对象可能实现这个接口。那么，当ApplicationContext自身启动和停止时，它将自动调用上下文内所有生命周期的实现。通过委托给LifecycleProcessor来做这个工作。
 package org.springframework.context;
 
 /**
@@ -23,16 +23,14 @@ package org.springframework.context;
  * @author Juergen Hoeller
  * @since 3.0
  */
+// 任何spring管理的对象可能实现这个接口。那么，当ApplicationContext自身启动和停止时，它将自动调用上下文内所有生命周期的实现。通过委托给LifecycleProcessor来做这个工作。
+// 注意LifecycleProcessor自身扩展了Lifecycle接口。它也增加了两个其他的方法来与上下文交互，使得可以刷新和关闭。
 public interface LifecycleProcessor extends Lifecycle {
 
-	/**
-	 * Notification of context refresh, e.g. for auto-starting components.
-	 */
+	// Notification of context refresh, e.g. for auto-starting components.
 	void onRefresh();
 
-	/**
-	 * Notification of context close phase, e.g. for auto-stopping components.
-	 */
+	// Notification of context close phase, e.g. for auto-stopping components.
 	void onClose();
 
 }

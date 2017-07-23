@@ -33,13 +33,11 @@ import org.w3c.dom.Element;
 
 /**
  * {@link org.springframework.beans.factory.xml.BeanDefinitionParser}
- * implementation that allows users to easily configure all the
- * infrastructure beans required to enable annotation-driven cache
- * demarcation.
+ * implementation that allows users to easily configure all the infrastructure beans required to enable annotation-driven cache demarcation.
  *
- * <p>By default, all proxies are created as JDK proxies. This may cause
- * some problems if you are injecting objects as concrete classes rather
- * than interfaces. To overcome this restriction you can set the
+ * <p>By default, all proxies are created as JDK proxies.
+ * This may cause some problems if you are injecting objects as concrete classes rather than interfaces.
+ * To overcome this restriction you can set the
  * '{@code proxy-target-class}' attribute to '{@code true}', which will
  * result in class-based proxies being created.
  *

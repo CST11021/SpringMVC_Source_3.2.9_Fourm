@@ -4,7 +4,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-//模拟邮件发送器，它向目的地发送邮件时，将产生一个MailSendEvent的时间，容器中注册了监听该事件的监听器MailSendListener。
+//模拟邮件发送器，它向目的地发送邮件时，将产生一个MailSendEvent的事件，容器中注册了监听该事件的监听器MailSendListener。
 public class MailSender implements ApplicationContextAware {
 
 	private ApplicationContext ctx ;

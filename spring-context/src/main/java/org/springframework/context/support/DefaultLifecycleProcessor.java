@@ -54,20 +54,15 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 
 	private volatile long timeoutPerShutdownPhase = 30000;
 
+	// 判断容器是否处于启动状态
 	private volatile boolean running;
-
 	private volatile ConfigurableListableBeanFactory beanFactory;
 
 
-	/**
-	 * Specify the maximum time allotted in milliseconds for the shutdown of
-	 * any phase (group of SmartLifecycle beans with the same 'phase' value).
-	 * The default value is 30 seconds.
-	 */
+
 	public void setTimeoutPerShutdownPhase(long timeoutPerShutdownPhase) {
 		this.timeoutPerShutdownPhase = timeoutPerShutdownPhase;
 	}
-
 	public void setBeanFactory(BeanFactory beanFactory) {
 		Assert.isInstanceOf(ConfigurableListableBeanFactory.class, beanFactory);
 		this.beanFactory = (ConfigurableListableBeanFactory) beanFactory;
@@ -85,6 +80,7 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 	 * declared as a dependency of another bean will be started before
 	 * the dependent bean regardless of the declared phase.
 	 */
+	// Spring容器启动时被调用
 	public void start() {
 		startBeans(false);
 		this.running = true;
@@ -99,6 +95,7 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 	 * declared as dependent on another bean will be stopped before
 	 * the dependency bean regardless of the declared phase.
 	 */
+	// Spring容器停止时被调用
 	public void stop() {
 		stopBeans();
 		this.running = false;
@@ -114,6 +111,7 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 		this.running = false;
 	}
 
+	// 判断Spring容器是否处于运行状态
 	public boolean isRunning() {
 		return this.running;
 	}
@@ -122,7 +120,9 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 	// internal helpers
 
 	private void startBeans(boolean autoStartupOnly) {
+		// 返回该工厂中所有实现了 Lifecycle 接口的单例bean
 		Map<String, Lifecycle> lifecycleBeans = getLifecycleBeans();
+
 		Map<Integer, LifecycleGroup> phases = new HashMap<Integer, LifecycleGroup>();
 		for (Map.Entry<String, ? extends Lifecycle> entry : lifecycleBeans.entrySet()) {
 			Lifecycle bean = entry.getValue();
@@ -204,8 +204,7 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 	 * @param lifecycleBeans Map with bean name as key and Lifecycle instance as value
 	 * @param beanName the name of the bean to stop
 	 */
-	private void doStop(Map<String, ? extends Lifecycle> lifecycleBeans, final String beanName,
-			final CountDownLatch latch, final Set<String> countDownBeanNames) {
+	private void doStop(Map<String, ? extends Lifecycle> lifecycleBeans, final String beanName, final CountDownLatch latch, final Set<String> countDownBeanNames) {
 
 		Lifecycle bean = lifecycleBeans.remove(beanName);
 		if (bean != null) {
@@ -256,21 +255,21 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 
 	// overridable hooks
 
-	/**
-	 * Retrieve all applicable Lifecycle beans: all singletons that have already been created,
-	 * as well as all SmartLifecycle beans (even if they are marked as lazy-init).
-	 * @return the Map of applicable beans, with bean names as keys and bean instances as values
-	 */
+	// 返回的所有实现了 Lifecycle 接口的单例bean，同时这个bean不能是工厂bean
 	protected Map<String, Lifecycle> getLifecycleBeans() {
 		Map<String, Lifecycle> beans = new LinkedHashMap<String, Lifecycle>();
+		// 返回所有实现了Lifecycle接口的bean
 		String[] beanNames = this.beanFactory.getBeanNamesForType(Lifecycle.class, false, false);
+
 		for (String beanName : beanNames) {
 			String beanNameToRegister = BeanFactoryUtils.transformedBeanName(beanName);
+			// 判断是否为工厂bean，如果是工厂bean，则需要修改beanName添加一个“&”前缀
 			boolean isFactoryBean = this.beanFactory.isFactoryBean(beanNameToRegister);
 			String beanNameToCheck = (isFactoryBean ? BeanFactory.FACTORY_BEAN_PREFIX + beanName : beanName);
-			if ((this.beanFactory.containsSingleton(beanNameToRegister) &&
-					(!isFactoryBean || Lifecycle.class.isAssignableFrom(this.beanFactory.getType(beanNameToCheck)))) ||
-					SmartLifecycle.class.isAssignableFrom(this.beanFactory.getType(beanNameToCheck))) {
+
+			// 如果是实现了Lifecycle接口的单例bean，又不是工厂bean
+			if ((this.beanFactory.containsSingleton(beanNameToRegister) && (!isFactoryBean || Lifecycle.class.isAssignableFrom(this.beanFactory.getType(beanNameToCheck)))
+							|| SmartLifecycle.class.isAssignableFrom(this.beanFactory.getType(beanNameToCheck)))) {
 				Lifecycle bean = this.beanFactory.getBean(beanNameToCheck, Lifecycle.class);
 				if (bean != this) {
 					beans.put(beanNameToRegister, bean);
