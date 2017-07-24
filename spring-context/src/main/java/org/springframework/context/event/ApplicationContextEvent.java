@@ -25,21 +25,35 @@ import org.springframework.context.ApplicationEvent;
  * @author Juergen Hoeller
  * @since 2.5
  */
+// 该类的作用是为了让使用Spring框架的用户扩展的，当我们继承该类后，它便成为Spring中的一个事件，这样我们便可以通过Spring来发布该事件（以便通知对应的事件监听）。
+// 注意，该类中的构造器 public ApplicationContextEvent(ApplicationContext source) 它需要注入一个 ApplicationContext ，这样事件的注册操作便可交由Spring类替我们完成。
+// 示例:
+/**
+ public class MailSender implements ApplicationContextAware {
+
+	 private ApplicationContext ctx ;
+
+	 // 实现ApplicationContextAware的接口方法，以便容器启动时注入容器实例
+	 @Override
+	 public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+	 	this.ctx = ctx;
+	 }
+
+	 public void sendMail(String to){
+	 	System.out.println("MailSender:模拟发送邮件...");
+	 	MailSendEvent mse = new MailSendEvent(this.ctx,to);// 向spring注册一个事件
+	 	ctx.publishEvent(mse);// spring发布事件
+	 }
+
+ }
+ */
 @SuppressWarnings("serial")
 public abstract class ApplicationContextEvent extends ApplicationEvent {
 
-	/**
-	 * Create a new ContextStartedEvent.
-	 * @param source the {@code ApplicationContext} that the event is raised for
-	 * (must not be {@code null})
-	 */
 	public ApplicationContextEvent(ApplicationContext source) {
 		super(source);
 	}
 
-	/**
-	 * Get the {@code ApplicationContext} that the event was raised for.
-	 */
 	public final ApplicationContext getApplicationContext() {
 		return (ApplicationContext) getSource();
 	}

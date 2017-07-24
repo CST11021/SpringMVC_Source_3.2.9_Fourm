@@ -18,27 +18,10 @@ package org.springframework.context;
 
 import java.util.EventListener;
 
-/**
- * Interface to be implemented by application event listeners.
- * Based on the standard {@code java.util.EventListener} interface
- * for the Observer design pattern.
- *
- * <p>As of Spring 3.0, an ApplicationListener can generically declare the event type
- * that it is interested in. When registered with a Spring ApplicationContext, events
- * will be filtered accordingly, with the listener getting invoked for matching event
- * objects only.
- *
- * @author Rod Johnson
- * @author Juergen Hoeller
- * @param <E> the specific ApplicationEvent subclass to listen to
- * @see org.springframework.context.event.ApplicationEventMulticaster
- */
+// spring中的事件监听接口，该监听用来监听 E 事件，当E事件触发
 public interface ApplicationListener<E extends ApplicationEvent> extends EventListener {
 
-	/**
-	 * Handle an application event.
-	 * @param event the event to respond to
-	 */
+	// 当该监听器监听到对应的事件发生时，会调用该方法进行相应的处理
 	void onApplicationEvent(E event);
 
 }

@@ -26,27 +26,8 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 
-/**
- * {@link MethodInterceptor Interceptor} that publishes an
- * {@code ApplicationEvent} to all {@code ApplicationListeners}
- * registered with an {@code ApplicationEventPublisher} after each
- * <i>successful</i> method invocation.
- *
- * <p>Note that this interceptor is only capable of publishing <i>stateless</i>
- * events configured via the
- * {@link #setApplicationEventClass "applicationEventClass"} property.
- *
- * @author Dmitriy Kopylenko
- * @author Juergen Hoeller
- * @author Rick Evans
- * @see #setApplicationEventClass
- * @see org.springframework.context.ApplicationEvent
- * @see org.springframework.context.ApplicationListener
- * @see org.springframework.context.ApplicationEventPublisher
- * @see org.springframework.context.ApplicationContext
- */
-public class EventPublicationInterceptor
-		implements MethodInterceptor, ApplicationEventPublisherAware, InitializingBean {
+// 事件发布拦截器
+public class EventPublicationInterceptor implements MethodInterceptor, ApplicationEventPublisherAware, InitializingBean {
 
 	private Constructor applicationEventClassConstructor;
 
@@ -87,7 +68,7 @@ public class EventPublicationInterceptor
 		}
 	}
 
-
+	// MethodInterceptor接口的方法
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 		Object retVal = invocation.proceed();
 

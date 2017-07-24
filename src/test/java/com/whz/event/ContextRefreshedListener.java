@@ -3,13 +3,12 @@ package com.whz.event;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
-
+// 容器刷新事件监听，它用于监听 ContextRefreshedEvent 事件是否发生
 public class ContextRefreshedListener implements ApplicationListener<ContextRefreshedEvent> {
 
     //Spring容器启动完毕后触发该方法
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-
 
         // 为什么要加这个判断呢？？？
         // 在web 项目中（spring mvc），系统会存在两个容器，一个是root application context ,另一个就是我们自己的 projectName-servlet context（作为root application context的子容器）。

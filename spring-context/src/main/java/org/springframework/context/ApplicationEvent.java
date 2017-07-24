@@ -18,35 +18,27 @@ package org.springframework.context;
 
 import java.util.EventObject;
 
-/**
- * Class to be extended by all application events. Abstract as it
- * doesn't make sense for generic events to be published directly.
- *
- * @author Rod Johnson
- * @author Juergen Hoeller
- */
+
+// 所有Spring事件需要继承该类。抽象地说，一般事件直接发布是没有意义的。
+// 该类的实现有：ApplicationContextEvent、ContextClosedEvent、ContextRefreshedEvent、ContextStartedEvent、ContextStoppedEvent
+// ApplicationContextEvent:是用于被使用该框架的用户扩展的，它一个抽象类
+// ContextClosedEvent:当使用 ConfigurableApplicationContext 接口中的 close() 方法关闭 ApplicationContext 时，该事件被发布。一个已关闭的上下文到达生命周期末端；它不能被刷新或重启。
+// ContextRefreshedEvent:ApplicationContext 被初始化或刷新时，该事件被发布。这也可以在 ConfigurableApplicationContext 接口中使用 refresh() 方法来发生。
+// ContextStartedEvent:当使用 ConfigurableApplicationContext 接口中的 start() 方法启动 ApplicationContext 时，该事件被发布。你可以调查你的数据库，或者你可以在接受到这个事件后重启任何停止的应用程序。
+// ContextStoppedEvent:当使用 ConfigurableApplicationContext 接口中的 stop() 方法停止 ApplicationContext 时，发布这个事件。你可以在接受到这个事件后做必要的清理的工作。
 public abstract class ApplicationEvent extends EventObject {
 
 	/** use serialVersionUID from Spring 1.2 for interoperability */
 	private static final long serialVersionUID = 7099057708183571937L;
 
-	/** System time when the event happened */
+	// 事件发生的系统时间
 	private final long timestamp;
 
-
-	/**
-	 * Create a new ApplicationEvent.
-	 * @param source the component that published the event (never {@code null})
-	 */
 	public ApplicationEvent(Object source) {
 		super(source);
 		this.timestamp = System.currentTimeMillis();
 	}
 
-
-	/**
-	 * Return the system time in milliseconds when the event happened.
-	 */
 	public final long getTimestamp() {
 		return this.timestamp;
 	}

@@ -19,54 +19,22 @@ package org.springframework.context.event;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
-/**
- * Interface to be implemented by objects that can manage a number of
- * {@link ApplicationListener} objects, and publish events to them.
- *
- * <p>An {@link org.springframework.context.ApplicationEventPublisher}, typically
- * a Spring {@link org.springframework.context.ApplicationContext}, can use an
- * ApplicationEventMulticaster as a delegate for actually publishing events.
- *
- * @author Rod Johnson
- * @author Juergen Hoeller
- */
+
+// 该接口用于管理Spring中的事件监听器，使用该接口可以进行事件的监听，事件的发布等功能，以便对应Spring中的监听器进行统一的管理
 public interface ApplicationEventMulticaster {
 
-	/**
-	 * Add a listener to be notified of all events.
-	 * @param listener the listener to add
-	 */
-	void addApplicationListener(ApplicationListener listener);
 
-	/**
-	 * Add a listener bean to be notified of all events.
-	 * @param listenerBeanName the name of the listener bean to add
-	 */
+	// 添加监听器
+	void addApplicationListener(ApplicationListener listener);
 	void addApplicationListenerBean(String listenerBeanName);
 
-	/**
-	 * Remove a listener from the notification list.
-	 * @param listener the listener to remove
-	 */
+	// 移除监听器
 	void removeApplicationListener(ApplicationListener listener);
-
-	/**
-	 * Remove a listener bean from the notification list.
-	 * @param listenerBeanName the name of the listener bean to add
-	 */
 	void removeApplicationListenerBean(String listenerBeanName);
-
-	/**
-	 * Remove all listeners registered with this multicaster.
-	 * <p>After a remove call, the multicaster will perform no action
-	 * on event notification until new listeners are being registered.
-	 */
+	// 移除所有监听器
 	void removeAllListeners();
 
-	/**
-	 * Multicast the given application event to appropriate listeners.
-	 * @param event the event to multicast
-	 */
+	// 将给定Spring事件广播给相应的监听器
 	void multicastEvent(ApplicationEvent event);
 
 }

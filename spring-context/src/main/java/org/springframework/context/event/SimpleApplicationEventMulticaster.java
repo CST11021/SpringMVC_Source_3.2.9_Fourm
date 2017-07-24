@@ -43,44 +43,12 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 
 	private Executor taskExecutor;
 
-
-	/**
-	 * Create a new SimpleApplicationEventMulticaster.
-	 */
-	public SimpleApplicationEventMulticaster() {
-	}
-
-	/**
-	 * Create a new SimpleApplicationEventMulticaster for the given BeanFactory.
-	 */
+	public SimpleApplicationEventMulticaster() {}
 	public SimpleApplicationEventMulticaster(BeanFactory beanFactory) {
 		setBeanFactory(beanFactory);
 	}
 
-
-	/**
-	 * Set the TaskExecutor to execute application listeners with.
-	 * <p>Default is a SyncTaskExecutor, executing the listeners synchronously
-	 * in the calling thread.
-	 * <p>Consider specifying an asynchronous TaskExecutor here to not block the
-	 * caller until all listeners have been executed. However, note that asynchronous
-	 * execution will not participate in the caller's thread context (class loader,
-	 * transaction association) unless the TaskExecutor explicitly supports this.
-	 * @see org.springframework.core.task.SyncTaskExecutor
-	 * @see org.springframework.core.task.SimpleAsyncTaskExecutor
-	 */
-	public void setTaskExecutor(Executor taskExecutor) {
-		this.taskExecutor = taskExecutor;
-	}
-
-	/**
-	 * Return the current TaskExecutor for this multicaster.
-	 */
-	protected Executor getTaskExecutor() {
-		return this.taskExecutor;
-	}
-
-
+	// 根据这个事件给所有相应的事件监听进行广播，并调用相应的处理方法，这里通过使用线程池来实现异步的处理方式
 	@SuppressWarnings("unchecked")
 	public void multicastEvent(final ApplicationEvent event) {
 		for (final ApplicationListener listener : getApplicationListeners(event)) {
@@ -97,5 +65,16 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 			}
 		}
 	}
+
+	// getter and setter
+	public void setTaskExecutor(Executor taskExecutor) {
+		this.taskExecutor = taskExecutor;
+	}
+	protected Executor getTaskExecutor() {
+		return this.taskExecutor;
+	}
+
+
+
 
 }

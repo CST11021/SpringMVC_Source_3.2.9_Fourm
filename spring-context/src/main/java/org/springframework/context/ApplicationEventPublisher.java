@@ -16,28 +16,12 @@
 
 package org.springframework.context;
 
-/**
- * Interface that encapsulates event publication functionality. Serves as super-interface for ApplicationContext.
- * 封装事件发布功能的接口。作为应用上下文的超级接口。
- * @author Juergen Hoeller
- * @since 1.1.1
- * @see ApplicationContext
- * @see ApplicationEventPublisherAware
- * @see org.springframework.context.ApplicationEvent
- * @see org.springframework.context.event.EventPublicationInterceptor
- */
+// 封装事件发布功能的接口。作为应用上下文的超级接口。
 // 让容器拥有发布应用上下文事件的功能，包括容器启动器事件、关闭事件等。实现了ApplicationListener事件监听接口的Bean可以接收到容器事件，并对事件进行响应处理。
 // 在ApplicationContext抽象实现类AbstractApplicationContext中，我们可以发现存在一个ApplicationEventMulticaster，它负责保存所有监听器，以便在容器产生上下文事件时通知这些事件监听者。
 public interface ApplicationEventPublisher {
 
-	/**
-	 * Notify all listeners registered with this application of an application event.
-	 * 通知所有注册应用程序事件的侦听器
-	 * Events may be framework events (such as RequestHandledEvent) or application-specific events.
-	 * 事件可能是框架事件(如RequestHandledEvent)或特定于应用程序的事件。
-	 * @param event the event to publish
-	 * @see org.springframework.web.context.support.RequestHandledEvent
-	 */
+	// ApplicationContext 容器实现了该方法，通过该方法进行事件的发布，以便通知所有相应的事件监听器
 	void publishEvent(ApplicationEvent event);
 
 }
