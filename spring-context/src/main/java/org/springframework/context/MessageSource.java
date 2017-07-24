@@ -40,70 +40,35 @@ import java.util.Locale;
 // 它们都继承NestingMessageSource以便能够处理嵌套的消息。StaticMessageSource很少被使用，但能以编程的方式向消息源添加消息。
 public interface MessageSource {
 
-	/**
-	 * Try to resolve the message. Return default message if no message was found.
-	 * @param code the code to lookup up, such as 'calculator.noRateSet'. Users of
-	 * this class are encouraged to base message names on the relevant fully
-	 * qualified class name, thus avoiding conflict and ensuring maximum clarity.
-	 * @param args array of arguments that will be filled in for params within
-	 * the message (params look like "{0}", "{1,date}", "{2,time}" within a message),
-	 * or {@code null} if none.
-	 * @param defaultMessage String to return if the lookup fails
-	 * @param locale the Locale in which to do the lookup
-	 * @return the resolved message if the lookup was successful;
-	 * otherwise the default message passed as a parameter
-	 * @see java.text.MessageFormat
-	 */
 	// 用来从MessageSource获取消息的基本方法。如果在指定的locale中没有找到消息，则使用默认的消息。args中的参数将使用标准类库中的MessageFormat来作消息中替换值。
 	String getMessage(String code, Object[] args, String defaultMessage, Locale locale);
 
-	/**
-	 * Try to resolve the message. Treat as an error if the message can't be found.
-	 * @param code the code to lookup up, such as 'calculator.noRateSet'
-	 * @param args Array of arguments that will be filled in for params within
-	 * the message (params look like "{0}", "{1,date}", "{2,time}" within a message),
-	 * or {@code null} if none.
-	 * @param locale the Locale in which to do the lookup
-	 * @return the resolved message
-	 * @throws NoSuchMessageException if the message wasn't found
-	 * @see java.text.MessageFormat
-	 */
 	// 本质上和上一个方法相同，其区别在：没有指定默认值，如果没找到消息，会抛出一个NoSuchMessageException异常。
 	String getMessage(String code, Object[] args, Locale locale) throws NoSuchMessageException;
 
-	/**
-	 * Try to resolve the message using all the attributes contained within the
-	 * {@code MessageSourceResolvable} argument that was passed in.
-	 * <p>NOTE: We must throw a {@code NoSuchMessageException} on this method
-	 * since at the time of calling this method we aren't able to determine if the
-	 * {@code defaultMessage} property of the resolvable is null or not.
-	 * @param resolvable value object storing attributes required to properly resolve a message
-	 * @param locale the Locale in which to do the lookup
-	 * @return the resolved message
-	 * @throws NoSuchMessageException if the message wasn't found
-	 * @see java.text.MessageFormat
-	 */
 	// 上面方法中所使用的属性都封装到一个MessageSourceResolvable实现中，而本方法可以指定MessageSourceResolvable实现。
 	String getMessage(MessageSourceResolvable resolvable, Locale locale) throws NoSuchMessageException;
 
 }
 /**
- * 当一个ApplicationContext被加载时，它会自动在context中查找已定义为MessageSource类型的bean。此bean的名称须为messageSource。如果找到，那么所有对上述方法的调用将被委托给该bean。
- * 否则ApplicationContext会在其父类中查找是否含有同名的bean。如果有，就把它作为MessageSource。如果它最终没有找到任何的消息源，一个空的StaticMessageSource将会被实例化，使它能够接受上述方法的调用。
- *
- * ResourceBundleMessageSource会用得更多一些，为此提供了一下示例：
+	当一个ApplicationContext被加载时，它会自动在context中查找已定义为MessageSource类型的bean。此bean的名称须为messageSource。
+ 如果找到，那么所有对上述方法的调用将被委托给该bean。否则ApplicationContext会在其父类中查找是否含有同名的bean。如果有，就把它
+ 作为MessageSource。如果它最终没有找到任何的消息源，一个空的StaticMessageSource将会被实例化，使它能够接受上述方法的调用。
+
+	ResourceBundleMessageSource会用得更多一些，为此提供了一下示例：
  <beans>
- <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
- <property name="basenames">
- <list>
- <value>format</value>
- <value>exceptions</value>
- <value>windows</value>
- </list>
- </property>
- </bean>
+	 <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		 <property name="basenames">
+			 <list>
+				 <value>format</value>
+				 <value>exceptions</value>
+				 <value>windows</value>
+			 </list>
+		 </property>
+	 </bean>
  </beans>
- 这段配置假定在你的classpath中有三个资源文件（resource bundle），它们是format，exceptions和windows。通过ResourceBundle，使用JDK中解析消息的标准方式，来处理任何解析消息的请求。出于示例的目的，假定上面的两个资源文件的内容为…
+ 	这段配置假定在你的classpath中有三个资源文件（resource bundle），它们是format，exceptions和windows。通过ResourceBundle，使用
+ JDK中解析消息的标准方式，来处理任何解析消息的请求。出于示例的目的，假定上面的两个资源文件的内容为…
 
  # in 'format.properties'
  message=Alligators rock!
@@ -112,14 +77,15 @@ public interface MessageSource {
  下面是测试代码。因为ApplicationContext实现也都实现了MessageSource接口，所以能被转型为MessageSource接口
 
  public static void main(String[] args) {
- MessageSource resources = new ClassPathXmlApplicationContext("beans.xml");
- String message = resources.getMessage("message", null, "Default", null);
- System.out.println(message);
+	 MessageSource resources = new ClassPathXmlApplicationContext("beans.xml");
+	 String message = resources.getMessage("message", null, "Default", null);
+	 System.out.println(message);
  }
  上述程序的输出结果将会是...
  Alligators rock!
 
- 总而言之，我们在'beans.xml'的文件中（在classpath根目录下）定义了一个messageSource bean，通过它的basenames属性引用多个资源文件；而basenames属性值由list元素所指定的三个值传入，它们以文件的形式存在并被放置在classpath的根目录下（分别为format.properties，exceptions.properties和windows.properties）。
+ 	总而言之，我们在'beans.xml'的文件中（在classpath根目录下）定义了一个messageSource bean，通过它的basenames属性引用多个资源文件；
+ 而basenames属性值由list元素所指定的三个值传入，它们以文件的形式存在并被放置在classpath的根目录下（分别为format.properties，exceptions.properties和windows.properties）。
 
 
 

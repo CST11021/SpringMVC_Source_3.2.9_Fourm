@@ -98,11 +98,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	//** List of bean definition names, in registration order */
 	// 按注册顺序保存BeanDefinition
 	private final List<String> beanDefinitionNames = new ArrayList<String>();
-	//** Whether bean definition metadata may be cached for all beans */
+	// 标识该工厂是否被冻结，冻结所有的BeanDefinition意味着已注册的bean定义将不再被修改或后处理
 	private boolean configurationFrozen = false;
-	//** Cached array of bean definition names in case of frozen configuration */
+	// 在冻结配置的情况下，将所有已注册的beanName存放到这里
 	private String[] frozenBeanDefinitionNames;
-
 
 
 	public DefaultListableBeanFactory() {
@@ -494,6 +493,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	protected boolean isBeanEligibleForMetadataCaching(String beanName) {
 		return (this.configurationFrozen || super.isBeanEligibleForMetadataCaching(beanName));
 	}
+	// 该方法用于初始化所有的单实例bean。
+	// ApplicationContext的初始化和BeanFactory有一个重大区别：BeanFactory在初始化容器时，并未实例化Bean，直到第一次访问某个Bean时才实例目标Bean；
+	// 而ApplicationContext则在初始化应用上下文时就实例化所有单实例的Bean。因此ApplicationContext的初始化时间会比BeanFactory稍长一些。
 	public void preInstantiateSingletons() throws BeansException {
 		if (this.logger.isInfoEnabled()) {
 			this.logger.info("Pre-instantiating singletons in " + this);
@@ -504,9 +506,11 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			// While this may not be part of the regular factory bootstrap, it does otherwise work fine.
 			beanNames = new ArrayList<String>(this.beanDefinitionNames);
 		}
+
 		for (String beanName : beanNames) {
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
+				// 判断是否为工厂bean
 				if (isFactoryBean(beanName)) {
 					final FactoryBean<?> factory = (FactoryBean<?>) getBean(FACTORY_BEAN_PREFIX + beanName);
 					boolean isEagerInit;
@@ -518,8 +522,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 						}, getAccessControlContext());
 					}
 					else {
-						isEagerInit = (factory instanceof SmartFactoryBean &&
-								((SmartFactoryBean<?>) factory).isEagerInit());
+						isEagerInit = (factory instanceof SmartFactoryBean && ((SmartFactoryBean<?>) factory).isEagerInit());
 					}
 					if (isEagerInit) {
 						getBean(beanName);
@@ -530,6 +533,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				}
 			}
 		}
+
 	}
 
 

@@ -16,45 +16,16 @@ public interface ConfigurableListableBeanFactory extends ListableBeanFactory, Au
 	// 注册一个与依赖类型相对应的自动绑定值
 	void registerResolvableDependency(Class<?> dependencyType, Object autowiredValue);
 
-	/**
-	 * Determine whether the specified bean qualifies as an autowire candidate,
-	 * to be injected into other beans which declare a dependency of matching type.
-	 * <p>This method checks ancestor factories as well.
-	 * @param beanName the name of the bean to check
-	 * @param descriptor the descriptor of the dependency to resolve
-	 * @return whether the bean should be considered as autowire candidate
-	 * @throws NoSuchBeanDefinitionException if there is no bean with the given name
-	 */
+	// 判断指定的bean是否具有自动注入的功能，并将其注入到其他bean中，这些bean声明了匹配类型的依赖关系。
 	boolean isAutowireCandidate(String beanName, DependencyDescriptor descriptor) throws NoSuchBeanDefinitionException;
 
-	/**
-	 * Return the registered BeanDefinition for the specified bean, allowing access
-	 * to its property values and constructor argument value (which can be
-	 * modified during bean factory post-processing).
-	 * <p>A returned BeanDefinition object should not be a copy but the original
-	 * definition object as registered in the factory. This means that it should
-	 * be castable to a more specific implementation type, if necessary.
-	 * <p><b>NOTE:</b> This method does <i>not</i> consider ancestor factories.
-	 * It is only meant for accessing local bean definitions of this factory.
-	 * @param beanName the name of the bean
-	 * @return the registered BeanDefinition
-	 * @throws NoSuchBeanDefinitionException if there is no bean with the given name
-	 * defined in this factory
-	 */
+	// 根据beanName返回一个BeanDefinition
 	BeanDefinition getBeanDefinition(String beanName) throws NoSuchBeanDefinitionException;
 
-	/**
-	 * Freeze all bean definitions, signalling that the registered bean definitions
-	 * will not be modified or post-processed any further.
-	 * <p>This allows the factory to aggressively cache bean definition metadata.
-	 */
+	// 冻结所有的bean定义，意味着已注册的bean定义将不再被修改或后处理。
 	void freezeConfiguration();
 
-	/**
-	 * Return whether this factory's bean definitions are frozen,
-	 * i.e. are not supposed to be modified or post-processed any further.
-	 * @return {@code true} if the factory's configuration is considered frozen
-	 */
+	// 返回该工厂的bean定义是否被冻结(也就是说，不应该被修改或后处理。)
 	boolean isConfigurationFrozen();
 
 	// 预加载不是懒加载的单例.用于解决循环依赖问题

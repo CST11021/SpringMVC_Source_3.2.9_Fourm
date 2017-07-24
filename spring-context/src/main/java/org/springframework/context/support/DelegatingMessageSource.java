@@ -34,19 +34,18 @@ import org.springframework.context.NoSuchMessageException;
  * @since 1.1.5
  * @see AbstractApplicationContext
  */
+// 如果Spring配置文件中没有配置名为“messageSource”的bean则，默认使用该来作为消息处理类
 public class DelegatingMessageSource extends MessageSourceSupport implements HierarchicalMessageSource {
 
 	private MessageSource parentMessageSource;
 
-
+	// HierarchicalMessageSource 接口方法
 	public void setParentMessageSource(MessageSource parent) {
 		this.parentMessageSource = parent;
 	}
-
 	public MessageSource getParentMessageSource() {
 		return this.parentMessageSource;
 	}
-
 
 	public String getMessage(String code, Object[] args, String defaultMessage, Locale locale) {
 		if (this.parentMessageSource != null) {
@@ -56,7 +55,6 @@ public class DelegatingMessageSource extends MessageSourceSupport implements Hie
 			return renderDefaultMessage(defaultMessage, args, locale);
 		}
 	}
-
 	public String getMessage(String code, Object[] args, Locale locale) throws NoSuchMessageException {
 		if (this.parentMessageSource != null) {
 			return this.parentMessageSource.getMessage(code, args, locale);
@@ -65,7 +63,6 @@ public class DelegatingMessageSource extends MessageSourceSupport implements Hie
 			throw new NoSuchMessageException(code, locale);
 		}
 	}
-
 	public String getMessage(MessageSourceResolvable resolvable, Locale locale) throws NoSuchMessageException {
 		if (this.parentMessageSource != null) {
 			return this.parentMessageSource.getMessage(resolvable, locale);

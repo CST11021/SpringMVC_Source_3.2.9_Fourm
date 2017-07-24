@@ -75,7 +75,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	// 工厂中的MessageSource bean的名称。如果没有提供，则将消息解析委托给父容器。
+	// 工厂中的MessageSource bean的名称。如果没有提供，则将消息解析委托给父容器，默认使用 DelegatingMessageSource。
 	public static final String MESSAGE_SOURCE_BEAN_NAME = "messageSource";
 	// 工厂中的 LifecycleProcessor（生命周期处理器）的bean名称。如果没有提供，默认使用 DefaultLifecycleProcessor 。
 	public static final String LIFECYCLE_PROCESSOR_BEAN_NAME = "lifecycleProcessor";
@@ -564,8 +564,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			if (this.parent != null && this.messageSource instanceof HierarchicalMessageSource) {
 				HierarchicalMessageSource hms = (HierarchicalMessageSource) this.messageSource;
 				if (hms.getParentMessageSource() == null) {
-					// Only set parent context as parent MessageSource if no parent MessageSource
-					// registered already.
+					// Only set parent context as parent MessageSource if no parent MessageSource registered already.
 					hms.setParentMessageSource(getInternalParentMessageSource());
 				}
 			}
@@ -580,8 +579,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			this.messageSource = dms;
 			beanFactory.registerSingleton(MESSAGE_SOURCE_BEAN_NAME, this.messageSource);
 			if (logger.isDebugEnabled()) {
-				logger.debug("Unable to locate MessageSource with name '" + MESSAGE_SOURCE_BEAN_NAME +
-						"': using default [" + this.messageSource + "]");
+				logger.debug("Unable to locate MessageSource with name '" + MESSAGE_SOURCE_BEAN_NAME + "': using default [" + this.messageSource + "]");
 			}
 		}
 	}
@@ -589,8 +587,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	protected void initApplicationEventMulticaster() {
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
 		if (beanFactory.containsLocalBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME)) {
-			this.applicationEventMulticaster =
-					beanFactory.getBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, ApplicationEventMulticaster.class);
+			this.applicationEventMulticaster = beanFactory.getBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, ApplicationEventMulticaster.class);
 			if (logger.isDebugEnabled()) {
 				logger.debug("Using ApplicationEventMulticaster [" + this.applicationEventMulticaster + "]");
 			}
@@ -600,8 +597,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			beanFactory.registerSingleton(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, this.applicationEventMulticaster);
 			if (logger.isDebugEnabled()) {
 				logger.debug("Unable to locate ApplicationEventMulticaster with name '" +
-						APPLICATION_EVENT_MULTICASTER_BEAN_NAME +
-						"': using default [" + this.applicationEventMulticaster + "]");
+						APPLICATION_EVENT_MULTICASTER_BEAN_NAME + "': using default [" + this.applicationEventMulticaster + "]");
 			}
 		}
 	}
@@ -658,13 +654,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		getApplicationEventMulticaster().addApplicationListener(listener);
 	}
 	// 11、初始化剩下的单实例（非惰性）
-	//完成BeanFactoryBean的初始化工作，其中包括ConversionService的设置，配置冻结以及非延迟加载的bean的初始化工作。
+	// 完成BeanFactoryBean的初始化工作，其中包括ConversionService的设置，配置冻结以及非延迟加载的bean的初始化工作。
+	// ApplicationContext 实现的默认行为就是在启动时将所有单例bean提前进行实例化。提前实例化意味着作为初始化过程的一部分，
+	// ApplicationContext实例会创建并配置所有的单例bean。通常情况下这时一件好事，因为这样在配置中的任何错误就会即刻被发现（否则的化可能要花很长时间来排查）。
+	// 而这个实例化的过程就是在finishBeanFactoryInitialization中完成的。
 	protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
 		// Initialize conversion service for this context.
-		if (beanFactory.containsBean(CONVERSION_SERVICE_BEAN_NAME) &&
-				beanFactory.isTypeMatch(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class)) {
-			beanFactory.setConversionService(
-					beanFactory.getBean(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class));
+		if (beanFactory.containsBean(CONVERSION_SERVICE_BEAN_NAME) && beanFactory.isTypeMatch(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class)) {
+			beanFactory.setConversionService(beanFactory.getBean(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class));
 		}
 
 		// Initialize LoadTimeWeaverAware beans early to allow for registering their transformers early.
@@ -676,10 +673,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		// Stop using the temporary ClassLoader for type matching.
 		beanFactory.setTempClassLoader(null);
 
-		// Allow for caching all bean definition metadata, not expecting further changes.
+		// 冻结所有的bean定义，意味着已注册的bean定义将不再被修改或后处理。
 		beanFactory.freezeConfiguration();
 
-		// Instantiate all remaining (non-lazy-init) singletons.
+		// 初始化所有的单实例bean
 		beanFactory.preInstantiateSingletons();
 	}
 	// 12、完成刷新过程，通知生命周期处理器lifecycleProcessor 刷新过程，同时发出ContextRefreshEvent通知别人
@@ -940,11 +937,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	public String getMessage(MessageSourceResolvable resolvable, Locale locale) throws NoSuchMessageException {
 		return getMessageSource().getMessage(resolvable, locale);
 	}
-	/**
-	 * Return the internal MessageSource used by the context.
-	 * @return the internal MessageSource (never {@code null})
-	 * @throws IllegalStateException if the context has not been initialized yet
-	 */
+	// 返回容器内部使用的MessageSource
 	private MessageSource getMessageSource() throws IllegalStateException {
 		if (this.messageSource == null) {
 			throw new IllegalStateException("MessageSource not initialized - " +
@@ -952,10 +945,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		}
 		return this.messageSource;
 	}
-	/**
-	 * Return the internal message source of the parent context if it is an
-	 * AbstractApplicationContext too; else, return the parent context itself.
-	 */
+	// 返回父上下文的内部消息源如果这是一个AbstractApplicationContext; 否则，返回父上下文中本身。
 	protected MessageSource getInternalParentMessageSource() {
 		return (getParent() instanceof AbstractApplicationContext) ?
 			((AbstractApplicationContext) getParent()).messageSource : getParent();

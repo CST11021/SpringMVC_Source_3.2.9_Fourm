@@ -9,7 +9,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-//提供一个适用于多并发环境的有序 key-value 容器
+// 提供一个适用于多并发环境的有序 key-value 容器
 public class MutablePropertySources implements PropertySources {
 
 	static final String NON_EXISTENT_PROPERTY_SOURCE_MESSAGE = "PropertySource named [%s] does not exist";

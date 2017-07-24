@@ -1,5 +1,6 @@
 package com.whz.i18n;
 
+import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -9,13 +10,8 @@ import java.util.Locale;
 
 public class I18nGreeting {
 
-	public static void main(String[] args) throws Exception {
-		rsrBdlMessageResource();
-//		rrsrBdlMessageResource();
-//		ctxMessageResource();
-	}
-
-	private static void rsrBdlMessageResource(){
+	@Test
+	public void rsrBdlMessageResource(){
 		String[] configs = {"com/whz/i18n/spring-i18n.xml"};
 		ApplicationContext ctx = new ClassPathXmlApplicationContext(configs);
 		
@@ -31,7 +27,8 @@ public class I18nGreeting {
 		
 	}
 
-	private static void rrsrBdlMessageResource() throws Exception {
+	@Test
+	public void rrsrBdlMessageResource() throws Exception {
 		String[] configs = {"com/whz/i18n/spring-i18n.xml"};
 		ApplicationContext ctx = new ClassPathXmlApplicationContext(configs);
 		
@@ -44,8 +41,9 @@ public class I18nGreeting {
 			Thread.currentThread().sleep(20000);
 		}	
 	}
-	
-	private static void ctxMessageResource() throws Exception {
+
+	@Test
+	public void ctxMessageResource() throws Exception {
 		String[] configs = {"com/whz/i18n/spring-i18n.xml"};
 		ApplicationContext ctx = new ClassPathXmlApplicationContext(configs);
 		Object[] params = {"John", new GregorianCalendar().getTime()};

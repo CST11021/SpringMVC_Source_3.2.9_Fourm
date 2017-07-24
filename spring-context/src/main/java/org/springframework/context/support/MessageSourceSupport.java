@@ -39,78 +39,38 @@ import org.springframework.util.ObjectUtils;
  * @since 2.5.5
  */
 public abstract class MessageSourceSupport {
+	protected final Log logger = LogFactory.getLog(getClass());
 
 	private static final MessageFormat INVALID_MESSAGE_FORMAT = new MessageFormat("");
 
-	/** Logger available to subclasses */
-	protected final Log logger = LogFactory.getLog(getClass());
-
+	// 标识是否总是应用MessageFormat规则
 	private boolean alwaysUseMessageFormat = false;
 
 	/**
 	 * Cache to hold already generated MessageFormats per message.
-	 * Used for passed-in default messages. MessageFormats for resolved
-	 * codes are cached on a specific basis in subclasses.
+	 * 缓存保存已生成的每个消息的messageformat。
+	 * Used for passed-in default messages.
+	 * 用于传递的默认消息。
+	 * MessageFormats for resolved codes are cached on a specific basis in subclasses.
+	 * 解析代码的消息格式缓存在子类中特定的基础上。
 	 */
-	private final Map<String, Map<Locale, MessageFormat>> messageFormatsPerMessage =
-			new HashMap<String, Map<Locale, MessageFormat>>();
+	private final Map<String, Map<Locale, MessageFormat>> messageFormatsPerMessage = new HashMap<String, Map<Locale, MessageFormat>>();
 
 
-	/**
-	 * Set whether to always apply the MessageFormat rules, parsing even
-	 * messages without arguments.
-	 * <p>Default is "false": Messages without arguments are by default
-	 * returned as-is, without parsing them through MessageFormat.
-	 * Set this to "true" to enforce MessageFormat for all messages,
-	 * expecting all message texts to be written with MessageFormat escaping.
-	 * <p>For example, MessageFormat expects a single quote to be escaped
-	 * as "''". If your message texts are all written with such escaping,
-	 * even when not defining argument placeholders, you need to set this
-	 * flag to "true". Else, only message texts with actual arguments
-	 * are supposed to be written with MessageFormat escaping.
-	 * @see java.text.MessageFormat
-	 */
 	public void setAlwaysUseMessageFormat(boolean alwaysUseMessageFormat) {
 		this.alwaysUseMessageFormat = alwaysUseMessageFormat;
 	}
-
-	/**
-	 * Return whether to always apply the MessageFormat rules, parsing even
-	 * messages without arguments.
-	 */
 	protected boolean isAlwaysUseMessageFormat() {
 		return this.alwaysUseMessageFormat;
 	}
 
-
-	/**
-	 * Render the given default message String. The default message is
-	 * passed in as specified by the caller and can be rendered into
-	 * a fully formatted default message shown to the user.
-	 * <p>The default implementation passes the String to {@code formatMessage},
-	 * resolving any argument placeholders found in them. Subclasses may override
-	 * this method to plug in custom processing of default messages.
-	 * @param defaultMessage the passed-in default message String
-	 * @param args array of arguments that will be filled in for params within
-	 * the message, or {@code null} if none.
-	 * @param locale the Locale used for formatting
-	 * @return the rendered default message (with resolved arguments)
-	 * @see #formatMessage(String, Object[], java.util.Locale)
-	 */
+	// 返回给定的默认消息字符串。默认的消息是由调用者指定的，并且可以被呈现为一个完全格式化的默认消息，显示给用户。
 	protected String renderDefaultMessage(String defaultMessage, Object[] args, Locale locale) {
 		return formatMessage(defaultMessage, args, locale);
 	}
 
-	/**
-	 * Format the given message String, using cached MessageFormats.
-	 * By default invoked for passed-in default messages, to resolve
-	 * any argument placeholders found in them.
-	 * @param msg the message to format
-	 * @param args array of arguments that will be filled in for params within
-	 * the message, or {@code null} if none
-	 * @param locale the Locale used for formatting
-	 * @return the formatted message (with resolved arguments)
-	 */
+	// 使用缓存的messageformat来格式化给定的消息字符串。
+	// 默认情况下，在默认情况下调用默认消息，以解决在其中找到的任何参数占位符。
 	protected String formatMessage(String msg, Object[] args, Locale locale) {
 		if (msg == null || (!this.alwaysUseMessageFormat && ObjectUtils.isEmpty(args))) {
 			return msg;
@@ -159,14 +119,7 @@ public abstract class MessageSourceSupport {
 		return new MessageFormat((msg != null ? msg : ""), locale);
 	}
 
-	/**
-	 * Template method for resolving argument objects.
-	 * <p>The default implementation simply returns the given argument array as-is.
-	 * Can be overridden in subclasses in order to resolve special argument types.
-	 * @param args the original argument array
-	 * @param locale the Locale to resolve against
-	 * @return the resolved argument array
-	 */
+	// 模板方法，用于被子类重写
 	protected Object[] resolveArguments(Object[] args, Locale locale) {
 		return args;
 	}

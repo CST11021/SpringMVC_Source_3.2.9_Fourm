@@ -66,18 +66,14 @@ import org.springframework.util.StringUtils;
  */
 public class ResourceBundleMessageSource extends AbstractMessageSource implements BeanClassLoaderAware {
 
+	// 表示配置的磨人的.properties文件，如：fmt_resource.properties
 	private String[] basenames = new String[0];
-
+	// .properties文件默认的编码格式
 	private String defaultEncoding;
-
 	private boolean fallbackToSystemLocale = true;
-
 	private long cacheMillis = -1;
-
 	private ClassLoader bundleClassLoader;
-
 	private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
-
 	/**
 	 * Cache to hold loaded ResourceBundles.
 	 * This Map is keyed with the bundle basename, which holds a Map that is
@@ -85,9 +81,7 @@ public class ResourceBundleMessageSource extends AbstractMessageSource implement
 	 * This allows for very efficient hash lookups, significantly faster
 	 * than the ResourceBundle class's own cache.
 	 */
-	private final Map<String, Map<Locale, ResourceBundle>> cachedResourceBundles =
-			new HashMap<String, Map<Locale, ResourceBundle>>();
-
+	private final Map<String, Map<Locale, ResourceBundle>> cachedResourceBundles = new HashMap<String, Map<Locale, ResourceBundle>>();
 	/**
 	 * Cache to hold already generated MessageFormats.
 	 * This Map is keyed with the ResourceBundle, which holds a Map that is
@@ -96,45 +90,12 @@ public class ResourceBundleMessageSource extends AbstractMessageSource implement
 	 * very efficient hash lookups without concatenated keys.
 	 * @see #getMessageFormat
 	 */
-	private final Map<ResourceBundle, Map<String, Map<Locale, MessageFormat>>> cachedBundleMessageFormats =
-			new HashMap<ResourceBundle, Map<String, Map<Locale, MessageFormat>>>();
+	private final Map<ResourceBundle, Map<String, Map<Locale, MessageFormat>>> cachedBundleMessageFormats = new HashMap<ResourceBundle, Map<String, Map<Locale, MessageFormat>>>();
 
 
-	/**
-	 * Set a single basename, following {@link java.util.ResourceBundle} conventions:
-	 * essentially, a fully-qualified classpath location. If it doesn't contain a
-	 * package qualifier (such as {@code org.mypackage}), it will be resolved
-	 * from the classpath root.
-	 * <p>Messages will normally be held in the "/lib" or "/classes" directory of
-	 * a web application's WAR structure. They can also be held in jar files on
-	 * the class path.
-	 * <p>Note that ResourceBundle names are effectively classpath locations: As a
-	 * consequence, the JDK's standard ResourceBundle treats dots as package separators.
-	 * This means that "test.theme" is effectively equivalent to "test/theme",
-	 * just like it is for programmatic {@code java.util.ResourceBundle} usage.
-	 * @see #setBasenames
-	 * @see java.util.ResourceBundle#getBundle(String)
-	 */
 	public void setBasename(String basename) {
 		setBasenames(basename);
 	}
-
-	/**
-	 * Set an array of basenames, each following {@link java.util.ResourceBundle}
-	 * conventions: essentially, a fully-qualified classpath location. If it
-	 * doesn't contain a package qualifier (such as {@code org.mypackage}),
-	 * it will be resolved from the classpath root.
-	 * <p>The associated resource bundles will be checked sequentially
-	 * when resolving a message code. Note that message definitions in a
-	 * <i>previous</i> resource bundle will override ones in a later bundle,
-	 * due to the sequential lookup.
-	 * <p>Note that ResourceBundle names are effectively classpath locations: As a
-	 * consequence, the JDK's standard ResourceBundle treats dots as package separators.
-	 * This means that "test.theme" is effectively equivalent to "test/theme",
-	 * just like it is for programmatic {@code java.util.ResourceBundle} usage.
-	 * @see #setBasename
-	 * @see java.util.ResourceBundle#getBundle(String)
-	 */
 	public void setBasenames(String... basenames) {
 		if (basenames != null) {
 			this.basenames = new String[basenames.length];
@@ -149,14 +110,6 @@ public class ResourceBundleMessageSource extends AbstractMessageSource implement
 		}
 	}
 
-	/**
-	 * Set the default charset to use for parsing resource bundle files.
-	 * <p>Default is none, using the {@code java.util.ResourceBundle}
-	 * default encoding: ISO-8859-1.
-	 * <p><b>NOTE: Only works on JDK 1.6 and higher.</b> Consider using
-	 * {@link ReloadableResourceBundleMessageSource} for JDK 1.5 support
-	 * and more flexibility in setting of an encoding per file.
-	 */
 	public void setDefaultEncoding(String defaultEncoding) {
 		this.defaultEncoding = defaultEncoding;
 	}
@@ -245,9 +198,9 @@ public class ResourceBundleMessageSource extends AbstractMessageSource implement
 	}
 
 	/**
-	 * Resolves the given message code as key in the registered resource bundles,
-	 * using a cached MessageFormat instance per message code.
+	 * Resolves the given message code as key in the registered resource bundles, using a cached MessageFormat instance per message code.
 	 */
+	// 将给定的消息代码解析为已注册资源包中的键，使用每个消息代码的缓存消息格式实例。
 	@Override
 	protected MessageFormat resolveCode(String code, Locale locale) {
 		MessageFormat messageFormat = null;
@@ -259,7 +212,6 @@ public class ResourceBundleMessageSource extends AbstractMessageSource implement
 		}
 		return messageFormat;
 	}
-
 
 	/**
 	 * Return a ResourceBundle for the given basename and code,
@@ -342,8 +294,7 @@ public class ResourceBundleMessageSource extends AbstractMessageSource implement
 	 * defined for the given code
 	 * @throws MissingResourceException if thrown by the ResourceBundle
 	 */
-	protected MessageFormat getMessageFormat(ResourceBundle bundle, String code, Locale locale)
-			throws MissingResourceException {
+	protected MessageFormat getMessageFormat(ResourceBundle bundle, String code, Locale locale) throws MissingResourceException {
 
 		synchronized (this.cachedBundleMessageFormats) {
 			Map<String, Map<Locale, MessageFormat>> codeMap = this.cachedBundleMessageFormats.get(bundle);
@@ -388,9 +339,7 @@ public class ResourceBundleMessageSource extends AbstractMessageSource implement
 		}
 	}
 
-	/**
-	 * Show the configuration of this MessageSource.
-	 */
+
 	@Override
 	public String toString() {
 		return getClass().getName() + ": basenames=[" +
