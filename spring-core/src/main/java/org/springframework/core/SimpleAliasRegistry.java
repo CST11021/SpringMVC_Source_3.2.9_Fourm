@@ -74,11 +74,8 @@ public class SimpleAliasRegistry implements AliasRegistry {
 		}
 	}
 
-	/**
-	 * Resolve all alias target names and aliases registered in this factory, applying the given StringValueResolver to them.
-	 * <p>The value resolver may for example resolve placeholders in target bean names and even in alias names.
-	 * @param valueResolver the StringValueResolver to apply
-	 */
+	// 解析本工厂中注册的所有别名目标名称和别名，将给定的StringValueResolver应用于它们
+	// 例如，值解析器可以在目标bean名称中解析占位符，甚至在别名中解析占位符。
 	public void resolveAliases(StringValueResolver valueResolver) {
 		Assert.notNull(valueResolver, "StringValueResolver must not be null");
 		synchronized (this.aliasMap) {

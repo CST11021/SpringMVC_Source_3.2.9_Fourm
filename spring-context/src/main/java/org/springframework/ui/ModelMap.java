@@ -41,31 +41,13 @@ import org.springframework.util.Assert;
 @SuppressWarnings("serial")
 public class ModelMap extends LinkedHashMap<String, Object> {
 
-	/**
-	 * Construct a new, empty {@code ModelMap}.
-	 */
-	public ModelMap() {
-	}
-
-	/**
-	 * Construct a new {@code ModelMap} containing the supplied attribute
-	 * under the supplied name.
-	 * @see #addAttribute(String, Object)
-	 */
+	public ModelMap() {}
 	public ModelMap(String attributeName, Object attributeValue) {
 		addAttribute(attributeName, attributeValue);
 	}
-
-	/**
-	 * Construct a new {@code ModelMap} containing the supplied attribute.
-	 * Uses attribute name generation to generate the key for the supplied model
-	 * object.
-	 * @see #addAttribute(Object)
-	 */
 	public ModelMap(Object attributeValue) {
 		addAttribute(attributeValue);
 	}
-
 
 	/**
 	 * Add the supplied attribute under the supplied name.

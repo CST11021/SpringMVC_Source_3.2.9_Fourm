@@ -11,6 +11,7 @@ import org.springframework.beans.factory.config.BeanDefinitionHolder;
 public interface NamespaceHandler {
 
 	// DefaultBeanDefinitionDocumentReader 实例化一个NamespaceHandler对象的时候会调用此方法
+	// 一般该方法中都会注册一些自定义标签对应的解析器，这样Spring解析的时候就能使用不同的解析器来解析不同的自定义标签
 	void init();
 
 	// 解析指定的的Element对象，并返回一个BeanDefinition对象

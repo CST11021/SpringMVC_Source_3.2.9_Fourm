@@ -57,7 +57,7 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 	private final ClassLoader classLoader;
 	//** Resource location to search for */
 	private final String handlerMappingsLocation;
-	//** Stores the mappings from namespace URI to NamespaceHandler class name / instance */
+	//** Stores the mappings from namespace URI to NamespaceHandler class name / instance */ 用来保存命名空间对应的处理器，如："http://www.springframework.org/schema/context"对应ContextNamespaceHandler.java
 	private volatile Map<String, Object> handlerMappings;
 
 
@@ -75,7 +75,7 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 
 
 	// Locate the {@link NamespaceHandler} for the supplied namespace URI from the configured mappings.
-	// 根据命名空间URI获取相应的处理器
+	// 根据命名空间URI获取相应的处理器，例如：命名空间为：http://www.springframework.org/schema/context 对应的处理器是 ContextNamespaceHandler.java
 	public NamespaceHandler resolve(String namespaceUri) {
 		Map<String, Object> handlerMappings = getHandlerMappings();
 		Object handlerOrClassName = handlerMappings.get(namespaceUri);
@@ -95,7 +95,7 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 				}
 				// 实例化NamespaceHandler对象
 				NamespaceHandler namespaceHandler = (NamespaceHandler) BeanUtils.instantiateClass(handlerClass);
-				// 初始化NamespaceHandler对象
+				// 初始化NamespaceHandler对象，一般该方法用来注册配置标签对应的解析器
 				namespaceHandler.init();
 				// 把NamespaceHandler对象缓存到handlerMappings对象中
 				handlerMappings.put(namespaceUri, namespaceHandler);

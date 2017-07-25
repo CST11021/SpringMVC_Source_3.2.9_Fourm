@@ -61,11 +61,9 @@ abstract class AbstractPropertyLoadingBeanDefinitionParser extends AbstractSingl
 			builder.addPropertyValue("order", Integer.valueOf(order));
 		}
 
-		builder.addPropertyValue("ignoreResourceNotFound",
-				Boolean.valueOf(element.getAttribute("ignore-resource-not-found")));
+		builder.addPropertyValue("ignoreResourceNotFound", Boolean.valueOf(element.getAttribute("ignore-resource-not-found")));
 
-		builder.addPropertyValue("localOverride",
-				Boolean.valueOf(element.getAttribute("local-override")));
+		builder.addPropertyValue("localOverride", Boolean.valueOf(element.getAttribute("local-override")));
 
 		builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 	}

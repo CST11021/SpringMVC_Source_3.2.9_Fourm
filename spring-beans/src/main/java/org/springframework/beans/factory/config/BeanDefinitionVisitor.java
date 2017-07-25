@@ -44,35 +44,19 @@ import org.springframework.util.StringValueResolver;
  * @see BeanDefinition#getConstructorArgumentValues
  * @see PropertyPlaceholderConfigurer
  */
+// 该类来访问BeanDefinition中的信息，以解决占位符问题
 public class BeanDefinitionVisitor {
 
 	private StringValueResolver valueResolver;
 
 
-	/**
-	 * Create a new BeanDefinitionVisitor, applying the specified
-	 * value resolver to all bean metadata values.
-	 * @param valueResolver the StringValueResolver to apply
-	 */
 	public BeanDefinitionVisitor(StringValueResolver valueResolver) {
 		Assert.notNull(valueResolver, "StringValueResolver must not be null");
 		this.valueResolver = valueResolver;
 	}
-
-	/**
-	 * Create a new BeanDefinitionVisitor for subclassing.
-	 * Subclasses need to override the {@link #resolveStringValue} method.
-	 */
-	protected BeanDefinitionVisitor() {
-	}
+	protected BeanDefinitionVisitor() {}
 
 
-	/**
-	 * Traverse the given BeanDefinition object and the MutablePropertyValues
-	 * and ConstructorArgumentValues contained in them.
-	 * @param beanDefinition the BeanDefinition object to traverse
-	 * @see #resolveStringValue(String)
-	 */
 	public void visitBeanDefinition(BeanDefinition beanDefinition) {
 		visitParentName(beanDefinition);
 		visitBeanClassName(beanDefinition);
@@ -84,7 +68,6 @@ public class BeanDefinitionVisitor {
 		visitIndexedArgumentValues(cas.getIndexedArgumentValues());
 		visitGenericArgumentValues(cas.getGenericArgumentValues());
 	}
-
 	protected void visitParentName(BeanDefinition beanDefinition) {
 		String parentName = beanDefinition.getParentName();
 		if (parentName != null) {
@@ -94,7 +77,6 @@ public class BeanDefinitionVisitor {
 			}
 		}
 	}
-
 	protected void visitBeanClassName(BeanDefinition beanDefinition) {
 		String beanClassName = beanDefinition.getBeanClassName();
 		if (beanClassName != null) {
@@ -104,7 +86,6 @@ public class BeanDefinitionVisitor {
 			}
 		}
 	}
-
 	protected void visitFactoryBeanName(BeanDefinition beanDefinition) {
 		String factoryBeanName = beanDefinition.getFactoryBeanName();
 		if (factoryBeanName != null) {
@@ -114,7 +95,6 @@ public class BeanDefinitionVisitor {
 			}
 		}
 	}
-
 	protected void visitFactoryMethodName(BeanDefinition beanDefinition) {
 		String factoryMethodName = beanDefinition.getFactoryMethodName();
 		if (factoryMethodName != null) {
@@ -124,7 +104,6 @@ public class BeanDefinitionVisitor {
 			}
 		}
 	}
-
 	protected void visitScope(BeanDefinition beanDefinition) {
 		String scope = beanDefinition.getScope();
 		if (scope != null) {
@@ -134,7 +113,6 @@ public class BeanDefinitionVisitor {
 			}
 		}
 	}
-
 	protected void visitPropertyValues(MutablePropertyValues pvs) {
 		PropertyValue[] pvArray = pvs.getPropertyValues();
 		for (PropertyValue pv : pvArray) {
@@ -144,7 +122,6 @@ public class BeanDefinitionVisitor {
 			}
 		}
 	}
-
 	protected void visitIndexedArgumentValues(Map<Integer, ConstructorArgumentValues.ValueHolder> ias) {
 		for (ConstructorArgumentValues.ValueHolder valueHolder : ias.values()) {
 			Object newVal = resolveValue(valueHolder.getValue());
@@ -153,7 +130,6 @@ public class BeanDefinitionVisitor {
 			}
 		}
 	}
-
 	protected void visitGenericArgumentValues(List<ConstructorArgumentValues.ValueHolder> gas) {
 		for (ConstructorArgumentValues.ValueHolder valueHolder : gas) {
 			Object newVal = resolveValue(valueHolder.getValue());
@@ -162,7 +138,6 @@ public class BeanDefinitionVisitor {
 			}
 		}
 	}
-
 	@SuppressWarnings("rawtypes")
 	protected Object resolveValue(Object value) {
 		if (value instanceof BeanDefinition) {
@@ -210,7 +185,6 @@ public class BeanDefinitionVisitor {
 		}
 		return value;
 	}
-
 	protected void visitArray(Object[] arrayVal) {
 		for (int i = 0; i < arrayVal.length; i++) {
 			Object elem = arrayVal[i];
@@ -220,7 +194,6 @@ public class BeanDefinitionVisitor {
 			}
 		}
 	}
-
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	protected void visitList(List listVal) {
 		for (int i = 0; i < listVal.size(); i++) {
@@ -231,7 +204,6 @@ public class BeanDefinitionVisitor {
 			}
 		}
 	}
-
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	protected void visitSet(Set setVal) {
 		Set newContent = new LinkedHashSet();
@@ -248,7 +220,6 @@ public class BeanDefinitionVisitor {
 			setVal.addAll(newContent);
 		}
 	}
-
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	protected void visitMap(Map<?, ?> mapVal) {
 		Map newContent = new LinkedHashMap();
@@ -269,11 +240,8 @@ public class BeanDefinitionVisitor {
 		}
 	}
 
-	/**
-	 * Resolve the given String value, for example parsing placeholders.
-	 * @param strVal the original String value
-	 * @return the resolved String value
-	 */
+
+	// 翻译占位符
 	protected String resolveStringValue(String strVal) {
 		if (this.valueResolver == null) {
 			throw new IllegalStateException("No StringValueResolver specified - pass a resolver " +

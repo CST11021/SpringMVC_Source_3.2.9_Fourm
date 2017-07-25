@@ -73,8 +73,7 @@ public abstract class ValidationUtils {
 			logger.debug("Invoking validator [" + validator + "]");
 		}
 		if (obj != null && !validator.supports(obj.getClass())) {
-			throw new IllegalArgumentException(
-					"Validator [" + validator.getClass() + "] does not support [" + obj.getClass() + "]");
+			throw new IllegalArgumentException("Validator [" + validator.getClass() + "] does not support [" + obj.getClass() + "]");
 		}
 		if (!ObjectUtils.isEmpty(validationHints) && validator instanceof SmartValidator) {
 			((SmartValidator) validator).validate(obj, errors, validationHints);
@@ -91,7 +90,6 @@ public abstract class ValidationUtils {
 			}
 		}
 	}
-
 
 	/**
 	 * Reject the given field with the given error code if the value is empty.
@@ -158,8 +156,7 @@ public abstract class ValidationUtils {
 	 * (can be {@code null})
 	 * @param defaultMessage fallback default message
 	 */
-	public static void rejectIfEmpty(
-			Errors errors, String field, String errorCode, Object[] errorArgs, String defaultMessage) {
+	public static void rejectIfEmpty(Errors errors, String field, String errorCode, Object[] errorArgs, String defaultMessage) {
 
 		Assert.notNull(errors, "Errors object must not be null");
 		Object value = errors.getFieldValue(field);
@@ -197,9 +194,7 @@ public abstract class ValidationUtils {
 	 * @param errorCode the error code, interpretable as message key
 	 * @param defaultMessage fallback default message
 	 */
-	public static void rejectIfEmptyOrWhitespace(
-			Errors errors, String field, String errorCode, String defaultMessage) {
-
+	public static void rejectIfEmptyOrWhitespace(Errors errors, String field, String errorCode, String defaultMessage) {
 		rejectIfEmptyOrWhitespace(errors, field, errorCode, null, defaultMessage);
 	}
 
@@ -217,9 +212,7 @@ public abstract class ValidationUtils {
 	 * @param errorArgs the error arguments, for argument binding via MessageFormat
 	 * (can be {@code null})
 	 */
-	public static void rejectIfEmptyOrWhitespace(
-			Errors errors, String field, String errorCode, Object[] errorArgs) {
-
+	public static void rejectIfEmptyOrWhitespace(Errors errors, String field, String errorCode, Object[] errorArgs) {
 		rejectIfEmptyOrWhitespace(errors, field, errorCode, errorArgs, null);
 	}
 
@@ -238,8 +231,7 @@ public abstract class ValidationUtils {
 	 * (can be {@code null})
 	 * @param defaultMessage fallback default message
 	 */
-	public static void rejectIfEmptyOrWhitespace(
-			Errors errors, String field, String errorCode, Object[] errorArgs, String defaultMessage) {
+	public static void rejectIfEmptyOrWhitespace(Errors errors, String field, String errorCode, Object[] errorArgs, String defaultMessage) {
 
 		Assert.notNull(errors, "Errors object must not be null");
 		Object value = errors.getFieldValue(field);

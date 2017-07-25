@@ -119,7 +119,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 						parseDefaultElement(ele, delegate);
 					}
 					else {
-						// 解析自定义命名空间的标签
+						// 解析自定义命名空间的标签：定义命名空间的处理器都定义在spring.handlers文件中
 						delegate.parseCustomElement(ele);
 					}
 				}

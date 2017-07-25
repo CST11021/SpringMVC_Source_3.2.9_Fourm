@@ -28,115 +28,25 @@ import org.springframework.util.DefaultPropertiesPersister;
 import org.springframework.util.PropertiesPersister;
 
 /**
- * Base class for JavaBean-style components that need to load properties
- * from one or more resources. Supports local properties as well, with
- * configurable overriding.
+ * Base class for JavaBean-style components that need to load properties from one or more resources.
+ * Supports local properties as well, with configurable overriding.
  *
  * @author Juergen Hoeller
  * @since 1.2.2
  */
 public abstract class PropertiesLoaderSupport {
-
-	/** Logger available to subclasses */
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	protected Properties[] localProperties;
-
+	// 标识是否允许从文件读取的属性来覆盖掉本地默认的属性
 	protected boolean localOverride = false;
-
 	private Resource[] locations;
-
 	private boolean ignoreResourceNotFound = false;
-
 	private String fileEncoding;
-
 	private PropertiesPersister propertiesPersister = new DefaultPropertiesPersister();
 
 
-	/**
-	 * Set local properties, e.g. via the "props" tag in XML bean definitions.
-	 * These can be considered defaults, to be overridden by properties
-	 * loaded from files.
-	 */
-	public void setProperties(Properties properties) {
-		this.localProperties = new Properties[] {properties};
-	}
-
-	/**
-	 * Set local properties, e.g. via the "props" tag in XML bean definitions,
-	 * allowing for merging multiple properties sets into one.
-	 */
-	public void setPropertiesArray(Properties[] propertiesArray) {
-		this.localProperties = propertiesArray;
-	}
-
-	/**
-	 * Set a location of a properties file to be loaded.
-	 * <p>Can point to a classic properties file or to an XML file
-	 * that follows JDK 1.5's properties XML format.
-	 */
-	public void setLocation(Resource location) {
-		this.locations = new Resource[] {location};
-	}
-
-	/**
-	 * Set locations of properties files to be loaded.
-	 * <p>Can point to classic properties files or to XML files
-	 * that follow JDK 1.5's properties XML format.
-	 * <p>Note: Properties defined in later files will override
-	 * properties defined earlier files, in case of overlapping keys.
-	 * Hence, make sure that the most specific files are the last
-	 * ones in the given list of locations.
-	 */
-	public void setLocations(Resource[] locations) {
-		this.locations = locations;
-	}
-
-	/**
-	 * Set whether local properties override properties from files.
-	 * <p>Default is "false": Properties from files override local defaults.
-	 * Can be switched to "true" to let local properties override defaults
-	 * from files.
-	 */
-	public void setLocalOverride(boolean localOverride) {
-		this.localOverride = localOverride;
-	}
-
-	/**
-	 * Set if failure to find the property resource should be ignored.
-	 * <p>"true" is appropriate if the properties file is completely optional.
-	 * Default is "false".
-	 */
-	public void setIgnoreResourceNotFound(boolean ignoreResourceNotFound) {
-		this.ignoreResourceNotFound = ignoreResourceNotFound;
-	}
-
-	/**
-	 * Set the encoding to use for parsing properties files.
-	 * <p>Default is none, using the {@code java.util.Properties}
-	 * default encoding.
-	 * <p>Only applies to classic properties files, not to XML files.
-	 * @see org.springframework.util.PropertiesPersister#load
-	 */
-	public void setFileEncoding(String encoding) {
-		this.fileEncoding = encoding;
-	}
-
-	/**
-	 * Set the PropertiesPersister to use for parsing properties files.
-	 * The default is DefaultPropertiesPersister.
-	 * @see org.springframework.util.DefaultPropertiesPersister
-	 */
-	public void setPropertiesPersister(PropertiesPersister propertiesPersister) {
-		this.propertiesPersister =
-				(propertiesPersister != null ? propertiesPersister : new DefaultPropertiesPersister());
-	}
-
-
-	/**
-	 * Return a merged Properties instance containing both the
-	 * loaded properties and properties set on this FactoryBean.
-	 */
+	// 返回一个合并的Properties实例，该实例包含在这个FactoryBean上设置的已加载的属性和属性。
 	protected Properties mergeProperties() throws IOException {
 		Properties result = new Properties();
 
@@ -158,13 +68,7 @@ public abstract class PropertiesLoaderSupport {
 
 		return result;
 	}
-
-	/**
-	 * Load properties into the given instance.
-	 * @param props the Properties instance to load into
-	 * @throws IOException in case of I/O errors
-	 * @see #setLocations
-	 */
+	// 解析 this.locations 指向的属性文件，并加载到指定的 Properties 对象中
 	protected void loadProperties(Properties props) throws IOException {
 		if (this.locations != null) {
 			for (Resource location : this.locations) {
@@ -172,8 +76,7 @@ public abstract class PropertiesLoaderSupport {
 					logger.info("Loading properties file from " + location);
 				}
 				try {
-					PropertiesLoaderUtils.fillProperties(
-							props, new EncodedResource(location, this.fileEncoding), this.propertiesPersister);
+					PropertiesLoaderUtils.fillProperties(props, new EncodedResource(location, this.fileEncoding), this.propertiesPersister);
 				}
 				catch (IOException ex) {
 					if (this.ignoreResourceNotFound) {
@@ -189,4 +92,30 @@ public abstract class PropertiesLoaderSupport {
 		}
 	}
 
+
+	// setter ...
+	public void setProperties(Properties properties) {
+		this.localProperties = new Properties[] {properties};
+	}
+	public void setPropertiesArray(Properties[] propertiesArray) {
+		this.localProperties = propertiesArray;
+	}
+	public void setLocation(Resource location) {
+		this.locations = new Resource[] {location};
+	}
+	public void setLocations(Resource[] locations) {
+		this.locations = locations;
+	}
+	public void setLocalOverride(boolean localOverride) {
+		this.localOverride = localOverride;
+	}
+	public void setIgnoreResourceNotFound(boolean ignoreResourceNotFound) {
+		this.ignoreResourceNotFound = ignoreResourceNotFound;
+	}
+	public void setFileEncoding(String encoding) {
+		this.fileEncoding = encoding;
+	}
+	public void setPropertiesPersister(PropertiesPersister propertiesPersister) {
+		this.propertiesPersister = (propertiesPersister != null ? propertiesPersister : new DefaultPropertiesPersister());
+	}
 }

@@ -29,27 +29,21 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * Provides methods to support various naming and other conventions used
- * throughout the framework. Mainly for internal use within the framework.
+ * Provides methods to support various naming and other conventions used throughout the framework.
+ * Mainly for internal use within the framework.
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
  * @since 2.0
  */
+// 提供方法来支持在整个框架中使用的各种命名和其他约定。该类主要用于框架内部
 public abstract class Conventions {
 
-	/**
-	 * Suffix added to names when using arrays.
-	 */
+	// 使用数组时添加的数组后缀
 	private static final String PLURAL_SUFFIX = "List";
 
-
-	/**
-	 * Set of interfaces that are supposed to be ignored
-	 * when searching for the 'primary' interface of a proxy.
-	 */
+	// 在搜索代理的“主”接口时，应该忽略这些接口。
 	private static final Set<Class> ignoredInterfaces = new HashSet<Class>();
-
 	static {
 		ignoredInterfaces.add(Serializable.class);
 		ignoredInterfaces.add(Externalizable.class);
@@ -57,22 +51,7 @@ public abstract class Conventions {
 		ignoredInterfaces.add(Comparable.class);
 	}
 
-
-	/**
-	 * Determine the conventional variable name for the supplied
-	 * {@code Object} based on its concrete type. The convention
-	 * used is to return the uncapitalized short name of the {@code Class},
-	 * according to JavaBeans property naming rules: So,
-	 * {@code com.myapp.Product} becomes {@code product};
-	 * {@code com.myapp.MyProduct} becomes {@code myProduct};
-	 * {@code com.myapp.UKProduct} becomes {@code UKProduct}.
-	 * <p>For arrays, we use the pluralized version of the array component type.
-	 * For {@code Collection}s we attempt to 'peek ahead' in the
-	 * {@code Collection} to determine the component type and
-	 * return the pluralized version of that component type.
-	 * @param value the value to generate a variable name for
-	 * @return the generated variable name
-	 */
+	// 根据其具体类型确定所提供对象的常规变量名。返回类的小写短名称
 	public static String getVariableName(Object value) {
 		Assert.notNull(value, "Value must not be null");
 		Class valueClass;
@@ -245,10 +224,8 @@ public abstract class Conventions {
 		return enclosingClass.getName() + "." + attributeName;
 	}
 
-
 	/**
-	 * Determines the class to use for naming a variable that contains
-	 * the given value.
+	 * Determines the class to use for naming a variable that contains the given value.
 	 * <p>Will return the class of the given value, except when
 	 * encountering a JDK proxy, in which case it will determine
 	 * the 'primary' interface implemented by that proxy.
@@ -266,35 +243,26 @@ public abstract class Conventions {
 			}
 		}
 		else if (valueClass.getName().lastIndexOf('$') != -1 && valueClass.getDeclaringClass() == null) {
-			// '$' in the class name but no inner class -
-			// assuming it's a special subclass (e.g. by OpenJPA)
+			// '$' in the class name but no inner class assuming it's a special subclass (e.g. by OpenJPA)
 			valueClass = valueClass.getSuperclass();
 		}
 		return valueClass;
 	}
 
-	/**
-	 * Pluralize the given name.
-	 */
+	// name + "List"
 	private static String pluralize(String name) {
 		return name + PLURAL_SUFFIX;
 	}
 
-	/**
-	 * Retrieves the {@code Class} of an element in the {@code Collection}.
-	 * The exact element for which the {@code Class} is retreived will depend
-	 * on the concrete {@code Collection} implementation.
-	 */
+	// 返回collection的第一个元素
 	private static Object peekAhead(Collection collection) {
 		Iterator it = collection.iterator();
 		if (!it.hasNext()) {
-			throw new IllegalStateException(
-					"Unable to peek ahead in non-empty collection - no element found");
+			throw new IllegalStateException("Unable to peek ahead in non-empty collection - no element found");
 		}
 		Object value = it.next();
 		if (value == null) {
-			throw new IllegalStateException(
-					"Unable to peek ahead in non-empty collection - only null element found");
+			throw new IllegalStateException("Unable to peek ahead in non-empty collection - only null element found");
 		}
 		return value;
 	}

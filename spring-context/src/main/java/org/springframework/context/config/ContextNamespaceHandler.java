@@ -30,6 +30,12 @@ import org.springframework.context.annotation.ComponentScanBeanDefinitionParser;
  */
 public class ContextNamespaceHandler extends NamespaceHandlerSupport {
 
+	// 初始化方法：用来告诉Spring解析XML时，如果遇到以下的配置标签，则应该使用相应的解析器来进行处理。
+	// 如：
+	// <!-- 扫描com.whz.dao包下所有标注@Repository的DAO组件 -->
+	// <context:component-scan base-package="com.whz.dao"/>
+	// <!--获取jdbc.properties文件-->
+	// <context:property-placeholder location="classpath:jdbc.properties"/>
 	public void init() {
 		registerBeanDefinitionParser("property-placeholder", new PropertyPlaceholderBeanDefinitionParser());
 		registerBeanDefinitionParser("property-override", new PropertyOverrideBeanDefinitionParser());

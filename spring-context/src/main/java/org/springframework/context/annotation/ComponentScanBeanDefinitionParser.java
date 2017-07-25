@@ -50,28 +50,19 @@ import org.springframework.util.StringUtils;
  * @author Juergen Hoeller
  * @since 2.5
  */
+// 该类主要用来解析<context:component-scan/>标签。例如，扫描com.whz.service包下所有使用Spring的注解，如@Service，则需配置：<context:component-scan base-package="com.whz.service"/>
 public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 
 	private static final String BASE_PACKAGE_ATTRIBUTE = "base-package";
-
 	private static final String RESOURCE_PATTERN_ATTRIBUTE = "resource-pattern";
-
 	private static final String USE_DEFAULT_FILTERS_ATTRIBUTE = "use-default-filters";
-
 	private static final String ANNOTATION_CONFIG_ATTRIBUTE = "annotation-config";
-
 	private static final String NAME_GENERATOR_ATTRIBUTE = "name-generator";
-
 	private static final String SCOPE_RESOLVER_ATTRIBUTE = "scope-resolver";
-
 	private static final String SCOPED_PROXY_ATTRIBUTE = "scoped-proxy";
-
 	private static final String EXCLUDE_FILTER_ELEMENT = "exclude-filter";
-
 	private static final String INCLUDE_FILTER_ELEMENT = "include-filter";
-
 	private static final String FILTER_TYPE_ATTRIBUTE = "type";
-
 	private static final String FILTER_EXPRESSION_ATTRIBUTE = "expression";
 
 
@@ -129,8 +120,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 		return new ClassPathBeanDefinitionScanner(readerContext.getRegistry(), useDefaultFilters);
 	}
 
-	protected void registerComponents(
-			XmlReaderContext readerContext, Set<BeanDefinitionHolder> beanDefinitions, Element element) {
+	protected void registerComponents(XmlReaderContext readerContext, Set<BeanDefinitionHolder> beanDefinitions, Element element) {
 
 		Object source = readerContext.extractSource(element);
 		CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(element.getTagName(), source);
@@ -194,8 +184,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 		}
 	}
 
-	protected void parseTypeFilters(
-			Element element, ClassPathBeanDefinitionScanner scanner, XmlReaderContext readerContext, ParserContext parserContext) {
+	protected void parseTypeFilters(Element element, ClassPathBeanDefinitionScanner scanner, XmlReaderContext readerContext, ParserContext parserContext) {
 
 		// Parse exclude and include filter elements.
 		ClassLoader classLoader = scanner.getResourceLoader().getClassLoader();

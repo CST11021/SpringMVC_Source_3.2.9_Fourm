@@ -58,21 +58,18 @@ import java.util.Properties;
 public class DefaultPropertiesPersister implements PropertiesPersister {
 
 	// Determine whether Properties.load(Reader) is available (on JDK 1.6+)
-	private static final boolean loadFromReaderAvailable =
-			ClassUtils.hasMethod(Properties.class, "load", new Class[] {Reader.class});
-
+	private static final boolean loadFromReaderAvailable = ClassUtils.hasMethod(Properties.class, "load", new Class[] {Reader.class});
 	// Determine whether Properties.store(Writer, String) is available (on JDK 1.6+)
-	private static final boolean storeToWriterAvailable =
-			ClassUtils.hasMethod(Properties.class, "store", new Class[] {Writer.class, String.class});
+	private static final boolean storeToWriterAvailable = ClassUtils.hasMethod(Properties.class, "store", new Class[] {Writer.class, String.class});
 
-
+	// 将.properties文件中的配置属性载入Properties实例中
 	public void load(Properties props, InputStream is) throws IOException {
 		props.load(is);
 	}
-
 	public void load(Properties props, Reader reader) throws IOException {
 		if (loadFromReaderAvailable) {
 			// On JDK 1.6+
+			// load方法，将.properties文件中的配置属性载入Properties实例中
 			props.load(reader);
 		}
 		else {
@@ -80,7 +77,6 @@ public class DefaultPropertiesPersister implements PropertiesPersister {
 			doLoad(props, reader);
 		}
 	}
-
 	protected void doLoad(Properties props, Reader reader) throws IOException {
 		BufferedReader in = new BufferedReader(reader);
 		while (true) {
@@ -112,7 +108,55 @@ public class DefaultPropertiesPersister implements PropertiesPersister {
 			}
 		}
 	}
+	// 从.xml文件中读取properties，如：
+	// <properties>
+	// 	<entry key="username">xuzengqiang</entry>
+	// 	<entry key="email">253948113@qq.com</entry>
+	// </properties>
+	public void loadFromXml(Properties props, InputStream is) throws IOException {
+		props.loadFromXML(is);
+	}
 
+
+	// 将props集合保存到流中
+	public void store(Properties props, OutputStream os, String header) throws IOException {
+		props.store(os, header);
+	}
+	public void store(Properties props, Writer writer, String header) throws IOException {
+		if (storeToWriterAvailable) {
+			// On JDK 1.6+
+			props.store(writer, header);
+		}
+		else {
+			// Fall back to manual parsing.
+			doStore(props, writer, header);
+		}
+	}
+	protected void doStore(Properties props, Writer writer, String header) throws IOException {
+		BufferedWriter out = new BufferedWriter(writer);
+		if (header != null) {
+			out.write("#" + header);
+			out.newLine();
+		}
+		out.write("#" + new Date());
+		out.newLine();
+		for (Enumeration keys = props.keys(); keys.hasMoreElements();) {
+			String key = (String) keys.nextElement();
+			String val = props.getProperty(key);
+			out.write(escape(key, true) + "=" + escape(val, false));
+			out.newLine();
+		}
+		out.flush();
+	}
+	public void storeToXml(Properties props, OutputStream os, String header) throws IOException {
+		props.storeToXML(os, header);
+	}
+	public void storeToXml(Properties props, OutputStream os, String header, String encoding) throws IOException {
+		props.storeToXML(os, header, encoding);
+	}
+
+
+	// 如果字符串是奇数个‘\’结尾则返回true，否则返回false
 	protected boolean endsWithContinuationMarker(String line) {
 		boolean evenSlashCount = true;
 		int index = line.length() - 1;
@@ -122,7 +166,7 @@ public class DefaultPropertiesPersister implements PropertiesPersister {
 		}
 		return !evenSlashCount;
 	}
-
+	// 翻译字符串中的这些特殊符号，如：ab\tcd\fe --> ab	  cd e
 	protected String unescape(String str) {
 		StringBuilder result = new StringBuilder(str.length());
 		for (int index = 0; index < str.length();) {
@@ -146,40 +190,6 @@ public class DefaultPropertiesPersister implements PropertiesPersister {
 		}
 		return result.toString();
 	}
-
-
-	public void store(Properties props, OutputStream os, String header) throws IOException {
-		props.store(os, header);
-	}
-
-	public void store(Properties props, Writer writer, String header) throws IOException {
-		if (storeToWriterAvailable) {
-			// On JDK 1.6+
-			props.store(writer, header);
-		}
-		else {
-			// Fall back to manual parsing.
-			doStore(props, writer, header);
-		}
-	}
-
-	protected void doStore(Properties props, Writer writer, String header) throws IOException {
-		BufferedWriter out = new BufferedWriter(writer);
-		if (header != null) {
-			out.write("#" + header);
-			out.newLine();
-		}
-		out.write("#" + new Date());
-		out.newLine();
-		for (Enumeration keys = props.keys(); keys.hasMoreElements();) {
-			String key = (String) keys.nextElement();
-			String val = props.getProperty(key);
-			out.write(escape(key, true) + "=" + escape(val, false));
-			out.newLine();
-		}
-		out.flush();
-	}
-
 	protected String escape(String str, boolean isKey) {
 		int len = str.length();
 		StringBuilder result = new StringBuilder(len * 2);
@@ -217,17 +227,5 @@ public class DefaultPropertiesPersister implements PropertiesPersister {
 		return result.toString();
 	}
 
-
-	public void loadFromXml(Properties props, InputStream is) throws IOException {
-		props.loadFromXML(is);
-	}
-
-	public void storeToXml(Properties props, OutputStream os, String header) throws IOException {
-		props.storeToXML(os, header);
-	}
-
-	public void storeToXml(Properties props, OutputStream os, String header, String encoding) throws IOException {
-		props.storeToXML(os, header, encoding);
-	}
 
 }

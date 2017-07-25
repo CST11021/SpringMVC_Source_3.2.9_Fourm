@@ -31,6 +31,7 @@ import org.springframework.util.StringUtils;
  * @author Chris Beams
  * @since 2.5
  */
+// 该解析器用来解析<context:property-placeholder/>标签
 class PropertyPlaceholderBeanDefinitionParser extends AbstractPropertyLoadingBeanDefinitionParser {
 
 	private static final String SYSTEM_PROPERTIES_MODE_ATTRIB = "system-properties-mode";
@@ -46,8 +47,7 @@ class PropertyPlaceholderBeanDefinitionParser extends AbstractPropertyLoadingBea
 			return PropertySourcesPlaceholderConfigurer.class;
 		}
 
-		// the user has explicitly specified a value for system-properties-mode. Revert
-		// to PropertyPlaceholderConfigurer to ensure backward compatibility.
+		// the user has explicitly specified a value for system-properties-mode. Revert to PropertyPlaceholderConfigurer to ensure backward compatibility.
 		return PropertyPlaceholderConfigurer.class;
 	}
 
@@ -55,8 +55,7 @@ class PropertyPlaceholderBeanDefinitionParser extends AbstractPropertyLoadingBea
 	protected void doParse(Element element, BeanDefinitionBuilder builder) {
 		super.doParse(element, builder);
 
-		builder.addPropertyValue("ignoreUnresolvablePlaceholders",
-				Boolean.valueOf(element.getAttribute("ignore-unresolvable")));
+		builder.addPropertyValue("ignoreUnresolvablePlaceholders", Boolean.valueOf(element.getAttribute("ignore-unresolvable")));
 
 		String systemPropertiesModeName = element.getAttribute(SYSTEM_PROPERTIES_MODE_ATTRIB);
 		if (StringUtils.hasLength(systemPropertiesModeName) &&
