@@ -22,12 +22,12 @@ public class AspectJTest {
 
     @Before("test()")
     public void beforeTest() {
-        System.out.println("beforeTest");
+        System.out.println("beforeTest2");
     }
 
     @After("test()")
     public void afterTest() {
-        System.out.println("afterTest");
+        System.out.println("afterTest2");
     }
 
     @Around("test()")
@@ -48,45 +48,9 @@ public class AspectJTest {
     @Test
     public void t() {
 
-//        ApplicationContext context = new ClassPathXmlApplicationContext("com/whz/aspectJ/aspectJConfig.xml");
-//        TestBean bean = (TestBean) context.getBean("test");
-//        bean.test();
-
-
-
-        Annotation annotation2 = new RequestMapping() {
-            public Class<? extends Annotation> annotationType() {
-                return RequestMapping.class;
-            }
-
-            public String[] value() {
-                return new String[]{"value1","value2"};
-            }
-
-            public String[] params() {
-                return new String[]{"param1","param1"};
-            }
-
-            public RequestMethod[] method() {
-                return new RequestMethod[0];
-            }
-
-            public String[] headers() {
-                return new String[0];
-            }
-
-            public String[] consumes() {
-                return new String[0];
-            }
-
-            public String[] produces() {
-                return new String[0];
-            }
-        };
-
-        TestBean testBean = new TestBean();
-        AnnotationBeanUtils.copyPropertiesToBean(annotation2, testBean, "method", "headers", "consumes", "produces");
-        System.out.print("");
+        ApplicationContext context = new ClassPathXmlApplicationContext("com/whz/aspectJ/aspectJConfig.xml");
+        TestBean bean = (TestBean) context.getBean("test");
+        bean.test();
 
     }
 

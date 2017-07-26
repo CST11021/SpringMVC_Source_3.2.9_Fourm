@@ -569,6 +569,7 @@
             </executions>
         </plugin>
 
+        <!--配置编译器-->
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-compiler-plugin</artifactId>
