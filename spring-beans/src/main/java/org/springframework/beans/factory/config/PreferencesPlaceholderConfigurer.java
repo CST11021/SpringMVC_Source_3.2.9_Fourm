@@ -42,38 +42,16 @@ import org.springframework.beans.factory.InitializingBean;
  * @see #setUserTreePath
  * @see java.util.prefs.Preferences
  */
+// 太深奥了，暂时忽略此实现类的使用
 public class PreferencesPlaceholderConfigurer extends PropertyPlaceholderConfigurer implements InitializingBean {
 
 	private String systemTreePath;
-
 	private String userTreePath;
-
 	private Preferences systemPrefs;
-
 	private Preferences userPrefs;
 
-
-	/**
-	 * Set the path in the system preferences tree to use for resolving
-	 * placeholders. Default is the root node.
-	 */
-	public void setSystemTreePath(String systemTreePath) {
-		this.systemTreePath = systemTreePath;
-	}
-
-	/**
-	 * Set the path in the system preferences tree to use for resolving
-	 * placeholders. Default is the root node.
-	 */
-	public void setUserTreePath(String userTreePath) {
-		this.userTreePath = userTreePath;
-	}
-
-
-	/**
-	 * This implementation eagerly fetches the Preferences instances
-	 * for the required system and user tree nodes.
-	 */
+	// This implementation eagerly fetches the Preferences instances for the required system and user tree nodes.
+	// 该实现急切地获取所需的系统和用户树节点的首选项实例。
 	public void afterPropertiesSet() {
 		this.systemPrefs = (this.systemTreePath != null) ?
 				Preferences.systemRoot().node(this.systemTreePath) : Preferences.systemRoot();
@@ -81,11 +59,8 @@ public class PreferencesPlaceholderConfigurer extends PropertyPlaceholderConfigu
 				Preferences.userRoot().node(this.userTreePath) : Preferences.userRoot();
 	}
 
-	/**
-	 * This implementation tries to resolve placeholders as keys first
-	 * in the user preferences, then in the system preferences, then in
-	 * the passed-in properties.
-	 */
+	// This implementation tries to resolve placeholders as keys first in the user preferences, then in the system preferences, then in the passed-in properties.
+	// 这个实现尝试在用户首选项中首先解析占位符，然后在系统首选项中，然后在输入的属性中。
 	@Override
 	protected String resolvePlaceholder(String placeholder, Properties props) {
 		String path = null;
@@ -104,7 +79,6 @@ public class PreferencesPlaceholderConfigurer extends PropertyPlaceholderConfigu
 		}
 		return value;
 	}
-
 	/**
 	 * Resolve the given path and key against the given Preferences.
 	 * @param path the preferences path (placeholder part before '/')
@@ -112,6 +86,7 @@ public class PreferencesPlaceholderConfigurer extends PropertyPlaceholderConfigu
 	 * @param preferences the Preferences to resolve against
 	 * @return the value for the placeholder, or {@code null} if none found
 	 */
+	// 根据给定的参数选择给定的路径和键。
 	protected String resolvePlaceholder(String path, String key, Preferences preferences) {
 		if (path != null) {
 			 // Do not create the node if it does not exist...
@@ -132,4 +107,18 @@ public class PreferencesPlaceholderConfigurer extends PropertyPlaceholderConfigu
 		}
 	}
 
+
+	public static void main(String[] args) {
+
+	}
+
+
+	// Set the path in the system preferences tree to use for resolving placeholders. Default is the root node.
+	// 在系统首选项树中设置路径，用于解析占位符。默认是根节点。
+	public void setSystemTreePath(String systemTreePath) {
+		this.systemTreePath = systemTreePath;
+	}
+	public void setUserTreePath(String userTreePath) {
+		this.userTreePath = userTreePath;
+	}
 }

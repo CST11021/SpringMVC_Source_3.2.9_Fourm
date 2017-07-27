@@ -78,6 +78,9 @@ public class PropertyPlaceholderConfigurer extends PlaceholderConfigurerSupport 
 	}
 
 	// 在给定的bean工厂中访问每个BeanDefinition并尝试替换${...}占位符。
+	// Spring启动的时候会去调用所有实现了后处理器的Bean的后处理方法，当我们配置了
+	// <property-placeholder>标签，Spring 就行注册了一个PropertyPlaceholderConfigurer的Bean，这样PropertyPlaceholderConfigurer的后处理方法会来调用
+	// 该方法，进行BeanDefinition中占位符的翻译。
 	@Override
 	protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess, Properties props) throws BeansException {
 		StringValueResolver valueResolver = new PlaceholderResolvingStringValueResolver(props);

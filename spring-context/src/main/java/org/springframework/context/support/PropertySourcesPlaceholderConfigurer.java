@@ -61,24 +61,20 @@ import org.springframework.util.StringValueResolver;
  * @see org.springframework.beans.factory.config.PlaceholderConfigurerSupport
  * @see org.springframework.beans.factory.config.PropertyPlaceholderConfigurer
  */
-public class PropertySourcesPlaceholderConfigurer extends PlaceholderConfigurerSupport
-		implements EnvironmentAware {
+public class PropertySourcesPlaceholderConfigurer extends PlaceholderConfigurerSupport implements EnvironmentAware {
 
 	/**
 	 * {@value} is the name given to the {@link PropertySource} for the set of
 	 * {@linkplain #mergeProperties() merged properties} supplied to this configurer.
 	 */
 	public static final String LOCAL_PROPERTIES_PROPERTY_SOURCE_NAME = "localProperties";
-
 	/**
 	 * {@value} is the name given to the {@link PropertySource} that wraps the
 	 * {@linkplain #setEnvironment environment} supplied to this configurer.
 	 */
 	public static final String ENVIRONMENT_PROPERTIES_PROPERTY_SOURCE_NAME = "environmentProperties";
 
-
 	private MutablePropertySources propertySources;
-
 	private Environment environment;
 
 
@@ -151,12 +147,8 @@ public class PropertySourcesPlaceholderConfigurer extends PlaceholderConfigurerS
 		processProperties(beanFactory, new PropertySourcesPropertyResolver(this.propertySources));
 	}
 
-	/**
-	 * Visit each bean definition in the given bean factory and attempt to replace ${...} property
-	 * placeholders with values from the given properties.
-	 */
-	protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess,
-			final ConfigurablePropertyResolver propertyResolver) throws BeansException {
+	// 该方法的作用是：从beanFactoryToProcess工厂中访问每个BeanDefinition，并替换掉每个BeanDefinition中使用到的${...}占位符
+	protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess, final ConfigurablePropertyResolver propertyResolver) throws BeansException {
 
 		propertyResolver.setPlaceholderPrefix(this.placeholderPrefix);
 		propertyResolver.setPlaceholderSuffix(this.placeholderSuffix);
@@ -174,16 +166,11 @@ public class PropertySourcesPlaceholderConfigurer extends PlaceholderConfigurerS
 		doProcessProperties(beanFactoryToProcess, valueResolver);
 	}
 
-	/**
-	 * Implemented for compatibility with {@link org.springframework.beans.factory.config.PlaceholderConfigurerSupport}.
-	 * @deprecated in favor of {@link #processProperties(ConfigurableListableBeanFactory, ConfigurablePropertyResolver)}
-	 * @throws UnsupportedOperationException
-	 */
+
 	@Override
 	@Deprecated
 	protected void processProperties(ConfigurableListableBeanFactory beanFactory, Properties props) {
-		throw new UnsupportedOperationException(
-				"Call processProperties(ConfigurableListableBeanFactory, ConfigurablePropertyResolver) instead");
+		throw new UnsupportedOperationException("Call processProperties(ConfigurableListableBeanFactory, ConfigurablePropertyResolver) instead");
 	}
 
 }

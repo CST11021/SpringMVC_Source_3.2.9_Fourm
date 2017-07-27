@@ -507,6 +507,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			beanNames = new ArrayList<String>(this.beanDefinitionNames);
 		}
 
+		// 遍历所有的单实例Bean，并一个一个的实例化
 		for (String beanName : beanNames) {
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {

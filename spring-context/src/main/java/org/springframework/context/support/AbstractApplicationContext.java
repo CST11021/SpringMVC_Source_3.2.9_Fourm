@@ -263,6 +263,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 				postProcessBeanFactory(beanFactory);
 
 				// 5、激活各种BeanFactory处理器
+				// 其中的一个应用是运用后处理器，处理BeanDefinition注册表中的一些占位符，因为Spring在解析Bean的时候时候如果有引用占位符，在解析阶段占位符是不会被翻译的，
+				// ApplicationContext 通过后处理器的方式来进行翻译相应的占位符，如果你使用BeanFactory级别的容器，那么调用getBean方法返回的Bean的属性信息是永远不会被解析的。
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// 6、注册拦截Bean创建的Bean处理器，这里只是注册，真正的调用是在getBean时候
@@ -432,6 +434,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		}
 
 		// 不要在这里初始化factorybean:我们需要让所有的常规bean都没有初始化，以便对它们使用bean工厂的后处理程序
+		// Spring中通过配置一些实现了BeanFactoryPostProcessor后处理接口的Bean，来进行一些操作，这些对于使用Spring的用户来说是透明，所有有时候会让用户觉得，Spring好神奇。
+		// 这里举一个例子，我们常常会配置像 <context:property-placeholder location="classpath:jdbc.properties"/> 这样的配置，Spring解析这个配置的时候会注册一个名称为
+		// “org.springframework.beans.factory.config.PropertyPlaceholderConfigurer#0”这样的bean，这样我们就可以在引用占位符进行配置了。因为解析占位符的操作是通过后处理器
+		// 来进行处理的，我们会发现在 PreferencesPlaceholderConfigurer 类中，该类实现了一个 BeanFactoryPostProcessor 接口。
+		// Spring在启动的过程中会去调用所有后处理器bean，并执行相应的处理，所以说像这种由框架为我们处理的一些我们看不见的操作，对我们来说是透明的。
 		String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanFactoryPostProcessor.class, true, false);
 
 		// 实现优先级排序
@@ -455,6 +462,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
 		// First, invoke the BeanFactoryPostProcessors that implement PriorityOrdered.
 		OrderComparator.sort(priorityOrderedPostProcessors);
+		// 调用后处理器，其中的一个应用是BeanDefinition中的${...}占位符在这里被翻译了
 		invokeBeanFactoryPostProcessors(priorityOrderedPostProcessors, beanFactory);
 
 		// Next, invoke the BeanFactoryPostProcessors that implement Ordered.
@@ -472,9 +480,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		}
 		invokeBeanFactoryPostProcessors(nonOrderedPostProcessors, beanFactory);
 	}
-	/**
-	 * Invoke the given BeanFactoryPostProcessor beans.
-	 */
+	// 将后处理器应用到对应的BeanFactory中
 	private void invokeBeanFactoryPostProcessors(Collection<? extends BeanFactoryPostProcessor> postProcessors, ConfigurableListableBeanFactory beanFactory) {
 
 		for (BeanFactoryPostProcessor postProcessor : postProcessors) {
@@ -673,7 +679,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		// Stop using the temporary ClassLoader for type matching.
 		beanFactory.setTempClassLoader(null);
 
-		// 冻结所有的bean定义，意味着已注册的bean定义将不再被修改或后处理。
+		// 冻结所有的BeanDefinition，意味着已注册的BeanDefinition将不再被修改或后处理。
 		beanFactory.freezeConfiguration();
 
 		// 初始化所有的单实例bean

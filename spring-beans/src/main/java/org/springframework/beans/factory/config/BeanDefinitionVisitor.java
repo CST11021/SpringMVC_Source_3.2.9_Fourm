@@ -44,7 +44,7 @@ import org.springframework.util.StringValueResolver;
  * @see BeanDefinition#getConstructorArgumentValues
  * @see PropertyPlaceholderConfigurer
  */
-// 该类来访问BeanDefinition中的信息，以解决占位符问题
+// 该类用来将BeanDefinition中所有引用的占位符，解析为真实值，以解决占位符问题
 public class BeanDefinitionVisitor {
 
 	private StringValueResolver valueResolver;

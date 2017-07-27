@@ -106,7 +106,7 @@ public abstract class PlaceholderConfigurerSupport extends PropertyResourceConfi
 	private BeanFactory beanFactory;
 	private String beanName;
 
-
+	// 该方法的作用是：从beanFactoryToProcess工厂中访问每个BeanDefinition，并替换掉每个BeanDefinition中使用到的${...}占位符，该操作委托给了BeanDefinitionVisitor来实现
 	protected void doProcessProperties(ConfigurableListableBeanFactory beanFactoryToProcess, StringValueResolver valueResolver) {
 
 		BeanDefinitionVisitor visitor = new BeanDefinitionVisitor(valueResolver);

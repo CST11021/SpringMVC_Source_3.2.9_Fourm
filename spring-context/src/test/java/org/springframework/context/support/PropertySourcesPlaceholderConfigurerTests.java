@@ -55,8 +55,7 @@ public class PropertySourcesPlaceholderConfigurerTests {
 		MockEnvironment env = new MockEnvironment();
 		env.setProperty("my.name", "myValue");
 
-		PropertySourcesPlaceholderConfigurer ppc =
-			new PropertySourcesPlaceholderConfigurer();
+		PropertySourcesPlaceholderConfigurer ppc = new PropertySourcesPlaceholderConfigurer();
 		ppc.setEnvironment(env);
 		ppc.postProcessBeanFactory(bf);
 		assertThat(bf.getBean(TestBean.class).getName(), equalTo("myValue"));

@@ -1211,8 +1211,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					return;
 				}
 				catch (BeansException ex) {
-					throw new BeanCreationException(
-							mbd.getResourceDescription(), beanName, "Error setting property values", ex);
+					throw new BeanCreationException(mbd.getResourceDescription(), beanName, "Error setting property values", ex);
 				}
 			}
 			original = mpvs.getPropertyValueList();
@@ -1242,8 +1241,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				Object originalValue = pv.getValue();
 				Object resolvedValue = valueResolver.resolveValueIfNecessary(pv, originalValue);
 				Object convertedValue = resolvedValue;
-				boolean convertible = bw.isWritableProperty(propertyName) &&
-						!PropertyAccessorUtils.isNestedOrIndexedProperty(propertyName);
+				boolean convertible = bw.isWritableProperty(propertyName) && !PropertyAccessorUtils.isNestedOrIndexedProperty(propertyName);
 				if (convertible) {
 					convertedValue = convertForProperty(resolvedValue, propertyName, bw, converter);
 				}

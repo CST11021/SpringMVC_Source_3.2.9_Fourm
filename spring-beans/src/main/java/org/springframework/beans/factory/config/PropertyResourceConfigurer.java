@@ -49,6 +49,7 @@ import org.springframework.util.ObjectUtils;
  * @see PropertyOverrideConfigurer
  * @see PropertyPlaceholderConfigurer
  */
+// 该在继承 PropertiesLoaderSupport 基础上实现了 BeanFactoryPostProcessor 接口，表示可从外部加载配置属性，并应用到BeanFactory中
 public abstract class PropertyResourceConfigurer extends PropertiesLoaderSupport implements BeanFactoryPostProcessor, PriorityOrdered {
 
 	private int order = Ordered.LOWEST_PRECEDENCE;  // default: same as non-Ordered
@@ -58,7 +59,9 @@ public abstract class PropertyResourceConfigurer extends PropertiesLoaderSupport
 		try {
 			// 返回一个合并的Properties实例，该实例包含在这个FactoryBean上设置的已加载的属性和属性。
 			Properties mergedProps = mergeProperties();
+			// 1、做转换
 			convertProperties(mergedProps);
+			// 2、应用后处理方法
 			processProperties(beanFactory, mergedProps);
 		}
 		catch (IOException ex) {
@@ -66,7 +69,7 @@ public abstract class PropertyResourceConfigurer extends PropertiesLoaderSupport
 		}
 	}
 
-	// 转换属性值(有时候我们会在.properties文件配置加密后字符串，我们可通过子类重写方法来进行解密操作)
+	// 1、转换属性值(有时候我们会在.properties文件配置加密后字符串，我们可通过子类重写方法来进行解密操作)
 	protected void convertProperties(Properties props) {
 		Enumeration<?> propertyNames = props.propertyNames();
 		while (propertyNames.hasMoreElements()) {
@@ -85,7 +88,7 @@ public abstract class PropertyResourceConfigurer extends PropertiesLoaderSupport
 		return originalValue;
 	}
 
-	// 将给定的属性应用到给定的BeanFactory。
+	// 2、将给定的属性应用到给定的BeanFactory。
 	protected abstract void processProperties(ConfigurableListableBeanFactory beanFactory, Properties props) throws BeansException;
 
 

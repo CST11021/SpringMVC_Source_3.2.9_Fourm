@@ -19,6 +19,8 @@ import org.springframework.core.AttributeAccessor;
 // 有通过parenetName属性来灵活设置parent BeanDefinition。RootBeanDefinition 用来在配置阶段进行注册BeanDefinition。然而，从spring 2.5后，编写注册bean definition有了更好
 // 的方法：GenericBeanDefinition。GenericBeanDefinition支持动态定义父类依赖，而非硬编码作为RootBeanDefinition。
 
+
+// 补充：spring配置被解析完后bean是以BeanDefinition的形式存储在注册表中，这里BeanDefinition中的属性配置如果引用了占位符
 public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 
 	//单例或原型

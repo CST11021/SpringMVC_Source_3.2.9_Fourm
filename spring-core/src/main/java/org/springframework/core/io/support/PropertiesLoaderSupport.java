@@ -34,15 +34,30 @@ import org.springframework.util.PropertiesPersister;
  * @author Juergen Hoeller
  * @since 1.2.2
  */
+// 该类用于读取Spring中.xml文件配置的属性，如：
+// <bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+// 	<property name="properties">
+// 		<props>
+// 			<prop key="myName">yourName</prop>
+// 		</props>
+// 	</property>
+// </bean>
+// 这种配置通过反射机制调用setProperties()方法进行注入，我们称这种属性为本地属性（localProperties）
+// 还有一种是通过 loadProperties() 方法加载外部的.propertes文件
 public abstract class PropertiesLoaderSupport {
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	// 指向外部的.properties文件
+	private Resource[] locations;
+	// 文件编码
+	private String fileEncoding;
+	// 本地的配置属性
 	protected Properties[] localProperties;
 	// 标识是否允许从文件读取的属性来覆盖掉本地默认的属性
 	protected boolean localOverride = false;
-	private Resource[] locations;
+	// 标识是否忽略没找到的外部文件
 	private boolean ignoreResourceNotFound = false;
-	private String fileEncoding;
+	// 用于处理Properties对象和外部文件间的相互转换
 	private PropertiesPersister propertiesPersister = new DefaultPropertiesPersister();
 
 
@@ -51,24 +66,25 @@ public abstract class PropertiesLoaderSupport {
 		Properties result = new Properties();
 
 		if (this.localOverride) {
-			// Load properties from file upfront, to let local properties override.
+			// 从this.locations指向的文件中加载属性到result对象中
 			loadProperties(result);
 		}
 
+		// 合并外部的文件属性和本地属性
 		if (this.localProperties != null) {
 			for (Properties localProp : this.localProperties) {
 				CollectionUtils.mergePropertiesIntoMap(localProp, result);
 			}
 		}
 
+		// 如果允许覆盖掉本地属性，就使用文件中属性覆盖
 		if (!this.localOverride) {
-			// Load properties from file afterwards, to let those properties override.
 			loadProperties(result);
 		}
 
 		return result;
 	}
-	// 解析 this.locations 指向的属性文件，并加载到指定的 Properties 对象中
+	// 解析 this.locations 指向的属性文件，并加载 props 对象中
 	protected void loadProperties(Properties props) throws IOException {
 		if (this.locations != null) {
 			for (Resource location : this.locations) {
