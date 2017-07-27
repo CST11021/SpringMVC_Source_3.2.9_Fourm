@@ -39,10 +39,15 @@ public class ContextNamespaceHandler extends NamespaceHandlerSupport {
 	public void init() {
 		registerBeanDefinitionParser("property-placeholder", new PropertyPlaceholderBeanDefinitionParser());
 		registerBeanDefinitionParser("property-override", new PropertyOverrideBeanDefinitionParser());
+		// <annotation-config>和<component-scan>的作用类似
 		registerBeanDefinitionParser("annotation-config", new AnnotationConfigBeanDefinitionParser());
 		registerBeanDefinitionParser("component-scan", new ComponentScanBeanDefinitionParser());
+		// load-time-weaver简称：LTW，具体参考：http://sexycoding.iteye.com/blog/1062372
 		registerBeanDefinitionParser("load-time-weaver", new LoadTimeWeaverBeanDefinitionParser());
+		// <spring-configured>的作用请参照 SpringConfiguredBeanDefinitionParser 类中的说明
 		registerBeanDefinitionParser("spring-configured", new SpringConfiguredBeanDefinitionParser());
+
+		// mbean是Spring与JMX集成相关的，JMX（Java Management Extensions，即Java管理扩展）是一个为应用程序、设备、系统等植入管理功能的框架。
 		registerBeanDefinitionParser("mbean-export", new MBeanExportBeanDefinitionParser());
 		registerBeanDefinitionParser("mbean-server", new MBeanServerBeanDefinitionParser());
 	}

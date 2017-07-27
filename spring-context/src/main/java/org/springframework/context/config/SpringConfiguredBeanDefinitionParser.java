@@ -31,16 +31,32 @@ import org.springframework.beans.factory.xml.ParserContext;
  * @author Juergen Hoeller
  * @since 2.5
  */
+
+/*
+	spring 可以为IOC容器里的bean进行依赖注入，但如果某些类，没有配置在IOC里，比如一些Domain Object，是否也可以依赖注入哪？答案是肯定的。
+	以User 为例，该User并没有配置在IOC理，但我想对其里面的一个UserDao进行依赖注入，其代码如下：
+
+	@Configurable(autowire = Autowire.BY_NAME, dependencyCheck = false)
+	public class User {
+		  private String UserName;
+		  private UserDao userDao;
+		 	...
+		  @Autowired
+		  public void setUserDao〔UserDao userDao〕{
+			 this.userDao=userDao.
+		 }
+	}
+
+	然后再在XML文件里加上 <context:spring-configured/>就可以了。<context:spring-configured/>主要是通过Spring管理AnnotationBeanConfigurerAspect切面，  具体的工作由该切面完成。
+ */
 class SpringConfiguredBeanDefinitionParser implements BeanDefinitionParser {
 
 	/**
 	 * The bean name of the internally managed bean configurer aspect.
 	 */
-	public static final String BEAN_CONFIGURER_ASPECT_BEAN_NAME =
-			"org.springframework.context.config.internalBeanConfigurerAspect";
+	public static final String BEAN_CONFIGURER_ASPECT_BEAN_NAME = "org.springframework.context.config.internalBeanConfigurerAspect";
 
-	static final String BEAN_CONFIGURER_ASPECT_CLASS_NAME =
-			"org.springframework.beans.factory.aspectj.AnnotationBeanConfigurerAspect";
+	static final String BEAN_CONFIGURER_ASPECT_CLASS_NAME = "org.springframework.beans.factory.aspectj.AnnotationBeanConfigurerAspect";
 
 
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
