@@ -21,8 +21,6 @@ public class CglibTest {
 
 		// 生成动态 Bean
 		CglibBean bean = new CglibBean(propertyMap);
-
-		// 给 Bean 设置值
 		bean.setValue("id", new Integer(123));
 		bean.setValue("name", "454");
 		bean.setValue("address", "789");
@@ -39,7 +37,8 @@ public class CglibTest {
 		Class clazz = object.getClass();
 		Method[] methods = clazz.getDeclaredMethods();
 		for (int i = 0; i < methods.length; i++) {
-			System.out.println(methods[i].getName());
+			System.out.println((i+1) + methods[i].getName());
 		}
+
 	}
 }

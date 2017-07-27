@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <bean id="target" class="com.whz.aop.advice.NaiveWaiter"/>
+    <bean id="greetingBefore" class="com.whz.aop.advice.GreetingBeforeAdvice"/>
+    <bean id="greetingAfter" class="com.whz.aop.advice.GreetingAfterAdvice"/>
+    <bean id="greetAround" class="com.whz.aop.advice.GreetingInterceptor"/>
+
+    <!--proxyInterfaces:指定代理的接口，如果是多个接口，请使用<list>元素-->
+    <!--interceptorNames:指定使用的增强-->
+    <!--target:指定对哪个bean进行代理-->
+    <bean id="waiter" class="org.springframework.aop.framework.ProxyFactoryBean"
+        p:proxyInterfaces="com.whz.aop.advice.Waiter"
+        p:interceptorNames="greetingBefore,greetingAfter,greetAround"
+        p:target-ref="target"/>
+
+</beans>
