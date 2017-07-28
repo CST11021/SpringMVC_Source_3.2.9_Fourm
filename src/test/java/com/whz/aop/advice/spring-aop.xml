@@ -17,4 +17,17 @@
         p:interceptorNames="greetingBefore,greetingAfter,greetAround"
         p:target-ref="target"/>
 
+
+    <!--要被织入的增强-->
+    <bean id="pmonitor" class="com.whz.aop.advice.ControllablePerformanceMonitor" />
+    <!--被织入的目标类-->
+    <bean id="forumServiceTarget" class="com.whz.aop.advice.ForumService" />
+    <!--被织入增强后的代理类-->
+    <bean id="forumService" class="org.springframework.aop.framework.ProxyFactoryBean"
+          p:interfaces="com.whz.aop.advice.Monitorable"
+          p:target-ref="forumServiceTarget"
+          p:interceptorNames="pmonitor"
+          p:proxyTargetClass="true" />
+
+
 </beans>

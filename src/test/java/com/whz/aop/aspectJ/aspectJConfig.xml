@@ -6,7 +6,7 @@
     <!--开启注解aop-->
     <aop:aspectj-autoproxy/>
 
-    <bean id="test" class="com.whz.aspectJ.TestBean"/>
-    <bean class="com.whz.aspectJ.AspectJTest"/>
+    <bean id="test" class="com.whz.aop.aspectJ.TestBean"/>
+    <bean class="com.whz.aop.aspectJ.AspectJTest"/>
 
 </beans>

@@ -1,4 +1,4 @@
-package com.whz.aspectJ;
+package com.whz.aop.aspectJ;
 
 
 import lombok.Getter;

@@ -1,16 +1,10 @@
-package com.whz.aspectJ;
+package com.whz.aop.aspectJ;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.junit.Test;
-import org.springframework.beans.annotation.AnnotationBeanUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
-import java.lang.annotation.Annotation;
 
 @Aspect
 public class AspectJTest {
@@ -48,7 +42,7 @@ public class AspectJTest {
     @Test
     public void t() {
 
-        ApplicationContext context = new ClassPathXmlApplicationContext("com/whz/aspectJ/aspectJConfig.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("com/whz/aop/aspectJ/aspectJConfig.xml");
         TestBean bean = (TestBean) context.getBean("test");
         bean.test();
 

@@ -1,5 +1,6 @@
 package com.whz.aop.advice;
 
+// 打印监视器信息
 public class MethodPerformance{
     private long begin;
 	private long end;
@@ -13,6 +14,6 @@ public class MethodPerformance{
 	public void printPerformance(){
 		end = System.currentTimeMillis();
 		long elapse = end - begin;
-		System.out.println(serviceMethod+"花费"+elapse+"毫秒");
+		System.out.println(serviceMethod + "花费" + elapse + "毫秒");
 	}
 }

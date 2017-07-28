@@ -1,5 +1,6 @@
 package com.whz.aop.advice;
 
+// 该类用于被织入目标类
 public class PerformanceMonitor{
 
 	private static ThreadLocal<MethodPerformance> performanceRecord = new ThreadLocal<MethodPerformance>();
