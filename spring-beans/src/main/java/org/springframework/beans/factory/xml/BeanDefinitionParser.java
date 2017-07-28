@@ -21,8 +21,7 @@ import org.w3c.dom.Element;
 import org.springframework.beans.factory.config.BeanDefinition;
 
 /**
- * Interface used by the {@link DefaultBeanDefinitionDocumentReader} to handle custom,
- * top-level (directly under {@code <beans/>}) tags.
+ * Interface used by the {@link DefaultBeanDefinitionDocumentReader} to handle custom, top-level (directly under {@code <beans/>}) tags.
  *
  * <p>Implementations are free to turn the metadata in the custom tag into as many
  * {@link BeanDefinition BeanDefinitions} as required.
@@ -35,23 +34,10 @@ import org.springframework.beans.factory.config.BeanDefinition;
  * @see NamespaceHandler
  * @see AbstractBeanDefinitionParser
  */
+// 该接口是用于解析位于<beans/>内的自定义级别的标签，所有的自定义解析器都会来实现该接口
 public interface BeanDefinitionParser {
 
-	/**
-	 * Parse the specified {@link Element} and register the resulting
-	 * {@link BeanDefinition BeanDefinition(s)} with the
-	 * {@link org.springframework.beans.factory.xml.ParserContext#getRegistry() BeanDefinitionRegistry}
-	 * embedded in the supplied {@link ParserContext}.
-	 * <p>Implementations must return the primary {@link BeanDefinition} that results
-	 * from the parse if they will ever be used in a nested fashion (for example as
-	 * an inner tag in a {@code <property/>} tag). Implementations may return
-	 * {@code null} if they will <strong>not</strong> be used in a nested fashion.
-	 * @param element the element that is to be parsed into one or more {@link BeanDefinition BeanDefinitions}
-	 * @param parserContext the object encapsulating the current state of the parsing process;
-	 * provides access to a {@link org.springframework.beans.factory.support.BeanDefinitionRegistry}
-	 * @return the primary {@link BeanDefinition}
-	 */
-	// 解析指定的节点元素，并返回一个已经注册到BeanDefinitionRegistry对象（BeanDefinition注册表）中的BeanDefinition对象。
+	// 解析指定的节点元素，并返回一个BeanDefinition
 	BeanDefinition parse(Element element, ParserContext parserContext);
 
 }

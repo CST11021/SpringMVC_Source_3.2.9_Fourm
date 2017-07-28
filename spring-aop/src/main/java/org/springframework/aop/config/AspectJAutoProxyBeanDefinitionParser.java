@@ -35,6 +35,7 @@ import org.springframework.beans.factory.xml.ParserContext;
  * @author Juergen Hoeller
  * @since 2.0
  */
+// 用于解析<aop:aspectj-autoproxy/>标签
 class AspectJAutoProxyBeanDefinitionParser implements BeanDefinitionParser {
 
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
