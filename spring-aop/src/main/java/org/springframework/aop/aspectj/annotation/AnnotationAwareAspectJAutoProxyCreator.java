@@ -53,10 +53,7 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 	private BeanFactoryAspectJAdvisorsBuilder aspectJAdvisorsBuilder;
 
 
-	/**
-	 * Set a list of regex patterns, matching eligible @AspectJ bean names.
-	 * <p>Default is to consider all @AspectJ beans as eligible.
-	 */
+	// Set a list of regex patterns, matching eligible @AspectJ bean names. <p>Default is to consider all @AspectJ beans as eligible.
 	public void setIncludePatterns(List<String> patterns) {
 		this.includePatterns = new ArrayList<Pattern>(patterns.size());
 		for (String patternText : patterns) {
@@ -76,10 +73,10 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 				new BeanFactoryAspectJAdvisorsBuilderAdapter(beanFactory, this.aspectJAdvisorFactory);
 	}
 
-
 	@Override
 	protected List<Advisor> findCandidateAdvisors() {
 		// Add all the Spring advisors found according to superclass rules.
+		// 当使用注解方式配置AOP的时候并不是丢弃了对XML配置的支持，在这里调用父类方法加载配置文件中的AOP声明
 		List<Advisor> advisors = super.findCandidateAdvisors();
 		// Build Advisors for all AspectJ aspects in the bean factory.
 		advisors.addAll(this.aspectJAdvisorsBuilder.buildAspectJAdvisors());
@@ -120,10 +117,7 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 	}
 
 
-	/**
-	 * Subclass of BeanFactoryAspectJAdvisorsBuilderAdapter that delegates to
-	 * surrounding AnnotationAwareAspectJAutoProxyCreator facilities.
-	 */
+	// Subclass of BeanFactoryAspectJAdvisorsBuilderAdapter that delegates to surrounding AnnotationAwareAspectJAutoProxyCreator facilities.
 	private class BeanFactoryAspectJAdvisorsBuilderAdapter extends BeanFactoryAspectJAdvisorsBuilder {
 
 		public BeanFactoryAspectJAdvisorsBuilderAdapter(

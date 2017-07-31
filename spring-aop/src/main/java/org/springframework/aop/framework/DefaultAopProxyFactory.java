@@ -49,6 +49,26 @@ import org.springframework.aop.SpringProxy;
 public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 
 
+	/*
+	对于Spring的代理中JDKProxy的实现和CGLIBProxy的实现。Spring是如果选取的呢？从if中的判断条件可以看到3个方面的影响设Spring的判断。
+	1、optimize:用来控制通过CGLIB创建的代理是否使用激进的优化策略。除非完全了解AOP代理如果处理优化，否则不推荐用户使用这个设置。目前这个属性仅用于CGLIB代理，对于JDK动态代理（缺省代理）无效。
+	2、proxyTargetClass：这个属性为true时，目标类本身被代理而不是目标类的接口。如果这个属性被设置为true，CGLIB代理将被创建，设置方式：<aop:aspectj-autoproxy proxy-target-class="true"/>。
+	3、hasNoUserSuppliedProxyInterfaces:是否存在代理接口。
+
+	下面是对JDK与Cglib方式的总结。
+	1、如果目标对象实现了接口，默认情况下回采用JDK的动态代理实现AOP。
+	2、如果目标对象实现了接口，可以强制使用CGLIB实现AOP。
+	3、如果目标对象没有实现接口，必须采用CGLIB库，Spring会自动在JDK动态代理和CGLIB之间转化。
+
+	如何强制使用CGLIB实现AOP？
+	1、添加CGLIB库，Spring_HOME/cglib/*.jar
+	2、在Spring配置文件加入<aop:aspectj-autoproxy proxy-target-class="true"/>。
+
+	JDK动态代理CGLIB字节码生成的区别？
+	1、JDK动态代理只能对实现了接口的类生成代理，而不能针对类。
+	2、CGLIB是针对类实现代理，主要是对指定的类生成一个子类，覆盖其中的方法，因为是继承，所以该类或方法最好不要声明成final。
+
+	 */
 	public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {
 		if (config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config)) {
 			Class targetClass = config.getTargetClass();
@@ -66,21 +86,14 @@ public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 		}
 	}
 
-	/**
-	 * Determine whether the supplied {@link AdvisedSupport} has only the
-	 * {@link org.springframework.aop.SpringProxy} interface specified
-	 * (or no proxy interfaces specified at all).
-	 */
+	// Determine whether the supplied AdvisedSupport has only the SpringProxy interface specified (or no proxy interfaces specified at all).
 	private boolean hasNoUserSuppliedProxyInterfaces(AdvisedSupport config) {
 		Class[] interfaces = config.getProxiedInterfaces();
 		return (interfaces.length == 0 || (interfaces.length == 1 && SpringProxy.class.equals(interfaces[0])));
 	}
 
 
-	/**
-	 * Inner factory class used to just introduce a CGLIB dependency
-	 * when actually creating a CGLIB proxy.
-	 */
+	// 在实际创建CGLIB代理时，内部工厂类仅用于引入CGLIB依赖项
 	private static class CglibProxyFactory {
 
 		public static AopProxy createCglibProxy(AdvisedSupport advisedSupport) {

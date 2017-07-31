@@ -37,29 +37,20 @@ import org.springframework.aop.support.Pointcuts;
  * @author Juergen Hoeller
  * @since 2.0
  */
-class InstantiationModelAwarePointcutAdvisorImpl
-		implements InstantiationModelAwarePointcutAdvisor, AspectJPrecedenceInformation {
+
+// 根据切点信息生成增强。所有的增强都由 Advisor 的实现类 InstantiationModelAwarePointcutAdvisorImpl 统一封装的
+class InstantiationModelAwarePointcutAdvisorImpl implements InstantiationModelAwarePointcutAdvisor, AspectJPrecedenceInformation {
 
 	private final AspectJExpressionPointcut declaredPointcut;
-
 	private Pointcut pointcut;
-
 	private final MetadataAwareAspectInstanceFactory aspectInstanceFactory;
-
 	private final Method method;
-
 	private final boolean lazy;
-
 	private final AspectJAdvisorFactory atAspectJAdvisorFactory;
-
 	private Advice instantiatedAdvice;
-
 	private int declarationOrder;
-
 	private String aspectName;
-
 	private Boolean isBeforeAdvice;
-
 	private Boolean isAfterAdvice;
 
 
@@ -75,8 +66,7 @@ class InstantiationModelAwarePointcutAdvisorImpl
 
 		if (aif.getAspectMetadata().isLazilyInstantiated()) {
 			// Static part of the pointcut is a lazy type.
-			Pointcut preInstantiationPointcut =
-					Pointcuts.union(aif.getAspectMetadata().getPerClausePointcut(), this.declaredPointcut);
+			Pointcut preInstantiationPointcut = Pointcuts.union(aif.getAspectMetadata().getPerClausePointcut(), this.declaredPointcut);
 
 			// Make it dynamic: must mutate from pre-instantiation to post-instantiation state.
 			// If it's not a dynamic pointcut, it may be optimized out
@@ -86,6 +76,9 @@ class InstantiationModelAwarePointcutAdvisorImpl
 		}
 		else {
 			// A singleton aspect.
+			// 在封装过程中只是简单地将信息封装在类的实例中，所有的信息单纯地赋值，在实例初始化的过程中还完成了对于增强器的初始化。因为不同的增强所体现的逻辑是不同的，
+			// 比如@Before("test()")与@After("test()")标签的不同的就是增强器增强的位置不同，所以就需要不同的增强器来完成不同的逻辑，而根据注解中的信息初始化对应的增强器
+			// 就是在 instantiateAdvice 函数中实现的
 			this.instantiatedAdvice = instantiateAdvice(this.declaredPointcut);
 			this.pointcut = declaredPointcut;
 			this.lazy = false;
@@ -137,8 +130,7 @@ class InstantiationModelAwarePointcutAdvisorImpl
 
 
 	private Advice instantiateAdvice(AspectJExpressionPointcut pcut) {
-		return this.atAspectJAdvisorFactory.getAdvice(
-				this.method, pcut, this.aspectInstanceFactory, this.declarationOrder, this.aspectName);
+		return this.atAspectJAdvisorFactory.getAdvice(this.method, pcut, this.aspectInstanceFactory, this.declarationOrder, this.aspectName);
 	}
 
 	public MetadataAwareAspectInstanceFactory getAspectInstanceFactory() {

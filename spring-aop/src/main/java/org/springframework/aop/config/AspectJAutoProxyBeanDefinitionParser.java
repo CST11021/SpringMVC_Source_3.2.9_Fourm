@@ -39,23 +39,24 @@ import org.springframework.beans.factory.xml.ParserContext;
 class AspectJAutoProxyBeanDefinitionParser implements BeanDefinitionParser {
 
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
-		// 注册 AspectJAnnotationAutoProxyCreator
+		// 解析<aop:aspectj-autoproxy/>标签时，会注册一个名为“org.Springframework.aop.config.internalAutoProxyCreator”的bean，
+		// 该bean对应的类型是 AnnotationAwareAspectJAutoProxyCreator
 		AopNamespaceUtils.registerAspectJAnnotationAutoProxyCreatorIfNecessary(parserContext, element);
 		// 对于注解中子类的处理
 		extendBeanDefinition(element, parserContext);
 		return null;
 	}
-
+	// 处理<aop:aspectj-autoproxy/>内的子节点
 	private void extendBeanDefinition(Element element, ParserContext parserContext) {
-		BeanDefinition beanDef =
-				parserContext.getRegistry().getBeanDefinition(AopConfigUtils.AUTO_PROXY_CREATOR_BEAN_NAME);
+		BeanDefinition beanDef = parserContext.getRegistry().getBeanDefinition(AopConfigUtils.AUTO_PROXY_CREATOR_BEAN_NAME);
 		if (element.hasChildNodes()) {
 			addIncludePatterns(element, parserContext, beanDef);
 		}
 	}
-
 	private void addIncludePatterns(Element element, ParserContext parserContext, BeanDefinition beanDef) {
 		ManagedList<TypedStringValue> includePatterns = new ManagedList<TypedStringValue>();
+
+		// 遍历子节点
 		NodeList childNodes = element.getChildNodes();
 		for (int i = 0; i < childNodes.getLength(); i++) {
 			Node node = childNodes.item(i);
@@ -66,6 +67,7 @@ class AspectJAutoProxyBeanDefinitionParser implements BeanDefinitionParser {
 				includePatterns.add(valueHolder);
 			}
 		}
+
 		if (!includePatterns.isEmpty()) {
 			includePatterns.setSource(parserContext.extractSource(element));
 			beanDef.getPropertyValues().add("includePatterns", includePatterns);

@@ -33,82 +33,47 @@ import org.springframework.util.Assert;
 public class ProxyCreatorSupport extends AdvisedSupport {
 
 	private AopProxyFactory aopProxyFactory;
-
 	private List<AdvisedSupportListener> listeners = new LinkedList<AdvisedSupportListener>();
-
-	/** Set to true when the first AOP proxy has been created */
+	// 当第一个AOP代理被创建时，设置为true
 	private boolean active = false;
 
-
-	/**
-	 * Create a new ProxyCreatorSupport instance.
-	 */
+	// 构造器
 	public ProxyCreatorSupport() {
 		this.aopProxyFactory = new DefaultAopProxyFactory();
 	}
-
-	/**
-	 * Create a new ProxyCreatorSupport instance.
-	 * @param aopProxyFactory the AopProxyFactory to use
-	 */
 	public ProxyCreatorSupport(AopProxyFactory aopProxyFactory) {
 		Assert.notNull(aopProxyFactory, "AopProxyFactory must not be null");
 		this.aopProxyFactory = aopProxyFactory;
 	}
 
-
-	/**
-	 * Customize the AopProxyFactory, allowing different strategies
-	 * to be dropped in without changing the core framework.
-	 * <p>Default is {@link DefaultAopProxyFactory}, using dynamic JDK
-	 * proxies or CGLIB proxies based on the requirements.
-	 */
 	public void setAopProxyFactory(AopProxyFactory aopProxyFactory) {
 		Assert.notNull(aopProxyFactory, "AopProxyFactory must not be null");
 		this.aopProxyFactory = aopProxyFactory;
 	}
-
-	/**
-	 * Return the AopProxyFactory that this ProxyConfig uses.
-	 */
 	public AopProxyFactory getAopProxyFactory() {
 		return this.aopProxyFactory;
 	}
 
-	/**
-	 * Add the given AdvisedSupportListener to this proxy configuration.
-	 * @param listener the listener to register
-	 */
+	// 给代理配置添加监听器
 	public void addListener(AdvisedSupportListener listener) {
 		Assert.notNull(listener, "AdvisedSupportListener must not be null");
 		this.listeners.add(listener);
 	}
-
-	/**
-	 * Remove the given AdvisedSupportListener from this proxy configuration.
-	 * @param listener the listener to deregister
-	 */
 	public void removeListener(AdvisedSupportListener listener) {
 		Assert.notNull(listener, "AdvisedSupportListener must not be null");
 		this.listeners.remove(listener);
 	}
 
-
-	/**
-	 * Subclasses should call this to get a new AOP proxy. They should <b>not</b>
-	 * create an AOP proxy with {@code this} as an argument.
-	 */
+	// 子类应该调用createAopProxy() 来获得一个新的AOP代理。他们不应该用 this 作为一个参数来创建一个AOP代理
 	protected final synchronized AopProxy createAopProxy() {
 		if (!this.active) {
 			activate();
 		}
+		// 创建代理
 		return getAopProxyFactory().createAopProxy(this);
 	}
 
-	/**
-	 * Activate this proxy configuration.
-	 * @see AdvisedSupportListener#activated
-	 */
+	// 激活这个代理配置
 	private void activate() {
 		this.active = true;
 		for (AdvisedSupportListener listener : this.listeners) {
@@ -116,10 +81,7 @@ public class ProxyCreatorSupport extends AdvisedSupport {
 		}
 	}
 
-	/**
-	 * Propagate advice change event to all AdvisedSupportListeners.
-	 * @see AdvisedSupportListener#adviceChanged
-	 */
+	// 将增强更改事件通知给所有的监听器
 	@Override
 	protected void adviceChanged() {
 		super.adviceChanged();
@@ -132,9 +94,7 @@ public class ProxyCreatorSupport extends AdvisedSupport {
 		}
 	}
 
-	/**
-	 * Subclasses can call this to check whether any AOP proxies have been created yet.
-	 */
+	// 只要有一个AOP代理被创建，方法将返回true
 	protected final synchronized boolean isActive() {
 		return this.active;
 	}

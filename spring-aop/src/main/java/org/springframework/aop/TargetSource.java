@@ -30,15 +30,18 @@ package org.springframework.aop;
  *
  * @author Rod Johnson
  */
+
+/*
+
+通常，在使用ProxyFactory的时候，我们都是通过setTarget()方法指定具体的目标对象。使用ProxyFactoryBean也是如此，或者ProxyFactoryBean还可以通过setTargetName()指定目标对象在IOC容器中的beanName。但除此之外，还可以通过setTargetSource()来指定目标对象。
+
+TargetSource的作用就好像是为目标对象在外面加了一个壳，或者说，它就像目标对象的容器。当每个针对目标对象的方法调用经历层层拦截而到达调用链的终点的时候，就该调用目标对象上定义的方法了。但这时，Spring AOP做了点手脚，它不是直接调用这个目标对象上的方法，而是通过“插足于”调用链于实例目标对象之间的某个TargetSource来取得具体目标对象，然后在调用从TargetSource中取得的目标对象上的相应方法。
+
+在通常情况下，无论是通过setTarget()，还是通过setTargetName()等方法设置的目标对象，框架内部都会通过一个TargetSource实现类对这个设置的目标对象进行封装，也就是，框架内部会以统一的方式处理调用链终点的目标对象。
+ */
 public interface TargetSource extends TargetClassAware {
 
-	/**
-	 * Return the type of targets returned by this {@link TargetSource}.
-	 * <p>Can return {@code null}, although certain usages of a
-	 * {@code TargetSource} might just work with a predetermined
-	 * target class.
-	 * @return the type of targets returned by this {@link TargetSource}
-	 */
+	// 返回被代理的目标类类型
 	Class<?> getTargetClass();
 
 	/**
@@ -51,20 +54,10 @@ public interface TargetSource extends TargetClassAware {
 	 */
 	boolean isStatic();
 
-	/**
-	 * Return a target instance. Invoked immediately before the
-	 * AOP framework calls the "target" of an AOP method invocation.
-	 * @return the target object, which contains the joinpoint
-	 * @throws Exception if the target object can't be resolved
-	 */
+	// 获取包含连接点的目标对象
 	Object getTarget() throws Exception;
 
-	/**
-	 * Release the given target object obtained from the
-	 * {@link #getTarget()} method.
-	 * @param target object obtained from a call to {@link #getTarget()}
-	 * @throws Exception if the object can't be released
-	 */
+	// 释放 target
 	void releaseTarget(Object target) throws Exception;
 
 }

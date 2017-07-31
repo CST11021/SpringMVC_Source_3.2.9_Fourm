@@ -88,73 +88,49 @@ import org.springframework.util.ClassUtils;
  * @see DefaultAdvisorAutoProxyCreator
  */
 @SuppressWarnings("serial")
-public abstract class AbstractAutoProxyCreator extends ProxyConfig
-		implements SmartInstantiationAwareBeanPostProcessor, BeanClassLoaderAware, BeanFactoryAware,
-		Ordered, AopInfrastructureBean {
+public abstract class AbstractAutoProxyCreator extends ProxyConfig implements SmartInstantiationAwareBeanPostProcessor, BeanClassLoaderAware, BeanFactoryAware, Ordered, AopInfrastructureBean {
+	protected final Log logger = LogFactory.getLog(getClass());
 
 	/**
 	 * Convenience constant for subclasses: Return value for "do not proxy".
 	 * @see #getAdvicesAndAdvisorsForBean
 	 */
 	protected static final Object[] DO_NOT_PROXY = null;
-
 	/**
 	 * Convenience constant for subclasses: Return value for
 	 * "proxy without additional interceptors, just the common ones".
 	 * @see #getAdvicesAndAdvisorsForBean
 	 */
 	protected static final Object[] PROXY_WITHOUT_ADDITIONAL_INTERCEPTORS = new Object[0];
-
-
-	/** Logger available to subclasses */
-	protected final Log logger = LogFactory.getLog(getClass());
-
 	/** Default value is same as non-ordered */
 	private int order = Ordered.LOWEST_PRECEDENCE;
-
 	/** Default is global AdvisorAdapterRegistry */
 	private AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
-
 	/**
 	 * Indicates whether or not the proxy should be frozen. Overridden from super
 	 * to prevent the configuration from becoming frozen too early.
 	 */
 	private boolean freezeProxy = false;
-
 	/** Default is no common interceptors */
 	private String[] interceptorNames = new String[0];
 
 	private boolean applyCommonInterceptorsFirst = true;
-
 	private TargetSourceCreator[] customTargetSourceCreators;
-
 	private ClassLoader proxyClassLoader = ClassUtils.getDefaultClassLoader();
-
 	private boolean classLoaderConfigured = false;
-
 	private BeanFactory beanFactory;
-
 	private final Map<Object, Boolean> advisedBeans = new ConcurrentHashMap<Object, Boolean>(64);
-
 	// using a ConcurrentHashMap as a Set
 	private final Map<String, Boolean> targetSourcedBeans = new ConcurrentHashMap<String, Boolean>(16);
-
 	// using a ConcurrentHashMap as a Set
 	private final Map<Object, Boolean> earlyProxyReferences = new ConcurrentHashMap<Object, Boolean>(16);
-
 	private final Map<Object, Class<?>> proxyTypes = new ConcurrentHashMap<Object, Class<?>>(16);
 
 
-	/**
-	 * Set the ordering which will apply to this class's implementation
-	 * of Ordered, used when applying multiple BeanPostProcessors.
-	 * <p>Default value is {@code Integer.MAX_VALUE}, meaning that it's non-ordered.
-	 * @param order ordering value
-	 */
+
 	public final void setOrder(int order) {
 		this.order = order;
 	}
-
 	public final int getOrder() {
 		return this.order;
 	}
@@ -169,7 +145,6 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 	public void setFrozen(boolean frozen) {
 		this.freezeProxy = frozen;
 	}
-
 	@Override
 	public boolean isFrozen() {
 		return this.freezeProxy;
@@ -183,7 +158,6 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 	public void setAdvisorAdapterRegistry(AdvisorAdapterRegistry advisorAdapterRegistry) {
 		this.advisorAdapterRegistry = advisorAdapterRegistry;
 	}
-
 	/**
 	 * Set custom TargetSourceCreators to be applied in this order.
 	 * If the list is empty, or they all return null, a SingletonTargetSource
@@ -201,7 +175,6 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 	public void setCustomTargetSourceCreators(TargetSourceCreator[] targetSourceCreators) {
 		this.customTargetSourceCreators = targetSourceCreators;
 	}
-
 	/**
 	 * Set the common interceptors. These must be bean names in the current factory.
 	 * They can be of any advice or advisor type Spring supports.
@@ -212,7 +185,6 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 	public void setInterceptorNames(String[] interceptorNames) {
 		this.interceptorNames = interceptorNames;
 	}
-
 	/**
 	 * Set whether the common interceptors should be applied before bean-specific ones.
 	 * Default is "true"; else, bean-specific interceptors will get applied first.
@@ -220,7 +192,6 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 	public void setApplyCommonInterceptorsFirst(boolean applyCommonInterceptorsFirst) {
 		this.applyCommonInterceptorsFirst = applyCommonInterceptorsFirst;
 	}
-
 	/**
 	 * Set the ClassLoader to generate the proxy class in.
 	 * <p>Default is the bean ClassLoader, i.e. the ClassLoader used by the
@@ -231,13 +202,11 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 		this.proxyClassLoader = classLoader;
 		this.classLoaderConfigured = (classLoader != null);
 	}
-
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		if (!this.classLoaderConfigured) {
 			this.proxyClassLoader = classLoader;
 		}
 	}
-
 	public void setBeanFactory(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 	}
@@ -249,7 +218,6 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 	protected BeanFactory getBeanFactory() {
 		return this.beanFactory;
 	}
-
 
 	public Class<?> predictBeanType(Class<?> beanClass, String beanName) {
 		Object cacheKey = getCacheKey(beanClass, beanName);
@@ -300,8 +268,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 		return true;
 	}
 
-	public PropertyValues postProcessPropertyValues(
-			PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) {
+	public PropertyValues postProcessPropertyValues(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) {
 
 		return pvs;
 	}
@@ -310,11 +277,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 		return bean;
 	}
 
-	/**
-	 * Create a proxy with the configured interceptors if the bean is
-	 * identified as one to proxy by the subclass.
-	 * @see #getAdvicesAndAdvisorsForBean
-	 */
+	// Create a proxy with the configured interceptors if the bean is identified as one to proxy by the subclass.
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		if (bean != null) {
 			// 根据给定的bean的class和name构建出个key，格式：beanClassName_beanName
@@ -326,7 +289,6 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 		}
 		return bean;
 	}
-
 
 	/**
 	 * Build a cache key for the given bean class and bean name.
@@ -365,7 +327,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 		// 如果获取到了增强则需要针对增强创建代理
 		if (specificInterceptors != DO_NOT_PROXY) {
 			this.advisedBeans.put(cacheKey, Boolean.TRUE);
-			// 创建代理
+			// 创建代理：在获取了所有对应bean的增强器后，便可以进行代理的创建了
 			Object proxy = createProxy(bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));
 			this.proxyTypes.put(cacheKey, proxy.getClass());
 			return proxy;
@@ -452,30 +414,36 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 	 * @return the AOP proxy for the bean
 	 * @see #buildAdvisors
 	 */
-	protected Object createProxy(
-			Class<?> beanClass, String beanName, Object[] specificInterceptors, TargetSource targetSource) {
+	protected Object createProxy(Class<?> beanClass, String beanName, Object[] specificInterceptors, TargetSource targetSource) {
 
 		ProxyFactory proxyFactory = new ProxyFactory();
 		// Copy our properties (proxyTargetClass etc) inherited from ProxyConfig.
+		// 获取当前类中相关属性
 		proxyFactory.copyFrom(this);
-
+		// 决定对于给定的bean是否应该使用targetClass而不是他的接口代理，检查ProxyTargetClass设置以及preserveTargetClass属性
 		if (!shouldProxyTargetClass(beanClass, beanName)) {
 			// Must allow for introductions; can't just set interfaces to
 			// the target's interfaces only.
 			Class<?>[] targetInterfaces = ClassUtils.getAllInterfacesForClass(beanClass, this.proxyClassLoader);
 			for (Class<?> targetInterface : targetInterfaces) {
+				// 添加代理接口
 				proxyFactory.addInterface(targetInterface);
 			}
 		}
 
 		Advisor[] advisors = buildAdvisors(beanName, specificInterceptors);
 		for (Advisor advisor : advisors) {
+			// 加入增强器
 			proxyFactory.addAdvisor(advisor);
 		}
 
+		// 设置要代理的类
 		proxyFactory.setTargetSource(targetSource);
+		// 定制代理
 		customizeProxyFactory(proxyFactory);
 
+		// 用来控制代理工厂被配置工厂之后，是否还允许修改通知。
+		// 缺省值为false（即在代理被配置之后，不允许修改代理的配置）。
 		proxyFactory.setFrozen(this.freezeProxy);
 		if (advisorsPreFiltered()) {
 			proxyFactory.setPreFiltered(true);
@@ -525,10 +493,12 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 	 */
 	protected Advisor[] buildAdvisors(String beanName, Object[] specificInterceptors) {
 		// Handle prototypes correctly...
+		// 解析注册的所有interceptorName
 		Advisor[] commonInterceptors = resolveInterceptorNames();
 
 		List<Object> allInterceptors = new ArrayList<Object>();
 		if (specificInterceptors != null) {
+			// 加入拦截器
 			allInterceptors.addAll(Arrays.asList(specificInterceptors));
 			if (commonInterceptors != null) {
 				if (this.applyCommonInterceptorsFirst) {
@@ -548,6 +518,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 
 		Advisor[] advisors = new Advisor[allInterceptors.size()];
 		for (int i = 0; i < allInterceptors.size(); i++) {
+			// 拦截器进行封装转化为Advisor
 			advisors[i] = this.advisorAdapterRegistry.wrap(allInterceptors.get(i));
 		}
 		return advisors;
@@ -578,8 +549,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 	 * TargetSource and interfaces and will be used to create the proxy
 	 * immediably after this method returns
 	 */
-	protected void customizeProxyFactory(ProxyFactory proxyFactory) {
-	}
+	protected void customizeProxyFactory(ProxyFactory proxyFactory) {}
 
 
 	/**
@@ -598,7 +568,6 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 	 * @see #DO_NOT_PROXY
 	 * @see #PROXY_WITHOUT_ADDITIONAL_INTERCEPTORS
 	 */
-	protected abstract Object[] getAdvicesAndAdvisorsForBean(
-			Class<?> beanClass, String beanName, TargetSource customTargetSource) throws BeansException;
+	protected abstract Object[] getAdvicesAndAdvisorsForBean(Class<?> beanClass, String beanName, TargetSource customTargetSource) throws BeansException;
 
 }

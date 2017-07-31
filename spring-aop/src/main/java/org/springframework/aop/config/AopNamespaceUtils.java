@@ -95,14 +95,14 @@ public abstract class AopNamespaceUtils {
 
 	// 注册 AnnotationAwareAspectJAutoProxyCreator
 	public static void registerAspectJAnnotationAutoProxyCreatorIfNecessary(ParserContext parserContext, Element sourceElement) {
-		// 注册或升级 AnnotationAwareAspectJAutoProxyCreator 定义beanName为org.Springframework.aop.config.internalAutoProxyCreator的BeanDefinition
+		// 注册一个beanName为“org.Springframework.aop.config.internalAutoProxyCreator”的BeanDefinition，
+		// 该Bean对应的类型是 AnnotationAwareAspectJAutoProxyCreator，
 		// 对于AOP的实现，基本上都是靠 AnnotationAwareAspectJAutoProxyCreator 去完成的，它可以根据@Point注解定义的切点来自动代理相匹配的bean。
 		// 但是为了配置简便，Spring使用了自定义配置来帮助我们自动注册 AnnotationAwareAspectJAutoProxyCreator ，其注册过程就是在这里实现的。
 		BeanDefinition beanDefinition = AopConfigUtils.registerAspectJAnnotationAutoProxyCreatorIfNecessary(parserContext.getRegistry(), parserContext.extractSource(sourceElement));
-		// 处理proxy-target-class和expose-proxy属性
+		// 处理 proxy-target-class 和 expose-proxy 属性
 		useClassProxyingIfNecessary(parserContext.getRegistry(), sourceElement);
 		// 注册组件并通知，便于监听器做进一步处理
-		// 其中BeanDefinition的className为 AnnotationAutoProxyCreator
 		registerComponentIfNecessary(beanDefinition, parserContext);
 	}
 
@@ -127,15 +127,41 @@ public abstract class AopNamespaceUtils {
 		AopConfigUtils.forceAutoProxyCreatorToUseClassProxying(registry);
 	}
 
-	// 处理proxy-target-class和expose-proxy属性
+	// 处理 proxy-target-class 和 expose-proxy 属性
 	private static void useClassProxyingIfNecessary(BeanDefinitionRegistry registry, Element sourceElement) {
 		if (sourceElement != null) {
-			// 处理 proxy-target-class属性
+			// 处理 proxy-target-class 属性：proxy-target-class属性值决定是基于接口的还是基于类的代理被创建。
+			// 如果proxy-target-class 属性值被设置为true，那么基于类的代理将起作用（这时需要cglib库）；
+			// 如果proxy-target-class 属性值被设置为false，或者这个属性被省略，那么标准的JDK 基于接口的代理将起作用。
+			// 另外，即使你未声明 proxy-target-class="true" ，但运行类没有继承接口，spring也会自动使用CGLIB代理。高版本spring自动根据运行类选择 JDK 或 CGLIB 代理
 			boolean proxyTargetClass = Boolean.valueOf(sourceElement.getAttribute(PROXY_TARGET_CLASS_ATTRIBUTE));
 			if (proxyTargetClass) {
 				AopConfigUtils.forceAutoProxyCreatorToUseClassProxying(registry);
 			}
-			// 处理 expose-proxy属性
+			//
+			/*
+			处理 expose-proxy 属性：当前代理是否为可暴露状态,值是"ture",则为可访问。
+			expose-proxy：有时候目标对象内部的自动调用将无法实施切面中的增强，如下示例：
+				public interface AService{
+					public void a();
+					public void b();
+				}
+				@Servcie()
+				public class AServiceImpl1 implements AService{
+					@Transactional(propagation = Propagation.REQUIRED)
+					public void a(){
+						this.b();
+					}
+					@Transactional(propagation = Propagation.REQUIRES_NEW)
+					public void b(){
+
+					}
+				}
+
+				此处的this指向目标对象，因此调用this.b()将不会执行b事务切面，即不会执行事务增强，因此b方法的事务定义“@Transactional(propagation = Propagation.REQUIRES_NEW)”将不会实施，
+			为了解决这个问题，我们可以这样做：<aop:aspectj-autoproxy expose-proxy="true"/>,然后将以上代码中的“this.b();”修改为“((AService)AopContext.currentProxy()).b();”即可。
+			通过以上的修改便可以完成对a和b方法的同时增强。
+			 */
 			boolean exposeProxy = Boolean.valueOf(sourceElement.getAttribute(EXPOSE_PROXY_ATTRIBUTE));
 			if (exposeProxy) {
 				AopConfigUtils.forceAutoProxyCreatorToExposeProxy(registry);
@@ -143,10 +169,10 @@ public abstract class AopNamespaceUtils {
 		}
 	}
 
+	// Spring 中每次注册一个Bean都会通知相应的监听器
 	private static void registerComponentIfNecessary(BeanDefinition beanDefinition, ParserContext parserContext) {
 		if (beanDefinition != null) {
-			BeanComponentDefinition componentDefinition =
-					new BeanComponentDefinition(beanDefinition, AopConfigUtils.AUTO_PROXY_CREATOR_BEAN_NAME);
+			BeanComponentDefinition componentDefinition = new BeanComponentDefinition(beanDefinition, AopConfigUtils.AUTO_PROXY_CREATOR_BEAN_NAME);
 			parserContext.registerComponent(componentDefinition);
 		}
 	}

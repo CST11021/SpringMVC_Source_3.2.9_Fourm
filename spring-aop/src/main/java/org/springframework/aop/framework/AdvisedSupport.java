@@ -61,78 +61,47 @@ import org.springframework.util.CollectionUtils;
 @SuppressWarnings("unchecked")
 public class AdvisedSupport extends ProxyConfig implements Advised {
 
-	/** use serialVersionUID from Spring 2.0 for interoperability */
 	private static final long serialVersionUID = 2651364800145442165L;
 
-
-	/**
-	 * Canonical TargetSource when there's no target, and behavior is
-	 * supplied by the advisors.
-	 */
+	// 当没有目标类时，使用 EmptyTargetSource 规范目标类
 	public static final TargetSource EMPTY_TARGET_SOURCE = EmptyTargetSource.INSTANCE;
-
-
-	/** Package-protected to allow direct access for efficiency */
+	//** Package-protected to allow direct access for efficiency */
 	TargetSource targetSource = EMPTY_TARGET_SOURCE;
-
-	/** Whether the Advisors are already filtered for the specific target class */
+	//** Whether the Advisors are already filtered for the specific target class */
 	private boolean preFiltered = false;
 
-	/** The AdvisorChainFactory to use */
 	AdvisorChainFactory advisorChainFactory = new DefaultAdvisorChainFactory();
 
-	/** Cache with Method as key and advisor chain List as value */
+	// 以方法为键，增强链为值，进行缓存
 	private transient Map<MethodCacheKey, List<Object>> methodCache;
 
-	/**
-	 * Interfaces to be implemented by the proxy. Held in List to keep the order
-	 * of registration, to create JDK proxy with specified order of interfaces.
-	 */
+	// 保存代理类将要实现的接口。保存在列表中以保持注册顺序，用指定的接口顺序创建JDK代理
 	private List<Class> interfaces = new ArrayList<Class>();
 
-	/**
-	 * List of Advisors. If an Advice is added, it will be wrapped
-	 * in an Advisor before being added to this List.
-	 */
+	// List of Advisors. If an Advice is added, it will be wrapped in an Advisor before being added to this List.
 	private List<Advisor> advisors = new LinkedList<Advisor>();
-
-	/**
-	 * Array updated on changes to the advisors list, which is easier
-	 * to manipulate internally.
-	 */
+	// Array updated on changes to the advisors list, which is easier to manipulate internally.
 	private Advisor[] advisorArray = new Advisor[0];
 
 
-	/**
-	 * No-arg constructor for use as a JavaBean.
-	 */
 	public AdvisedSupport() {
 		initMethodCache();
 	}
-
-	/**
-	 * Create a AdvisedSupport instance with the given parameters.
-	 * @param interfaces the proxied interfaces
-	 */
 	public AdvisedSupport(Class[] interfaces) {
 		this();
 		setInterfaces(interfaces);
 	}
 
-	/**
-	 * Initialize the method cache.
-	 */
+
+	// Initialize the method cache.
 	private void initMethodCache() {
 		this.methodCache = new ConcurrentHashMap<MethodCacheKey, List<Object>>(32);
 	}
 
 
-	/**
-	 * Set the given object as target.
-	 * Will create a SingletonTargetSource for the object.
-	 * @see #setTargetSource
-	 * @see org.springframework.aop.target.SingletonTargetSource
-	 */
+	// ------------------------------------------ getter and setter ... ------------------------------------------
+
+	// 设置目标类
 	public void setTarget(Object target) {
 		setTargetSource(new SingletonTargetSource(target));
 	}
@@ -140,28 +109,13 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	public void setTargetSource(TargetSource targetSource) {
 		this.targetSource = (targetSource != null ? targetSource : EMPTY_TARGET_SOURCE);
 	}
-
 	public TargetSource getTargetSource() {
 		return this.targetSource;
 	}
 
-	/**
-	 * Set a target class to be proxied, indicating that the proxy
-	 * should be castable to the given class.
-	 * <p>Internally, an {@link org.springframework.aop.target.EmptyTargetSource}
-	 * for the given target class will be used. The kind of proxy needed
-	 * will be determined on actual creation of the proxy.
-	 * <p>This is a replacement for setting a "targetSource" or "target",
-	 * for the case where we want a proxy based on a target class
-	 * (which can be an interface or a concrete class) without having
-	 * a fully capable TargetSource available.
-	 * @see #setTargetSource
-	 * @see #setTarget
-	 */
 	public void setTargetClass(Class<?> targetClass) {
 		this.targetSource = EmptyTargetSource.forClass(targetClass);
 	}
-
 	public Class<?> getTargetClass() {
 		return this.targetSource.getTargetClass();
 	}
@@ -169,31 +123,18 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	public void setPreFiltered(boolean preFiltered) {
 		this.preFiltered = preFiltered;
 	}
-
 	public boolean isPreFiltered() {
 		return this.preFiltered;
 	}
 
-	/**
-	 * Set the advisor chain factory to use.
-	 * <p>Default is a {@link DefaultAdvisorChainFactory}.
-	 */
 	public void setAdvisorChainFactory(AdvisorChainFactory advisorChainFactory) {
 		Assert.notNull(advisorChainFactory, "AdvisorChainFactory must not be null");
 		this.advisorChainFactory = advisorChainFactory;
 	}
-
-	/**
-	 * Return the advisor chain factory to use (never {@code null}).
-	 */
 	public AdvisorChainFactory getAdvisorChainFactory() {
 		return this.advisorChainFactory;
 	}
 
-
-	/**
-	 * Set the interfaces to be proxied.
-	 */
 	public void setInterfaces(Class<?>... interfaces) {
 		Assert.notNull(interfaces, "Interfaces must not be null");
 		this.interfaces.clear();
@@ -201,11 +142,6 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 			addInterface(ifc);
 		}
 	}
-
-	/**
-	 * Add a new proxied interface.
-	 * @param intf the additional interface to proxy
-	 */
 	public void addInterface(Class<?> intf) {
 		Assert.notNull(intf, "Interface must not be null");
 		if (!intf.isInterface()) {
@@ -216,17 +152,14 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 			adviceChanged();
 		}
 	}
-
-	/**
-	 * Remove a proxied interface.
-	 * <p>Does nothing if the given interface isn't proxied.
-	 * @param intf the interface to remove from the proxy
-	 * @return {@code true} if the interface was removed; {@code false}
-	 * if the interface was not found and hence could not be removed
-	 */
 	public boolean removeInterface(Class<?> intf) {
 		return this.interfaces.remove(intf);
 	}
+	// ------------------------------------------ getter and setter ... ------------------------------------------
+
+
+
+
 
 	public Class<?>[] getProxiedInterfaces() {
 		return this.interfaces.toArray(new Class[this.interfaces.size()]);
@@ -242,22 +175,20 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 
+	// ----------- 关于增强 -----------------------------------------------
 	public final Advisor[] getAdvisors() {
 		return this.advisorArray;
 	}
-
 	public void addAdvisor(Advisor advisor) {
 		int pos = this.advisors.size();
 		addAdvisor(pos, advisor);
 	}
-
 	public void addAdvisor(int pos, Advisor advisor) throws AopConfigException {
 		if (advisor instanceof IntroductionAdvisor) {
 			validateIntroductionAdvisor((IntroductionAdvisor) advisor);
 		}
 		addAdvisorInternal(pos, advisor);
 	}
-
 	public boolean removeAdvisor(Advisor advisor) {
 		int index = indexOf(advisor);
 		if (index == -1) {
@@ -268,7 +199,6 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 			return true;
 		}
 	}
-
 	public void removeAdvisor(int index) throws AopConfigException {
 		if (isFrozen()) {
 			throw new AopConfigException("Cannot remove Advisor: Configuration is frozen.");
@@ -291,12 +221,10 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 		updateAdvisorArray();
 		adviceChanged();
 	}
-
 	public int indexOf(Advisor advisor) {
 		Assert.notNull(advisor, "Advisor must not be null");
 		return this.advisors.indexOf(advisor);
 	}
-
 	public boolean replaceAdvisor(Advisor a, Advisor b) throws AopConfigException {
 		Assert.notNull(a, "Advisor a must not be null");
 		Assert.notNull(b, "Advisor b must not be null");
@@ -309,28 +237,14 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 		return true;
 	}
 
-	/**
-	 * Add all of the given advisors to this proxy configuration.
-	 * @param advisors the advisors to register
-	 * @deprecated as of Spring 3.0, in favor of {@link #addAdvisors}
-	 */
+
 	@Deprecated
 	public void addAllAdvisors(Advisor[] advisors) {
 		addAdvisors(Arrays.asList(advisors));
 	}
-
-	/**
-	 * Add all of the given advisors to this proxy configuration.
-	 * @param advisors the advisors to register
-	 */
 	public void addAdvisors(Advisor... advisors) {
 		addAdvisors(Arrays.asList(advisors));
 	}
-
-	/**
-	 * Add all of the given advisors to this proxy configuration.
-	 * @param advisors the advisors to register
-	 */
 	public void addAdvisors(Collection<Advisor> advisors) {
 		if (isFrozen()) {
 			throw new AopConfigException("Cannot add advisor: Configuration is frozen.");
@@ -348,6 +262,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 		}
 	}
 
+
 	private void validateIntroductionAdvisor(IntroductionAdvisor advisor) {
 		advisor.validateInterfaces();
 		// If the advisor passed validation, we can make the change.
@@ -356,7 +271,6 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 			addInterface(ifc);
 		}
 	}
-
 	private void addAdvisorInternal(int pos, Advisor advisor) throws AopConfigException {
 		Assert.notNull(advisor, "Advisor must not be null");
 		if (isFrozen()) {
@@ -371,18 +285,12 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 		adviceChanged();
 	}
 
-	/**
-	 * Bring the array up to date with the list.
-	 */
+	// 更新advisorArray数组和advisors列表
 	protected final void updateAdvisorArray() {
 		this.advisorArray = this.advisors.toArray(new Advisor[this.advisors.size()]);
 	}
 
-	/**
-	 * Allows uncontrolled access to the {@link List} of {@link Advisor Advisors}.
-	 * <p>Use with care, and remember to {@link #updateAdvisorArray() refresh the advisor array}
-	 * and {@link #adviceChanged() fire advice changed events} when making any modifications.
-	 */
+	// 返回 advisors
 	protected final List<Advisor> getAdvisorsInternal() {
 		return this.advisors;
 	}
@@ -392,15 +300,11 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 		int pos = this.advisors.size();
 		addAdvice(pos, advice);
 	}
-
-	/**
-	 * Cannot add introductions this way unless the advice implements IntroductionInfo.
-	 */
 	public void addAdvice(int pos, Advice advice) throws AopConfigException {
 		Assert.notNull(advice, "Advice must not be null");
+		// 判断是否为引介增强
 		if (advice instanceof IntroductionInfo) {
-			// We don't need an IntroductionAdvisor for this kind of introduction:
-			// It's fully self-describing.
+			// We don't need an IntroductionAdvisor for this kind of introduction: It's fully self-describing.
 			addAdvisor(pos, new DefaultIntroductionAdvisor(advice, (IntroductionInfo) advice));
 		}
 		else if (advice instanceof DynamicIntroductionAdvice) {
@@ -411,7 +315,6 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 			addAdvisor(pos, new DefaultPointcutAdvisor(advice));
 		}
 	}
-
 	public boolean removeAdvice(Advice advice) throws AopConfigException {
 		int index = indexOf(advice);
 		if (index == -1) {
@@ -422,7 +325,6 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 			return true;
 		}
 	}
-
 	public int indexOf(Advice advice) {
 		Assert.notNull(advice, "Advice must not be null");
 		for (int i = 0; i < this.advisors.size(); i++) {
@@ -541,10 +443,8 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 
-	//---------------------------------------------------------------------
-	// Serialization support
-	//---------------------------------------------------------------------
 
+	// 序列化相关
 	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
 		// Rely on default serialization; just initialize state after deserialization.
 		ois.defaultReadObject();
@@ -552,15 +452,9 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 		// Initialize transient fields.
 		initMethodCache();
 	}
-
-
 	public String toProxyConfigString() {
 		return toString();
 	}
-
-	/**
-	 * For debugging/diagnostic use.
-	 */
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder(getClass().getName());
@@ -574,14 +468,10 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 
-	/**
-	 * Simple wrapper class around a Method. Used as the key when
-	 * caching methods, for efficient equals and hashCode comparisons.
-	 */
+	// 一个方法的简单包装类。用于缓存方法时，用于有效的equals和hashCode比较
 	private static class MethodCacheKey {
 
 		private final Method method;
-
 		private final int hashCode;
 
 		public MethodCacheKey(Method method) {
@@ -597,7 +487,6 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 			MethodCacheKey otherKey = (MethodCacheKey) other;
 			return (this.method == otherKey.method);
 		}
-
 		@Override
 		public int hashCode() {
 			return this.hashCode;

@@ -10,21 +10,21 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class AspectJTest {
 
     @Pointcut("execution(* *.test(..))")
-    public void test() {
+    public void test1() {
 
     }
 
-    @Before("test()")
+    @Before("test1()")
     public void beforeTest() {
         System.out.println("beforeTest2");
     }
 
-    @After("test()")
+    @After("test1()")
     public void afterTest() {
         System.out.println("afterTest2");
     }
 
-    @Around("test()")
+    @Around("test1()")
     public Object arountTest(ProceedingJoinPoint p) {
 
         System.out.println("before1");

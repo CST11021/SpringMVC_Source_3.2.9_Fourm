@@ -7,7 +7,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class Test {
 
-    // 测试使用编程的形式织入前置增强
+    // 测试使用编程的形式,织入前置增强
     @org.junit.Test
     public void TestBeforeAdvice() {
         Waiter target = new NaiveWaiter();

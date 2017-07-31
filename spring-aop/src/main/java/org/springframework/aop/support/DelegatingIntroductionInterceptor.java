@@ -49,8 +49,7 @@ import org.springframework.util.Assert;
  * @see DelegatePerTargetObjectIntroductionInterceptor
  */
 @SuppressWarnings("serial")
-public class DelegatingIntroductionInterceptor extends IntroductionInfoSupport
-		implements IntroductionInterceptor {
+public class DelegatingIntroductionInterceptor extends IntroductionInfoSupport implements IntroductionInterceptor {
 
 	/**
 	 * Object that actually implements the interfaces.

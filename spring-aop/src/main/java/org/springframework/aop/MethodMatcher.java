@@ -45,11 +45,39 @@ import java.lang.reflect.Method;
  * @see Pointcut
  * @see ClassFilter
  */
+/*
+	相对于 ClassFilter 的简单定义 MethodMatcher则要复杂得多，毕竟Spring主要支持的就是方法级别的拦截。
+
+	MethodMatcher 定义了两个matches方法，而这两个方法的分界线就是isRuntime()方法。
+在对对象具体方法进行拦截的时候可以忽略每次方法执行的时候调用者传入的参数，也可以每次都检查这些方法调用的参数以强化拦截条件。
+假设对以下方法进行拦截：
+
+	public boolean login(String username,Sring password);
+
+	如果只想在login方法之前插入计数功能，那么login方法的参数对于Joinpoint捕捉就是可以忽略的。而如果想在用户登录的时候对某个
+用户做单独处理，如不让其登录或者给予特殊权限那么这个方法的参数就是在匹配Joinpoint的时候必须要考虑的。
+
+	(1) 在前一种情况下isRuntime()返回false表示不会考虑具体Joinpoint的方法参数这种类型的MethodMatcher称之为StaticMethodMatcher。
+因为不用每次都检查参数那么对于同样类型的方法匹配结果就可以在框架内部缓存以提高性能。isRuntime方法返回false表明当前的MethodMatcher
+为StaticMethodMatcher的时候只有 boolean matches(Method method, Class targetClass);方法将被执行它的匹配结果将会成为其所属的Pointcut主要依据。
+
+	(2) 当isRuntime()方法返回true时表明该MethodMatcher将会每次都对方法调用的参数进行匹配检查这种类型的MethodMatcher称之为DynamicMethodMatcher。
+因为每次都要对方法参数进行检查无法对匹配的结果进行缓存所以匹配效率相对于StaticMethodMatcher来说要差。而且大部分情况下StaticMethodMatcher
+已经可以满足需要最好避免使用DynamicMethodMatcher类型。如果一个MethodMatcher为DynamicMethodMatcher isRuntime()返回true，并且当方法
+boolean matches(Method method, Class targetClass);也返回true的时候三个参数的matches方法将被执行以进一步检查匹配条件。如果方法
+boolean matches(Method method,Class targetClass);返回false那么不管这个MethodMatcher是StaticMethodMatcher还是DynamicMethodMatcher
+该结果已经是最终的匹配结果——你可以猜得到三个参数的matches方法那铁定是执行不了了。 在MethodMatcher类型的基础上Pointcut可以分为
+两类即StaticMethodMatcherPointcut和DynamicMethodMatcherPointcut。因为StaticMethodMatcherPointcut具有明显的性能优势所以Spring为其提供了更多支持。
+
+ */
 public interface MethodMatcher {
 
+	// 与所有方法匹配的规范实例
+	MethodMatcher TRUE = TrueMethodMatcher.INSTANCE;
+
 	/**
-	 * Perform static checking whether the given method matches. If this
-	 * returns {@code false} or if the {@link #isRuntime()} method
+	 * Perform static checking whether the given method matches.
+	 * If this returns {@code false} or if the {@link #isRuntime()} method
 	 * returns {@code false}, no runtime check (i.e. no.
 	 * {@link #matches(java.lang.reflect.Method, Class, Object[])} call) will be made.
 	 * @param method the candidate method
@@ -58,7 +86,6 @@ public interface MethodMatcher {
 	 * @return whether or not this method matches statically
 	 */
 	boolean matches(Method method, Class<?> targetClass);
-
 	/**
 	 * Is this MethodMatcher dynamic, that is, must a final call be made on the
 	 * {@link #matches(java.lang.reflect.Method, Class, Object[])} method at
@@ -70,10 +97,8 @@ public interface MethodMatcher {
 	 * is required if static matching passed
 	 */
 	boolean isRuntime();
-
 	/**
-	 * Check whether there a runtime (dynamic) match for this method,
-	 * which must have matched statically.
+	 * Check whether there a runtime (dynamic) match for this method, which must have matched statically.
 	 * <p>This method is invoked only if the 2-arg matches method returns
 	 * {@code true} for the given method and target class, and if the
 	 * {@link #isRuntime()} method returns {@code true}. Invoked
@@ -89,9 +114,6 @@ public interface MethodMatcher {
 	boolean matches(Method method, Class<?> targetClass, Object[] args);
 
 
-	/**
-	 * Canonical instance that matches all methods.
-	 */
-	MethodMatcher TRUE = TrueMethodMatcher.INSTANCE;
+
 
 }

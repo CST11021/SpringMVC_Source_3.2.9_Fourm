@@ -42,6 +42,7 @@ public class ProxyConfig implements Serializable {
 
 	// 设置是否直接代理目标类，而不是直接代理特定的接口，默认false
 	// 如果这个目标类是一个接口，那么将为给定的接口创建一个JDK代理，否则将为给定的类创建一个CGLIB代理。
+	// 对应配置中的 <aop:aspectj-autoproxy proxy-target-class="true"/>
 	public void setProxyTargetClass(boolean proxyTargetClass) {
 		this.proxyTargetClass = proxyTargetClass;
 	}

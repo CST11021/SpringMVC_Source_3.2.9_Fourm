@@ -28,12 +28,10 @@ package org.springframework.aop;
  * @author Rod Johnson
  * @since 1.1.1
  */
+// 该接口提供描述一个 introduction（引介增强） 所必需的信息
 public interface IntroductionInfo {
 
-	/**
-	 * Return the additional interfaces introduced by this Advisor or Advice.
-	 * @return the introduced interfaces
-	 */
+	// 返回引介增强所要实现的接口
 	Class[] getInterfaces();
 
 }

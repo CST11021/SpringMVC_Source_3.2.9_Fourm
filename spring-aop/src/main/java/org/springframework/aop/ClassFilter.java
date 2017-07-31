@@ -27,19 +27,26 @@ package org.springframework.aop;
  * @see Pointcut
  * @see MethodMatcher
  */
+
+/*
+		当织入的目标对象的Class类型与Pointcut所规定的类型相符时，matches方法将会返回true，否则，
+	返回false，即意味着不会对这个类型的目标对象进行织入操作。比如，如果我们仅希望对系统中Foo类型的类执行织入，则可以如下这样定义ClassFilter:
+	public class FooClassFilter{
+		public boolean matches(Class clazz){
+			return Foo.class.equals(clazz);
+		}
+	}
+		当然，如果类型对我们所捕捉的切点无所谓，那么切点中使用的ClassFilter可以直接使用“ClassFilter TRUE = TrueClassFilter.INSTANCE;”。
+	当切点中返回的ClassFilter类型为该类型实例时，切点的匹配将会针对系统所有的目标类以及他们的实例进行。
+ */
 public interface ClassFilter {
 
-	/**
-	 * Should the pointcut apply to the given interface or target class?
-	 * @param clazz the candidate target class
-	 * @return whether the advice should apply to the given target class
-	 */
+	// 一个与所有类匹配的ClassFilter的规范实例
+	ClassFilter TRUE = TrueClassFilter.INSTANCE;
+
+	// 判断增强是否适用于给定的目标类
 	boolean matches(Class<?> clazz);
 
 
-	/**
-	 * Canonical instance of a ClassFilter that matches all classes.
-	 */
-	ClassFilter TRUE = TrueClassFilter.INSTANCE;
 
 }

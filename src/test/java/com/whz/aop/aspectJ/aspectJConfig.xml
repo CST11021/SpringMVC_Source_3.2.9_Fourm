@@ -4,9 +4,20 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
     <!--开启注解aop-->
-    <aop:aspectj-autoproxy/>
+    <!--通过aop命名空间的<aop:aspectj-autoproxy />声明自动为spring容器中那些配置@aspectJ切面的bean创建代理，织入切面。-->
+    <!--当然，spring在内部依旧采用AnnotationAwareAspectJAutoProxyCreator进行自动代理的创建工作，但具体实现的细节已经被<aop:aspectj-autoproxy />隐藏起来了-->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
 
     <bean id="test" class="com.whz.aop.aspectJ.TestBean"/>
+
     <bean class="com.whz.aop.aspectJ.AspectJTest"/>
+
+    <bean id="annotationAwareAspectJAutoProxyCreatorTest"
+          class="com.whz.aop.aspectJ.AnnotationAwareAspectJAutoProxyCreatorTest"/>
+    <aop:config>
+        <aop:aspect ref="annotationAwareAspectJAutoProxyCreatorTest">
+            <aop:around method="process" pointcut="execution(* com.whz.aop.aspectJ.*.*(..))"/>
+        </aop:aspect>
+    </aop:config>
 
 </beans>

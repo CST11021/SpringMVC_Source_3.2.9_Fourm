@@ -27,13 +27,10 @@ package org.springframework.aop;
  * @since 2.0.3
  * @see org.springframework.aop.support.AopUtils#getTargetClass(Object)
  */
+// 该接口用于返回被代理的目标类
 public interface TargetClassAware {
 
-	/**
-	 * Return the target class behind the implementing object
-	 * (typically a proxy configuration or an actual proxy).
-	 * @return the target Class, or {@code null} if not known
-	 */
+	// 返回实现对象背后的目标类(通常是代理配置或实际代理)
 	Class<?> getTargetClass();
 
 }

@@ -33,15 +33,19 @@ import org.springframework.beans.factory.BeanNameAware;
  * @author Rod Johnson
  * @author Rob Harrop
  */
+
+/**
+ Spring提供的ProxyBeanFactory将切面织入到不同的目标类中。当然，为每一个目标类手工配置一个切面的比较烦琐的，
+ Spring利用BeanPostProcessor可干涉Bean生命周期的机制，提供了一些自动创建代理，织入切面的自动代理创建器，
+ 其中DefaultAdvisorAutoProxyCreator是功能强大的自动代理创建器，它可以将容器中所有Advisor自动织入到目标Bean中。
+ */
 @SuppressWarnings("serial")
 public class DefaultAdvisorAutoProxyCreator extends AbstractAdvisorAutoProxyCreator implements BeanNameAware {
 
 	/** Separator between prefix and remainder of bean name */
 	public final static String SEPARATOR = ".";
 
-
 	private boolean usePrefix;
-
 	private String advisorBeanNamePrefix;
 
 

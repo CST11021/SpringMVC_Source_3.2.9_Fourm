@@ -29,6 +29,9 @@ import org.aopalliance.intercept.MethodInterceptor;
  * @author Rod Johnson
  * @see DynamicIntroductionAdvice
  */
+// 引介增强接口：
+// 引介是一种特殊的增强，它为类添加一些属性和方法。这样，即使一个业务类原本没有实现某个接口，通过AOP的引介功能，
+// 我们可以动态地为该业务类添加接口的实现逻辑，让业务类成为这个接口的实现类。
 public interface IntroductionInterceptor extends MethodInterceptor, DynamicIntroductionAdvice {
 
 }

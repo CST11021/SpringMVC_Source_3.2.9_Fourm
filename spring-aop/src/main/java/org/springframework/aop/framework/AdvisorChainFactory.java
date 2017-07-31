@@ -27,15 +27,7 @@ import java.util.List;
  */
 public interface AdvisorChainFactory {
 
-	/**
-	 * Determine a list of {@link org.aopalliance.intercept.MethodInterceptor} objects
-	 * for the given advisor chain configuration.
-	 * @param config the AOP configuration in the form of an Advised object
-	 * @param method the proxied method
-	 * @param targetClass the target class
-	 * @return List of MethodInterceptors (may also include InterceptorAndDynamicMethodMatchers)
-	 */
-	List<Object> getInterceptorsAndDynamicInterceptionAdvice(
-			Advised config, Method method, Class targetClass);
+	// 通过给定的配置，为目标类的指定方法配置一个方法拦截器对象列表
+	List<Object> getInterceptorsAndDynamicInterceptionAdvice(Advised config, Method method, Class targetClass);
 
 }

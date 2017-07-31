@@ -48,12 +48,12 @@ public abstract class AopConfigUtils {
 	// 由内部自动代理创建器生成的bean名称。
 	public static final String AUTO_PROXY_CREATOR_BEAN_NAME = "org.springframework.aop.config.internalAutoProxyCreator";
 
-	// 用于存储自动代理创建器
+	// 用于存储自动代理创建器，优先使用优先级高的创建器（优先级越高，所在集合的索引越大）
 	private static final List<Class> APC_PRIORITY_LIST = new ArrayList<Class>();
 	static {
 		APC_PRIORITY_LIST.add(InfrastructureAdvisorAutoProxyCreator.class);
 		APC_PRIORITY_LIST.add(AspectJAwareAdvisorAutoProxyCreator.class);
-		APC_PRIORITY_LIST.add(AnnotationAwareAspectJAutoProxyCreator.class);
+		APC_PRIORITY_LIST.add(AnnotationAwareAspectJAutoProxyCreator.class);// AnnotationAwareAspectJAutoProxyCreator 默认优先级最高
 	}
 
 
@@ -75,7 +75,7 @@ public abstract class AopConfigUtils {
 	public static BeanDefinition registerAspectJAnnotationAutoProxyCreatorIfNecessary(BeanDefinitionRegistry registry, Object source) {
 		return registerOrEscalateApcAsRequired(AnnotationAwareAspectJAutoProxyCreator.class, registry, source);
 	}
-	// 如果 cls 的name在APC_PRIORITY_LIST中比“自动代理创建器”的name优先级高，则使用cls的name作为自动代理创建器的beanName
+	// 如果 cls 在APC_PRIORITY_LIST中比“自动代理创建器”的优先级高，则使用cls作为自动代理创建器的bean
 	private static BeanDefinition registerOrEscalateApcAsRequired(Class cls, BeanDefinitionRegistry registry, Object source) {
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
 		// 如果已经存在了自动代理创建器且存在的自动代理创建器与现在的不一致那么需要根据优先级来判断到底需要使用哪个
