@@ -44,30 +44,18 @@ import org.springframework.util.ClassUtils;
 public class IntroductionInfoSupport implements IntroductionInfo, Serializable {
 
 	protected final Set<Class> publishedInterfaces = new HashSet<Class>();
-
+	// 如果 键值对应的 Method 是 publishedInterfaces 中的接口方法，则value对应的值为true
 	private transient Map<Method, Boolean> rememberedMethods = new ConcurrentHashMap<Method, Boolean>(32);
 
-
-	/**
-	 * Suppress the specified interface, which may have been autodetected
-	 * due to the delegate implementing it. Call this method to exclude
-	 * internal interfaces from being visible at the proxy level.
-	 * <p>Does nothing if the interface is not implemented by the delegate.
-	 * @param intf the interface to suppress
-	 */
+	// 从 this.publishedInterfaces 移除 intf 接口
 	public void suppressInterface(Class intf) {
 		this.publishedInterfaces.remove(intf);
 	}
-
+	// 返回 this.publishedInterfaces
 	public Class[] getInterfaces() {
 		return this.publishedInterfaces.toArray(new Class[this.publishedInterfaces.size()]);
 	}
-
-	/**
-	 * Check whether the specified interfaces is a published introduction interface.
-	 * @param ifc the interface to check
-	 * @return whether the interface is part of this introduction
-	 */
+	// 判断 this.publishedInterfaces 中是否包含指定的ifc接口
 	public boolean implementsInterface(Class ifc) {
 		for (Class pubIfc : this.publishedInterfaces) {
 			if (ifc.isInterface() && ifc.isAssignableFrom(pubIfc)) {
@@ -76,20 +64,11 @@ public class IntroductionInfoSupport implements IntroductionInfo, Serializable {
 		}
 		return false;
 	}
-
-	/**
-	 * Publish all interfaces that the given delegate implements at the proxy level.
-	 * @param delegate the delegate object
-	 */
+	// 将delegate中所实现的所有接口添加到this.publishedInterfaces中
 	protected void implementInterfacesOnObject(Object delegate) {
 		this.publishedInterfaces.addAll(ClassUtils.getAllInterfacesAsSet(delegate));
 	}
-
-	/**
-	 * Is this method on an introduced interface?
-	 * @param mi the method invocation
-	 * @return whether the invoked method is on an introduced interface
-	 */
+	// 判断 mi 方法是否为 this.publishedInterfaces 中的接口方法
 	protected final boolean isMethodOnIntroducedInterface(MethodInvocation mi) {
 		Boolean rememberedResult = this.rememberedMethods.get(mi.getMethod());
 		if (rememberedResult != null) {
@@ -104,10 +83,8 @@ public class IntroductionInfoSupport implements IntroductionInfo, Serializable {
 	}
 
 
-	//---------------------------------------------------------------------
-	// Serialization support
-	//---------------------------------------------------------------------
 
+	// Serialization support
 	/**
 	 * This method is implemented only to restore the logger.
 	 * We don't make the logger static as that would mean that subclasses

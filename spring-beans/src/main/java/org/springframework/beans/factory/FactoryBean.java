@@ -17,8 +17,8 @@
 package org.springframework.beans.factory;
 
 // 当某些对象的实例化过程过于烦琐，通过XML配置过于复杂，使我们宁愿使用Java代码来完成这个实例化过程的时候，
-// 或者，某些第三方库不能直接注册到Spring容器的时候，就可以实现 org.springframework.beans.factory.FactoryBean 接口，给出自己的对象实例化逻辑代码。
-// 如果你要在Spring的配置文件中配置 factory-bean 来生成bean实例并注入，你就需要实现该接口
+// 或者，某些第三方库不能直接注册到Spring容器的时候，就可以实现 org.springframework.beans.factory.FactoryBean 接口，
+// 给出自己的对象实例化逻辑代码。如果你要在Spring的配置文件中配置 factory-bean 来生成bean实例并注入，你就需要实现该接口
 public interface FactoryBean<T> {
 
 	// 返回该工厂创建的实例对象

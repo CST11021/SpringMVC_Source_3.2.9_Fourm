@@ -29,23 +29,18 @@ package org.springframework.aop;
  * @since 04.04.2003
  * @see IntroductionInterceptor
  */
+// 引介增强接口
+/*
+	IntroductionAdvisor与PointcutAdvisor最本质的区别就是，IntroductionAdvisor只能应用于类级别的拦截，
+	只能使用Introduction型的Advice，而不能像PointcutAdvisor那样，可以使用任何类型的Pointcut，以及差不
+	多任何类型的Advice。也就是说，IntroductionAdvisor纯粹就是为了Introduction而生的。
+ */
 public interface IntroductionAdvisor extends Advisor, IntroductionInfo {
 
-	/**
-	 * Return the filter determining which target classes this introduction
-	 * should apply to.
-	 * <p>This represents the class part of a pointcut. Note that method
-	 * matching doesn't make sense to introductions.
-	 * @return the class filter
-	 */
+	// 返回该增强的一个ClassFilter
 	ClassFilter getClassFilter();
 
-	/**
-	 * Can the advised interfaces be implemented by the introduction advice?
-	 * Invoked before adding an IntroductionAdvisor.
-	 * @throws IllegalArgumentException if the advised interfaces can't be
-	 * implemented by the introduction advice
-	 */
+	// 判断将要织入的接口方法是否有被增强实现
 	void validateInterfaces() throws IllegalArgumentException;
 
 }

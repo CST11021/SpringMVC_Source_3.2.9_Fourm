@@ -59,8 +59,50 @@ import org.springframework.util.ClassUtils;
  * @see AdvisedSupport
  * @see ProxyFactory
  */
-final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializable {
 
+
+/*
+  使用JDK代理示例：
+
+	  public class PerformaceHandler implements InvocationHandler {
+		private Object target;
+		public PerformaceHandler(Object target){
+			this.target = target;
+		}
+		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+			PerformanceMonitor.begin(target.getClass().getName()+"."+ method.getName());
+			Object obj = method.invoke(target, args);
+			PerformanceMonitor.end();
+			return obj;
+		}
+	}
+
+	测试类：
+	public class TestForumService {
+		public static void main(String[] args) {
+			// 业务类正常编码的测试
+			 ForumService forumService = new ForumServiceImpl();
+			 forumService.removeForum(10);
+			 forumService.removeTopic(1012);
+
+			// 使用JDK动态代理
+			ForumService target = new ForumServiceImpl();
+			PerformaceHandler handler = new PerformaceHandler(target);
+			ForumService proxy = (ForumService) Proxy.newProxyInstance(
+					target.getClass().getClassLoader(),
+					target.getClass().getInterfaces(),
+					handler);
+			proxy.removeForum(10);
+			proxy.removeTopic(1012);
+		}
+	}
+
+
+
+ */
+final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializable {
+	/** We use a static Log to avoid serialization issues */
+	private static Log logger = LogFactory.getLog(JdkDynamicAopProxy.class);
 	/** use serialVersionUID from Spring 1.2 for interoperability */
 	private static final long serialVersionUID = 5531744639992436476L;
 
@@ -74,29 +116,16 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 	 * This way, we can also more easily take advantage of minor optimizations in each class.
 	 */
 
-	/** We use a static Log to avoid serialization issues */
-	private static Log logger = LogFactory.getLog(JdkDynamicAopProxy.class);
-
-	/** Config used to configure this proxy */
+	//** Config used to configure this proxy */
 	private final AdvisedSupport advised;
 
-	/**
-	 * Is the {@link #equals} method defined on the proxied interfaces?
-	 */
+	// Is the {@link #equals} method defined on the proxied interfaces?
 	private boolean equalsDefined;
-
-	/**
-	 * Is the {@link #hashCode} method defined on the proxied interfaces?
-	 */
+	// Is the {@link #hashCode} method defined on the proxied interfaces?
 	private boolean hashCodeDefined;
 
 
-	/**
-	 * Construct a new JdkDynamicAopProxy for the given AOP configuration.
-	 * @param config the AOP configuration as AdvisedSupport object
-	 * @throws AopConfigException if the config is invalid. We try to throw an informative
-	 * exception in this case, rather than let a mysterious failure happen later.
-	 */
+
 	public JdkDynamicAopProxy(AdvisedSupport config) throws AopConfigException {
 		Assert.notNull(config, "AdvisedSupport must not be null");
 		if (config.getAdvisors().length == 0 && config.getTargetSource() == AdvisedSupport.EMPTY_TARGET_SOURCE) {
@@ -109,21 +138,17 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 	public Object getProxy() {
 		return getProxy(ClassUtils.getDefaultClassLoader());
 	}
-
 	public Object getProxy(ClassLoader classLoader) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Creating JDK dynamic proxy: target source is " + this.advised.getTargetSource());
 		}
+		// 获取要代理接口
 		Class[] proxiedInterfaces = AopProxyUtils.completeProxiedInterfaces(this.advised);
 		findDefinedEqualsAndHashCodeMethods(proxiedInterfaces);
+		// 我们可以看到，底层使用的是JDK代理的方式，这里传入了一个this参数，它实现了 InvocationHandler 接口
+		// 所以，当执行代理类方法时，如果，这个方法是被代理的接口方法，就会自动来调用 this.invoke()这个方法，这个方法将调用目标类的原始方法
 		return Proxy.newProxyInstance(classLoader, proxiedInterfaces, this);
 	}
-
-	/**
-	 * Finds any {@link #equals} or {@link #hashCode} method that may be defined
-	 * on the supplied set of interfaces.
-	 * @param proxiedInterfaces the interfaces to introspect
-	 */
 	private void findDefinedEqualsAndHashCodeMethods(Class[] proxiedInterfaces) {
 		for (Class proxiedInterface : proxiedInterfaces) {
 			Method[] methods = proxiedInterface.getDeclaredMethods();
@@ -190,8 +215,7 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 				setProxyContext = true;
 			}
 
-			// May be null. Get as late as possible to minimize the time we "own" the target,
-			// in case it comes from a pool.
+			// May be null. Get as late as possible to minimize the time we "own" the target, in case it comes from a pool.
 			target = targetSource.getTarget();
 			if (target != null) {
 				targetClass = target.getClass();
@@ -220,7 +244,6 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 			}
 
 			// Massage return value if necessary.
-			// 返回结果
 			Class<?> returnType = method.getReturnType();
 			if (retVal != null && retVal == target && returnType.isInstance(proxy) &&
 					!RawTargetAccess.class.isAssignableFrom(method.getDeclaringClass())) {
@@ -246,11 +269,7 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 	}
 
 
-	/**
-	 * Equality means interfaces, advisors and TargetSource are equal.
-	 * <p>The compared object may be a JdkDynamicAopProxy instance itself
-	 * or a dynamic proxy wrapping a JdkDynamicAopProxy instance.
-	 */
+
 	@Override
 	public boolean equals(Object other) {
 		if (other == this) {
@@ -279,10 +298,6 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 		// If we get here, otherProxy is the other AopProxy.
 		return AopProxyUtils.equalsInProxy(this.advised, otherProxy.advised);
 	}
-
-	/**
-	 * Proxy uses the hash code of the TargetSource.
-	 */
 	@Override
 	public int hashCode() {
 		return JdkDynamicAopProxy.class.hashCode() * 13 + this.advised.getTargetSource().hashCode();

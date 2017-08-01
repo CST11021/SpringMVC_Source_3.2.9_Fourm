@@ -47,7 +47,7 @@ public class Test {
 //        forumService.removeForum(10);
 //        forumService.removeTopic(1022);
 
-        Monitorable moniterable = (Monitorable)forumService;
+        Monitorable moniterable = (Monitorable) forumService;
         moniterable.setMonitorActive(true);
         forumService.removeForum(10);
         forumService.removeTopic(1022);

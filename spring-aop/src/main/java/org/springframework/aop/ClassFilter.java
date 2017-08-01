@@ -39,6 +39,7 @@ package org.springframework.aop;
 		当然，如果类型对我们所捕捉的切点无所谓，那么切点中使用的ClassFilter可以直接使用“ClassFilter TRUE = TrueClassFilter.INSTANCE;”。
 	当切点中返回的ClassFilter类型为该类型实例时，切点的匹配将会针对系统所有的目标类以及他们的实例进行。
  */
+// 简单的说 ClassFilter 是用来过滤目标对象，只有匹配了才能给目标对象织入增强逻辑
 public interface ClassFilter {
 
 	// 一个与所有类匹配的ClassFilter的规范实例

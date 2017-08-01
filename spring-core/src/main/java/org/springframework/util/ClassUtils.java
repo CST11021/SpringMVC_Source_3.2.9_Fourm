@@ -519,29 +519,9 @@ public abstract class ClassUtils {
 		return (clazz.getSuperclass() != null && hasAtLeastOneMethodWithName(clazz.getSuperclass(), methodName));
 	}
 
-	/**
-	 * Given a method, which may come from an interface, and a target class used
-	 * in the current reflective invocation, find the corresponding target method
-	 * if there is one. E.g. the method may be {@code IFoo.bar()} and the
-	 * target class may be {@code DefaultFoo}. In this case, the method may be
-	 * {@code DefaultFoo.bar()}. This enables attributes on that method to be found.
-	 * <p><b>NOTE:</b> In contrast to {@link org.springframework.aop.support.AopUtils#getMostSpecificMethod},
-	 * this method does <i>not</i> resolve Java 5 bridge methods automatically.
-	 * Call {@link org.springframework.core.BridgeMethodResolver#findBridgedMethod}
-	 * if bridge method resolution is desirable (e.g. for obtaining metadata from
-	 * the original method definition).
-	 * <p><b>NOTE:</b> Since Spring 3.1.1, if Java security settings disallow reflective
-	 * access (e.g. calls to {@code Class#getDeclaredMethods} etc, this implementation
-	 * will fall back to returning the originally provided method.
-	 * @param method the method to be invoked, which may come from an interface
-	 * @param targetClass the target class for the current invocation.
-	 * May be {@code null} or may not even implement the method.
-	 * @return the specific target method, or the original method if the
-	 * {@code targetClass} doesn't implement it or is {@code null}
-	 */
+	// 此处将查找当前类覆盖的方法
 	public static Method getMostSpecificMethod(Method method, Class<?> targetClass) {
-		if (method != null && isOverridable(method, targetClass) &&
-				targetClass != null && !targetClass.equals(method.getDeclaringClass())) {
+		if (method != null && isOverridable(method, targetClass) && targetClass != null && !targetClass.equals(method.getDeclaringClass())) {
 			try {
 				if (Modifier.isPublic(method.getModifiers())) {
 					try {
@@ -552,8 +532,7 @@ public abstract class ClassUtils {
 					}
 				}
 				else {
-					Method specificMethod =
-							ReflectionUtils.findMethod(targetClass, method.getName(), method.getParameterTypes());
+					Method specificMethod = ReflectionUtils.findMethod(targetClass, method.getName(), method.getParameterTypes());
 					return (specificMethod != null ? specificMethod : method);
 				}
 			}
@@ -564,11 +543,7 @@ public abstract class ClassUtils {
 		return method;
 	}
 
-	/**
-	 * Determine whether the given method is overridable in the given target class.
-	 * @param method the method to check
-	 * @param targetClass the target class to check against
-	 */
+	// 判断method目标类中是否可覆盖，如果private就不可以重写
 	private static boolean isOverridable(Method method, Class<?> targetClass) {
 		if (Modifier.isPrivate(method.getModifiers())) {
 			return false;
@@ -822,7 +797,7 @@ public abstract class ClassUtils {
 		}
 	}
 
-	// 判断是否为CGLIB生成的代理类
+	// 判断是否为CGLIB生成的代理类，如果是CGLIB生成的，className必定包含$$
 	public static boolean isCglibProxy(Object object) {
 		return ClassUtils.isCglibProxyClass(object.getClass());
 	}

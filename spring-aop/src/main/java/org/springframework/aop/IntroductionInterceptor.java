@@ -32,6 +32,10 @@ import org.aopalliance.intercept.MethodInterceptor;
 // 引介增强接口：
 // 引介是一种特殊的增强，它为类添加一些属性和方法。这样，即使一个业务类原本没有实现某个接口，通过AOP的引介功能，
 // 我们可以动态地为该业务类添加接口的实现逻辑，让业务类成为这个接口的实现类。
+// Introduction可以在不改动目标类定义的情况下，为目标类添加新的属性以及行为。
+// 在Spring中，为目标对象添加新的属性和行为必须声明相应的接口以及相应的实现。
+// 这样，在通过特定的拦截器将新的接口定义以及实现类中的逻辑附加到目标对象之上。
+// 之后，代理对象就拥有了新的状态和行为。这个特定的拦截器就是IntroductionInterceptor
 public interface IntroductionInterceptor extends MethodInterceptor, DynamicIntroductionAdvice {
 
 }

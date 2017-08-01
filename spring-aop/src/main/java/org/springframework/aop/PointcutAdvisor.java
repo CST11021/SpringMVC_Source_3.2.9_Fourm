@@ -23,6 +23,9 @@ package org.springframework.aop;
  *
  * @author Rod Johnson
  */
+
+
+// PointcutAdvisor定义了一个Pointcut和一个Advice的Advisor，大部分的Advisor实现都属于 PointcutAdvisor 这一分支的
 public interface PointcutAdvisor extends Advisor {
 
 	/**

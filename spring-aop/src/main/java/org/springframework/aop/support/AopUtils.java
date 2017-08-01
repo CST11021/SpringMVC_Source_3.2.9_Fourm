@@ -53,66 +53,35 @@ import org.springframework.util.ReflectionUtils;
  */
 public abstract class AopUtils {
 
-	/**
-	 * Check whether the given object is a JDK dynamic proxy or a CGLIB proxy.
-	 * @param object the object to check
-	 * @see #isJdkDynamicProxy
-	 * @see #isCglibProxy
-	 */
+	// 判断 object 这个对象是否为JDK 动态代理 或是 CGLIB代理
 	public static boolean isAopProxy(Object object) {
 		return (object instanceof SpringProxy &&
 				(Proxy.isProxyClass(object.getClass()) || ClassUtils.isCglibProxyClass(object.getClass())));
 	}
 
-	/**
-	 * Check whether the given object is a JDK dynamic proxy.
-	 * @param object the object to check
-	 * @see java.lang.reflect.Proxy#isProxyClass
-	 */
+	// 判断 object 这个对象是否为 JDK 动态代理
 	public static boolean isJdkDynamicProxy(Object object) {
 		return (object instanceof SpringProxy && Proxy.isProxyClass(object.getClass()));
 	}
 
-	/**
-	 * Check whether the given object is a CGLIB proxy. Goes beyond the implementation
-	 * in {@link ClassUtils#isCglibProxy(Object)} by checking also to see if the given
-	 * object is an instance of {@link SpringProxy}.
-	 * @param object the object to check
-	 * @see ClassUtils#isCglibProxy(Object)
-	 */
+	// 判断 object 这个对象是否为 CGLIB代理
 	public static boolean isCglibProxy(Object object) {
 		return (object instanceof SpringProxy && ClassUtils.isCglibProxy(object));
 	}
 
-	/**
-	 * Check whether the specified class is a CGLIB-generated class.
-	 * @param clazz the class to check
-	 * @deprecated as of Spring 3.1 in favor of {@link ClassUtils#isCglibProxyClass(Class)}
-	 */
+	// 判断 clazz 是否为 CGLIB代理对象生成的class
 	@Deprecated
 	public static boolean isCglibProxyClass(Class<?> clazz) {
 		return ClassUtils.isCglibProxyClass(clazz);
 	}
 
-	/**
-	 * Check whether the specified class name is a CGLIB-generated class.
-	 * @param className the class name to check
-	 * @deprecated as of Spring 3.1 in favor of {@link ClassUtils#isCglibProxyClassName(String)}
-	 */
+	// 判断这个 className 是否为CGLIB代理生成的，CGLIB代理生成的className一定包含"$$"
 	@Deprecated
 	public static boolean isCglibProxyClassName(String className) {
 		return ClassUtils.isCglibProxyClassName(className);
 	}
 
-	/**
-	 * Determine the target class of the given bean instance which might be an AOP proxy.
-	 * <p>Returns the target class for an AOP proxy and the plain class else.
-	 * @param candidate the instance to check (might be an AOP proxy)
-	 * @return the target class (or the plain class of the given object as fallback;
-	 * never {@code null})
-	 * @see org.springframework.aop.TargetClassAware#getTargetClass()
-	 * @see org.springframework.aop.framework.AopProxyUtils#ultimateTargetClass(Object)
-	 */
+	// 返回这个 candidate 的目标类，candidate可能是一个AOP代理类
 	public static Class<?> getTargetClass(Object candidate) {
 		Assert.notNull(candidate, "Candidate object must not be null");
 		Class<?> result = null;
@@ -125,84 +94,36 @@ public abstract class AopUtils {
 		return result;
 	}
 
-	/**
-	 * Determine whether the given method is an "equals" method.
-	 * @see java.lang.Object#equals
-	 */
+	// 判断 method 是否是 equals 方法
 	public static boolean isEqualsMethod(Method method) {
 		return ReflectionUtils.isEqualsMethod(method);
 	}
-
-	/**
-	 * Determine whether the given method is a "hashCode" method.
-	 * @see java.lang.Object#hashCode
-	 */
+	// 判断 method 是否是 hashcode 方法
 	public static boolean isHashCodeMethod(Method method) {
 		return ReflectionUtils.isHashCodeMethod(method);
 	}
-
-	/**
-	 * Determine whether the given method is a "toString" method.
-	 * @see java.lang.Object#toString()
-	 */
+	// 判断 method 是否是 toString 方法
 	public static boolean isToStringMethod(Method method) {
 		return ReflectionUtils.isToStringMethod(method);
 	}
-
-	/**
-	 * Determine whether the given method is a "finalize" method.
-	 * @see java.lang.Object#finalize()
-	 */
+	// 判断 method 是否是 finalize 方法
 	public static boolean isFinalizeMethod(Method method) {
 		return (method != null && method.getName().equals("finalize") &&
 				method.getParameterTypes().length == 0);
 	}
 
-	/**
-	 * Given a method, which may come from an interface, and a target class used
-	 * in the current AOP invocation, find the corresponding target method if there
-	 * is one. E.g. the method may be {@code IFoo.bar()} and the target class
-	 * may be {@code DefaultFoo}. In this case, the method may be
-	 * {@code DefaultFoo.bar()}. This enables attributes on that method to be found.
-	 * <p><b>NOTE:</b> In contrast to {@link org.springframework.util.ClassUtils#getMostSpecificMethod},
-	 * this method resolves Java 5 bridge methods in order to retrieve attributes
-	 * from the <i>original</i> method definition.
-	 * @param method the method to be invoked, which may come from an interface
-	 * @param targetClass the target class for the current invocation.
-	 * May be {@code null} or may not even implement the method.
-	 * @return the specific target method, or the original method if the
-	 * {@code targetClass} doesn't implement it or is {@code null}
-	 * @see org.springframework.util.ClassUtils#getMostSpecificMethod
-	 */
+	// 返回最具体的方法
 	public static Method getMostSpecificMethod(Method method, Class<?> targetClass) {
 		Method resolvedMethod = ClassUtils.getMostSpecificMethod(method, targetClass);
-		// If we are dealing with method with generic parameters, find the original method.
+		// 如果我们处理的是泛型参数的方法，找到原始的方法
 		return BridgeMethodResolver.findBridgedMethod(resolvedMethod);
 	}
 
-
-	/**
-	 * Can the given pointcut apply at all on the given class?
-	 * <p>This is an important test as it can be used to optimize
-	 * out a pointcut for a class.
-	 * @param pc the static or dynamic pointcut to check
-	 * @param targetClass the class to test
-	 * @return whether the pointcut can apply on any method
-	 */
+	// 判断能否在指定的目标类上应用指定的切点
 	public static boolean canApply(Pointcut pc, Class<?> targetClass) {
 		return canApply(pc, targetClass, false);
 	}
-
-	/**
-	 * Can the given pointcut apply at all on the given class?
-	 * <p>This is an important test as it can be used to optimize
-	 * out a pointcut for a class.
-	 * @param pc the static or dynamic pointcut to check
-	 * @param targetClass the class to test
-	 * @param hasIntroductions whether or not the advisor chain
-	 * for this bean includes any introductions
-	 * @return whether the pointcut can apply on any method
-	 */
+	// hasIntroductions表示：这个bean的增强链是否有包含任何的引介增强
 	public static boolean canApply(Pointcut pc, Class<?> targetClass, boolean hasIntroductions) {
 		Assert.notNull(pc, "Pointcut must not be null");
 		if (!pc.getClassFilter().matches(targetClass)) {
@@ -231,28 +152,10 @@ public abstract class AopUtils {
 		return false;
 	}
 
-	/**
-	 * Can the given advisor apply at all on the given class?
-	 * This is an important test as it can be used to optimize
-	 * out a advisor for a class.
-	 * @param advisor the advisor to check
-	 * @param targetClass class we're testing
-	 * @return whether the pointcut can apply on any method
-	 */
+	// 判断能否在指定的目标类上应用指定的增强
 	public static boolean canApply(Advisor advisor, Class<?> targetClass) {
 		return canApply(advisor, targetClass, false);
 	}
-
-	/**
-	 * Can the given advisor apply at all on the given class?
-	 * <p>This is an important test as it can be used to optimize out a advisor for a class.
-	 * This version also takes into account introductions (for IntroductionAwareMethodMatchers).
-	 * @param advisor the advisor to check
-	 * @param targetClass class we're testing
-	 * @param hasIntroductions whether or not the advisor chain for this bean includes
-	 * any introductions
-	 * @return whether the pointcut can apply on any method
-	 */
 	public static boolean canApply(Advisor advisor, Class<?> targetClass, boolean hasIntroductions) {
 		if (advisor instanceof IntroductionAdvisor) {
 			return ((IntroductionAdvisor) advisor).getClassFilter().matches(targetClass);
@@ -267,14 +170,7 @@ public abstract class AopUtils {
 		}
 	}
 
-	/**
-	 * Determine the sublist of the {@code candidateAdvisors} list
-	 * that is applicable to the given class.
-	 * @param candidateAdvisors the Advisors to evaluate
-	 * @param clazz the target class
-	 * @return sublist of Advisors that can apply to an object of the given class
-	 * (may be the incoming List as-is)
-	 */
+	// 判断能否在指定的目标类上应用指定的增强链
 	public static List<Advisor> findAdvisorsThatCanApply(List<Advisor> candidateAdvisors, Class<?> clazz) {
 		if (candidateAdvisors.isEmpty()) {
 			return candidateAdvisors;
@@ -302,17 +198,8 @@ public abstract class AopUtils {
 	}
 
 
-	/**
-	 * Invoke the given target via reflection, as part of an AOP method invocation.
-	 * @param target the target object
-	 * @param method the method to invoke
-	 * @param args the arguments for the method
-	 * @return the invocation result, if any
-	 * @throws Throwable if thrown by the target method
-	 * @throws org.springframework.aop.AopInvocationException in case of a reflection error
-	 */
-	public static Object invokeJoinpointUsingReflection(Object target, Method method, Object[] args)
-			throws Throwable {
+	// 调用目标类的method方法
+	public static Object invokeJoinpointUsingReflection(Object target, Method method, Object[] args) throws Throwable {
 
 		// Use reflection to invoke the method.
 		try {
@@ -325,8 +212,7 @@ public abstract class AopUtils {
 			throw ex.getTargetException();
 		}
 		catch (IllegalArgumentException ex) {
-			throw new AopInvocationException("AOP configuration seems to be invalid: tried calling method [" +
-					method + "] on target [" + target + "]", ex);
+			throw new AopInvocationException("AOP configuration seems to be invalid: tried calling method [" + method + "] on target [" + target + "]", ex);
 		}
 		catch (IllegalAccessException ex) {
 			throw new AopInvocationException("Could not access method [" + method + "]", ex);

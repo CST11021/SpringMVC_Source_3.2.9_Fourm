@@ -7,7 +7,7 @@ import org.aopalliance.intercept.MethodInvocation;
 import java.lang.reflect.Method;
 
 
-//定义一个环绕增强
+// 定义一个环绕增强
 public class GreetingInterceptor implements MethodInterceptor {
 
    public Object invoke(MethodInvocation invocation) throws Throwable {

@@ -195,8 +195,7 @@ final class CglibAopProxy implements AopProxy, Serializable {
 			for (int x = 0; x < types.length; x++) {
 				types[x] = callbacks[x].getClass();
 			}
-			enhancer.setCallbackFilter(new ProxyCallbackFilter(
-					this.advised.getConfigurationOnlyCopy(), this.fixedInterceptorMap, this.fixedInterceptorOffset));
+			enhancer.setCallbackFilter(new ProxyCallbackFilter(this.advised.getConfigurationOnlyCopy(), this.fixedInterceptorMap, this.fixedInterceptorOffset));
 			enhancer.setCallbackTypes(types);
 			enhancer.setCallbacks(callbacks);
 
@@ -213,16 +212,12 @@ final class CglibAopProxy implements AopProxy, Serializable {
 			return proxy;
 		}
 		catch (CodeGenerationException ex) {
-			throw new AopConfigException("Could not generate CGLIB subclass of class [" +
-					this.advised.getTargetClass() + "]: " +
-					"Common causes of this problem include using a final class or a non-visible class",
-					ex);
+			throw new AopConfigException("Could not generate CGLIB subclass of class [" + this.advised.getTargetClass() + "]: " +
+					"Common causes of this problem include using a final class or a non-visible class", ex);
 		}
 		catch (IllegalArgumentException ex) {
-			throw new AopConfigException("Could not generate CGLIB subclass of class [" +
-					this.advised.getTargetClass() + "]: " +
-					"Common causes of this problem include using a final class or a non-visible class",
-					ex);
+			throw new AopConfigException("Could not generate CGLIB subclass of class [" + this.advised.getTargetClass() + "]: " +
+					"Common causes of this problem include using a final class or a non-visible class", ex);
 		}
 		catch (Exception ex) {
 			// TargetSource.getTarget() failed

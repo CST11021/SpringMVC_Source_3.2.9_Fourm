@@ -36,7 +36,6 @@ import org.springframework.util.ObjectUtils;
  * @see org.springframework.aop.framework.AdvisedSupport#setTarget(Object)
  */
 public class SingletonTargetSource implements TargetSource, Serializable {
-	/** use serialVersionUID from Spring 1.2 for interoperability */
 	private static final long serialVersionUID = 9031246629662423738L;
 	private final Object target;
 

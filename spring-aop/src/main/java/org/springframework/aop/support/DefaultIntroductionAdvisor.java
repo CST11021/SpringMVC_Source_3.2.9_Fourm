@@ -42,28 +42,13 @@ import org.springframework.util.ClassUtils;
 public class DefaultIntroductionAdvisor implements IntroductionAdvisor, ClassFilter, Ordered, Serializable {
 
 	private final Advice advice;
-
 	private final Set<Class> interfaces = new HashSet<Class>();
-
 	private int order = Integer.MAX_VALUE;
 
 
-	/**
-	 * Create a DefaultIntroductionAdvisor for the given advice.
-	 * @param advice the Advice to apply (may implement the
-	 * {@link org.springframework.aop.IntroductionInfo} interface)
-	 * @see #addInterface
-	 */
 	public DefaultIntroductionAdvisor(Advice advice) {
 		this(advice, (advice instanceof IntroductionInfo ? (IntroductionInfo) advice : null));
 	}
-
-	/**
-	 * Create a DefaultIntroductionAdvisor for the given advice.
-	 * @param advice the Advice to apply
-	 * @param introductionInfo the IntroductionInfo that describes
-	 * the interface to introduce (may be {@code null})
-	 */
 	public DefaultIntroductionAdvisor(Advice advice, IntroductionInfo introductionInfo) {
 		Assert.notNull(advice, "Advice must not be null");
 		this.advice = advice;
@@ -77,12 +62,6 @@ public class DefaultIntroductionAdvisor implements IntroductionAdvisor, ClassFil
 			}
 		}
 	}
-
-	/**
-	 * Create a DefaultIntroductionAdvisor for the given advice.
-	 * @param advice the Advice to apply
-	 * @param intf the interface to introduce
-	 */
 	public DefaultIntroductionAdvisor(DynamicIntroductionAdvice advice, Class intf) {
 		Assert.notNull(advice, "Advice must not be null");
 		this.advice = advice;
@@ -90,10 +69,6 @@ public class DefaultIntroductionAdvisor implements IntroductionAdvisor, ClassFil
 	}
 
 
-	/**
-	 * Add the specified interface to the list of interfaces to introduce.
-	 * @param intf the interface to introduce
-	 */
 	public void addInterface(Class intf) {
 		Assert.notNull(intf, "Interface must not be null");
 		if (!intf.isInterface()) {
@@ -101,11 +76,11 @@ public class DefaultIntroductionAdvisor implements IntroductionAdvisor, ClassFil
 		}
 		this.interfaces.add(intf);
 	}
-
 	public Class[] getInterfaces() {
 		return this.interfaces.toArray(new Class[this.interfaces.size()]);
 	}
 
+	// 校验增强接口是否有被增强类实现
 	public void validateInterfaces() throws IllegalArgumentException {
 		for (Class ifc : this.interfaces) {
 			if (this.advice instanceof DynamicIntroductionAdvice &&
@@ -120,7 +95,6 @@ public class DefaultIntroductionAdvisor implements IntroductionAdvisor, ClassFil
 	public void setOrder(int order) {
 		this.order = order;
 	}
-
 	public int getOrder() {
 		return this.order;
 	}
@@ -137,7 +111,7 @@ public class DefaultIntroductionAdvisor implements IntroductionAdvisor, ClassFil
 	public ClassFilter getClassFilter() {
 		return this;
 	}
-
+	// 该增强匹配所有目标类
 	public boolean matches(Class clazz) {
 		return true;
 	}
@@ -154,12 +128,10 @@ public class DefaultIntroductionAdvisor implements IntroductionAdvisor, ClassFil
 		DefaultIntroductionAdvisor otherAdvisor = (DefaultIntroductionAdvisor) other;
 		return (this.advice.equals(otherAdvisor.advice) && this.interfaces.equals(otherAdvisor.interfaces));
 	}
-
 	@Override
 	public int hashCode() {
 		return this.advice.hashCode() * 13 + this.interfaces.hashCode();
 	}
-
 	@Override
 	public String toString() {
 		return ClassUtils.getShortName(getClass()) + ": advice [" + this.advice + "]; interfaces " +

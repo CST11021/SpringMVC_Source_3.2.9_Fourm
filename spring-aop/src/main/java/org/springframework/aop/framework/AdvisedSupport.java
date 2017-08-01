@@ -58,6 +58,9 @@ import org.springframework.util.CollectionUtils;
  * @author Juergen Hoeller
  * @see org.springframework.aop.framework.AopProxy
  */
+// AdvisedSupport继承了ProxyConfig并实现了Advised接口，所以AdvisedSupport所承载的信息可以划分为两类：
+// 一个类是ProxyConfig，记载生成代理对象的控制信息；
+// 一类是Advised，承载生成代理对象所需要的必要信息，如相关目标类、Advice、Advisor等。
 @SuppressWarnings("unchecked")
 public class AdvisedSupport extends ProxyConfig implements Advised {
 
@@ -66,6 +69,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	// 当没有目标类时，使用 EmptyTargetSource 规范目标类
 	public static final TargetSource EMPTY_TARGET_SOURCE = EmptyTargetSource.INSTANCE;
 	//** Package-protected to allow direct access for efficiency */
+	// 表示要带被代理的目标类
 	TargetSource targetSource = EMPTY_TARGET_SOURCE;
 	//** Whether the Advisors are already filtered for the specific target class */
 	private boolean preFiltered = false;
@@ -78,9 +82,9 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	// 保存代理类将要实现的接口。保存在列表中以保持注册顺序，用指定的接口顺序创建JDK代理
 	private List<Class> interfaces = new ArrayList<Class>();
 
-	// List of Advisors. If an Advice is added, it will be wrapped in an Advisor before being added to this List.
+	// 表示增强链，在增强Advice添加到 advisors 前都会被包装成 Advisor 的实例
 	private List<Advisor> advisors = new LinkedList<Advisor>();
-	// Array updated on changes to the advisors list, which is easier to manipulate internally.
+	// 数组更新了对 advisors 列表的更改，这在内部更容易操作
 	private Advisor[] advisorArray = new Advisor[0];
 
 
@@ -135,6 +139,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 		return this.advisorChainFactory;
 	}
 
+	// 设置代理类要实现的接口
 	public void setInterfaces(Class<?>... interfaces) {
 		Assert.notNull(interfaces, "Interfaces must not be null");
 		this.interfaces.clear();
@@ -184,6 +189,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 		addAdvisor(pos, advisor);
 	}
 	public void addAdvisor(int pos, Advisor advisor) throws AopConfigException {
+		// 判断是否为引介增强
 		if (advisor instanceof IntroductionAdvisor) {
 			validateIntroductionAdvisor((IntroductionAdvisor) advisor);
 		}
@@ -277,8 +283,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 			throw new AopConfigException("Cannot add advisor: Configuration is frozen.");
 		}
 		if (pos > this.advisors.size()) {
-			throw new IllegalArgumentException(
-					"Illegal position " + pos + " in advisor list with size " + this.advisors.size());
+			throw new IllegalArgumentException("Illegal position " + pos + " in advisor list with size " + this.advisors.size());
 		}
 		this.advisors.add(pos, advisor);
 		updateAdvisorArray();
@@ -302,16 +307,20 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 	public void addAdvice(int pos, Advice advice) throws AopConfigException {
 		Assert.notNull(advice, "Advice must not be null");
-		// 判断是否为引介增强
+		// 实现Introduction型的Advice的有两条分支，以DynamicIntroductionAdvice为首的动态分支和以IntroductionInfo为首的静态分支。
+
 		if (advice instanceof IntroductionInfo) {
+			// 判断是否为 IntroductionInfo 类型的引介增强
 			// We don't need an IntroductionAdvisor for this kind of introduction: It's fully self-describing.
 			addAdvisor(pos, new DefaultIntroductionAdvisor(advice, (IntroductionInfo) advice));
 		}
 		else if (advice instanceof DynamicIntroductionAdvice) {
+			// 判断是否为 DynamicIntroductionAdvice 类型的引介增强
 			// We need an IntroductionAdvisor for this kind of introduction.
 			throw new AopConfigException("DynamicIntroductionAdvice may only be added as part of IntroductionAdvisor");
 		}
 		else {
+			// 这里是将advice封装为 DefaultPointcutAdvisor 实例，Spring中同时使用Advisor来包装增强
 			addAdvisor(pos, new DefaultPointcutAdvisor(advice));
 		}
 	}
@@ -388,9 +397,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 		return cached;
 	}
 
-	/**
-	 * Invoked when advice has changed.
-	 */
+	// 当织入的增强链改变时，该方法被调用
 	protected void adviceChanged() {
 		this.methodCache.clear();
 	}

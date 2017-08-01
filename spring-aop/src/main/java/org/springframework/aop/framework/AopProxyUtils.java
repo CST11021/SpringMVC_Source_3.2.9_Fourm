@@ -140,16 +140,12 @@ public abstract class AopProxyUtils {
 				(equalsProxiedInterfaces(a, b) && equalsAdvisors(a, b) && a.getTargetSource().equals(b.getTargetSource())));
 	}
 
-	/**
-	 * Check equality of the proxied interfaces behind the given AdvisedSupport objects.
-	 */
+	// 判断两个AdvisedSupport对象的代理接口是否相等
 	public static boolean equalsProxiedInterfaces(AdvisedSupport a, AdvisedSupport b) {
 		return Arrays.equals(a.getProxiedInterfaces(), b.getProxiedInterfaces());
 	}
 
-	/**
-	 * Check equality of the advisors behind the given AdvisedSupport objects.
-	 */
+	// 判断两个AdvisedSupport对象的增强链是否相等
 	public static boolean equalsAdvisors(AdvisedSupport a, AdvisedSupport b) {
 		return Arrays.equals(a.getAdvisors(), b.getAdvisors());
 	}

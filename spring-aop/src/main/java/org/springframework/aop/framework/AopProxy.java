@@ -27,27 +27,15 @@ package org.springframework.aop.framework;
  * @author Juergen Hoeller
  * @see DefaultAopProxyFactory
  */
+
+/*
+	Spring AOP框架内使用AopProxy对使用的不同代理实现机制进行了适度的抽象，针对不同的代理实现机制提供相应的AOPProxy子类实现。
+	目前，Spring AOP框架内提供了针对JDK的动态代理和CGLIB两种机制的AOPProxy实现。
+ */
 public interface AopProxy {
 
-	/**
-	 * Create a new proxy object.
-	 * <p>Uses the AopProxy's default class loader (if necessary for proxy creation):
-	 * usually, the thread context class loader.
-	 * @return the new proxy object (never {@code null})
-	 * @see Thread#getContextClassLoader()
-	 */
+	// 创建一个新的代理对象
 	Object getProxy();
-
-	/**
-	 * Create a new proxy object.
-	 * <p>Uses the given class loader (if necessary for proxy creation).
-	 * {@code null} will simply be passed down and thus lead to the low-level
-	 * proxy facility's default, which is usually different from the default chosen
-	 * by the AopProxy implementation's {@link #getProxy()} method.
-	 * @param classLoader the class loader to create the proxy with
-	 * (or {@code null} for the low-level proxy facility's default)
-	 * @return the new proxy object (never {@code null})
-	 */
 	Object getProxy(ClassLoader classLoader);
 
 }
