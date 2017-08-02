@@ -31,7 +31,7 @@ public class Test {
 
     // 使用spring配置的形式，测试前置、后置和环绕增强
     @org.junit.Test
-    public void TestAdvice() {
+    public void TestAdvice1() {
         String configPath = "com/whz/aop/advice/spring-aop.xml";
         ApplicationContext ctx = new ClassPathXmlApplicationContext(configPath);
         Waiter waiter = (Waiter)ctx.getBean("waiter");
@@ -40,7 +40,7 @@ public class Test {
 
     // 测试引介增强
     @org.junit.Test
-    public void t() {
+    public void TestAdvice2() {
         String configPath = "com/whz/aop/advice/spring-aop.xml";
         ApplicationContext ctx = new ClassPathXmlApplicationContext(configPath);
         ForumService forumService = (ForumService)ctx.getBean("forumService");
@@ -52,7 +52,5 @@ public class Test {
         forumService.removeForum(10);
         forumService.removeTopic(1022);
     }
-
-
 
 }

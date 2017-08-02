@@ -3,7 +3,7 @@ package com.whz.aop.dynamicproxy;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-// 将被织入的增强代码
+// 使用JDK动态代理，将增强代码织入目标类
 public class LogHandler implements InvocationHandler {
     Object obj;
 
