@@ -54,11 +54,11 @@
           <!--<artifactId>spring-core</artifactId>-->
           <!--<version>${spring-version}</version>-->
       <!--</dependency>-->
-        <dependency>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-jdbc</artifactId>
-          <version>${spring-version}</version>
-        </dependency>
+        <!--<dependency>-->
+          <!--<groupId>org.springframework</groupId>-->
+          <!--<artifactId>spring-jdbc</artifactId>-->
+          <!--<version>${spring-version}</version>-->
+        <!--</dependency>-->
         <dependency>
           <groupId>org.springframework</groupId>
           <artifactId>spring-oxm</artifactId>
@@ -479,9 +479,49 @@
           <scope>test</scope>
       </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.mchange/c3p0 -->
+        <dependency>
+            <groupId>com.mchange</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>0.9.5.2</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.196</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.hsqldb/hsqldb -->
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>2.4.0</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.derby/derby -->
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>10.6.2.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.derby/derbyclient -->
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derbyclient</artifactId>
+            <version>10.6.2.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.geronimo.specs/geronimo-jta_1.1_spec -->
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jta_1.1_spec</artifactId>
+            <version>1.1.1</version>
+        </dependency>
 
 
-  </dependencies>
+
+
+    </dependencies>
   <build>
     <finalName>SpringMVC_Source_3.2.9_Fourm</finalName>
 
@@ -496,6 +536,7 @@
           <resource><directory>spring-beans/src/main/resources</directory></resource>
           <resource><directory>spring-context/src/main/resources</directory></resource>
           <resource><directory>spring-aop/src/main/resources</directory></resource>
+          <resource><directory>spring-jdbc/src/main/resources</directory></resource>
       </resources>
       <!--默认测试资源目录-->
       <testResources>
@@ -535,6 +576,7 @@
                             <source>spring-core/src/main/java</source>
                             <source>spring-context/src/main/java</source>
                             <source>spring-aop/src/main/java</source>
+                            <source>spring-jdbc/src/main/java</source>
                         </sources>
                     </configuration>
                 </execution>
