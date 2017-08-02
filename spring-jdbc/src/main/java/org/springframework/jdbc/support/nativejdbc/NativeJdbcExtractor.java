@@ -65,11 +65,15 @@ import java.sql.Statement;
  * @see org.springframework.jdbc.core.JdbcTemplate#setNativeJdbcExtractor
  * @see org.springframework.jdbc.support.lob.OracleLobHandler#setNativeJdbcExtractor
  */
+
+// 从数据源返回的数据连接对象是本地JDBC对象（OracleConnection、SQLServerConnection）的代理类，这是因为数据源需要改变原有的行为以便施加额外的控制：如调用Connection#close()方法时，
+// 将数据连接返回到连接池中而非将其关闭。在某些情况下，我们希望得到被代理前的本地JDBC对象，如OracleConnection何OracleResultSet，以便调用这些驱动程序厂商相关的API以完成一些特殊操作。
+
+// NativeJdbcExtractor定义了从数据源JDBC对象抽取本地JDBC对象的方法
 public interface NativeJdbcExtractor {
 
 	/**
-	 * Return whether it is necessary to work on the native Connection to
-	 * receive native Statements.
+	 * Return whether it is necessary to work on the native Connection to receive native Statements.
 	 * <p>This should be true if the connection pool does not allow to extract
 	 * the native JDBC objects from its Statement wrapper but supports a way
 	 * to retrieve the native JDBC Connection. This way, applications can
@@ -77,10 +81,8 @@ public interface NativeJdbcExtractor {
 	 * native JDBC Connection.
 	 */
 	boolean isNativeConnectionNecessaryForNativeStatements();
-
 	/**
-	 * Return whether it is necessary to work on the native Connection to
-	 * receive native PreparedStatements.
+	 * Return whether it is necessary to work on the native Connection to receive native PreparedStatements.
 	 * <p>This should be true if the connection pool does not allow to extract
 	 * the native JDBC objects from its PreparedStatement wrappers but
 	 * supports a way to retrieve the native JDBC Connection. This way,
@@ -88,10 +90,8 @@ public interface NativeJdbcExtractor {
 	 * working on the native JDBC Connection.
 	 */
 	boolean isNativeConnectionNecessaryForNativePreparedStatements();
-
 	/**
-	 * Return whether it is necessary to work on the native Connection to
-	 * receive native CallableStatements.
+	 * Return whether it is necessary to work on the native Connection to receive native CallableStatements.
 	 * <p>This should be true if the connection pool does not allow to extract
 	 * the native JDBC objects from its CallableStatement wrappers but
 	 * supports a way to retrieve the native JDBC Connection. This way,
@@ -99,6 +99,12 @@ public interface NativeJdbcExtractor {
 	 * working on the native JDBC Connection.
 	 */
 	boolean isNativeConnectionNecessaryForNativeCallableStatements();
+
+
+
+
+
+	// 以下方法是获取一系列本地对象
 
 	/**
 	 * Retrieve the underlying native JDBC Connection for the given Connection.
@@ -109,7 +115,6 @@ public interface NativeJdbcExtractor {
 	 * @throws SQLException if thrown by JDBC methods
 	 */
 	Connection getNativeConnection(Connection con) throws SQLException;
-
 	/**
 	 * Retrieve the underlying native JDBC Connection for the given Statement.
 	 * Supposed to return the {@code Statement.getConnection()} if not
@@ -125,7 +130,6 @@ public interface NativeJdbcExtractor {
 	 * @see java.sql.Statement#getConnection()
 	 */
 	Connection getNativeConnectionFromStatement(Statement stmt) throws SQLException;
-
 	/**
 	 * Retrieve the underlying native JDBC Statement for the given Statement.
 	 * Supposed to return the given Statement if not capable of unwrapping.
@@ -135,7 +139,6 @@ public interface NativeJdbcExtractor {
 	 * @throws SQLException if thrown by JDBC methods
 	 */
 	Statement getNativeStatement(Statement stmt) throws SQLException;
-
 	/**
 	 * Retrieve the underlying native JDBC PreparedStatement for the given statement.
 	 * Supposed to return the given PreparedStatement if not capable of unwrapping.
@@ -145,7 +148,6 @@ public interface NativeJdbcExtractor {
 	 * @throws SQLException if thrown by JDBC methods
 	 */
 	PreparedStatement getNativePreparedStatement(PreparedStatement ps) throws SQLException;
-
 	/**
 	 * Retrieve the underlying native JDBC CallableStatement for the given statement.
 	 * Supposed to return the given CallableStatement if not capable of unwrapping.
@@ -155,7 +157,6 @@ public interface NativeJdbcExtractor {
 	 * @throws SQLException if thrown by JDBC methods
 	 */
 	CallableStatement getNativeCallableStatement(CallableStatement cs) throws SQLException;
-
 	/**
 	 * Retrieve the underlying native JDBC ResultSet for the given statement.
 	 * Supposed to return the given ResultSet if not capable of unwrapping.

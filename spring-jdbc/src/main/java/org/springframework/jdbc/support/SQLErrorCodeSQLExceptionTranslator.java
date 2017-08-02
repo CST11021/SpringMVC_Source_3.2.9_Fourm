@@ -64,6 +64,7 @@ import org.springframework.jdbc.InvalidResultSetAccessException;
  * @see SQLErrorCodesFactory
  * @see SQLStateSQLExceptionTranslator
  */
+// 用来翻译SQL错误代码
 public class SQLErrorCodeSQLExceptionTranslator extends AbstractFallbackSQLExceptionTranslator {
 
 	private static final int MESSAGE_ONLY_CONSTRUCTOR = 1;

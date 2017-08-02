@@ -96,41 +96,22 @@ import org.springframework.util.LinkedCaseInsensitiveMap;
 public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 
 	private static final String RETURN_RESULT_SET_PREFIX = "#result-set-";
-
 	private static final String RETURN_UPDATE_COUNT_PREFIX = "#update-count-";
 
-
-	/** Custom NativeJdbcExtractor */
+	// 本地JDBC抽取器
 	private NativeJdbcExtractor nativeJdbcExtractor;
-
-	/** If this variable is false, we will throw exceptions on SQL warnings */
+	// 如果这个变量是false，我们将在SQL警告中抛出异常
 	private boolean ignoreWarnings = true;
-
-	/**
-	 * If this variable is set to a non-zero value, it will be used for setting the
-	 * fetchSize property on statements used for query processing.
-	 */
+	// 设置查询处理语句的fetchSize属性
 	private int fetchSize = 0;
-
-	/**
-	 * If this variable is set to a non-zero value, it will be used for setting the
-	 * maxRows property on statements used for query processing.
-	 */
 	private int maxRows = 0;
-
-	/**
-	 * If this variable is set to a non-zero value, it will be used for setting the
-	 * queryTimeout property on statements used for query processing.
-	 */
 	private int queryTimeout = 0;
-
 	/**
 	 * If this variable is set to true then all results checking will be bypassed for any
 	 * callable statement processing.  This can be used to avoid a bug in some older Oracle
 	 * JDBC drivers like 10.1.0.2.
 	 */
 	private boolean skipResultsProcessing = false;
-
 	/**
 	 * If this variable is set to true then all results from a stored procedure call
 	 * that don't have a corresponding SqlOutParameter declaration will be bypassed.
@@ -138,7 +119,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	 * {@code skipResultsProcessing} is set to {@code true}.
 	 */
 	private boolean skipUndeclaredResults = false;
-
 	/**
 	 * If this variable is set to true then execution of a CallableStatement will return
 	 * the results in a Map that uses case insensitive names for the parameters if
@@ -147,37 +127,19 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	private boolean resultsMapCaseInsensitive = false;
 
 
-	/**
-	 * Construct a new JdbcTemplate for bean usage.
-	 * <p>Note: The DataSource has to be set before using the instance.
-	 * @see #setDataSource
-	 */
-	public JdbcTemplate() {
-	}
-
-	/**
-	 * Construct a new JdbcTemplate, given a DataSource to obtain connections from.
-	 * <p>Note: This will not trigger initialization of the exception translator.
-	 * @param dataSource the JDBC DataSource to obtain connections from
-	 */
+	public JdbcTemplate() {}
 	public JdbcTemplate(DataSource dataSource) {
 		setDataSource(dataSource);
 		afterPropertiesSet();
 	}
-
-	/**
-	 * Construct a new JdbcTemplate, given a DataSource to obtain connections from.
-	 * <p>Note: Depending on the "lazyInit" flag, initialization of the exception translator
-	 * will be triggered.
-	 * @param dataSource the JDBC DataSource to obtain connections from
-	 * @param lazyInit whether to lazily initialize the SQLExceptionTranslator
-	 */
 	public JdbcTemplate(DataSource dataSource, boolean lazyInit) {
 		setDataSource(dataSource);
 		setLazyInit(lazyInit);
 		afterPropertiesSet();
 	}
 
+
+	// --------------------------- getter and setter ... ---------------------------------------------------------------
 
 	/**
 	 * Set a NativeJdbcExtractor to extract native JDBC objects from wrapped handles.
@@ -188,14 +150,12 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	public void setNativeJdbcExtractor(NativeJdbcExtractor extractor) {
 		this.nativeJdbcExtractor = extractor;
 	}
-
 	/**
 	 * Return the current NativeJdbcExtractor implementation.
 	 */
 	public NativeJdbcExtractor getNativeJdbcExtractor() {
 		return this.nativeJdbcExtractor;
 	}
-
 	/**
 	 * Set whether or not we want to ignore SQLWarnings.
 	 * <p>Default is "true", swallowing and logging all warnings. Switch this flag
@@ -207,14 +167,12 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	public void setIgnoreWarnings(boolean ignoreWarnings) {
 		this.ignoreWarnings = ignoreWarnings;
 	}
-
 	/**
 	 * Return whether or not we ignore SQLWarnings.
 	 */
 	public boolean isIgnoreWarnings() {
 		return this.ignoreWarnings;
 	}
-
 	/**
 	 * Set the fetch size for this JdbcTemplate. This is important for processing
 	 * large result sets: Setting this higher than the default value will increase
@@ -226,14 +184,12 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	public void setFetchSize(int fetchSize) {
 		this.fetchSize = fetchSize;
 	}
-
 	/**
 	 * Return the fetch size specified for this JdbcTemplate.
 	 */
 	public int getFetchSize() {
 		return this.fetchSize;
 	}
-
 	/**
 	 * Set the maximum number of rows for this JdbcTemplate. This is important
 	 * for processing subsets of large result sets, avoiding to read and hold
@@ -246,14 +202,12 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	public void setMaxRows(int maxRows) {
 		this.maxRows = maxRows;
 	}
-
 	/**
 	 * Return the maximum number of rows specified for this JdbcTemplate.
 	 */
 	public int getMaxRows() {
 		return this.maxRows;
 	}
-
 	/**
 	 * Set the query timeout for statements that this JdbcTemplate executes.
 	 * <p>Default is 0, indicating to use the JDBC driver's default.
@@ -265,14 +219,12 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	public void setQueryTimeout(int queryTimeout) {
 		this.queryTimeout = queryTimeout;
 	}
-
 	/**
 	 * Return the query timeout for statements that this JdbcTemplate executes.
 	 */
 	public int getQueryTimeout() {
 		return this.queryTimeout;
 	}
-
 	/**
 	 * Set whether results processing should be skipped. Can be used to optimize callable
 	 * statement processing when we know that no results are being passed back - the processing
@@ -282,28 +234,24 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	public void setSkipResultsProcessing(boolean skipResultsProcessing) {
 		this.skipResultsProcessing = skipResultsProcessing;
 	}
-
 	/**
 	 * Return whether results processing should be skipped.
 	 */
 	public boolean isSkipResultsProcessing() {
 		return this.skipResultsProcessing;
 	}
-
 	/**
 	 * Set whether undeclared results should be skipped.
 	 */
 	public void setSkipUndeclaredResults(boolean skipUndeclaredResults) {
 		this.skipUndeclaredResults = skipUndeclaredResults;
 	}
-
 	/**
 	 * Return whether undeclared results should be skipped.
 	 */
 	public boolean isSkipUndeclaredResults() {
 		return this.skipUndeclaredResults;
 	}
-
 	/**
 	 * Set whether execution of a CallableStatement will return the results in a Map
 	 * that uses case insensitive names for the parameters.
@@ -311,7 +259,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	public void setResultsMapCaseInsensitive(boolean resultsMapCaseInsensitive) {
 		this.resultsMapCaseInsensitive = resultsMapCaseInsensitive;
 	}
-
 	/**
 	 * Return whether execution of a CallableStatement will return the results in a Map
 	 * that uses case insensitive names for the parameters.
@@ -472,7 +419,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		List<T> results = query(sql, rowMapper);
 		return DataAccessUtils.requiredSingleResult(results);
 	}
-
 	public <T> T queryForObject(String sql, Class<T> requiredType) throws DataAccessException {
 		return queryForObject(sql, getSingleColumnRowMapper(requiredType));
 	}
@@ -482,7 +428,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		Number number = queryForObject(sql, Long.class);
 		return (number != null ? number.longValue() : 0);
 	}
-
 	@Deprecated
 	public int queryForInt(String sql) throws DataAccessException {
 		Number number = queryForObject(sql, Integer.class);
@@ -562,8 +507,8 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	// Methods dealing with prepared statements
 	//-------------------------------------------------------------------------
 
-	public <T> T execute(PreparedStatementCreator psc, PreparedStatementCallback<T> action)
-			throws DataAccessException {
+	// execute 作为数据操作的核心入口，将大多数数据库操作相同的步骤统一封装，而将个性化的操作使用 PreparedStatementCallback 进行回调。
+	public <T> T execute(PreparedStatementCreator psc, PreparedStatementCallback<T> action) throws DataAccessException {
 
 		Assert.notNull(psc, "PreparedStatementCreator must not be null");
 		Assert.notNull(action, "Callback object must not be null");
@@ -572,6 +517,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			logger.debug("Executing prepared SQL statement" + (sql != null ? " [" + sql + "]" : ""));
 		}
 
+		// 获取数据库连接
 		Connection con = DataSourceUtils.getConnection(getDataSource());
 		PreparedStatement ps = null;
 		try {
@@ -612,7 +558,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			DataSourceUtils.releaseConnection(con, getDataSource());
 		}
 	}
-
 	public <T> T execute(String sql, PreparedStatementCallback<T> action) throws DataAccessException {
 		return execute(new SimplePreparedStatementCreator(sql), action);
 	}
@@ -629,9 +574,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	 * @return an arbitrary result object, as returned by the ResultSetExtractor
 	 * @throws DataAccessException if there is any problem
 	 */
-	public <T> T query(
-			PreparedStatementCreator psc, final PreparedStatementSetter pss, final ResultSetExtractor<T> rse)
-			throws DataAccessException {
+	public <T> T query(PreparedStatementCreator psc, final PreparedStatementSetter pss, final ResultSetExtractor<T> rse) throws DataAccessException {
 
 		Assert.notNull(rse, "ResultSetExtractor must not be null");
 		logger.debug("Executing prepared SQL query");
@@ -659,23 +602,18 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			}
 		});
 	}
-
 	public <T> T query(PreparedStatementCreator psc, ResultSetExtractor<T> rse) throws DataAccessException {
 		return query(psc, null, rse);
 	}
-
 	public <T> T query(String sql, PreparedStatementSetter pss, ResultSetExtractor<T> rse) throws DataAccessException {
 		return query(new SimplePreparedStatementCreator(sql), pss, rse);
 	}
-
 	public <T> T query(String sql, Object[] args, int[] argTypes, ResultSetExtractor<T> rse) throws DataAccessException {
 		return query(sql, newArgTypePreparedStatementSetter(args, argTypes), rse);
 	}
-
 	public <T> T query(String sql, Object[] args, ResultSetExtractor<T> rse) throws DataAccessException {
 		return query(sql, newArgPreparedStatementSetter(args), rse);
 	}
-
 	public <T> T query(String sql, ResultSetExtractor<T> rse, Object... args) throws DataAccessException {
 		return query(sql, newArgPreparedStatementSetter(args), rse);
 	}
@@ -683,19 +621,15 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	public void query(PreparedStatementCreator psc, RowCallbackHandler rch) throws DataAccessException {
 		query(psc, new RowCallbackHandlerResultSetExtractor(rch));
 	}
-
 	public void query(String sql, PreparedStatementSetter pss, RowCallbackHandler rch) throws DataAccessException {
 		query(sql, pss, new RowCallbackHandlerResultSetExtractor(rch));
 	}
-
 	public void query(String sql, Object[] args, int[] argTypes, RowCallbackHandler rch) throws DataAccessException {
 		query(sql, newArgTypePreparedStatementSetter(args, argTypes), rch);
 	}
-
 	public void query(String sql, Object[] args, RowCallbackHandler rch) throws DataAccessException {
 		query(sql, newArgPreparedStatementSetter(args), rch);
 	}
-
 	public void query(String sql, RowCallbackHandler rch, Object... args) throws DataAccessException {
 		query(sql, newArgPreparedStatementSetter(args), rch);
 	}
@@ -703,50 +637,39 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	public <T> List<T> query(PreparedStatementCreator psc, RowMapper<T> rowMapper) throws DataAccessException {
 		return query(psc, new RowMapperResultSetExtractor<T>(rowMapper));
 	}
-
 	public <T> List<T> query(String sql, PreparedStatementSetter pss, RowMapper<T> rowMapper) throws DataAccessException {
 		return query(sql, pss, new RowMapperResultSetExtractor<T>(rowMapper));
 	}
-
 	public <T> List<T> query(String sql, Object[] args, int[] argTypes, RowMapper<T> rowMapper) throws DataAccessException {
 		return query(sql, args, argTypes, new RowMapperResultSetExtractor<T>(rowMapper));
 	}
-
 	public <T> List<T> query(String sql, Object[] args, RowMapper<T> rowMapper) throws DataAccessException {
 		return query(sql, args, new RowMapperResultSetExtractor<T>(rowMapper));
 	}
-
 	public <T> List<T> query(String sql, RowMapper<T> rowMapper, Object... args) throws DataAccessException {
 		return query(sql, args, new RowMapperResultSetExtractor<T>(rowMapper));
 	}
 
-	public <T> T queryForObject(String sql, Object[] args, int[] argTypes, RowMapper<T> rowMapper)
-			throws DataAccessException {
+	public <T> T queryForObject(String sql, Object[] args, int[] argTypes, RowMapper<T> rowMapper) throws DataAccessException {
 
 		List<T> results = query(sql, args, argTypes, new RowMapperResultSetExtractor<T>(rowMapper, 1));
 		return DataAccessUtils.requiredSingleResult(results);
 	}
-
 	public <T> T queryForObject(String sql, Object[] args, RowMapper<T> rowMapper) throws DataAccessException {
 		List<T> results = query(sql, args, new RowMapperResultSetExtractor<T>(rowMapper, 1));
 		return DataAccessUtils.requiredSingleResult(results);
 	}
-
 	public <T> T queryForObject(String sql, RowMapper<T> rowMapper, Object... args) throws DataAccessException {
 		List<T> results = query(sql, args, new RowMapperResultSetExtractor<T>(rowMapper, 1));
 		return DataAccessUtils.requiredSingleResult(results);
 	}
-
-	public <T> T queryForObject(String sql, Object[] args, int[] argTypes, Class<T> requiredType)
-			throws DataAccessException {
+	public <T> T queryForObject(String sql, Object[] args, int[] argTypes, Class<T> requiredType) throws DataAccessException {
 
 		return queryForObject(sql, args, argTypes, getSingleColumnRowMapper(requiredType));
 	}
-
 	public <T> T queryForObject(String sql, Object[] args, Class<T> requiredType) throws DataAccessException {
 		return queryForObject(sql, args, getSingleColumnRowMapper(requiredType));
 	}
-
 	public <T> T queryForObject(String sql, Class<T> requiredType, Object... args) throws DataAccessException {
 		return queryForObject(sql, args, getSingleColumnRowMapper(requiredType));
 	}
@@ -754,7 +677,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	public Map<String, Object> queryForMap(String sql, Object[] args, int[] argTypes) throws DataAccessException {
 		return queryForObject(sql, args, argTypes, getColumnMapRowMapper());
 	}
-
 	public Map<String, Object> queryForMap(String sql, Object... args) throws DataAccessException {
 		return queryForObject(sql, args, getColumnMapRowMapper());
 	}
@@ -764,19 +686,16 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		Number number = queryForObject(sql, args, argTypes, Long.class);
 		return (number != null ? number.longValue() : 0);
 	}
-
 	@Deprecated
 	public long queryForLong(String sql, Object... args) throws DataAccessException {
 		Number number = queryForObject(sql, args, Long.class);
 		return (number != null ? number.longValue() : 0);
 	}
-
 	@Deprecated
 	public int queryForInt(String sql, Object[] args, int[] argTypes) throws DataAccessException {
 		Number number = queryForObject(sql, args, argTypes, Integer.class);
 		return (number != null ? number.intValue() : 0);
 	}
-
 	@Deprecated
 	public int queryForInt(String sql, Object... args) throws DataAccessException {
 		Number number = queryForObject(sql, args, Integer.class);
@@ -786,11 +705,9 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	public <T> List<T> queryForList(String sql, Object[] args, int[] argTypes, Class<T> elementType) throws DataAccessException {
 		return query(sql, args, argTypes, getSingleColumnRowMapper(elementType));
 	}
-
 	public <T> List<T> queryForList(String sql, Object[] args, Class<T> elementType) throws DataAccessException {
 		return query(sql, args, getSingleColumnRowMapper(elementType));
 	}
-
 	public <T> List<T> queryForList(String sql, Class<T> elementType, Object... args) throws DataAccessException {
 		return query(sql, args, getSingleColumnRowMapper(elementType));
 	}
@@ -798,7 +715,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	public List<Map<String, Object>> queryForList(String sql, Object[] args, int[] argTypes) throws DataAccessException {
 		return query(sql, args, argTypes, getColumnMapRowMapper());
 	}
-
 	public List<Map<String, Object>> queryForList(String sql, Object... args) throws DataAccessException {
 		return query(sql, args, getColumnMapRowMapper());
 	}
@@ -806,13 +722,12 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	public SqlRowSet queryForRowSet(String sql, Object[] args, int[] argTypes) throws DataAccessException {
 		return query(sql, args, argTypes, new SqlRowSetResultSetExtractor());
 	}
-
 	public SqlRowSet queryForRowSet(String sql, Object... args) throws DataAccessException {
 		return query(sql, args, new SqlRowSetResultSetExtractor());
 	}
 
-	protected int update(final PreparedStatementCreator psc, final PreparedStatementSetter pss)
-			throws DataAccessException {
+	// 更新方法
+	protected int update(final PreparedStatementCreator psc, final PreparedStatementSetter pss) throws DataAccessException {
 
 		logger.debug("Executing prepared SQL update");
 		return execute(psc, new PreparedStatementCallback<Integer>() {
@@ -835,13 +750,10 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			}
 		});
 	}
-
 	public int update(PreparedStatementCreator psc) throws DataAccessException {
 		return update(psc, (PreparedStatementSetter) null);
 	}
-
-	public int update(final PreparedStatementCreator psc, final KeyHolder generatedKeyHolder)
-			throws DataAccessException {
+	public int update(final PreparedStatementCreator psc, final KeyHolder generatedKeyHolder) throws DataAccessException {
 
 		Assert.notNull(generatedKeyHolder, "KeyHolder must not be null");
 		logger.debug("Executing SQL update and returning generated keys");
@@ -869,19 +781,17 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			}
 		});
 	}
-
 	public int update(String sql, PreparedStatementSetter pss) throws DataAccessException {
 		return update(new SimplePreparedStatementCreator(sql), pss);
 	}
-
 	public int update(String sql, Object[] args, int[] argTypes) throws DataAccessException {
 		return update(sql, newArgTypePreparedStatementSetter(args, argTypes));
 	}
-
 	public int update(String sql, Object... args) throws DataAccessException {
 		return update(sql, newArgPreparedStatementSetter(args));
 	}
 
+	// 批量更新
 	public int[] batchUpdate(String sql, final BatchPreparedStatementSetter pss) throws DataAccessException {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Executing SQL batch update [" + sql + "]");
@@ -928,17 +838,13 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			}
 		});
 	}
-
 	public int[] batchUpdate(String sql, List<Object[]> batchArgs) throws DataAccessException {
 		return batchUpdate(sql, batchArgs, new int[0]);
 	}
-
 	public int[] batchUpdate(String sql, List<Object[]> batchArgs, int[] argTypes) throws DataAccessException {
 		return BatchUpdateUtils.executeBatchUpdate(sql, batchArgs, argTypes, this);
 	}
-
-	public <T> int[][] batchUpdate(String sql, final Collection<T> batchArgs, final int batchSize,
-			final ParameterizedPreparedStatementSetter<T> pss) throws DataAccessException {
+	public <T> int[][] batchUpdate(String sql, final Collection<T> batchArgs, final int batchSize, final ParameterizedPreparedStatementSetter<T> pss) throws DataAccessException {
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("Executing SQL batch update [" + sql + "] with a batch size of " + batchSize);
@@ -990,8 +896,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	// Methods dealing with callable statements
 	//-------------------------------------------------------------------------
 
-	public <T> T execute(CallableStatementCreator csc, CallableStatementCallback<T> action)
-			throws DataAccessException {
+	public <T> T execute(CallableStatementCreator csc, CallableStatementCallback<T> action) throws DataAccessException {
 
 		Assert.notNull(csc, "CallableStatementCreator must not be null");
 		Assert.notNull(action, "Callback object must not be null");
@@ -1039,13 +944,11 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			DataSourceUtils.releaseConnection(con, getDataSource());
 		}
 	}
-
 	public <T> T execute(String callString, CallableStatementCallback<T> action) throws DataAccessException {
 		return execute(new SimpleCallableStatementCreator(callString), action);
 	}
 
-	public Map<String, Object> call(CallableStatementCreator csc, List<SqlParameter> declaredParameters)
-			throws DataAccessException {
+	public Map<String, Object> call(CallableStatementCreator csc, List<SqlParameter> declaredParameters) throws DataAccessException {
 
 		final List<SqlParameter> updateCountParameters = new ArrayList<SqlParameter>();
 		final List<SqlParameter> resultSetParameters = new ArrayList<SqlParameter>();
@@ -1088,9 +991,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	 * @param resultSetParameters Parameter list of declared resultSet parameters for the stored procedure
 	 * @return Map that contains returned results
 	 */
-	protected Map<String, Object> extractReturnedResults(CallableStatement cs,
-			List<SqlParameter> updateCountParameters, List<SqlParameter> resultSetParameters, int updateCount)
-			throws SQLException {
+	protected Map<String, Object> extractReturnedResults(CallableStatement cs, List<SqlParameter> updateCountParameters, List<SqlParameter> resultSetParameters, int updateCount) throws SQLException {
 
 		Map<String, Object> returnedResults = new HashMap<String, Object>();
 		int rsIndex = 0;
@@ -1144,15 +1045,13 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		}
 		return returnedResults;
 	}
-
 	/**
 	 * Extract output parameters from the completed stored procedure.
 	 * @param cs JDBC wrapper for the stored procedure
 	 * @param parameters parameter list for the stored procedure
 	 * @return Map that contains returned results
 	 */
-	protected Map<String, Object> extractOutputParameters(CallableStatement cs, List<SqlParameter> parameters)
-			throws SQLException {
+	protected Map<String, Object> extractOutputParameters(CallableStatement cs, List<SqlParameter> parameters) throws SQLException {
 
 		Map<String, Object> returnedResults = new HashMap<String, Object>();
 		int sqlColIndex = 1;

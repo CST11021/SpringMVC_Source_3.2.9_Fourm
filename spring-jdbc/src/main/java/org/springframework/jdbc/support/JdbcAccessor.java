@@ -37,61 +37,39 @@ import org.springframework.beans.factory.InitializingBean;
  */
 public abstract class JdbcAccessor implements InitializingBean {
 
-	/** Logger available to subclasses */
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	private DataSource dataSource;
-
+	// 异常转换器
 	private SQLExceptionTranslator exceptionTranslator;
-
+	// 是否延迟初始化异常转换器
 	private boolean lazyInit = true;
 
 
-	/**
-	 * Set the JDBC DataSource to obtain connections from.
-	 */
+	public void afterPropertiesSet() {
+		// 该方法会在 JdbcTemplate 设置完数据源属性后被调用，数据源不允许为空
+		if (getDataSource() == null) {
+			throw new IllegalArgumentException("Property 'dataSource' is required");
+		}
+		if (!isLazyInit()) {
+			getExceptionTranslator();
+		}
+	}
+
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
-
-	/**
-	 * Return the DataSource used by this template.
-	 */
 	public DataSource getDataSource() {
 		return this.dataSource;
 	}
-
-	/**
-	 * Specify the database product name for the DataSource that this accessor uses.
-	 * This allows to initialize a SQLErrorCodeSQLExceptionTranslator without
-	 * obtaining a Connection from the DataSource to get the metadata.
-	 * @param dbName the database product name that identifies the error codes entry
-	 * @see SQLErrorCodeSQLExceptionTranslator#setDatabaseProductName
-	 * @see java.sql.DatabaseMetaData#getDatabaseProductName()
-	 */
+	// 根据 dbName(数据库名称) 设置异常转换器
 	public void setDatabaseProductName(String dbName) {
 		this.exceptionTranslator = new SQLErrorCodeSQLExceptionTranslator(dbName);
 	}
-
-	/**
-	 * Set the exception translator for this instance.
-	 * <p>If no custom translator is provided, a default
-	 * {@link SQLErrorCodeSQLExceptionTranslator} is used
-	 * which examines the SQLException's vendor-specific error code.
-	 * @see org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator
-	 * @see org.springframework.jdbc.support.SQLStateSQLExceptionTranslator
-	 */
 	public void setExceptionTranslator(SQLExceptionTranslator exceptionTranslator) {
 		this.exceptionTranslator = exceptionTranslator;
 	}
-
-	/**
-	 * Return the exception translator for this instance.
-	 * <p>Creates a default {@link SQLErrorCodeSQLExceptionTranslator}
-	 * for the specified DataSource if none set, or a
-	 * {@link SQLStateSQLExceptionTranslator} in case of no DataSource.
-	 * @see #getDataSource()
-	 */
+	// 获取异常SQL异常转换器，如果数据源不为空则使用“SQL错误代码转换器”，否则使用“SQL状态码转换器”
 	public synchronized SQLExceptionTranslator getExceptionTranslator() {
 		if (this.exceptionTranslator == null) {
 			DataSource dataSource = getDataSource();
@@ -104,38 +82,13 @@ public abstract class JdbcAccessor implements InitializingBean {
 		}
 		return this.exceptionTranslator;
 	}
-
-	/**
-	 * Set whether to lazily initialize the SQLExceptionTranslator for this accessor,
-	 * on first encounter of a SQLException. Default is "true"; can be switched to
-	 * "false" for initialization on startup.
-	 * <p>Early initialization just applies if {@code afterPropertiesSet()} is called.
-	 * @see #getExceptionTranslator()
-	 * @see #afterPropertiesSet()
-	 */
 	public void setLazyInit(boolean lazyInit) {
 		this.lazyInit = lazyInit;
 	}
-
-	/**
-	 * Return whether to lazily initialize the SQLExceptionTranslator for this accessor.
-	 * @see #getExceptionTranslator()
-	 */
 	public boolean isLazyInit() {
 		return this.lazyInit;
 	}
 
-	/**
-	 * Eagerly initialize the exception translator, if demanded,
-	 * creating a default one for the specified DataSource if none set.
-	 */
-	public void afterPropertiesSet() {
-		if (getDataSource() == null) {
-			throw new IllegalArgumentException("Property 'dataSource' is required");
-		}
-		if (!isLazyInit()) {
-			getExceptionTranslator();
-		}
-	}
+
 
 }

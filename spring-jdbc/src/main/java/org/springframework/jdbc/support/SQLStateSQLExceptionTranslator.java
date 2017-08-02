@@ -42,6 +42,7 @@ import org.springframework.jdbc.BadSqlGrammarException;
  * @see java.sql.SQLException#getSQLState()
  * @see SQLErrorCodeSQLExceptionTranslator
  */
+// 用来翻译SQL状态码
 public class SQLStateSQLExceptionTranslator extends AbstractFallbackSQLExceptionTranslator {
 
 	private static final Set<String> BAD_SQL_GRAMMAR_CODES = new HashSet<String>(8);
