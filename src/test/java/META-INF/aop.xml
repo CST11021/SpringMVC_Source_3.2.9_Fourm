@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<aspectj>
+	<!-- 以下为@Configure的测试配置 -->
+	<aspects>
+		<!--使用的切面类-->
+		<aspect name="com.whz.aop.ltw.PreGreetingAspect" />
+	</aspects>
+	<!--指定织入器参数，以便在类加载器织入切面时，可以在控制台打印出相关的信息-->
+	<weaver options="-showWeaveInfo
+		-XmessageHandlerClass:org.springframework.aop.aspectj.AspectJWeaverMessageHandler">
+		<!--要织入切面的候选类-->
+		<include within="com.whz.aop.ltw.*" />
+	</weaver>
+
+</aspectj>
