@@ -57,6 +57,8 @@ import org.springframework.util.Assert;
  * @see JdbcTemplate
  * @see org.springframework.jdbc.object.MappingSqlQuery
  */
+// 对 RowMapper 对象进行了进一步的封装，你会发现，在使用 RowMapper 接口时，无需在mapRow()方法中对结果集进行一行行的遍历，
+// 就能获取到这个结果集所有行记录，这个里面的遍历操作就由 RowMapperResultSetExtractor 的 extractData() 方法帮我们代劳了。
 public class RowMapperResultSetExtractor<T> implements ResultSetExtractor<List<T>> {
 
 	private final RowMapper<T> rowMapper;
@@ -64,26 +66,14 @@ public class RowMapperResultSetExtractor<T> implements ResultSetExtractor<List<T
 	private final int rowsExpected;
 
 
-	/**
-	 * Create a new RowMapperResultSetExtractor.
-	 * @param rowMapper the RowMapper which creates an object for each row
-	 */
 	public RowMapperResultSetExtractor(RowMapper<T> rowMapper) {
 		this(rowMapper, 0);
 	}
-
-	/**
-	 * Create a new RowMapperResultSetExtractor.
-	 * @param rowMapper the RowMapper which creates an object for each row
-	 * @param rowsExpected the number of expected rows
-	 * (just used for optimized collection handling)
-	 */
 	public RowMapperResultSetExtractor(RowMapper<T> rowMapper, int rowsExpected) {
 		Assert.notNull(rowMapper, "RowMapper is required");
 		this.rowMapper = rowMapper;
 		this.rowsExpected = rowsExpected;
 	}
-
 
 	public List<T> extractData(ResultSet rs) throws SQLException {
 		List<T> results = (this.rowsExpected > 0 ? new ArrayList<T>(this.rowsExpected) : new ArrayList<T>());

@@ -31,29 +31,15 @@ public class SimpleConnectionHandle implements ConnectionHandle {
 
 	private final Connection connection;
 
-
-	/**
-	 * Create a new SimpleConnectionHandle for the given Connection.
-	 * @param connection the JDBC Connection
-	 */
 	public SimpleConnectionHandle(Connection connection) {
 		Assert.notNull(connection, "Connection must not be null");
 		this.connection = connection;
 	}
 
-	/**
-	 * Return the specified Connection as-is.
-	 */
 	public Connection getConnection() {
 		return this.connection;
 	}
-
-	/**
-	 * This implementation is empty, as we're using a standard
-	 * Connection handle that does not have to be released.
-	 */
-	public void releaseConnection(Connection con) {
-	}
+	public void releaseConnection(Connection con) {}
 
 
 	@Override

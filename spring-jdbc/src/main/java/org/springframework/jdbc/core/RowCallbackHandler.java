@@ -42,6 +42,7 @@ import java.sql.SQLException;
  * @see ResultSetExtractor
  * @see RowCountCallbackHandler
  */
+// 作为一个回调接口来使用，注意与 RowMapper 接口的区别
 public interface RowCallbackHandler {
 
 	/**

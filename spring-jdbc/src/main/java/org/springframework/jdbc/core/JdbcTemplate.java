@@ -103,7 +103,11 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	// 如果这个变量是false，我们将在SQL警告中抛出异常
 	private boolean ignoreWarnings = true;
 	// 设置查询处理语句的fetchSize属性
+	// fetchSize之主要是为了减少网络交互次数设计的。访问ResultSet时，如果它每次只从服务器上读取一行数据，则会产生大量的开销。
+	// fetchSize的意思是当调用rs.next时，ResultSet会一次性从服务器上取得多少行数据会来，这样在下次rs.next时，它可以直接从
+	// 内存中获取数据而不需要网络交互，提高了效率。这个设置可能会被某些JDBC驱动忽略，而且设置过大也会造成内存的上升。
 	private int fetchSize = 0;
+	// maxRows将此Statement对象生成的所有ResultSet对象可以包含的最大行数限制设置为给定数
 	private int maxRows = 0;
 	private int queryTimeout = 0;
 	/**
@@ -127,6 +131,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	private boolean resultsMapCaseInsensitive = false;
 
 
+	// 构造器
 	public JdbcTemplate() {}
 	public JdbcTemplate(DataSource dataSource) {
 		setDataSource(dataSource);
@@ -139,8 +144,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	}
 
 
-	// --------------------------- getter and setter ... ---------------------------------------------------------------
-
+	/* --------------------------- getter and setter ... --------------------------------------------------------------- */
 	/**
 	 * Set a NativeJdbcExtractor to extract native JDBC objects from wrapped handles.
 	 * Useful if native Statement and/or ResultSet handles are expected for casting
@@ -266,12 +270,17 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	public boolean isResultsMapCaseInsensitive() {
 		return this.resultsMapCaseInsensitive;
 	}
+	/* --------------------------- getter and setter ... --------------------------------------------------------------- */
 
 
-	//-------------------------------------------------------------------------
+
+
+
+
+
+
+	/* ------------------------------------------------------------------------- */
 	// Methods dealing with a plain java.sql.Connection
-	//-------------------------------------------------------------------------
-
 	public <T> T execute(ConnectionCallback<T> action) throws DataAccessException {
 		Assert.notNull(action, "Callback object must not be null");
 
@@ -299,7 +308,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			DataSourceUtils.releaseConnection(con, getDataSource());
 		}
 	}
-
 	/**
 	 * Create a close-suppressing proxy for the given JDBC Connection.
 	 * Called by the {@code execute} method.
@@ -317,12 +325,18 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 				new Class<?>[] {ConnectionProxy.class},
 				new CloseSuppressingInvocationHandler(con));
 	}
+	/* ------------------------------------------------------------------------- */
+
+
+
+
+
+
 
 
 	//-------------------------------------------------------------------------
 	// Methods dealing with static SQL (java.sql.Statement)
-	//-------------------------------------------------------------------------
-
+	/* ------------------ 以下这些方法最后都会来调用 execute(StatementCallback<T> action) 这个方法 ------------------ */
 	public <T> T execute(StatementCallback<T> action) throws DataAccessException {
 		Assert.notNull(action, "Callback object must not be null");
 
@@ -330,11 +344,11 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		Statement stmt = null;
 		try {
 			Connection conToUse = con;
-			if (this.nativeJdbcExtractor != null &&
-					this.nativeJdbcExtractor.isNativeConnectionNecessaryForNativeStatements()) {
+			if (this.nativeJdbcExtractor != null && this.nativeJdbcExtractor.isNativeConnectionNecessaryForNativeStatements()) {
 				conToUse = this.nativeJdbcExtractor.getNativeConnection(con);
 			}
 			stmt = conToUse.createStatement();
+			// 给这个 stmt 对象设置一些属性，如：fetchSize、maxRows和queryTimeout
 			applyStatementSettings(stmt);
 			Statement stmtToUse = stmt;
 			if (this.nativeJdbcExtractor != null) {
@@ -358,7 +372,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			DataSourceUtils.releaseConnection(con, getDataSource());
 		}
 	}
-
 	public void execute(final String sql) throws DataAccessException {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Executing SQL statement [" + sql + "]");
@@ -374,7 +387,9 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		}
 		execute(new ExecuteStatementCallback());
 	}
-
+	public void query(String sql, RowCallbackHandler rch) throws DataAccessException {
+		query(sql, new RowCallbackHandlerResultSetExtractor(rch));
+	}
 	public <T> T query(final String sql, final ResultSetExtractor<T> rse) throws DataAccessException {
 		Assert.notNull(sql, "SQL must not be null");
 		Assert.notNull(rse, "ResultSetExtractor must not be null");
@@ -402,50 +417,18 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		}
 		return execute(new QueryStatementCallback());
 	}
-
-	public void query(String sql, RowCallbackHandler rch) throws DataAccessException {
-		query(sql, new RowCallbackHandlerResultSetExtractor(rch));
-	}
-
 	public <T> List<T> query(String sql, RowMapper<T> rowMapper) throws DataAccessException {
 		return query(sql, new RowMapperResultSetExtractor<T>(rowMapper));
 	}
-
-	public Map<String, Object> queryForMap(String sql) throws DataAccessException {
-		return queryForObject(sql, getColumnMapRowMapper());
-	}
-
-	public <T> T queryForObject(String sql, RowMapper<T> rowMapper) throws DataAccessException {
-		List<T> results = query(sql, rowMapper);
-		return DataAccessUtils.requiredSingleResult(results);
-	}
-	public <T> T queryForObject(String sql, Class<T> requiredType) throws DataAccessException {
-		return queryForObject(sql, getSingleColumnRowMapper(requiredType));
-	}
-
-	@Deprecated
-	public long queryForLong(String sql) throws DataAccessException {
-		Number number = queryForObject(sql, Long.class);
-		return (number != null ? number.longValue() : 0);
-	}
-	@Deprecated
-	public int queryForInt(String sql) throws DataAccessException {
-		Number number = queryForObject(sql, Integer.class);
-		return (number != null ? number.intValue() : 0);
-	}
-
 	public <T> List<T> queryForList(String sql, Class<T> elementType) throws DataAccessException {
 		return query(sql, getSingleColumnRowMapper(elementType));
 	}
-
 	public List<Map<String, Object>> queryForList(String sql) throws DataAccessException {
 		return query(sql, getColumnMapRowMapper());
 	}
-
 	public SqlRowSet queryForRowSet(String sql) throws DataAccessException {
 		return query(sql, new SqlRowSetResultSetExtractor());
 	}
-
 	public int update(final String sql) throws DataAccessException {
 		Assert.notNull(sql, "SQL must not be null");
 		if (logger.isDebugEnabled()) {
@@ -465,7 +448,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		}
 		return execute(new UpdateStatementCallback());
 	}
-
 	public int[] batchUpdate(final String[] sql) throws DataAccessException {
 		Assert.notEmpty(sql, "SQL array must not be empty");
 		if (logger.isDebugEnabled()) {
@@ -501,12 +483,40 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		}
 		return execute(new BatchUpdateStatementCallback());
 	}
+	public <T> T queryForObject(String sql, RowMapper<T> rowMapper) throws DataAccessException {
+		List<T> results = query(sql, rowMapper);
+		return DataAccessUtils.requiredSingleResult(results);
+	}
+	public Map<String, Object> queryForMap(String sql) throws DataAccessException {
+		return queryForObject(sql, getColumnMapRowMapper());
+	}
+	public <T> T queryForObject(String sql, Class<T> requiredType) throws DataAccessException {
+		return queryForObject(sql, getSingleColumnRowMapper(requiredType));
+	}
+	@Deprecated
+	public long queryForLong(String sql) throws DataAccessException {
+		Number number = queryForObject(sql, Long.class);
+		return (number != null ? number.longValue() : 0);
+	}
+	@Deprecated
+	public int queryForInt(String sql) throws DataAccessException {
+		Number number = queryForObject(sql, Integer.class);
+		return (number != null ? number.intValue() : 0);
+	}
+	/* ------------------ 以上这些方法最后都会来调用 execute(StatementCallback<T> action) 这个方法 ------------------ */
+
+
+
+
+
+
+
+
 
 
 	//-------------------------------------------------------------------------
 	// Methods dealing with prepared statements
-	//-------------------------------------------------------------------------
-
+	/* ----------------------- 以下方法最终都来调用 execute(PreparedStatementCreator psc, PreparedStatementCallback<T> action) ，它是核心方法 ----------------------- */
 	// execute 作为数据操作的核心入口，将大多数数据库操作相同的步骤统一封装，而将个性化的操作使用 PreparedStatementCallback 进行回调。
 	public <T> T execute(PreparedStatementCreator psc, PreparedStatementCallback<T> action) throws DataAccessException {
 
@@ -562,18 +572,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		return execute(new SimplePreparedStatementCreator(sql), action);
 	}
 
-	/**
-	 * Query using a prepared statement, allowing for a PreparedStatementCreator
-	 * and a PreparedStatementSetter. Most other query methods use this method,
-	 * but application code will always work with either a creator or a setter.
-	 * @param psc Callback handler that can create a PreparedStatement given a
-	 * Connection
-	 * @param pss object that knows how to set values on the prepared statement.
-	 * If this is null, the SQL will be assumed to contain no bind parameters.
-	 * @param rse object that will extract results.
-	 * @return an arbitrary result object, as returned by the ResultSetExtractor
-	 * @throws DataAccessException if there is any problem
-	 */
 	public <T> T query(PreparedStatementCreator psc, final PreparedStatementSetter pss, final ResultSetExtractor<T> rse) throws DataAccessException {
 
 		Assert.notNull(rse, "ResultSetExtractor must not be null");
@@ -651,7 +649,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	}
 
 	public <T> T queryForObject(String sql, Object[] args, int[] argTypes, RowMapper<T> rowMapper) throws DataAccessException {
-
 		List<T> results = query(sql, args, argTypes, new RowMapperResultSetExtractor<T>(rowMapper, 1));
 		return DataAccessUtils.requiredSingleResult(results);
 	}
@@ -726,7 +723,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		return query(sql, args, new SqlRowSetResultSetExtractor());
 	}
 
-	// 更新方法
 	protected int update(final PreparedStatementCreator psc, final PreparedStatementSetter pss) throws DataAccessException {
 
 		logger.debug("Executing prepared SQL update");
@@ -791,7 +787,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		return update(sql, newArgPreparedStatementSetter(args));
 	}
 
-	// 批量更新
 	public int[] batchUpdate(String sql, final BatchPreparedStatementSetter pss) throws DataAccessException {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Executing SQL batch update [" + sql + "]");
@@ -891,11 +886,23 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			}
 		});
 	}
+	/* ----------------------- 以下方法最终都来调用 execute(PreparedStatementCreator psc, PreparedStatementCallback<T> action) ，它是核心方法 ----------------------- */
+
+
+
+
+
+
+
+
+
+
+
+
 
 	//-------------------------------------------------------------------------
 	// Methods dealing with callable statements
-	//-------------------------------------------------------------------------
-
+	/* --------------------------------- 以下这些方法最终都会来调用 execute(CallableStatementCreator csc, CallableStatementCallback<T> action) 这个方法 ---------------------------------------- */
 	public <T> T execute(CallableStatementCreator csc, CallableStatementCallback<T> action) throws DataAccessException {
 
 		Assert.notNull(csc, "CallableStatementCreator must not be null");
@@ -947,7 +954,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	public <T> T execute(String callString, CallableStatementCallback<T> action) throws DataAccessException {
 		return execute(new SimpleCallableStatementCreator(callString), action);
 	}
-
 	public Map<String, Object> call(CallableStatementCreator csc, List<SqlParameter> declaredParameters) throws DataAccessException {
 
 		final List<SqlParameter> updateCountParameters = new ArrayList<SqlParameter>();
@@ -983,7 +989,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			}
 		});
 	}
-
 	/**
 	 * Extract returned ResultSets from the completed stored procedure.
 	 * @param cs JDBC wrapper for the stored procedure
@@ -1089,7 +1094,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		}
 		return returnedResults;
 	}
-
 	/**
 	 * Process the given ResultSet from a stored procedure.
 	 * @param rs the ResultSet to process
@@ -1127,12 +1131,20 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		}
 		return returnedResults;
 	}
+	/*--------------------------------- 以上这些方法最终都会来调用 execute(CallableStatementCreator csc, CallableStatementCallback<T> action) 这个方法 ----------------------------------------*/
+
+
+
+
+
+
+
+
 
 
 	//-------------------------------------------------------------------------
 	// Implementation hooks and helper methods
 	//-------------------------------------------------------------------------
-
 	/**
 	 * Create a new RowMapper for reading columns as key-value pairs.
 	 * @return the RowMapper to use
@@ -1141,7 +1153,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	protected RowMapper<Map<String, Object>> getColumnMapRowMapper() {
 		return new ColumnMapRowMapper();
 	}
-
 	/**
 	 * Create a new RowMapper for reading result objects from a single column.
 	 * @param requiredType the type that each result object is expected to match
@@ -1151,7 +1162,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	protected <T> RowMapper<T> getSingleColumnRowMapper(Class<T> requiredType) {
 		return new SingleColumnRowMapper<T>(requiredType);
 	}
-
 	/**
 	 * Create a Map instance to be used as results map.
 	 * <p>If "isResultsMapCaseInsensitive" has been set to true,
@@ -1167,17 +1177,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			return new LinkedHashMap<String, Object>();
 		}
 	}
-
-	/**
-	 * Prepare the given JDBC Statement (or PreparedStatement or CallableStatement),
-	 * applying statement settings such as fetch size, max rows, and query timeout.
-	 * @param stmt the JDBC Statement to prepare
-	 * @throws SQLException if thrown by JDBC API
-	 * @see #setFetchSize
-	 * @see #setMaxRows
-	 * @see #setQueryTimeout
-	 * @see org.springframework.jdbc.datasource.DataSourceUtils#applyTransactionTimeout
-	 */
+	// 给这个 stmt 对象设置一些属性，如：fetchSize、maxRows和queryTimeout
 	protected void applyStatementSettings(Statement stmt) throws SQLException {
 		int fetchSize = getFetchSize();
 		if (fetchSize > 0) {
@@ -1189,7 +1189,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		}
 		DataSourceUtils.applyTimeout(stmt, getDataSource(), getQueryTimeout());
 	}
-
 	/**
 	 * Create a new arg-based PreparedStatementSetter using the args passed in.
 	 * <p>By default, we'll create an {@link ArgumentPreparedStatementSetter}.
@@ -1200,7 +1199,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	protected PreparedStatementSetter newArgPreparedStatementSetter(Object[] args) {
 		return new ArgumentPreparedStatementSetter(args);
 	}
-
 	/**
 	 * Create a new arg-type-based PreparedStatementSetter using the args and types passed in.
 	 * <p>By default, we'll create an {@link ArgumentTypePreparedStatementSetter}.
@@ -1212,7 +1210,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	protected PreparedStatementSetter newArgTypePreparedStatementSetter(Object[] args, int[] argTypes) {
 		return new ArgumentTypePreparedStatementSetter(args, argTypes);
 	}
-
 	/**
 	 * Throw an SQLWarningException if we're not ignoring warnings,
 	 * else log the warnings (at debug level).
@@ -1235,7 +1232,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			handleWarnings(stmt.getWarnings());
 		}
 	}
-
 	/**
 	 * Throw an SQLWarningException if encountering an actual warning.
 	 * @param warning the warnings object from the current statement.
@@ -1247,7 +1243,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			throw new SQLWarningException("Warning not ignored", warning);
 		}
 	}
-
 	/**
 	 * Determine SQL from potential provider object.
 	 * @param sqlProvider object that's potentially a SqlProvider
@@ -1328,8 +1323,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			}
 		}
 	}
-
-
 	/**
 	 * Simple adapter for PreparedStatementCreator, allowing to use a plain SQL statement.
 	 */
@@ -1350,8 +1343,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			return this.sql;
 		}
 	}
-
-
 	/**
 	 * Simple adapter for CallableStatementCreator, allowing to use a plain SQL statement.
 	 */
@@ -1372,8 +1363,6 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			return this.callString;
 		}
 	}
-
-
 	/**
 	 * Adapter to enable use of a RowCallbackHandler inside a ResultSetExtractor.
 	 * <p>Uses a regular ResultSet, so we have to be careful when using it:

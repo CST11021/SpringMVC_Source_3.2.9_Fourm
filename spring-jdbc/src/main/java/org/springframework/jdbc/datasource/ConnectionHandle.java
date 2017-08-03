@@ -28,17 +28,13 @@ import java.sql.Connection;
  * @see ConnectionHolder
  * @see org.springframework.orm.jdo.JdoDialect#getJdbcConnection
  */
+// 用于JDBC连接的句柄(句柄就是引用的意思)实现的简单接口。
+// 该接口用于获取或释放一个 Connection 对象
 public interface ConnectionHandle {
 
-	/**
-	 * Fetch the JDBC Connection that this handle refers to.
-	 */
+	// 获取这个句柄所引用的JDBC连接
 	Connection getConnection();
-
-	/**
-	 * Release the JDBC Connection that this handle refers to.
-	 * @param con the JDBC Connection to release
-	 */
+	// 释放这个句柄所引用的JDBC连接
 	void releaseConnection(Connection con);
 
 }

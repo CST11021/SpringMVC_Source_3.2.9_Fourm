@@ -49,29 +49,14 @@ import org.springframework.util.Assert;
  * @see org.springframework.transaction.support.TransactionSynchronizationManager
  */
 public abstract class DataSourceUtils {
+	private static final Log logger = LogFactory.getLog(DataSourceUtils.class);
 
 	/**
 	 * Order value for TransactionSynchronization objects that clean up JDBC Connections.
 	 */
 	public static final int CONNECTION_SYNCHRONIZATION_ORDER = 1000;
 
-	private static final Log logger = LogFactory.getLog(DataSourceUtils.class);
-
-
-	/**
-	 * Obtain a Connection from the given DataSource. Translates SQLExceptions into
-	 * the Spring hierarchy of unchecked generic data access exceptions, simplifying
-	 * calling code and making any exception that is thrown more meaningful.
-	 * <p>Is aware of a corresponding Connection bound to the current thread, for example
-	 * when using {@link DataSourceTransactionManager}. Will bind a Connection to the
-	 * thread if transaction synchronization is active, e.g. when running within a
-	 * {@link org.springframework.transaction.jta.JtaTransactionManager JTA} transaction).
-	 * @param dataSource the DataSource to obtain Connections from
-	 * @return a JDBC Connection from the given DataSource
-	 * @throws org.springframework.jdbc.CannotGetJdbcConnectionException
-	 * if the attempt to get a Connection failed
-	 * @see #releaseConnection
-	 */
+	// 根据 DataSource 获取一个 Connection
 	public static Connection getConnection(DataSource dataSource) throws CannotGetJdbcConnectionException {
 		try {
 			return doGetConnection(dataSource);
@@ -80,19 +65,6 @@ public abstract class DataSourceUtils {
 			throw new CannotGetJdbcConnectionException("Could not get JDBC Connection", ex);
 		}
 	}
-
-	/**
-	 * Actually obtain a JDBC Connection from the given DataSource.
-	 * Same as {@link #getConnection}, but throwing the original SQLException.
-	 * <p>Is aware of a corresponding Connection bound to the current thread, for example
-	 * when using {@link DataSourceTransactionManager}. Will bind a Connection to the thread
-	 * if transaction synchronization is active (e.g. if in a JTA transaction).
-	 * <p>Directly accessed by {@link TransactionAwareDataSourceProxy}.
-	 * @param dataSource the DataSource to obtain Connections from
-	 * @return a JDBC Connection from the given DataSource
-	 * @throws SQLException if thrown by JDBC methods
-	 * @see #doReleaseConnection
-	 */
 	public static Connection doGetConnection(DataSource dataSource) throws SQLException {
 		Assert.notNull(dataSource, "No DataSource specified");
 
@@ -110,10 +82,11 @@ public abstract class DataSourceUtils {
 		logger.debug("Fetching JDBC Connection from DataSource");
 		Connection con = dataSource.getConnection();
 
+		// 当前线程支持同步
 		if (TransactionSynchronizationManager.isSynchronizationActive()) {
 			logger.debug("Registering transaction synchronization for JDBC Connection");
-			// Use same Connection for further JDBC actions within the transaction.
-			// Thread-bound object will get removed by synchronization at transaction completion.
+			// 在事务中使用相同的连接来进行进一步的JDBC操作
+			// 在事务完成时，线程绑定的对象将被同步化
 			ConnectionHolder holderToUse = conHolder;
 			if (holderToUse == null) {
 				holderToUse = new ConnectionHolder(con);
@@ -121,9 +94,10 @@ public abstract class DataSourceUtils {
 			else {
 				holderToUse.setConnection(con);
 			}
+
+			// 记录数据库连接
 			holderToUse.requested();
-			TransactionSynchronizationManager.registerSynchronization(
-					new ConnectionSynchronization(holderToUse, dataSource));
+			TransactionSynchronizationManager.registerSynchronization(new ConnectionSynchronization(holderToUse, dataSource));
 			holderToUse.setSynchronizedWithTransaction(true);
 			if (holderToUse != conHolder) {
 				TransactionSynchronizationManager.bindResource(dataSource, holderToUse);
@@ -141,8 +115,7 @@ public abstract class DataSourceUtils {
 	 * @throws SQLException if thrown by JDBC methods
 	 * @see #resetConnectionAfterTransaction
 	 */
-	public static Integer prepareConnectionForTransaction(Connection con, TransactionDefinition definition)
-			throws SQLException {
+	public static Integer prepareConnectionForTransaction(Connection con, TransactionDefinition definition) throws SQLException {
 
 		Assert.notNull(con, "No Connection specified");
 

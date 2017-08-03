@@ -42,47 +42,20 @@ public class ConnectionHolder extends ResourceHolderSupport {
 
 	public static final String SAVEPOINT_NAME_PREFIX = "SAVEPOINT_";
 
-
 	private ConnectionHandle connectionHandle;
-
 	private Connection currentConnection;
-
 	private boolean transactionActive = false;
-
 	private Boolean savepointsSupported;
-
 	private int savepointCounter = 0;
 
 
-	/**
-	 * Create a new ConnectionHolder for the given ConnectionHandle.
-	 * @param connectionHandle the ConnectionHandle to hold
-	 */
 	public ConnectionHolder(ConnectionHandle connectionHandle) {
 		Assert.notNull(connectionHandle, "ConnectionHandle must not be null");
 		this.connectionHandle = connectionHandle;
 	}
-
-	/**
-	 * Create a new ConnectionHolder for the given JDBC Connection,
-	 * wrapping it with a {@link SimpleConnectionHandle},
-	 * assuming that there is no ongoing transaction.
-	 * @param connection the JDBC Connection to hold
-	 * @see SimpleConnectionHandle
-	 * @see #ConnectionHolder(java.sql.Connection, boolean)
-	 */
 	public ConnectionHolder(Connection connection) {
 		this.connectionHandle = new SimpleConnectionHandle(connection);
 	}
-
-	/**
-	 * Create a new ConnectionHolder for the given JDBC Connection,
-	 * wrapping it with a {@link SimpleConnectionHandle}.
-	 * @param connection the JDBC Connection to hold
-	 * @param transactionActive whether the given Connection is involved
-	 * in an ongoing transaction
-	 * @see SimpleConnectionHandle
-	 */
 	public ConnectionHolder(Connection connection, boolean transactionActive) {
 		this(connection);
 		this.transactionActive = transactionActive;
@@ -194,7 +167,6 @@ public class ConnectionHolder extends ResourceHolderSupport {
 			this.currentConnection = null;
 		}
 	}
-
 
 	@Override
 	public void clear() {

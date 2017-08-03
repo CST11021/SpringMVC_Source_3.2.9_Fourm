@@ -45,18 +45,47 @@ import java.sql.SQLException;
  * @see ResultSetExtractor
  * @see org.springframework.jdbc.object.MappingSqlQuery
  */
+// 该接口被作为一个回调接口来使用，用于映射当前结果集中的当前行
+/*
+
+使用 RowCallbackHandler 接口：
+   final List forums = new ArrayList();
+   jdbcTemplate.query(sql, new RowCallbackHandler() {
+      @Override
+      public void processRow(ResultSet resultSet) throws SQLException {
+         Forum forum = new Forum();
+         forum.setId(resultSet.getInt("id"));
+         forum.setName(resultSet.getInt("name"));
+         forums.add(forum); // 注意这里的区别
+      }
+   });
+
+ 使用 RowMapper 接口
+ jdbcTemplate.query(sql, new RowMapper<Forum>() {
+      @Override
+      public Forum mapRow(ResultSet resultSet, int i) throws SQLException {
+         Forum forum = new Forum();
+         forum.setId(resultSet.getInt("id"));
+         forum.setName(resultSet.getString("name"));
+         return forum;
+      }
+   });
+
+	使用RowCallbackHandler接口，我们需要在接口方法processRow(ResultSet rs)中手工将forum添加到List中，
+	而在RowMapper<T>接口方法中，我们仅需简单定义结果行集和对象的映射关系即可。创建List<T>对象、将行数据映射对象添加到List中等操作都有JdbcTemplate代劳了
+ */
 public interface RowMapper<T> {
 
 	/**
-	 * Implementations must implement this method to map each row of data
-	 * in the ResultSet. This method should not call {@code next()} on
-	 * the ResultSet; it is only supposed to map values of the current row.
+	 * Implementations must implement this method to map each row of data in the ResultSet.
+	 * This method should not call {@code next()} on the ResultSet; it is only supposed to map values of the current row.
 	 * @param rs the ResultSet to map (pre-initialized for the current row)
 	 * @param rowNum the number of the current row
 	 * @return the result object for the current row
 	 * @throws SQLException if a SQLException is encountered getting
 	 * column values (that is, there's no need to catch SQLException)
 	 */
+	// 实现这个方法来映射ResultSet中的每一行数据。这个方法不应该在ResultSet上调用next();它只需要映射当前行的值
 	T mapRow(ResultSet rs, int rowNum) throws SQLException;
 
 }
