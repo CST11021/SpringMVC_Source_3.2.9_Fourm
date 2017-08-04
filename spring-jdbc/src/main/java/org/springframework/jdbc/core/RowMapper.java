@@ -46,6 +46,7 @@ import java.sql.SQLException;
  * @see org.springframework.jdbc.object.MappingSqlQuery
  */
 // 该接口被作为一个回调接口来使用，用于映射当前结果集中的当前行
+// RowMapper是ResultSetExtractor的精简版，功能类似于RowCallbackHandler，也只关注处理单行的结果。不过，处理后的结果会由ResultSetExtractor实现类进行组合。
 /*
 
 使用 RowCallbackHandler 接口：
@@ -67,7 +68,7 @@ import java.sql.SQLException;
          Forum forum = new Forum();
          forum.setId(resultSet.getInt("id"));
          forum.setName(resultSet.getString("name"));
-         return forum;
+         return forum;// 仅针对处理当前行的逻辑
       }
    });
 

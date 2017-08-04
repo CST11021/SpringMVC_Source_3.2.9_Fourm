@@ -45,22 +45,13 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
  * @author Juergen Hoeller
  */
 public abstract class JdbcUtils {
+	private static final Log logger = LogFactory.getLog(JdbcUtils.class);
 
-	/**
-	 * Constant that indicates an unknown (or unspecified) SQL type.
-	 * @see java.sql.Types
-	 */
+	// 常量表示未知(或未指定的)SQL类型 @see java.sql.Types
 	public static final int TYPE_UNKNOWN = Integer.MIN_VALUE;
 
 
-	private static final Log logger = LogFactory.getLog(JdbcUtils.class);
-
-
-	/**
-	 * Close the given JDBC Connection and ignore any thrown exception.
-	 * This is useful for typical finally blocks in manual JDBC code.
-	 * @param con the JDBC Connection to close (may be {@code null})
-	 */
+	// 关闭相应的对象
 	public static void closeConnection(Connection con) {
 		if (con != null) {
 			try {
@@ -75,12 +66,6 @@ public abstract class JdbcUtils {
 			}
 		}
 	}
-
-	/**
-	 * Close the given JDBC Statement and ignore any thrown exception.
-	 * This is useful for typical finally blocks in manual JDBC code.
-	 * @param stmt the JDBC Statement to close (may be {@code null})
-	 */
 	public static void closeStatement(Statement stmt) {
 		if (stmt != null) {
 			try {
@@ -95,12 +80,6 @@ public abstract class JdbcUtils {
 			}
 		}
 	}
-
-	/**
-	 * Close the given JDBC ResultSet and ignore any thrown exception.
-	 * This is useful for typical finally blocks in manual JDBC code.
-	 * @param rs the JDBC ResultSet to close (may be {@code null})
-	 */
 	public static void closeResultSet(ResultSet rs) {
 		if (rs != null) {
 			try {
@@ -116,19 +95,7 @@ public abstract class JdbcUtils {
 		}
 	}
 
-	/**
-	 * Retrieve a JDBC column value from a ResultSet, using the specified value type.
-	 * <p>Uses the specifically typed ResultSet accessor methods, falling back to
-	 * {@link #getResultSetValue(java.sql.ResultSet, int)} for unknown types.
-	 * <p>Note that the returned value may not be assignable to the specified
-	 * required type, in case of an unknown type. Calling code needs to deal
-	 * with this case appropriately, e.g. throwing a corresponding exception.
-	 * @param rs is the ResultSet holding the data
-	 * @param index is the column index
-	 * @param requiredType the required value type (may be {@code null})
-	 * @return the value object
-	 * @throws SQLException if thrown by the JDBC API
-	 */
+	// 返回当前 rs 中游标指向行的第 index 列的值，并使用 requiredType 指定的类型返回值
 	public static Object getResultSetValue(ResultSet rs, int index, Class requiredType) throws SQLException {
 		if (requiredType == null) {
 			return getResultSetValue(rs, index);
@@ -165,8 +132,7 @@ public abstract class JdbcUtils {
 			value = rs.getFloat(index);
 			wasNullCheck = true;
 		}
-		else if (double.class.equals(requiredType) || Double.class.equals(requiredType) ||
-				Number.class.equals(requiredType)) {
+		else if (double.class.equals(requiredType) || Double.class.equals(requiredType) || Number.class.equals(requiredType)) {
 			value = rs.getDouble(index);
 			wasNullCheck = true;
 		}
@@ -196,32 +162,13 @@ public abstract class JdbcUtils {
 			value = getResultSetValue(rs, index);
 		}
 
-		// Perform was-null check if demanded (for results that the
-		// JDBC driver returns as primitives).
+		// Perform was-null check if demanded (for results that the JDBC driver returns as primitives).
 		if (wasNullCheck && value != null && rs.wasNull()) {
 			value = null;
 		}
 		return value;
 	}
-
-	/**
-	 * Retrieve a JDBC column value from a ResultSet, using the most appropriate
-	 * value type. The returned value should be a detached value object, not having
-	 * any ties to the active ResultSet: in particular, it should not be a Blob or
-	 * Clob object but rather a byte array respectively String representation.
-	 * <p>Uses the {@code getObject(index)} method, but includes additional "hacks"
-	 * to get around Oracle 10g returning a non-standard object for its TIMESTAMP
-	 * datatype and a {@code java.sql.Date} for DATE columns leaving out the
-	 * time portion: These columns will explicitly be extracted as standard
-	 * {@code java.sql.Timestamp} object.
-	 * @param rs is the ResultSet holding the data
-	 * @param index is the column index
-	 * @return the value object
-	 * @throws SQLException if thrown by the JDBC API
-	 * @see java.sql.Blob
-	 * @see java.sql.Clob
-	 * @see java.sql.Timestamp
-	 */
+	// 返回当前 rs 中游标指向行的第 index 列的值
 	public static Object getResultSetValue(ResultSet rs, int index) throws SQLException {
 		Object obj = rs.getObject(index);
 		String className = null;
@@ -235,14 +182,12 @@ public abstract class JdbcUtils {
 			obj = rs.getString(index);
 		}
 		else if (className != null &&
-				("oracle.sql.TIMESTAMP".equals(className) ||
-				"oracle.sql.TIMESTAMPTZ".equals(className))) {
+				("oracle.sql.TIMESTAMP".equals(className) || "oracle.sql.TIMESTAMPTZ".equals(className))) {
 			obj = rs.getTimestamp(index);
 		}
 		else if (className != null && className.startsWith("oracle.sql.DATE")) {
 			String metaDataClassName = rs.getMetaData().getColumnClassName(index);
-			if ("java.sql.Timestamp".equals(metaDataClassName) ||
-					"oracle.sql.TIMESTAMP".equals(metaDataClassName)) {
+			if ("java.sql.Timestamp".equals(metaDataClassName) || "oracle.sql.TIMESTAMP".equals(metaDataClassName)) {
 				obj = rs.getTimestamp(index);
 			}
 			else {
@@ -259,9 +204,11 @@ public abstract class JdbcUtils {
 
 	/**
 	 * Extract database meta data via the given DatabaseMetaDataCallback.
+	 * 通过给定的DatabaseMetaDataCallback提取数据库元数据。
 	 * <p>This method will open a connection to the database and retrieve the database metadata.
-	 * Since this method is called before the exception translation feature is configured for
-	 * a datasource, this method can not rely on the SQLException translation functionality.
+	 * 该方法将打开到数据库的连接，并检索数据库元数据。
+	 * Since this method is called before the exception translation feature is configured for a datasource, this method can not rely on the SQLException translation functionality.
+	 * 由于这个方法是在为datasource配置异常翻译特性之前调用的，所以这个方法不能依赖于SQLException的翻译功能。
 	 * <p>Any exceptions will be wrapped in a MetaDataAccessException. This is a checked exception
 	 * and any calling code should catch and handle this exception. You can just log the
 	 * error and hope for the best, but there is probably a more serious error that will
@@ -272,8 +219,7 @@ public abstract class JdbcUtils {
 	 * the DatabaseMetaDataCallback's {@code processMetaData} method
 	 * @throws MetaDataAccessException if meta data access failed
 	 */
-	public static Object extractDatabaseMetaData(DataSource dataSource, DatabaseMetaDataCallback action)
-			throws MetaDataAccessException {
+	public static Object extractDatabaseMetaData(DataSource dataSource, DatabaseMetaDataCallback action) throws MetaDataAccessException {
 
 		Connection con = null;
 		try {
@@ -303,10 +249,9 @@ public abstract class JdbcUtils {
 			DataSourceUtils.releaseConnection(con, dataSource);
 		}
 	}
-
 	/**
-	 * Call the specified method on DatabaseMetaData for the given DataSource,
-	 * and extract the invocation result.
+	 * Call the specified method on DatabaseMetaData for the given DataSource, and extract the invocation result.
+	 * 为给定的数据源调用databasemetdatasource上指定的方法，并提取调用结果
 	 * @param dataSource the DataSource to extract meta data for
 	 * @param metaDataMethodName the name of the DatabaseMetaData method to call
 	 * @return the object returned by the specified DatabaseMetaData method
@@ -314,8 +259,7 @@ public abstract class JdbcUtils {
 	 * or failed to invoke the specified method
 	 * @see java.sql.DatabaseMetaData
 	 */
-	public static Object extractDatabaseMetaData(DataSource dataSource, final String metaDataMethodName)
-			throws MetaDataAccessException {
+	public static Object extractDatabaseMetaData(DataSource dataSource, final String metaDataMethodName) throws MetaDataAccessException {
 
 		return extractDatabaseMetaData(dataSource,
 				new DatabaseMetaDataCallback() {
@@ -343,17 +287,8 @@ public abstract class JdbcUtils {
 				});
 	}
 
-	/**
-	 * Return whether the given JDBC driver supports JDBC 2.0 batch updates.
-	 * <p>Typically invoked right before execution of a given set of statements:
-	 * to decide whether the set of SQL statements should be executed through
-	 * the JDBC 2.0 batch mechanism or simply in a traditional one-by-one fashion.
-	 * <p>Logs a warning if the "supportsBatchUpdates" methods throws an exception
-	 * and simply returns {@code false} in that case.
-	 * @param con the Connection to check
-	 * @return whether JDBC 2.0 batch updates are supported
-	 * @see java.sql.DatabaseMetaData#supportsBatchUpdates()
-	 */
+
+	// 判断给定的JDBC驱动程序是否支持JDBC 2.0的批处理更新。
 	public static boolean supportsBatchUpdates(Connection con) {
 		try {
 			DatabaseMetaData dbmd = con.getMetaData();
@@ -376,11 +311,7 @@ public abstract class JdbcUtils {
 		return false;
 	}
 
-	/**
-	 * Extract a common name for the database in use even if various drivers/platforms provide varying names.
-	 * @param source the name as provided in database metedata
-	 * @return the common name to be used
-	 */
+	// 根据数据源名称，返回通用名称，这里定义只返回“DB2”或“Sybase”
 	public static String commonDatabaseName(String source) {
 		String name = source;
 		if (source != null && source.startsWith("DB2")) {
@@ -395,11 +326,7 @@ public abstract class JdbcUtils {
 		return name;
 	}
 
-	/**
-	 * Check whether the given SQL type is numeric.
-	 * @param sqlType the SQL type to be checked
-	 * @return whether the type is numeric
-	 */
+	// 检查给定的SQL类型是否为数值类型
 	public static boolean isNumeric(int sqlType) {
 		return Types.BIT == sqlType || Types.BIGINT == sqlType || Types.DECIMAL == sqlType ||
 				Types.DOUBLE == sqlType || Types.FLOAT == sqlType || Types.INTEGER == sqlType ||
@@ -407,18 +334,7 @@ public abstract class JdbcUtils {
 				Types.TINYINT == sqlType;
 	}
 
-	/**
-	 * Determine the column name to use. The column name is determined based on a
-	 * lookup using ResultSetMetaData.
-	 * <p>This method implementation takes into account recent clarifications
-	 * expressed in the JDBC 4.0 specification:
-	 * <p><i>columnLabel - the label for the column specified with the SQL AS clause.
-	 * If the SQL AS clause was not specified, then the label is the name of the column</i>.
-	 * @return the column name to use
-	 * @param resultSetMetaData the current meta data to use
-	 * @param columnIndex the index of the column for the look up
-	 * @throws SQLException in case of lookup failure
-	 */
+	// 返回第 columnIndex 列，对应的列名
 	public static String lookupColumnName(ResultSetMetaData resultSetMetaData, int columnIndex) throws SQLException {
 		String name = resultSetMetaData.getColumnLabel(columnIndex);
 		if (name == null || name.length() < 1) {
@@ -427,12 +343,7 @@ public abstract class JdbcUtils {
 		return name;
 	}
 
-	/**
-	 * Convert a column name with underscores to the corresponding property name using "camel case".  A name
-	 * like "customer_number" would match a "customerNumber" property name.
-	 * @param name the column name to be converted
-	 * @return the name using "camel case"
-	 */
+	// 使用“驼峰”将一个列名称与下划线转换为相应的属性名，例如：customer_number --> customerNumber
 	public static String convertUnderscoreNameToPropertyName(String name) {
 		StringBuilder result = new StringBuilder();
 		boolean nextIsUpper = false;

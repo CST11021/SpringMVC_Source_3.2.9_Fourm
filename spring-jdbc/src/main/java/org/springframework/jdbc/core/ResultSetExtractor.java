@@ -46,6 +46,10 @@ import org.springframework.dao.DataAccessException;
  * @see RowMapper
  * @see org.springframework.jdbc.core.support.AbstractLobStreamingResultSetExtractor
  */
+/*
+ResultSetExtractor基本上属于JdbcTemplate内部使用的Callback接口。相对于下面两个Callback接口来说，ResultSetExtractor拥有更
+多的控制权，因为使用它，我们需要自行处理ResultSet。在直接处理完ResultSet之后，我们可以将处理后的结果一任何想要的形式包装后返回。
+ */
 public interface ResultSetExtractor<T> {
 
 	/**

@@ -65,6 +65,10 @@ import org.springframework.jdbc.InvalidResultSetAccessException;
  * @see SQLStateSQLExceptionTranslator
  */
 // 用来翻译SQL错误代码
+/* SQLErrorCodeSQLExceptionTranslator会基于SQLException所返回的ErrorCode进行异常转译。通常情况下，根据各数据库提供商所提
+   供的ErrorCode进行分析要比基于SQLState的方式准确得多。默认情况下，JdbcTemplate采用SQLErrorCodeSQLExceptionTranslator进
+   行SQLException的转译工作。只有当通过ErrorCode方式无法提供足够信息的时候，才会转而求助于SQLStateSQLExceptionTranslator。
+ */
 public class SQLErrorCodeSQLExceptionTranslator extends AbstractFallbackSQLExceptionTranslator {
 
 	private static final int MESSAGE_ONLY_CONSTRUCTOR = 1;

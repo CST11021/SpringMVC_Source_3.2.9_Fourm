@@ -64,6 +64,7 @@ public class JdbcConnectDBTest {
     }
 
 
+
     // 测试statement.executeQuery()方法，
     @Test
     public void testStatement1() throws SQLException, ClassNotFoundException {
@@ -132,6 +133,26 @@ public class JdbcConnectDBTest {
 
         //关闭相关的对象
         preparedStatement.close();
+        connection.close();
+
+    }
+
+
+
+    // 测试 CallableStatement 执行调用的存储过程
+    @Test
+    public void test() throws SQLException, ClassNotFoundException {
+        Class.forName(driver);
+        Connection connection = DriverManager.getConnection(url,username,password);
+
+        CallableStatement callableStatement = connection.prepareCall("CALL pro_findById(1);");
+        ResultSet resultSet = callableStatement.executeQuery();
+        while(resultSet.next()){
+            System.out.println("name: " + resultSet.getString("name"));
+        }
+
+        resultSet.close();
+        callableStatement.close();
         connection.close();
 
     }

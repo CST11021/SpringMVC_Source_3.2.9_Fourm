@@ -27,6 +27,16 @@ CREATE TABLE `user` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+-- 创建一个存储过程
+CREATE PROCEDURE pro_findById(IN userId INT)  -- IN: 输入参数
+BEGIN
+    SELECT * FROM `user` WHERE id=userId;
+END
+
+-- 测试调用存储过程
+--CALL pro_findById(1);
+
 -- ----------------------------
 -- Records of user
 -- ----------------------------

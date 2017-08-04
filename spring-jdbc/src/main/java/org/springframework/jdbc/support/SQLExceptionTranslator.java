@@ -36,12 +36,17 @@ import org.springframework.dao.DataAccessException;
 // SQL异常转换器接口
 /*
  	传统的JDBC API在发生几乎所有的数据操作问题都抛出相同的SQLException，它将异常的细节性信息封装在异常属性中，所以如果希
- 望了解异常的具体原因，用户必须分析异常对象的信息。SQLException拥有两个代表异常具体原因的属性：错误码和SQL状态码，前者是
+ 望了解异常的具体原因，用户必须分析异常对象的信息。SQLException 拥有两个代表异常具体原因的属性：错误码和SQL状态码，前者是
  数据库相关的，可通过getErrorCode()返回，其值的类型是int；而后者是一个标准的错误代码，可通过getSQLState()返回，是一个String
  类型的值，由5个字符组成。Spring中通过实现SQLExceptionTranslator 接口实现异常的转换，它根据错误码和SQL状态码信息将SQLException
  翻译成Spring DAO的异常体系。
  	该接口的两个实现类 SQLErrorCodeSQLExceptionTranslator 和 SQLStateSQLExceptionTranslator 分别负责处理SQLException中的错误
  代码和SQL状态码的翻译工作。
+ 	此外，SQLExceptionSubclassTranslator是Spring2.5新增加的SQLExceptionTranslator实现类，主要用于将随JDK6发布的JDBC4版本
+ 中新定义的异常体系转化到Spring的数据访问异常体系。对于之前的版本，该实现类自然是用不上了。
+
+
+
 */
 public interface SQLExceptionTranslator {
 

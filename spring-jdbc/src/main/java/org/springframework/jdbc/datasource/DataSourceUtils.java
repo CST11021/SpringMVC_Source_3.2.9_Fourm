@@ -51,12 +51,11 @@ import org.springframework.util.Assert;
 public abstract class DataSourceUtils {
 	private static final Log logger = LogFactory.getLog(DataSourceUtils.class);
 
-	/**
-	 * Order value for TransactionSynchronization objects that clean up JDBC Connections.
-	 */
+	// Order value for TransactionSynchronization objects that clean up JDBC Connections.
 	public static final int CONNECTION_SYNCHRONIZATION_ORDER = 1000;
 
 	// 根据 DataSource 获取一个 Connection
+	// 从指定的DataSource获取或者释放连接。与直接从DataSource取得Connection不同，DataSourceUtils会将取得的Connection绑定到当前线程，以便在使用Spring提供的统一事务抽象层进行事务管理的时候使用。
 	public static Connection getConnection(DataSource dataSource) throws CannotGetJdbcConnectionException {
 		try {
 			return doGetConnection(dataSource);
@@ -218,27 +217,11 @@ public abstract class DataSourceUtils {
 		return (conHolder != null && connectionEquals(conHolder, con));
 	}
 
-	/**
-	 * Apply the current transaction timeout, if any,
-	 * to the given JDBC Statement object.
-	 * @param stmt the JDBC Statement object
-	 * @param dataSource the DataSource that the Connection was obtained from
-	 * @throws SQLException if thrown by JDBC methods
-	 * @see java.sql.Statement#setQueryTimeout
-	 */
+
+	// 给当前事务超时应用到对应的 stmt 对象
 	public static void applyTransactionTimeout(Statement stmt, DataSource dataSource) throws SQLException {
 		applyTimeout(stmt, dataSource, 0);
 	}
-
-	/**
-	 * Apply the specified timeout - overridden by the current transaction timeout,
-	 * if any - to the given JDBC Statement object.
-	 * @param stmt the JDBC Statement object
-	 * @param dataSource the DataSource that the Connection was obtained from
-	 * @param timeout the timeout to apply (or 0 for no timeout outside of a transaction)
-	 * @throws SQLException if thrown by JDBC methods
-	 * @see java.sql.Statement#setQueryTimeout
-	 */
 	public static void applyTimeout(Statement stmt, DataSource dataSource, int timeout) throws SQLException {
 		Assert.notNull(stmt, "No Statement specified");
 		Assert.notNull(dataSource, "No DataSource specified");
@@ -253,15 +236,8 @@ public abstract class DataSourceUtils {
 		}
 	}
 
-	/**
-	 * Close the given Connection, obtained from the given DataSource,
-	 * if it is not managed externally (that is, not bound to the thread).
-	 * @param con the Connection to close if necessary
-	 * (if this is {@code null}, the call will be ignored)
-	 * @param dataSource the DataSource that the Connection was obtained from
-	 * (may be {@code null})
-	 * @see #getConnection
-	 */
+
+	// 释放 Connection
 	public static void releaseConnection(Connection con, DataSource dataSource) {
 		try {
 			doReleaseConnection(con, dataSource);
@@ -273,18 +249,6 @@ public abstract class DataSourceUtils {
 			logger.debug("Unexpected exception on closing JDBC Connection", ex);
 		}
 	}
-
-	/**
-	 * Actually close the given Connection, obtained from the given DataSource.
-	 * Same as {@link #releaseConnection}, but throwing the original SQLException.
-	 * <p>Directly accessed by {@link TransactionAwareDataSourceProxy}.
-	 * @param con the Connection to close if necessary
-	 * (if this is {@code null}, the call will be ignored)
-	 * @param dataSource the DataSource that the Connection was obtained from
-	 * (may be {@code null})
-	 * @throws SQLException if thrown by JDBC methods
-	 * @see #doGetConnection
-	 */
 	public static void doReleaseConnection(Connection con, DataSource dataSource) throws SQLException {
 		if (con == null) {
 			return;
@@ -301,49 +265,25 @@ public abstract class DataSourceUtils {
 		doCloseConnection(con, dataSource);
 	}
 
-	/**
-	 * Close the Connection, unless a {@link SmartDataSource} doesn't want us to.
-	 * @param con the Connection to close if necessary
-	 * @param dataSource the DataSource that the Connection was obtained from
-	 * @throws SQLException if thrown by JDBC methods
-	 * @see Connection#close()
-	 * @see SmartDataSource#shouldClose(Connection)
-	 */
+	// 关闭 Connection
 	public static void doCloseConnection(Connection con, DataSource dataSource) throws SQLException {
 		if (!(dataSource instanceof SmartDataSource) || ((SmartDataSource) dataSource).shouldClose(con)) {
 			con.close();
 		}
 	}
 
-	/**
-	 * Determine whether the given two Connections are equal, asking the target
-	 * Connection in case of a proxy. Used to detect equality even if the
-	 * user passed in a raw target Connection while the held one is a proxy.
-	 * @param conHolder the ConnectionHolder for the held Connection (potentially a proxy)
-	 * @param passedInCon the Connection passed-in by the user
-	 * (potentially a target Connection without proxy)
-	 * @return whether the given Connections are equal
-	 * @see #getTargetConnection
-	 */
+	// 判断 conHolder 中包装的 Connection 是否与 passedInCon 相等
 	private static boolean connectionEquals(ConnectionHolder conHolder, Connection passedInCon) {
 		if (!conHolder.hasConnection()) {
 			return false;
 		}
 		Connection heldCon = conHolder.getConnection();
-		// Explicitly check for identity too: for Connection handles that do not implement
-		// "equals" properly, such as the ones Commons DBCP exposes).
+		// Explicitly check for identity too: for Connection handles that do not implement "equals" properly, such as the ones Commons DBCP exposes).
 		return (heldCon == passedInCon || heldCon.equals(passedInCon) ||
 				getTargetConnection(heldCon).equals(passedInCon));
 	}
 
-	/**
-	 * Return the innermost target Connection of the given Connection. If the given
-	 * Connection is a proxy, it will be unwrapped until a non-proxy Connection is
-	 * found. Otherwise, the passed-in Connection will be returned as-is.
-	 * @param con the Connection proxy to unwrap
-	 * @return the innermost target Connection, or the passed-in one if no proxy
-	 * @see ConnectionProxy#getTargetConnection()
-	 */
+	// 获取被代理的con的目标对象
 	public static Connection getTargetConnection(Connection con) {
 		Connection conToUse = con;
 		while (conToUse instanceof ConnectionProxy) {
@@ -353,13 +293,13 @@ public abstract class DataSourceUtils {
 	}
 
 	/**
-	 * Determine the connection synchronization order to use for the given
-	 * DataSource. Decreased for every level of nesting that a DataSource
-	 * has, checked through the level of DelegatingDataSource nesting.
+	 * Determine the connection synchronization order to use for the given DataSource.
+	 * Decreased for every level of nesting that a DataSource has, checked through the level of DelegatingDataSource nesting.
 	 * @param dataSource the DataSource to check
 	 * @return the connection synchronization order to use
 	 * @see #CONNECTION_SYNCHRONIZATION_ORDER
 	 */
+	// 返回这个 dataSource 给定的 Connection对象的连接数
 	private static int getConnectionSynchronizationOrder(DataSource dataSource) {
 		int order = CONNECTION_SYNCHRONIZATION_ORDER;
 		DataSource currDs = dataSource;
@@ -379,11 +319,8 @@ public abstract class DataSourceUtils {
 	private static class ConnectionSynchronization extends TransactionSynchronizationAdapter {
 
 		private final ConnectionHolder connectionHolder;
-
 		private final DataSource dataSource;
-
 		private int order;
-
 		private boolean holderActive = true;
 
 		public ConnectionSynchronization(ConnectionHolder connectionHolder, DataSource dataSource) {
