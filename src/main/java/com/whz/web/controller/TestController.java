@@ -31,6 +31,10 @@ public class TestController {
         ModelAndView mav = new ModelAndView();
         mav.addObject("tagName",tagName);
         mav.addObject("timeout",timeout);
+        // 关于重定向的问题：
+        // 使用servlet重定向有两种方式，一种是forward，另一种就是redirect。
+        // forward是服务器内部重定向，客户端并不知道服务器把你当前请求重定向到哪里去了，地址栏的url与你之前访问的url保持不变。
+        // redirect则是客户端重定向，是服务器将你当前请求返回，然后给个状态标示给你，告诉你应该去重新请求另外一个url，具体表现就是地址栏的url变成了新的url。
         mav.setViewName("redirect:/index.html");
         return mav;
     }

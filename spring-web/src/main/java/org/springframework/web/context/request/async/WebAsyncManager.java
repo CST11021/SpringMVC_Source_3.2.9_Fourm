@@ -33,8 +33,7 @@ import org.springframework.web.context.request.async.DeferredResult.DeferredResu
 import org.springframework.web.util.UrlPathHelper;
 
 /**
- * The central class for managing asynchronous request processing, mainly intended
- * as an SPI and not typically used directly by application classes.
+ * The central class for managing asynchronous request processing, mainly intended as an SPI and not typically used directly by application classes.
  *
  * <p>An async scenario starts with request processing as usual in a thread (T1).
  * Concurrent request handling can be initiated by calling
@@ -54,43 +53,25 @@ import org.springframework.web.util.UrlPathHelper;
  * @see org.springframework.web.filter.OncePerRequestFilter#shouldNotFilterAsyncDispatch
  * @see org.springframework.web.filter.OncePerRequestFilter#isAsyncDispatch
  */
+// 用于管理异步请求处理的核心类，主要是作为一个SPI而不是应用程序类直接使用的。
 public final class WebAsyncManager {
-
-	private static final Object RESULT_NONE = new Object();
-
 	private static final Log logger = LogFactory.getLog(WebAsyncManager.class);
 
+	private static final Object RESULT_NONE = new Object();
 	private static final UrlPathHelper urlPathHelper = new UrlPathHelper();
-
-	private static final CallableProcessingInterceptor timeoutCallableInterceptor =
-			new TimeoutCallableProcessingInterceptor();
-
-	private static final DeferredResultProcessingInterceptor timeoutDeferredResultInterceptor =
-			new TimeoutDeferredResultProcessingInterceptor();
-
+	private static final CallableProcessingInterceptor timeoutCallableInterceptor = new TimeoutCallableProcessingInterceptor();
+	private static final DeferredResultProcessingInterceptor timeoutDeferredResultInterceptor = new TimeoutDeferredResultProcessingInterceptor();
 
 	private AsyncWebRequest asyncWebRequest;
-
 	private AsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor(this.getClass().getSimpleName());
-
 	private Object concurrentResult = RESULT_NONE;
-
 	private Object[] concurrentResultContext;
-
-	private final Map<Object, CallableProcessingInterceptor> callableInterceptors =
-			new LinkedHashMap<Object, CallableProcessingInterceptor>();
-
-	private final Map<Object, DeferredResultProcessingInterceptor> deferredResultInterceptors =
-			new LinkedHashMap<Object, DeferredResultProcessingInterceptor>();
+	private final Map<Object, CallableProcessingInterceptor> callableInterceptors = new LinkedHashMap<Object, CallableProcessingInterceptor>();
+	private final Map<Object, DeferredResultProcessingInterceptor> deferredResultInterceptors = new LinkedHashMap<Object, DeferredResultProcessingInterceptor>();
 
 
-	/**
-	 * Package private constructor.
-	 * @see WebAsyncUtils#getAsyncManager(javax.servlet.ServletRequest)
-	 * @see WebAsyncUtils#getAsyncManager(org.springframework.web.context.request.WebRequest)
-	 */
-	WebAsyncManager() {
-	}
+
+	WebAsyncManager() {}
 
 	/**
 	 * Configure the {@link AsyncWebRequest} to use. This property may be set
@@ -134,9 +115,7 @@ public final class WebAsyncManager {
 		return ((this.asyncWebRequest != null) && this.asyncWebRequest.isAsyncStarted());
 	}
 
-	/**
-	 * Whether a result value exists as a result of concurrent handling.
-	 */
+	// 结果值是否作为并发处理的结果存在
 	public boolean hasConcurrentResult() {
 		return (this.concurrentResult != RESULT_NONE);
 	}
@@ -363,8 +342,7 @@ public final class WebAsyncManager {
 	 * @see #getConcurrentResult()
 	 * @see #getConcurrentResultContext()
 	 */
-	public void startDeferredResultProcessing(
-			final DeferredResult<?> deferredResult, Object... processingContext) throws Exception {
+	public void startDeferredResultProcessing(final DeferredResult<?> deferredResult, Object... processingContext) throws Exception {
 
 		Assert.notNull(deferredResult, "DeferredResult must not be null");
 		Assert.state(this.asyncWebRequest != null, "AsyncWebRequest must not be null");

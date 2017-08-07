@@ -50,6 +50,18 @@ public abstract class WebUtils {
 	 * Standard Servlet 2.3+ spec request attributes for include URI and paths.
 	 * <p>If included via a RequestDispatcher, the current resource will see the
 	 * originating request. Its own URI and paths are exposed as request attributes.
+	 *
+	 * INCLUDE_REQUEST_URI_ATTRIBUTE常量值就是标题上的“javax.servlet.include.request_uri” ，isIncludeRequest(request)方法究竟是什么作用呢，
+	 * 要想明白这个问题，我们可以借助一条JSP的指令来理解：<jsp:incluede page="xxx.jsp"/> ，这条指令是指在一个页面中嵌套了另一个页面，
+	 * 那么我们知道JSP在运行期间是会被编译成相应的Servlet类来运行的，所以在Servlet中也会有类似的功能和调用语法，这就是RequestDispatch.include()方法。
+	 *
+	 * 那么假设servlet1使用RequestDispatcher的include方法调用servlet2，如果servlet2想知道那个调用它的servlet1的上下文信息该怎么办呢，
+	 * 那就可以通过request中的attribute中的如下属性获取：
+	 * javax.servlet.include.request_uri
+	 * javax.servlet.include.context_path
+	 * javax.servlet.include.servlet_path
+	 * javax.servlet.include.path_info
+	 * javax.servlet.include.query_string
 	 */
 	public static final String INCLUDE_REQUEST_URI_ATTRIBUTE = "javax.servlet.include.request_uri";
 	public static final String INCLUDE_CONTEXT_PATH_ATTRIBUTE = "javax.servlet.include.context_path";
@@ -208,6 +220,7 @@ public abstract class WebUtils {
 	 * @param servletContext the servlet context of the web application
 	 * @return the File representing the temporary directory
 	 */
+	// 获取 ServletContex 对应的临时文件地址，它以 File 对象的形式返回。
 	public static File getTempDir(ServletContext servletContext) {
 		Assert.notNull(servletContext, "ServletContext must not be null");
 		return (File) servletContext.getAttribute(TEMP_DIR_CONTEXT_ATTRIBUTE);
@@ -226,6 +239,7 @@ public abstract class WebUtils {
 	 * @throws FileNotFoundException if the path cannot be resolved to a resource
 	 * @see javax.servlet.ServletContext#getRealPath
 	 */
+	// 获取相对路径对应文件系统的真实文件路径
 	public static String getRealPath(ServletContext servletContext, String path) throws FileNotFoundException {
 		Assert.notNull(servletContext, "ServletContext must not be null");
 		// Interpret location as relative to the web application root directory.
@@ -247,6 +261,7 @@ public abstract class WebUtils {
 	 * @param request current HTTP request
 	 * @return the session id, or {@code null} if none
 	 */
+	// 获取 Session ID 的值
 	public static String getSessionId(HttpServletRequest request) {
 		Assert.notNull(request, "Request must not be null");
 		HttpSession session = request.getSession(false);
@@ -276,8 +291,8 @@ public abstract class WebUtils {
 	 * @return the value of the session attribute, or {@code null} if not found
 	 * @throws IllegalStateException if the session attribute could not be found
 	 */
-	public static Object getRequiredSessionAttribute(HttpServletRequest request, String name)
-			throws IllegalStateException {
+	// 获取 HttpSession 特定属性名的对象，否则您必须通过 request.getHttpSession.getAttribute(name) 完成相同的操作；
+	public static Object getRequiredSessionAttribute(HttpServletRequest request, String name) throws IllegalStateException {
 
 		Object attr = getSessionAttribute(request, name);
 		if (attr == null) {
@@ -317,8 +332,7 @@ public abstract class WebUtils {
 	 * @return the value of the session attribute, newly created if not found
 	 * @throws IllegalArgumentException if the session attribute could not be instantiated
 	 */
-	public static Object getOrCreateSessionAttribute(HttpSession session, String name, Class<?> clazz)
-			throws IllegalArgumentException {
+	public static Object getOrCreateSessionAttribute(HttpSession session, String name, Class<?> clazz) throws IllegalArgumentException {
 
 		Assert.notNull(session, "Session must not be null");
 		Object sessionObject = session.getAttribute(name);
@@ -413,15 +427,8 @@ public abstract class WebUtils {
 		return null;
 	}
 
-	/**
-	 * Determine whether the given request is an include request,
-	 * that is, not a top-level HTTP request coming in from the outside.
-	 * <p>Checks the presence of the "javax.servlet.include.request_uri"
-	 * request attribute. Could check any request attribute that is only
-	 * present in an include request.
-	 * @param request current servlet request
-	 * @return whether the given request is an include request
-	 */
+
+	// 判断 request 是否包含"javax.servlet.include.request_uri"属性，表示页面嵌套
 	public static boolean isIncludeRequest(ServletRequest request) {
 		return (request.getAttribute(INCLUDE_REQUEST_URI_ATTRIBUTE) != null);
 	}
@@ -480,6 +487,7 @@ public abstract class WebUtils {
 	 * @param name the name of the attribute
 	 * @param value the suggested value of the attribute
 	 */
+	// 将 Map 元素添加到 ServletRequest 的属性列表中，当请求被导向（forward）到下一个处理程序时，这些请求属性就可以被访问到了；
 	private static void exposeRequestAttributeIfNotPresent(ServletRequest request, String name, Object value) {
 		if (request.getAttribute(name) == null) {
 			request.setAttribute(name, value);
@@ -527,6 +535,7 @@ public abstract class WebUtils {
 	 * @param name cookie name
 	 * @return the first cookie with the given name, or {@code null} if none is found
 	 */
+	// 获取 HttpServletRequest 中特定名字的 Cookie 对象。如果您需要创建 Cookie， Spring 也提供了一个方便的 CookieGenerator 工具类
 	public static Cookie getCookie(HttpServletRequest request, String name) {
 		Assert.notNull(request, "Request must not be null");
 		Cookie cookies[] = request.getCookies();

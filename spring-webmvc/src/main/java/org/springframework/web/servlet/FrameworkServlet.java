@@ -90,12 +90,10 @@ public abstract class FrameworkServlet extends HttpServletBean {
 	private boolean refreshEventReceived = false;
 
 
-	public FrameworkServlet() {
-	}
+	public FrameworkServlet() {}
 	public FrameworkServlet(WebApplicationContext webApplicationContext) {
 		this.webApplicationContext = webApplicationContext;
 	}
-
 
 
 	// getter and setter ...
@@ -129,8 +127,10 @@ public abstract class FrameworkServlet extends HttpServletBean {
 	public String getContextConfigLocation() {
 		return this.contextConfigLocation;
 	}
-
-
+	// Return this servlet's WebApplicationContext.
+	public final WebApplicationContext getWebApplicationContext() {
+		return this.webApplicationContext;
+	}
 
 	@SuppressWarnings("unchecked")
 	public void setContextInitializers(ApplicationContextInitializer<? extends ConfigurableApplicationContext>... contextInitializers) {
@@ -158,7 +158,7 @@ public abstract class FrameworkServlet extends HttpServletBean {
 	}
 
 
-	//-------------初始化 WebApplicationContext -----------------------------------------------------------------------------------------------------
+	/* -------------初始化 WebApplicationContext ----------------------------------------------------------------------------------------------------- */
 
 	// 覆盖 HttpServletBean 中的方法，该方法设计了计时器来统计初始化的执行时间，而且提供了一个扩展方法 initFrameworkServlet() 用于子类的覆盖操作，而作为关键的初始化逻辑实现委托给了 initWebApplicationContext()方法
 	@Override
@@ -187,8 +187,7 @@ public abstract class FrameworkServlet extends HttpServletBean {
 			this.logger.info("FrameworkServlet '" + getServletName() + "': initialization completed in " + elapsedTime + " ms");
 		}
 	}
-
-	//创建或刷新WebApplicationContext实例并对servlet功能所使用的变量进行初始化
+	// 创建或刷新WebApplicationContext实例并对servlet功能所使用的变量进行初始化
 	protected WebApplicationContext initWebApplicationContext() {
 		//从 ServletContext 获取一个 WebApplicationContext 的Spring容器
 		WebApplicationContext rootContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
@@ -249,12 +248,6 @@ public abstract class FrameworkServlet extends HttpServletBean {
 		}
 		return wac;
 	}
-	// Return this servlet's WebApplicationContext.
-	public final WebApplicationContext getWebApplicationContext() {
-		return this.webApplicationContext;
-	}
-
-
 	protected WebApplicationContext createWebApplicationContext(WebApplicationContext parent) {
 		return createWebApplicationContext((ApplicationContext) parent);
 	}
@@ -322,6 +315,16 @@ public abstract class FrameworkServlet extends HttpServletBean {
 		//刷新Spring容器， 加载配置文件及整合parent到wac
 		wac.refresh();
 	}
+	//configureAndRefreshWebApplicationContext() 方法中调用容器刷新方法refresh()时会进行事件监听器的注册，当容器完成刷新动作后，发出ContextRefreshEvent通知别人
+	private class ContextRefreshListener implements ApplicationListener<ContextRefreshedEvent> {
+		public void onApplicationEvent(ContextRefreshedEvent event) {
+			FrameworkServlet.this.onApplicationEvent(event);
+		}
+	}
+	public void onApplicationEvent(ContextRefreshedEvent event) {
+		this.refreshEventReceived = true;
+		onRefresh(event.getApplicationContext());
+	}
 	protected void postProcessWebApplicationContext(ConfigurableWebApplicationContext wac) {}
 	protected void applyInitializers(ConfigurableApplicationContext wac) {
 		String globalClassNames = getServletContext().getInitParameter(ContextLoader.GLOBAL_INITIALIZER_CLASSES_PARAM);
@@ -342,23 +345,6 @@ public abstract class FrameworkServlet extends HttpServletBean {
 			initializer.initialize(wac);
 		}
 	}
-
-
-	//configureAndRefreshWebApplicationContext() 方法中调用容器刷新方法refresh()时会进行事件监听器的注册，当容器完成刷新动作后，发出ContextRefreshEvent通知别人
-	private class ContextRefreshListener implements ApplicationListener<ContextRefreshedEvent> {
-		public void onApplicationEvent(ContextRefreshedEvent event) {
-			FrameworkServlet.this.onApplicationEvent(event);
-		}
-	}
-	public void onApplicationEvent(ContextRefreshedEvent event) {
-		this.refreshEventReceived = true;
-		onRefresh(event.getApplicationContext());
-	}
-	protected void onRefresh(ApplicationContext context) {
-		// For subclasses: do nothing by default.
-	}
-
-
 	@SuppressWarnings("unchecked")
 	private ApplicationContextInitializer<ConfigurableApplicationContext> loadInitializer(String className, ConfigurableApplicationContext wac) {
 		try {
@@ -382,48 +368,19 @@ public abstract class FrameworkServlet extends HttpServletBean {
 	public String getServletContextAttributeName() {
 		return SERVLET_CONTEXT_PREFIX + getServletName();
 	}
-
+	// 留给子类实现
 	protected void initFrameworkServlet() throws ServletException {}
-
-	//-------------初始化 WebApplicationContext -----------------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	public void refresh() {
-		WebApplicationContext wac = getWebApplicationContext();
-		if (!(wac instanceof ConfigurableApplicationContext)) {
-			throw new IllegalStateException("WebApplicationContext does not support refresh: " + wac);
-		}
-		((ConfigurableApplicationContext) wac).refresh();
+	// 留给子类实现
+	protected void onRefresh(ApplicationContext context) {
+		// For subclasses: do nothing by default.
 	}
-
-	// 当Web应用被终止时，Servlet容器会先调用Servlet对象的destroy方法，然后在销毁Servlet对象，同时也销毁与Servlet对象相关联的ServletConfig对象。
-	// 我们可以在destroy方法的实现中，释放Servlet所占用的资源，如关闭数据库连接，关闭文件输入输出流等。
-	@Override
-	public void destroy() {
-		getServletContext().log("Destroying Spring FrameworkServlet '" + getServletName() + "'");
-		if (this.webApplicationContext instanceof ConfigurableApplicationContext) {
-			((ConfigurableApplicationContext) this.webApplicationContext).close();
-		}
-	}
+	/* -------------初始化 WebApplicationContext ----------------------------------------------------------------------------------------------------- */
 
 
 
-	//----------DispatcherServlet的请求处理实现----------------------------------------------------------------------------------------------------------------------------------
 
+
+	/* ----------DispatcherServlet的请求处理实现---------------------------------------------------------------------------------------------------------------------------------- */
 	// 我们知道Servlet的生命周期包括：init(),service()和destroy()
 	// DispatcherServlet 的init()通过继承HttpServletBean的init()方法来实现，而service()和destroy()通过FrameworkServlet来实现
 
@@ -434,7 +391,6 @@ public abstract class FrameworkServlet extends HttpServletBean {
 	//
 	//	之所以重新合并，原因还没看到，应该是不同类型的请求在spring内部还需要进行统计处理。
 	//	之所以不直接利用service进行处理，原因书上有讲，主要是出于灵活性的考虑吧，写过代码的同学应该都能理解。
-
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String method = request.getMethod();
@@ -569,14 +525,6 @@ public abstract class FrameworkServlet extends HttpServletBean {
 			publishRequestHandledEvent(request, startTime, failureCause);
 		}
 	}
-
-	//doService是实际处理请求的实现，最终交由DispatchServlet自己来实现
-	protected abstract void doService(HttpServletRequest request, HttpServletResponse response) throws Exception;
-
-	//----------DispatcherServlet的请求处理实现----------------------------------------------------------------------------------------------------------------------------------
-
-
-
 	/**
 	 * Build a LocaleContext for the given request, exposing the request's
 	 * primary locale as current locale.
@@ -587,7 +535,6 @@ public abstract class FrameworkServlet extends HttpServletBean {
 	protected LocaleContext buildLocaleContext(HttpServletRequest request) {
 		return new SimpleLocaleContext(request.getLocale());
 	}
-
 	/**
 	 * Build ServletRequestAttributes for the given request (potentially also
 	 * holding a reference to the response), taking pre-bound attributes
@@ -608,7 +555,6 @@ public abstract class FrameworkServlet extends HttpServletBean {
 			return null;  // preserve the pre-bound RequestAttributes instance
 		}
 	}
-
 	private void initContextHolders(HttpServletRequest request, LocaleContext localeContext, RequestAttributes requestAttributes) {
 
 		if (localeContext != null) {
@@ -621,7 +567,6 @@ public abstract class FrameworkServlet extends HttpServletBean {
 			logger.trace("Bound request context to thread: " + request);
 		}
 	}
-
 	private void resetContextHolders(HttpServletRequest request, LocaleContext prevLocaleContext, RequestAttributes previousAttributes) {
 
 		LocaleContextHolder.setLocaleContext(prevLocaleContext, this.threadContextInheritable);
@@ -630,7 +575,6 @@ public abstract class FrameworkServlet extends HttpServletBean {
 			logger.trace("Cleared thread-bound request context: " + request);
 		}
 	}
-
 	private void publishRequestHandledEvent(HttpServletRequest request, long startTime, Throwable failureCause) {
 		if (this.publishEvents) {
 			// Whether or not we succeeded, publish an event.
@@ -643,7 +587,6 @@ public abstract class FrameworkServlet extends HttpServletBean {
 							processingTime, failureCause));
 		}
 	}
-
 	/**
 	 * Determine the username for the given request.
 	 * <p>The default implementation takes the name of the UserPrincipal, if any.
@@ -656,14 +599,6 @@ public abstract class FrameworkServlet extends HttpServletBean {
 		Principal userPrincipal = request.getUserPrincipal();
 		return (userPrincipal != null ? userPrincipal.getName() : null);
 	}
-
-
-
-
-
-
-
-
 	/**
 	 * CallableProcessingInterceptor implementation that initializes and resets
 	 * FrameworkServlet's context holders, i.e. LocaleContextHolder and RequestContextHolder.
@@ -684,6 +619,30 @@ public abstract class FrameworkServlet extends HttpServletBean {
 			if (request != null) {
 				resetContextHolders(request, null, null);
 			}
+		}
+	}
+	// doService是实际处理请求的实现，最终交由DispatchServlet自己来实现
+	protected abstract void doService(HttpServletRequest request, HttpServletResponse response) throws Exception;
+	/* ----------DispatcherServlet的请求处理实现---------------------------------------------------------------------------------------------------------------------------------- */
+
+
+
+
+	public void refresh() {
+		WebApplicationContext wac = getWebApplicationContext();
+		if (!(wac instanceof ConfigurableApplicationContext)) {
+			throw new IllegalStateException("WebApplicationContext does not support refresh: " + wac);
+		}
+		((ConfigurableApplicationContext) wac).refresh();
+	}
+
+	// 当Web应用被终止时，Servlet容器会先调用Servlet对象的destroy方法，然后在销毁Servlet对象，同时也销毁与Servlet对象相关联的ServletConfig对象。
+	// 我们可以在destroy方法的实现中，释放Servlet所占用的资源，如关闭数据库连接，关闭文件输入输出流等。
+	@Override
+	public void destroy() {
+		getServletContext().log("Destroying Spring FrameworkServlet '" + getServletName() + "'");
+		if (this.webApplicationContext instanceof ConfigurableApplicationContext) {
+			((ConfigurableApplicationContext) this.webApplicationContext).close();
 		}
 	}
 

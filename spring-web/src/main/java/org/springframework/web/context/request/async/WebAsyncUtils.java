@@ -35,14 +35,10 @@ import org.springframework.web.context.request.WebRequest;
 public abstract class WebAsyncUtils {
 
 	public static final String WEB_ASYNC_MANAGER_ATTRIBUTE = WebAsyncManager.class.getName() + ".WEB_ASYNC_MANAGER";
-
 	private static Constructor<?> standardAsyncRequestConstructor;
 
 
-	/**
-	 * Obtain the {@link WebAsyncManager} for the current request, or if not
-	 * found, create and associate it with the request.
-	 */
+	// 获取当前请求的WebAsyncManager，或者如果没有找到，创建并将其与请求联系起来
 	public static WebAsyncManager getAsyncManager(ServletRequest servletRequest) {
 		WebAsyncManager asyncManager = (WebAsyncManager) servletRequest.getAttribute(WEB_ASYNC_MANAGER_ATTRIBUTE);
 		if (asyncManager == null) {

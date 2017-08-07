@@ -29,11 +29,11 @@
           <version>${spring-version}</version>
           <scope>test</scope>
         </dependency>
-        <dependency>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-webmvc</artifactId>
-          <version>${spring-version}</version>
-        </dependency>
+        <!--<dependency>-->
+          <!--<groupId>org.springframework</groupId>-->
+          <!--<artifactId>spring-webmvc</artifactId>-->
+          <!--<version>${spring-version}</version>-->
+        <!--</dependency>-->
         <!--<dependency>-->
           <!--<groupId>org.springframework</groupId>-->
           <!--<artifactId>spring-context</artifactId>-->
@@ -537,11 +537,15 @@
           <resource><directory>spring-context/src/main/resources</directory></resource>
           <resource><directory>spring-aop/src/main/resources</directory></resource>
           <resource><directory>spring-jdbc/src/main/resources</directory></resource>
+          <resource><directory>spring-webmvc/src/main/resources</directory></resource>
+          <resource><directory>spring-web/src/main/resources</directory></resource>
       </resources>
       <!--默认测试资源目录-->
       <testResources>
           <testResource><directory>spring-context/src/test/resources</directory></testResource>
           <testResource><directory>spring-beans/src/test/resources</directory></testResource>
+          <testResource><directory>spring-webmvc/src/test/resources</directory></testResource>
+          <testResource><directory>spring-web/src/test/resources</directory></testResource>
           <testResource>
               <directory>src/test/java</directory>
               <includes>
@@ -577,6 +581,8 @@
                             <source>spring-context/src/main/java</source>
                             <source>spring-aop/src/main/java</source>
                             <source>spring-jdbc/src/main/java</source>
+                            <source>spring-webmvc/src/main/java</source>
+                            <source>spring-web/src/main/java</source>
                         </sources>
                     </configuration>
                 </execution>
