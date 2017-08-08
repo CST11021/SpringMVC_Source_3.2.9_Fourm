@@ -34,7 +34,6 @@ import org.springframework.web.context.support.StandardServletEnvironment;
 //EnvironmentCapable接口提供获取Envirionment的方法，EnvironmentAware接口提供设置Envirionment的方法
 @SuppressWarnings("serial")
 public abstract class HttpServletBean extends HttpServlet implements EnvironmentCapable, EnvironmentAware {
-
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	// 用于存放<init-param>中必须指定的参数，用户可以通过requiredProperties参数的初始化来强制验证某些属性的必要性，这样，在属性封装的过程中，一旦检测到 requiredProperties 中的属性没有指定初始值，就会抛出异常。
@@ -42,9 +41,14 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 	private ConfigurableEnvironment environment;
 
 
-	//----- Web容器启动的时候会自动执行Servlet的初始化方法--------------------------------------------------------------
 
-	//重写父类HttpServlet的方法，Web容器启动的时候会自动来执行该方法
+
+
+
+
+	/* ----- Web容器启动的时候会自动执行Servlet的初始化方法---------------------------------------------------------- */
+
+	// 重写父类HttpServlet的方法，Web容器启动的时候会自动来执行该方法
 	@Override
 	public final void init() throws ServletException {
 		if (logger.isDebugEnabled()) {
@@ -77,23 +81,24 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 			logger.debug("Servlet '" + getServletName() + "' configured successfully");
 		}
 	}
-	protected void initBeanWrapper(BeanWrapper bw) throws BeansException {
-	}
+	protected void initBeanWrapper(BeanWrapper bw) throws BeansException {}
 	//空实现留给子类覆盖该方法
 	protected void initServletBean() throws ServletException {}
+	/* ----- Web容器启动的时候会自动执行Servlet的初始化方法---------------------------------------------------------- */
 
-	//----- Web容器启动的时候会自动执行Servlet的初始化方法--------------------------------------------------------------
 
-	protected final void addRequiredProperty(String property) {
-		this.requiredProperties.add(property);
-	}
 
-	// 重写父类方法
+
+
+
+
+
+	// 重写父类方法，返回这个DispatcherServlet的名称
 	@Override
 	public final String getServletName() {
 		return (getServletConfig() != null ? getServletConfig().getServletName() : null);
 	}
-	// 重写父类方法
+	// 重写父类方法，获取web上下文
 	@Override
 	public final ServletContext getServletContext() {
 		return (getServletConfig() != null ? getServletConfig().getServletContext() : null);
@@ -116,6 +121,10 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 		return new StandardServletEnvironment();
 	}
 
+
+	protected final void addRequiredProperty(String property) {
+		this.requiredProperties.add(property);
+	}
 
 	// ServletConfigPropertyValues用于封装及验证初始化参数
 	private static class ServletConfigPropertyValues extends MutablePropertyValues {

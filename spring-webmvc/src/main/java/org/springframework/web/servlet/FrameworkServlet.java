@@ -86,7 +86,7 @@ public abstract class FrameworkServlet extends HttpServletBean {
 	private boolean dispatchTraceRequest = false;
 	//** WebApplicationContext for this servlet
 	private WebApplicationContext webApplicationContext;
-	/** Flag used to detect whether onRefresh has already been called */
+	//** Flag used to detect whether onRefresh has already been called */
 	private boolean refreshEventReceived = false;
 
 
@@ -96,66 +96,7 @@ public abstract class FrameworkServlet extends HttpServletBean {
 	}
 
 
-	// getter and setter ...
-	public void setContextAttribute(String contextAttribute) {
-		this.contextAttribute = contextAttribute;
-	}
-	public String getContextAttribute() {
-		return this.contextAttribute;
-	}
-	public void setContextClass(Class<?> contextClass) {
-		this.contextClass = contextClass;
-	}
-	public Class<?> getContextClass() {
-		return this.contextClass;
-	}
-	public void setContextId(String contextId) {
-		this.contextId = contextId;
-	}
-	public String getContextId() {
-		return this.contextId;
-	}
-	public void setNamespace(String namespace) {
-		this.namespace = namespace;
-	}
-	public String getNamespace() {
-		return (this.namespace != null ? this.namespace : getServletName() + DEFAULT_NAMESPACE_SUFFIX);
-	}
-	public void setContextConfigLocation(String contextConfigLocation) {
-		this.contextConfigLocation = contextConfigLocation;
-	}
-	public String getContextConfigLocation() {
-		return this.contextConfigLocation;
-	}
-	// Return this servlet's WebApplicationContext.
-	public final WebApplicationContext getWebApplicationContext() {
-		return this.webApplicationContext;
-	}
 
-	@SuppressWarnings("unchecked")
-	public void setContextInitializers(ApplicationContextInitializer<? extends ConfigurableApplicationContext>... contextInitializers) {
-		for (ApplicationContextInitializer<? extends ConfigurableApplicationContext> initializer : contextInitializers) {
-			this.contextInitializers.add((ApplicationContextInitializer<ConfigurableApplicationContext>) initializer);
-		}
-	}
-	public void setContextInitializerClasses(String contextInitializerClasses) {
-		this.contextInitializerClasses = contextInitializerClasses;
-	}
-	public void setPublishContext(boolean publishContext) {
-		this.publishContext = publishContext;
-	}
-	public void setPublishEvents(boolean publishEvents) {
-		this.publishEvents = publishEvents;
-	}
-	public void setThreadContextInheritable(boolean threadContextInheritable) {
-		this.threadContextInheritable = threadContextInheritable;
-	}
-	public void setDispatchOptionsRequest(boolean dispatchOptionsRequest) {
-		this.dispatchOptionsRequest = dispatchOptionsRequest;
-	}
-	public void setDispatchTraceRequest(boolean dispatchTraceRequest) {
-		this.dispatchTraceRequest = dispatchTraceRequest;
-	}
 
 
 	/* -------------初始化 WebApplicationContext ----------------------------------------------------------------------------------------------------- */
@@ -384,13 +325,14 @@ public abstract class FrameworkServlet extends HttpServletBean {
 	// 我们知道Servlet的生命周期包括：init(),service()和destroy()
 	// DispatcherServlet 的init()通过继承HttpServletBean的init()方法来实现，而service()和destroy()通过FrameworkServlet来实现
 
-	//	我们总结一下这个流程，以doGet为例
-	//	get request->FrameworkServlet(service)->判断是不是patch请求：不是->HttpServlet(service)->判断是什么类型：get->HttpServlet(doGet)->doGet被子类重写->FrameworkServlet(doGet)->FrameworkServlet(processRequest)
+	// 我们总结一下这个流程，以doGet为例
+	// get request->FrameworkServlet(service)->判断是不是patch请求：不是->HttpServlet(service)->判断是什么类型：get->HttpServlet(doGet)->doGet被子类重写->FrameworkServlet(doGet)->FrameworkServlet(processRequest)
 	//
-	//	FrameworkServlet内的其他doxxx请求也是类似的，最终都是processRequest(request, response);来处理，也就是说在HttpServlet的service方法内doxx先按类型分开，然后在FrameworkServlet的doxx合并到一个方法处理。绕了一个大弯。
+	// FrameworkServlet内的其他doXxx请求也是类似的，最终都是processRequest(request, response);来处理，也就是说在HttpServlet的service方法内doXxx先按类型分开，
+	// 然后在FrameworkServlet的doxx合并到一个方法处理。绕了一个大弯。
 	//
-	//	之所以重新合并，原因还没看到，应该是不同类型的请求在spring内部还需要进行统计处理。
-	//	之所以不直接利用service进行处理，原因书上有讲，主要是出于灵活性的考虑吧，写过代码的同学应该都能理解。
+	// 之所以重新合并，原因还没看到，应该是不同类型的请求在spring内部还需要进行统计处理。
+	// 之所以不直接利用service进行处理，主要是出于灵活性的考虑吧，写过代码的同学应该都能理解。
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String method = request.getMethod();
@@ -468,8 +410,7 @@ public abstract class FrameworkServlet extends HttpServletBean {
 		long startTime = System.currentTimeMillis();
 		Throwable failureCause = null;
 
-		//先获取LocaleContext与RequestAttributes备份起来
-		//用于在finally中进行恢复
+		// 先获取LocaleContext与RequestAttributes备份起来，用于在finally中进行恢复
 		LocaleContext previousLocaleContext = LocaleContextHolder.getLocaleContext();
 		LocaleContext localeContext = buildLocaleContext(request);
 
@@ -479,11 +420,11 @@ public abstract class FrameworkServlet extends HttpServletBean {
 		WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
 		asyncManager.registerCallableInterceptor(FrameworkServlet.class.getName(), new RequestBindingInterceptor());
 
-		//将当前的localeContext，requestAttributes覆盖进去
+		// 将当前的localeContext，requestAttributes覆盖进去
 		initContextHolders(request, localeContext, requestAttributes);
 
 		try {
-			//实际处理请求的地方
+			// 实际处理请求的地方
 			doService(request, response);
 		}
 		catch (ServletException ex) {
@@ -520,8 +461,8 @@ public abstract class FrameworkServlet extends HttpServletBean {
 				}
 			}
 
-			//log...
-			//发布Event，类型是ServletRequestHandledEvent，这个下面有解释
+			// log...
+			// 发布Event，类型是ServletRequestHandledEvent，这个下面有解释
 			publishRequestHandledEvent(request, startTime, failureCause);
 		}
 	}
@@ -628,6 +569,8 @@ public abstract class FrameworkServlet extends HttpServletBean {
 
 
 
+
+
 	public void refresh() {
 		WebApplicationContext wac = getWebApplicationContext();
 		if (!(wac instanceof ConfigurableApplicationContext)) {
@@ -645,5 +588,79 @@ public abstract class FrameworkServlet extends HttpServletBean {
 			((ConfigurableApplicationContext) this.webApplicationContext).close();
 		}
 	}
+
+
+
+
+
+
+
+
+
+
+	// getter and setter ...
+	public void setContextAttribute(String contextAttribute) {
+		this.contextAttribute = contextAttribute;
+	}
+	public String getContextAttribute() {
+		return this.contextAttribute;
+	}
+	public void setContextClass(Class<?> contextClass) {
+		this.contextClass = contextClass;
+	}
+	public Class<?> getContextClass() {
+		return this.contextClass;
+	}
+	public void setContextId(String contextId) {
+		this.contextId = contextId;
+	}
+	public String getContextId() {
+		return this.contextId;
+	}
+	public void setNamespace(String namespace) {
+		this.namespace = namespace;
+	}
+	public String getNamespace() {
+		return (this.namespace != null ? this.namespace : getServletName() + DEFAULT_NAMESPACE_SUFFIX);
+	}
+	public void setContextConfigLocation(String contextConfigLocation) {
+		this.contextConfigLocation = contextConfigLocation;
+	}
+	public String getContextConfigLocation() {
+		return this.contextConfigLocation;
+	}
+	// Return this servlet's WebApplicationContext.
+	public final WebApplicationContext getWebApplicationContext() {
+		return this.webApplicationContext;
+	}
+
+	@SuppressWarnings("unchecked")
+	public void setContextInitializers(ApplicationContextInitializer<? extends ConfigurableApplicationContext>... contextInitializers) {
+		for (ApplicationContextInitializer<? extends ConfigurableApplicationContext> initializer : contextInitializers) {
+			this.contextInitializers.add((ApplicationContextInitializer<ConfigurableApplicationContext>) initializer);
+		}
+	}
+	public void setContextInitializerClasses(String contextInitializerClasses) {
+		this.contextInitializerClasses = contextInitializerClasses;
+	}
+	public void setPublishContext(boolean publishContext) {
+		this.publishContext = publishContext;
+	}
+	public void setPublishEvents(boolean publishEvents) {
+		this.publishEvents = publishEvents;
+	}
+	public void setThreadContextInheritable(boolean threadContextInheritable) {
+		this.threadContextInheritable = threadContextInheritable;
+	}
+	public void setDispatchOptionsRequest(boolean dispatchOptionsRequest) {
+		this.dispatchOptionsRequest = dispatchOptionsRequest;
+	}
+	public void setDispatchTraceRequest(boolean dispatchTraceRequest) {
+		this.dispatchTraceRequest = dispatchTraceRequest;
+	}
+
+
+
+
 
 }
