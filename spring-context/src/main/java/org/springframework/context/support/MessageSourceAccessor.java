@@ -37,25 +37,13 @@ import org.springframework.context.i18n.LocaleContextHolder;
 public class MessageSourceAccessor {
 
 	private final MessageSource messageSource;
-
 	private final Locale defaultLocale;
 
-	/**
-	 * Create a new MessageSourceAccessor, using LocaleContextHolder's locale
-	 * as default locale.
-	 * @param messageSource the MessageSource to wrap
-	 * @see org.springframework.context.i18n.LocaleContextHolder#getLocale()
-	 */
+
 	public MessageSourceAccessor(MessageSource messageSource) {
 		this.messageSource = messageSource;
 		this.defaultLocale = null;
 	}
-
-	/**
-	 * Create a new MessageSourceAccessor, using the given default locale.
-	 * @param messageSource the MessageSource to wrap
-	 * @param defaultLocale the default locale to use for message access
-	 */
 	public MessageSourceAccessor(MessageSource messageSource, Locale defaultLocale) {
 		this.messageSource = messageSource;
 		this.defaultLocale = defaultLocale;
@@ -73,6 +61,7 @@ public class MessageSourceAccessor {
 		return (this.defaultLocale != null ? this.defaultLocale : LocaleContextHolder.getLocale());
 	}
 
+
 	/**
 	 * Retrieve the message for the given code and the default Locale.
 	 * @param code code of the message
@@ -82,7 +71,6 @@ public class MessageSourceAccessor {
 	public String getMessage(String code, String defaultMessage) {
 		return this.messageSource.getMessage(code, null, defaultMessage, getDefaultLocale());
 	}
-
 	/**
 	 * Retrieve the message for the given code and the given Locale.
 	 * @param code code of the message
@@ -93,7 +81,6 @@ public class MessageSourceAccessor {
 	public String getMessage(String code, String defaultMessage, Locale locale) {
 		return this.messageSource.getMessage(code, null, defaultMessage, locale);
 	}
-
 	/**
 	 * Retrieve the message for the given code and the default Locale.
 	 * @param code code of the message
@@ -104,7 +91,6 @@ public class MessageSourceAccessor {
 	public String getMessage(String code, Object[] args, String defaultMessage) {
 		return this.messageSource.getMessage(code, args, defaultMessage, getDefaultLocale());
 	}
-
 	/**
 	 * Retrieve the message for the given code and the given Locale.
 	 * @param code code of the message
@@ -116,7 +102,6 @@ public class MessageSourceAccessor {
 	public String getMessage(String code, Object[] args, String defaultMessage, Locale locale) {
 		return this.messageSource.getMessage(code, args, defaultMessage, locale);
 	}
-
 	/**
 	 * Retrieve the message for the given code and the default Locale.
 	 * @param code code of the message
@@ -126,7 +111,6 @@ public class MessageSourceAccessor {
 	public String getMessage(String code) throws NoSuchMessageException {
 		return this.messageSource.getMessage(code, null, getDefaultLocale());
 	}
-
 	/**
 	 * Retrieve the message for the given code and the given Locale.
 	 * @param code code of the message
@@ -137,7 +121,6 @@ public class MessageSourceAccessor {
 	public String getMessage(String code, Locale locale) throws NoSuchMessageException {
 		return this.messageSource.getMessage(code, null, locale);
 	}
-
 	/**
 	 * Retrieve the message for the given code and the default Locale.
 	 * @param code code of the message
@@ -148,7 +131,6 @@ public class MessageSourceAccessor {
 	public String getMessage(String code, Object[] args) throws NoSuchMessageException {
 		return this.messageSource.getMessage(code, args, getDefaultLocale());
 	}
-
 	/**
 	 * Retrieve the message for the given code and the given Locale.
 	 * @param code code of the message
@@ -160,7 +142,6 @@ public class MessageSourceAccessor {
 	public String getMessage(String code, Object[] args, Locale locale) throws NoSuchMessageException {
 		return this.messageSource.getMessage(code, args, locale);
 	}
-
 	/**
 	 * Retrieve the given MessageSourceResolvable (e.g. an ObjectError instance)
 	 * in the default Locale.
@@ -171,7 +152,6 @@ public class MessageSourceAccessor {
 	public String getMessage(MessageSourceResolvable resolvable) throws NoSuchMessageException {
 		return this.messageSource.getMessage(resolvable, getDefaultLocale());
 	}
-
 	/**
 	 * Retrieve the given MessageSourceResolvable (e.g. an ObjectError instance)
 	 * in the given Locale.

@@ -20,6 +20,50 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.support.RequestContext;
 
 
+/*
+  	Spring MVC提供的View实现类都直接或者间接继承自AbstractView。该类定义了大多数View实现类都需要的一些属性和简单的模板化的实现流程。
+
+	主要属性如下几个：
+		contentType：
+		requestContextAttribute：
+			requestContextAttribute属性是要公开给视图模板使用的RequestContext对应的属性名，
+			比如，如果setRequestContextAttribute("rc")的话，那么，相应的RequestContext实例将以rc作为键放入模型中。
+			这样，我们就可以在视图模板中通过rc引用到该RequestContext。通常情况下，如果我们使用Spring提供的自定义标签，
+			那么不需要公开相应的RequestContext。但如果不使用Spring提供的自定义标签，那么为了能够访问处理过程中所返回的错误信息等，
+			就需要通过公开给视图模板的RequestContext来进行了。
+
+ 		staticAttributes：
+ 			如果视图有某些静态属性，比如页眉、页脚的固定信息等，只要将它们加入staticAttributes，那么，AbstractView将保证
+ 			这些静态属性将一并放入模型数据中，最终一起公开给视图模板。既然所有的View实现子类都继承自AbstractView，那么它
+ 			们也就都拥有了指定静态属性的能力。
+
+			比如我们在“面向多视图类型支持的ViewResolver”中定义了视图映射的映射的时候，为某些具体视图定义指定了静态属性，
+			如下所示：
+
+				<bean name="viewTemplate"
+					class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+					abstract="true"
+					p:attributesCSV="copyRight=spring21.cn, author=wanghongzhan">
+				</bean>
+
+			那么，现在我们就可以像普通的模型数据那样，在视图模板中访问这些静态属性，如下所示：
+			...
+			Author:${author}
+			<br/>
+			Copyright:${copyRight}
+			...
+			不过，除了通过attributesCSV属性以CSV字符串形式传入多个静态属性，我们还可以通过attributes属性以Properties的形
+			式传入静态属性，或者通过attributesMap属性以Map的形式传入静态参数。
+
+
+
+
+	 此外，在AbstractView中还定义了一个简单的模板化的方法流程：
+		1、将添加的静态属性全部导入到现有的模型数据Map中，以便后及流程在合并视图模板的时候可以获取这些数据；
+		2、如果requestContextAttribute被设置（默认为null），则将其一并导入现有的模型数据Map中；
+		3、根据是否要产生下载内容，设置相应的HTTP Header
+		4、公开renderMergedOutputModel(..)模板方法给子类实现
+ */
 public abstract class AbstractView extends WebApplicationObjectSupport implements View, BeanNameAware {
 
 	//** Default content type. Overridable as bean property.
@@ -31,10 +75,9 @@ public abstract class AbstractView extends WebApplicationObjectSupport implement
 	private String contentType = DEFAULT_CONTENT_TYPE;
 	private String requestContextAttribute;
 
-	//** Map of static attributes, keyed by attribute name (String)
+	// 静态属性的映射，由属性名作为key
 	private final Map<String, Object> staticAttributes = new LinkedHashMap<String, Object>();
-
-	//** Whether or not the view should add path variables in the model
+	// 标识视图是否应该在模型中添加路径变量
 	private boolean exposePathVariables = true;
 
 
@@ -182,7 +225,7 @@ public abstract class AbstractView extends WebApplicationObjectSupport implement
 	}
 
 
-
+	// 将模型数据以某种MIME类型渲染出来
 	public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		if (logger.isTraceEnabled()) {
 			logger.trace("Rendering view with name '" + this.beanName + "' with model " + model +
@@ -222,7 +265,6 @@ public abstract class AbstractView extends WebApplicationObjectSupport implement
 		return mergedModel;
 	}
 	protected RequestContext createRequestContext(HttpServletRequest request, HttpServletResponse response, Map<String, Object> model) {
-
 		return new RequestContext(request, response, getServletContext(), model);
 	}
 	protected void prepareResponse(HttpServletRequest request, HttpServletResponse response) {
@@ -234,6 +276,7 @@ public abstract class AbstractView extends WebApplicationObjectSupport implement
 	protected boolean generatesDownloadContent() {
 		return false;
 	}
+	// 将最终渲染 view 的工作留给子类实现
 	protected abstract void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception;
 
 

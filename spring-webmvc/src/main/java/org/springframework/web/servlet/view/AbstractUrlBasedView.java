@@ -29,35 +29,20 @@ import org.springframework.beans.factory.InitializingBean;
  */
 public abstract class AbstractUrlBasedView extends AbstractView implements InitializingBean {
 
+	// 这个URL表示这个视图对象在所在的web应用中的路径，比如：/testPage.jsp
 	private String url;
 
-
-	/**
-	 * Constructor for use as a bean.
-	 */
-	protected AbstractUrlBasedView() {
-	}
-
-	/**
-	 * Create a new AbstractUrlBasedView with the given URL.
-	 * @param url the URL to forward to
-	 */
+	protected AbstractUrlBasedView() {}
 	protected AbstractUrlBasedView(String url) {
 		this.url = url;
 	}
 
 
-	/**
-	 * Set the URL of the resource that this view wraps.
-	 * The URL must be appropriate for the concrete View implementation.
-	 */
+
+	// 设置该视图所包装的资源的url，这个url必须有对应的具体的视图实现
 	public void setUrl(String url) {
 		this.url = url;
 	}
-
-	/**
-	 * Return the URL of the resource that this view wraps.
-	 */
 	public String getUrl() {
 		return this.url;
 	}
@@ -68,23 +53,20 @@ public abstract class AbstractUrlBasedView extends AbstractView implements Initi
 		}
 	}
 
-	/**
-	 * Return whether the 'url' property is required.
-	 * <p>The default implementation returns {@code true}.
-	 * This can be overridden in subclasses.
-	 */
+
+	// 返回是否需要“url”属性，默认为ture
 	protected boolean isUrlRequired() {
 		return true;
 	}
 
 	/**
-	 * Check whether the underlying resource that the configured URL points to
-	 * actually exists.
+	 * Check whether the underlying resource that the configured URL points to actually exists.
 	 * @param locale the desired Locale that we're looking for
 	 * @return {@code true} if the resource exists (or is assumed to exist);
 	 * {@code false} if we know that it does not exist
 	 * @throws Exception if the resource exists but is invalid (e.g. could not be parsed)
 	 */
+	// 检查配置的URL所指向的底层资源是否实际存在
 	public boolean checkResource(Locale locale) throws Exception {
 		return true;
 	}

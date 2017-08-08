@@ -75,111 +75,46 @@ public class RequestContext {
 	 * @see org.springframework.web.servlet.theme.AbstractThemeResolver#ORIGINAL_DEFAULT_THEME_NAME
 	 */
 	public static final String DEFAULT_THEME_NAME = "theme";
-
 	/**
 	 * Request attribute to hold the current web application context for RequestContext usage. By default, the
 	 * DispatcherServlet's context (or the root context as fallback) is exposed.
 	 */
 	public static final String WEB_APPLICATION_CONTEXT_ATTRIBUTE = RequestContext.class.getName() + ".CONTEXT";
-
 	/**
 	 * The name of the bean to use to look up in an implementation of
 	 * {@link RequestDataValueProcessor} has been configured.
 	 */
 	private static final String REQUEST_DATA_VALUE_PROCESSOR_BEAN_NAME = "requestDataValueProcessor";
 
-
-	protected static final boolean jstlPresent = ClassUtils.isPresent("javax.servlet.jsp.jstl.core.Config",
-			RequestContext.class.getClassLoader());
+	protected static final boolean jstlPresent = ClassUtils.isPresent("javax.servlet.jsp.jstl.core.Config", RequestContext.class.getClassLoader());
 
 	private HttpServletRequest request;
-
 	private HttpServletResponse response;
-
 	private Map<String, Object> model;
-
 	private WebApplicationContext webApplicationContext;
-
 	private Locale locale;
-
 	private Theme theme;
-
 	private Boolean defaultHtmlEscape;
-
 	private UrlPathHelper urlPathHelper;
-
 	private RequestDataValueProcessor requestDataValueProcessor;
-
 	private Map<String, Errors> errorsMap;
 
 
-	/**
-	 * Create a new RequestContext for the given request, using the request attributes for Errors retrieval. <p>This
-	 * only works with InternalResourceViews, as Errors instances are part of the model and not normally exposed as
-	 * request attributes. It will typically be used within JSPs or custom tags. <p><b>Will only work within a
-	 * DispatcherServlet request.</b> Pass in a ServletContext to be able to fallback to the root WebApplicationContext.
-	 * @param request current HTTP request
-	 * @see org.springframework.web.servlet.DispatcherServlet
-	 * @see #RequestContext(javax.servlet.http.HttpServletRequest, javax.servlet.ServletContext)
-	 */
+
 	public RequestContext(HttpServletRequest request) {
 		initContext(request, null, null, null);
 	}
-
-	/**
-	 * Create a new RequestContext for the given request, using the request attributes for Errors retrieval. <p>This
-	 * only works with InternalResourceViews, as Errors instances are part of the model and not normally exposed as
-	 * request attributes. It will typically be used within JSPs or custom tags. <p>If a ServletContext is specified,
-	 * the RequestContext will also work with the root WebApplicationContext (outside a DispatcherServlet).
-	 * @param request current HTTP request
-	 * @param servletContext the servlet context of the web application (can be {@code null}; necessary for
-	 * fallback to root WebApplicationContext)
-	 * @see org.springframework.web.context.WebApplicationContext
-	 * @see org.springframework.web.servlet.DispatcherServlet
-	 */
 	public RequestContext(HttpServletRequest request, ServletContext servletContext) {
 		initContext(request, null, servletContext, null);
 	}
-
-	/**
-	 * Create a new RequestContext for the given request, using the given model attributes for Errors retrieval. <p>This
-	 * works with all View implementations. It will typically be used by View implementations. <p><b>Will only work
-	 * within a DispatcherServlet request.</b> Pass in a ServletContext to be able to fallback to the root
-	 * WebApplicationContext.
-	 * @param request current HTTP request
-	 * @param model the model attributes for the current view (can be {@code null}, using the request attributes
-	 * for Errors retrieval)
-	 * @see org.springframework.web.servlet.DispatcherServlet
-	 * @see #RequestContext(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, javax.servlet.ServletContext, Map)
-	 */
 	public RequestContext(HttpServletRequest request, Map<String, Object> model) {
 		initContext(request, null, null, model);
 	}
-
-	/**
-	 * Create a new RequestContext for the given request, using the given model attributes for Errors retrieval. <p>This
-	 * works with all View implementations. It will typically be used by View implementations. <p>If a ServletContext is
-	 * specified, the RequestContext will also work with a root WebApplicationContext (outside a DispatcherServlet).
-	 * @param request current HTTP request
-	 * @param response current HTTP response
-	 * @param servletContext the servlet context of the web application (can be {@code null}; necessary for
-	 * fallback to root WebApplicationContext)
-	 * @param model the model attributes for the current view (can be {@code null}, using the request attributes
-	 * for Errors retrieval)
-	 * @see org.springframework.web.context.WebApplicationContext
-	 * @see org.springframework.web.servlet.DispatcherServlet
-	 */
-	public RequestContext(HttpServletRequest request, HttpServletResponse response, ServletContext servletContext,
-			Map<String, Object> model) {
+	public RequestContext(HttpServletRequest request, HttpServletResponse response, ServletContext servletContext, Map<String, Object> model) {
 
 		initContext(request, response, servletContext, model);
 	}
-
-	/**
-	 * Default constructor for subclasses.
-	 */
-	protected RequestContext() {
-	}
+	protected RequestContext() {}
 
 
 	/**
@@ -196,8 +131,7 @@ public class RequestContext {
 	 * @see org.springframework.web.servlet.DispatcherServlet#LOCALE_RESOLVER_ATTRIBUTE
 	 * @see org.springframework.web.servlet.DispatcherServlet#THEME_RESOLVER_ATTRIBUTE
 	 */
-	protected void initContext(HttpServletRequest request, HttpServletResponse response, ServletContext servletContext,
-			Map<String, Object> model) {
+	protected void initContext(HttpServletRequest request, HttpServletResponse response, ServletContext servletContext, Map<String, Object> model) {
 
 		this.request = request;
 		this.response = response;

@@ -909,7 +909,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		response.setLocale(locale);
 
 		View view;
-		// 如果Controller返回的是String类型的视图
+		// 判断 mv 中的 View 是否为字符串，如果是字符串，则isReference()返回true
 		if (mv.isReference()) {
 			// 将String类型的视图名，解析为视图对象
 			view = resolveViewName(mv.getViewName(), mv.getModelInternal(), locale, request);
@@ -917,7 +917,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				throw new ServletException("Could not resolve view with name '" + mv.getViewName() + "' in servlet with name '" + getServletName() + "'");
 			}
 		}
-		// Controller 返回的是一个 View 的视图对象
+		// 获取的这个 mv 中的 View 就是一个视图对象
 		else {
 			view = mv.getView();
 			if (view == null) {

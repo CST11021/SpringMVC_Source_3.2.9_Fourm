@@ -68,38 +68,17 @@ import org.springframework.web.util.WebUtils;
 public class InternalResourceView extends AbstractUrlBasedView {
 
 	private boolean alwaysInclude = false;
-
 	private volatile Boolean exposeForwardAttributes;
-
 	private boolean exposeContextBeansAsAttributes = false;
-
 	private Set<String> exposedContextBeanNames;
-
 	private boolean preventDispatchLoop = false;
 
 
-	/**
-	 * Constructor for use as a bean.
-	 * @see #setUrl
-	 * @see #setAlwaysInclude
-	 */
-	public InternalResourceView() {
-	}
 
-	/**
-	 * Create a new InternalResourceView with the given URL.
-	 * @param url the URL to forward to
-	 * @see #setAlwaysInclude
-	 */
+	public InternalResourceView() {}
 	public InternalResourceView(String url) {
 		super(url);
 	}
-
-	/**
-	 * Create a new InternalResourceView with the given URL.
-	 * @param url the URL to forward to
-	 * @param alwaysInclude whether to always include the view rather than forward to it
-	 */
 	public InternalResourceView(String url, boolean alwaysInclude) {
 		super(url);
 		this.alwaysInclude = alwaysInclude;
@@ -117,7 +96,6 @@ public class InternalResourceView extends AbstractUrlBasedView {
 	public void setAlwaysInclude(boolean alwaysInclude) {
 		this.alwaysInclude = alwaysInclude;
 	}
-
 	/**
 	 * Set whether to explictly expose the Servlet 2.4 forward request attributes
 	 * when forwarding to the underlying view resource.
@@ -129,7 +107,6 @@ public class InternalResourceView extends AbstractUrlBasedView {
 	public void setExposeForwardAttributes(boolean exposeForwardAttributes) {
 		this.exposeForwardAttributes = exposeForwardAttributes;
 	}
-
 	/**
 	 * Set whether to make all Spring beans in the application context accessible
 	 * as request attributes, through lazy checking once an attribute gets accessed.
@@ -147,7 +124,6 @@ public class InternalResourceView extends AbstractUrlBasedView {
 	public void setExposeContextBeansAsAttributes(boolean exposeContextBeansAsAttributes) {
 		this.exposeContextBeansAsAttributes = exposeContextBeansAsAttributes;
 	}
-
 	/**
 	 * Specify the names of beans in the context which are supposed to be exposed.
 	 * If this is non-null, only the specified beans are eligible for exposure as
@@ -159,7 +135,6 @@ public class InternalResourceView extends AbstractUrlBasedView {
 	public void setExposedContextBeanNames(String[] exposedContextBeanNames) {
 		this.exposedContextBeanNames = new HashSet<String>(Arrays.asList(exposedContextBeanNames));
 	}
-
 	/**
 	 * Set whether to explicitly prevent dispatching back to the
 	 * current handler path.
@@ -170,7 +145,6 @@ public class InternalResourceView extends AbstractUrlBasedView {
 	public void setPreventDispatchLoop(boolean preventDispatchLoop) {
 		this.preventDispatchLoop = preventDispatchLoop;
 	}
-
 	/**
 	 * An ApplicationContext is not strictly required for InternalResourceView.
 	 */
@@ -206,31 +180,20 @@ public class InternalResourceView extends AbstractUrlBasedView {
 	 */
 	@Override
 	protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-		// Determine which request handle to expose to the RequestDispatcher.
 		// 包装request，供RequestDispatcher来使用
 		HttpServletRequest requestToExpose = getRequestToExpose(request);
-
-		// Expose the model object as request attributes.
 		// 将 model 中的属性和值作为属性放入包装的 requestToExpose
 		exposeModelAsRequestAttributes(model, requestToExpose);
-
-		// Expose helpers as request attributes, if any.
 		// 将不同实现类的 helper 放入包装的request中
 		exposeHelpers(requestToExpose);
-
-		// Determine the path for the request dispatcher.
 		// 渲染前的准备，确定request dispatcher要跳向(或者inclue)的路径
 		String dispatcherPath = prepareForRendering(requestToExpose, response);
-
-		// Obtain a RequestDispatcher for the target resource (typically a JSP).
-		// 获取requestDispatcher
+		// Obtain a RequestDispatcher for the target resource (typically a JSP).获取requestDispatcher
 		RequestDispatcher rd = getRequestDispatcher(requestToExpose, dispatcherPath);
 		if (rd == null) {
 			throw new ServletException("Could not get RequestDispatcher for [" + getUrl() + "]: Check that the corresponding file exists within your web application archive!");
 		}
 
-		// If already included or response already committed, perform include, else forward.
 		// 根据request中是否包含include uri属性来确实是forward或者include方法
 		if (useInclude(requestToExpose, response)) {
 			response.setContentType(getContentType());
@@ -239,7 +202,6 @@ public class InternalResourceView extends AbstractUrlBasedView {
 			}
 			rd.include(requestToExpose, response);
 		}
-
 		else {
 			// Note: The forwarded resource is supposed to determine the content type itself.
 			exposeForwardRequestAttributes(requestToExpose);
@@ -275,8 +237,7 @@ public class InternalResourceView extends AbstractUrlBasedView {
 	 * @see #renderMergedOutputModel
 	 * @see JstlView#exposeHelpers
 	 */
-	protected void exposeHelpers(HttpServletRequest request) throws Exception {
-	}
+	protected void exposeHelpers(HttpServletRequest request) throws Exception {}
 
 	/**
 	 * Prepare for rendering, and determine the request dispatcher path
@@ -290,8 +251,7 @@ public class InternalResourceView extends AbstractUrlBasedView {
 	 * @throws Exception if preparations failed
 	 * @see #getUrl()
 	 */
-	protected String prepareForRendering(HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	protected String prepareForRendering(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		String path = getUrl();
 		if (this.preventDispatchLoop) {

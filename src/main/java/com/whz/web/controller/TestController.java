@@ -39,4 +39,13 @@ public class TestController {
         return mav;
     }
 
+    @RequestMapping("/testPage.html")
+    public ModelAndView test1(HttpServletRequest request) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("test","just a test.");
+        mav.setViewName("forward:/testPage.jsp");
+        return mav;
+
+    }
+
 }
