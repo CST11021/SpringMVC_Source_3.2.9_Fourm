@@ -124,16 +124,13 @@ import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolv
  * @author Rossen Stoyanchev
  * @since 3.0
  */
+// 该类用来解析<mvc:annotation-driven /> 标签配置，
+// <mvc:annotation-driven /> 的作用是注册DefaultAnnotationHandlerMapping与AnnotationMethodHandlerAdapter 两个bean,是spring MVC为@Controllers分发请求所必须的。
 class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 
-	private static final boolean javaxValidationPresent = ClassUtils.isPresent(
-			"javax.validation.Validator", AnnotationDrivenBeanDefinitionParser.class.getClassLoader());
-
-	private static boolean romePresent =
-			ClassUtils.isPresent("com.sun.syndication.feed.WireFeed", AnnotationDrivenBeanDefinitionParser.class.getClassLoader());
-
-	private static final boolean jaxb2Present =
-			ClassUtils.isPresent("javax.xml.bind.Binder", AnnotationDrivenBeanDefinitionParser.class.getClassLoader());
+	private static final boolean javaxValidationPresent = ClassUtils.isPresent("javax.validation.Validator", AnnotationDrivenBeanDefinitionParser.class.getClassLoader());
+	private static boolean romePresent = ClassUtils.isPresent("com.sun.syndication.feed.WireFeed", AnnotationDrivenBeanDefinitionParser.class.getClassLoader());
+	private static final boolean jaxb2Present = ClassUtils.isPresent("javax.xml.bind.Binder", AnnotationDrivenBeanDefinitionParser.class.getClassLoader());
 
 	private static final boolean jackson2Present =
 			ClassUtils.isPresent("com.fasterxml.jackson.databind.ObjectMapper", AnnotationDrivenBeanDefinitionParser.class.getClassLoader()) &&
@@ -224,22 +221,19 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 		exceptionHandlerExceptionResolver.getPropertyValues().add("contentNegotiationManager", contentNegotiationManager);
 		exceptionHandlerExceptionResolver.getPropertyValues().add("messageConverters", messageConverters);
 		exceptionHandlerExceptionResolver.getPropertyValues().add("order", 0);
-		String methodExceptionResolverName =
-				parserContext.getReaderContext().registerWithGeneratedName(exceptionHandlerExceptionResolver);
+		String methodExceptionResolverName = parserContext.getReaderContext().registerWithGeneratedName(exceptionHandlerExceptionResolver);
 
 		RootBeanDefinition responseStatusExceptionResolver = new RootBeanDefinition(ResponseStatusExceptionResolver.class);
 		responseStatusExceptionResolver.setSource(source);
 		responseStatusExceptionResolver.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 		responseStatusExceptionResolver.getPropertyValues().add("order", 1);
-		String responseStatusExceptionResolverName =
-				parserContext.getReaderContext().registerWithGeneratedName(responseStatusExceptionResolver);
+		String responseStatusExceptionResolverName = parserContext.getReaderContext().registerWithGeneratedName(responseStatusExceptionResolver);
 
 		RootBeanDefinition defaultExceptionResolver = new RootBeanDefinition(DefaultHandlerExceptionResolver.class);
 		defaultExceptionResolver.setSource(source);
 		defaultExceptionResolver.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 		defaultExceptionResolver.getPropertyValues().add("order", 2);
-		String defaultExceptionResolverName =
-				parserContext.getReaderContext().registerWithGeneratedName(defaultExceptionResolver);
+		String defaultExceptionResolverName = parserContext.getReaderContext().registerWithGeneratedName(defaultExceptionResolver);
 
 		parserContext.registerComponent(new BeanComponentDefinition(handlerMappingDef, methodMappingName));
 		parserContext.registerComponent(new BeanComponentDefinition(handlerAdapterDef, handlerAdapterName));
@@ -271,7 +265,6 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 		}
 		return conversionServiceRef;
 	}
-
 	private RuntimeBeanReference getValidator(Element element, Object source, ParserContext parserContext) {
 		if (element.hasAttribute("validator")) {
 			return new RuntimeBeanReference(element.getAttribute("validator"));
@@ -289,7 +282,6 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 			return null;
 		}
 	}
-
 	private RuntimeBeanReference getContentNegotiationManager(Element element, Object source, ParserContext parserContext) {
 		RuntimeBeanReference contentNegotiationManagerRef;
 		if (element.hasAttribute("content-negotiation-manager")) {
@@ -308,7 +300,6 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 		}
 		return contentNegotiationManagerRef;
 	}
-
 	private Properties getDefaultMediaTypes() {
 		Properties props = new Properties();
 		if (romePresent) {
@@ -323,7 +314,6 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 		}
 		return props;
 	}
-
 	private RuntimeBeanReference getMessageCodesResolver(Element element) {
 		if (element.hasAttribute("message-codes-resolver")) {
 			return new RuntimeBeanReference(element.getAttribute("message-codes-resolver"));
@@ -332,12 +322,10 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 			return null;
 		}
 	}
-
 	private String getAsyncTimeout(Element element) {
 		Element asyncElement = DomUtils.getChildElementByTagName(element, "async-support");
 		return (asyncElement != null) ? asyncElement.getAttribute("default-timeout") : null;
 	}
-
 	private RuntimeBeanReference getAsyncExecutor(Element element) {
 		Element asyncElement = DomUtils.getChildElementByTagName(element, "async-support");
 		if (asyncElement != null) {
@@ -347,7 +335,6 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 		}
 		return null;
 	}
-
 	private ManagedList<?> getCallableInterceptors(Element element, Object source, ParserContext parserContext) {
 		ManagedList<? super Object> interceptors = new ManagedList<Object>();
 		Element asyncElement = DomUtils.getChildElementByTagName(element, "async-support");
@@ -364,7 +351,6 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 		}
 		return interceptors;
 	}
-
 	private ManagedList<?> getDeferredResultInterceptors(Element element, Object source, ParserContext parserContext) {
 		ManagedList<? super Object> interceptors = new ManagedList<Object>();
 		Element asyncElement = DomUtils.getChildElementByTagName(element, "async-support");
@@ -381,7 +367,6 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 		}
 		return interceptors;
 	}
-
 	private ManagedList<?> getArgumentResolvers(Element element, ParserContext parserContext) {
 		Element resolversElement = DomUtils.getChildElementByTagName(element, "argument-resolvers");
 		if (resolversElement != null) {
@@ -390,7 +375,6 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 		}
 		return null;
 	}
-
 	private ManagedList<?> getReturnValueHandlers(Element element, ParserContext parserContext) {
 		Element handlersElement = DomUtils.getChildElementByTagName(element, "return-value-handlers");
 		if (handlersElement != null) {
@@ -398,7 +382,6 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 		}
 		return null;
 	}
-
 	private ManagedList<?> getMessageConverters(Element element, Object source, ParserContext parserContext) {
 		Element convertersElement = DomUtils.getChildElementByTagName(element, "message-converters");
 		ManagedList<? super Object> messageConverters = new ManagedList<Object>();
@@ -438,14 +421,12 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 		}
 		return messageConverters;
 	}
-
 	private RootBeanDefinition createConverterDefinition(Class<? extends HttpMessageConverter> converterClass, Object source) {
 		RootBeanDefinition beanDefinition = new RootBeanDefinition(converterClass);
 		beanDefinition.setSource(source);
 		beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 		return beanDefinition;
 	}
-
 	private ManagedList<BeanDefinitionHolder> extractBeanSubElements(Element parentElement, ParserContext parserContext) {
 		ManagedList<BeanDefinitionHolder> list = new ManagedList<BeanDefinitionHolder>();
 		list.setSource(parserContext.extractSource(parentElement));
@@ -456,9 +437,7 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 		}
 		return list;
 	}
-
-	private ManagedList<BeanDefinitionHolder> wrapWebArgumentResolverBeanDefs(
-			List<BeanDefinitionHolder> beanDefs, ParserContext parserContext) {
+	private ManagedList<BeanDefinitionHolder> wrapWebArgumentResolverBeanDefs(List<BeanDefinitionHolder> beanDefs, ParserContext parserContext) {
 
 		ManagedList<BeanDefinitionHolder> result = new ManagedList<BeanDefinitionHolder>();
 		for (BeanDefinitionHolder beanDef : beanDefs) {

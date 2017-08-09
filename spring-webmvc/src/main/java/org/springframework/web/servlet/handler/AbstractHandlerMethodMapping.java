@@ -54,7 +54,7 @@ import org.springframework.web.servlet.HandlerMapping;
  * @since 3.1
  */
 public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMapping implements InitializingBean {
-
+	// 表示是否检测父容器中的Controller
 	private boolean detectHandlerMethodsInAncestorContexts = false;
 
 	private final Map<T, HandlerMethod> handlerMethods = new LinkedHashMap<T, HandlerMethod>();
@@ -75,36 +75,29 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 		this.detectHandlerMethodsInAncestorContexts = detectHandlerMethodsInAncestorContexts;
 	}
 
-	/**
-	 * Return a map with all handler methods and their mappings.
-	 */
+	// Return a map with all handler methods and their mappings.
 	public Map<T, HandlerMethod> getHandlerMethods() {
 		return Collections.unmodifiableMap(this.handlerMethods);
 	}
 
-	/**
-	 * Detects handler methods at initialization.
-	 */
+	// 该方法会在bean加载的过程中被框架调用
 	public void afterPropertiesSet() {
 		initHandlerMethods();
 	}
-
-	/**
-	 * Scan beans in the ApplicationContext, detect and register handler methods.
-	 * @see #isHandler(Class)
-	 * @see #getMappingForMethod(Method, Class)
-	 * @see #handlerMethodsInitialized(Map)
-	 */
+	// 该方法是注册请求映射器的入口方法
+	// 在ApplicationContext中扫描bean，检测和注册对应请求的处理方法，通常这些方法会使用如：@RequestMapping("/test.html") 的注解，也可能是在相应的XML配置文件中配置
 	protected void initHandlerMethods() {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Looking for request mappings in application context: " + getApplicationContext());
 		}
 
+		// 获取所有的bean
 		String[] beanNames = (this.detectHandlerMethodsInAncestorContexts ?
 				BeanFactoryUtils.beanNamesForTypeIncludingAncestors(getApplicationContext(), Object.class) :
 				getApplicationContext().getBeanNamesForType(Object.class));
 
 		for (String beanName : beanNames) {
+			// 判断该bean是否存在 @Controller或@RequestMapping 注解
 			if (isHandler(getApplicationContext().getType(beanName))){
 				detectHandlerMethods(beanName);
 			}
@@ -119,15 +112,12 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 */
 	protected abstract boolean isHandler(Class<?> beanType);
 
-	/**
-	 * Look for handler methods in a handler.
-	 * @param handler the bean name of a handler or a handler instance
-	 */
+	// 遍历这个 处理器bean 中所有的Handler方法，并进行注册
 	protected void detectHandlerMethods(final Object handler) {
-		Class<?> handlerType =
-				(handler instanceof String ? getApplicationContext().getType((String) handler) : handler.getClass());
+		// 判断这个 handler 参数是不是String类型的beanName，如果是返回bean的type
+		Class<?> handlerType = (handler instanceof String ? getApplicationContext().getType((String) handler) : handler.getClass());
 
-		// Avoid repeated calls to getMappingForMethod which would rebuild RequestMatchingInfo instances
+		// 避免重复调用getMappingForMethod方法，该方法将rebuild RequestMatchingInfo 实例
 		final Map<Method, T> mappings = new IdentityHashMap<Method, T>();
 		final Class<?> userType = ClassUtils.getUserClass(handlerType);
 
@@ -144,14 +134,14 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 			}
 		});
 
+		// 遍历所有的Handler方法进行注册
 		for (Method method : methods) {
 			registerHandlerMethod(handler, method, mappings.get(method));
 		}
 	}
 
 	/**
-	 * Provide the mapping for a handler method. A method for which no
-	 * mapping can be provided is not a handler method.
+	 * Provide the mapping for a handler method. A method for which no mapping can be provided is not a handler method.
 	 * @param method the method to provide a mapping for
 	 * @param handlerType the handler type, possibly a sub-type of the method's
 	 * declaring class
@@ -216,8 +206,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 * Invoked after all handler methods have been detected.
 	 * @param handlerMethods a read-only map with handler methods and mappings.
 	 */
-	protected void handlerMethodsInitialized(Map<T, HandlerMethod> handlerMethods) {
-	}
+	protected void handlerMethodsInitialized(Map<T, HandlerMethod> handlerMethods) {}
 
 
 	/**
@@ -329,8 +318,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 * @param request the current request
 	 * @throws ServletException in case of errors
 	 */
-	protected HandlerMethod handleNoMatch(Set<T> mappings, String lookupPath, HttpServletRequest request)
-			throws Exception {
+	protected HandlerMethod handleNoMatch(Set<T> mappings, String lookupPath, HttpServletRequest request) throws Exception {
 
 		return null;
 	}

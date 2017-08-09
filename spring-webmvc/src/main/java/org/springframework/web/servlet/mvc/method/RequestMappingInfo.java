@@ -28,7 +28,7 @@ import org.springframework.web.servlet.mvc.condition.RequestConditionHolder;
 import org.springframework.web.servlet.mvc.condition.RequestMethodsRequestCondition;
 
 /**
- * Encapsulates the following request mapping conditions:
+ * Encapsulates the following request mapping conditions:封装以下请求映射条件
  * <ol>
  * 	<li>{@link PatternsRequestCondition}
  * 	<li>{@link RequestMethodsRequestCondition}

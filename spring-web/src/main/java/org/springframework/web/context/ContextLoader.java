@@ -76,13 +76,16 @@ public class ContextLoader {
 	}
 
 
-
-	//用于映射当前的类加载器与创建的WebApplicationContextLoader实例，以便全局访问
-	private static final Map<ClassLoader, WebApplicationContext> currentContextPerThread = new ConcurrentHashMap<ClassLoader, WebApplicationContext>(1);
-	//* The 'current' WebApplicationContext, if the ContextLoader class is deployed in the web app ClassLoader itself.
+	// 注意这里使用了 volatile 表示该 currentContext 是线程间可见的
 	private static volatile WebApplicationContext currentContext;
+	// 用于映射当前的类加载器与创建的WebApplicationContextLoader实例，以便全局访问
+	private static final Map<ClassLoader, WebApplicationContext> currentContextPerThread = new ConcurrentHashMap<ClassLoader, WebApplicationContext>(1);
+
 	// 表示这个 ContextLoader 要管理的 WebApplicationContext 实例
 	private WebApplicationContext context;
+
+
+
 	//* Holds BeanFactoryReference when loading parent factory via ContextSingletonBeanFactoryLocator.
 	private BeanFactoryReference parentContextRef;
 
@@ -131,12 +134,14 @@ public class ContextLoader {
 				}
 			}
 
-			//第二步：将context记录在servletContext中，以便于 DispatcherServlet 可以通过 getServletContext().getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE) 来获取实例
+			// 第二步：将context记录在servletContext中，以便于 DispatcherServlet 可以通过 getServletContext().getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE) 来获取实例
 			servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, this.context);
 
-			//第三步：映射当前线程的类加载器与Spring容器到全局变量 currentContextPerThread 中。
+			// 第三步：将Spring容器记录到全局变量中
 			ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 			if (ccl == ContextLoader.class.getClassLoader()) {
+				// 情况下，程序会进入到这里
+				// 这里涉及到 “Thread.currentThread().getContextClassLoader()”与“ContextLoader.class.getClassLoader()”的区别的一个知识点
 				currentContext = this.context;
 			}
 			else if (ccl != null) {
@@ -351,6 +356,8 @@ public class ContextLoader {
 			}
 		}
 	}
+
+	// 该方法是一个静态方法，当Spring容器启动后，我们可以通过ContextLoad.getCurrentWebApplicationContext()方法得到这个Spring容器
 	public static WebApplicationContext getCurrentWebApplicationContext() {
 		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 		if (ccl != null) {

@@ -62,14 +62,11 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 	private final ConfigurableApplicationContext applicationContext;
 
 
-	/**
-	 * Create a new ApplicationContextAwareProcessor for the given context.
-	 */
 	public ApplicationContextAwareProcessor(ConfigurableApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
 
-
+	// Bean 调用构造函数，实例化之前执行该方法
 	public Object postProcessBeforeInitialization(final Object bean, String beanName) throws BeansException {
 		AccessControlContext acc = null;
 
@@ -101,8 +98,7 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 				((EnvironmentAware) bean).setEnvironment(this.applicationContext.getEnvironment());
 			}
 			if (bean instanceof EmbeddedValueResolverAware) {
-				((EmbeddedValueResolverAware) bean).setEmbeddedValueResolver(
-						new EmbeddedValueResolver(this.applicationContext.getBeanFactory()));
+				((EmbeddedValueResolverAware) bean).setEmbeddedValueResolver(new EmbeddedValueResolver(this.applicationContext.getBeanFactory()));
 			}
 			if (bean instanceof ResourceLoaderAware) {
 				((ResourceLoaderAware) bean).setResourceLoader(this.applicationContext);

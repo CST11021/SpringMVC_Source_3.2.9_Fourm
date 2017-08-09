@@ -136,6 +136,75 @@ import org.springframework.web.util.WebUtils;
  * @see org.springframework.web.servlet.mvc.Controller
  * @see org.springframework.web.context.ContextLoaderListener
  */
+/*
+
+ 	Spring MVC框架的处理控制器的实现策略，与其他的请求驱动的Web框架在总体思路上是相似的，就如我们之前所说的那样，通过引入
+ Front Controller和Page Controller的概念来分离流程控制逻辑与具体的Web请求处理逻辑。DispatcherServlet就是Spring框架中的
+ Front Controller，它负责接收并处理所有的Web请求，只不过针对具体的处理逻辑，他会委派给他的下一级控制器去实现，即
+ org.springframework.web.servlet.mvc.Controller,而Controller则对应Page Controller的角色定义。
+
+ 	DispatcherServlet是整个框架的FrontController（前端控制器），当将它注册到web.xml时，就注定了它要服务于规定的一组Web请求
+ 的命运，而不是像早期的Servlet那样，单独的处理一个Web请求。
+
+ 	早期时候，一个Web请求对应一个Servlet，我们需要相应的配置文件或web.xml中取配置对应的URL映射，现在DispatcherServlet需要
+ 自己来处理具体的Web请求和具体的处理类之间的映射关系匹配了。HandlerMapping就是专门来管理Web请求到具体的处理类之间的映射
+ 关系。在Web请求到达DispatcherServlet之后，Dispatcher将寻求具体的HandlerMapping实例，以获取对应当前Web请求的具体处理类，
+ 即Controller。
+
+ 	Controller是对应DispatcherServlet的次级控制器，它本身实现了对应某个具体Web请求的处理逻辑。在我们所使用的HandlerMapping
+ 查找到当前Web请求对应哪个Controller的具体实例之后，DispatcherServlet即可获得HandlerMapping所返回的结果，并调用Controller
+ 的处理方法来处理当前的Web请求。
+
+ 	Controller的处理方法执行完毕之后，将返回一个ModelAndView实例。有了ModelAndView所包含的视图与模型二者的信息之后，
+ DispatcherServlet就可以着手视图的渲染工作了。
+
+ 	如果按照JSP Model2的处理流程，我们已经走到了最后一步，即选择并转到最终的JSP视图文件，即如下代码所展示的逻辑：
+
+	request.setAttribute("infoList", infoList);
+	forward(request, response, "view.jsp");
+
+	但是，对于一个Web框架来说，我们是不可以怎么简单处理的。为什么呢？不要忘了，现在可用的视图技术可不只JSP一家，Velocity、
+ Freemarker等通用的模板引擎，都可以帮助我们构建相应的视图，而它们是不依赖request对象来传递模型数据的，甚至，我们也不只
+ 依赖JSP专用的RequestDispatcher来输出最终的视图。否则，我们也没有必要通过ModelAndView来返回视图以及模型数据了，直接在
+ Controller内部完成视图的渲染工作就可以了。鉴于此，Spring提出了一套基于ViewResolver和View接口的Web视图处理抽象层，以屏
+ 蔽Web框架在使用不同的Web视图技术时候的差异性。
+
+	那么，Spring MVC是如何以统一的方式，将相同的模型数据纳入不同的视图形式并显示的呢？实际上，撇开JSP使用的RequestDispatcher
+不谈，Servlet自身就提供了两种最基本的视图输出方式。不知道你还是否记得最初的out.prinltln？基本来说，我们要想客户端输出
+的视图类型，可以分为文本和二进制两种方式，比如JSP/JSTL、Velocity/Freemarker等最终的结果都是以（X）HTML等标记文本形式
+表现的，而PDF/Excel之类则属于二进制内容行列。对于这两种形式的视图内容的输出，Servlet自身公开给我们的HttpServletResponse
+已经足够可以应付了。
+
+	如下，是HttpServletResponse帮助我们处理这两种形式的视图输出的：
+	// 使用Servlet输出标记文本视图
+	String markupText = ...;
+	PrintWriter writer = response.getWriter();
+	writer.write(markupText);
+	writer.close();
+	...
+	//使用Servlet输出二进制格式视图
+	byte[] binaryContext = ...;
+	ServletOutputStream out = response.getOutputStream();
+	out.write(binaryContext);
+	out.flush();
+	out.close();
+
+	在HttpServletResponse可以同时支持文本形式的和二进制形式的视图输出的前提下，我们只要在最终将视图数据通过HttpServletResponse
+输出之前，借助于不同的视图技术API，并结合模型数据和相应的模板文件，就能生成最终的视图结果，如下伪代码所示：
+
+	1、获取模型（Model）数据；
+	2、获取视图模板文件（比如*.jsp、*.vm、*.fm、*.xls等）；
+	3、结合视图模板和模型数据，使用相应的视图技术API生成最终视图结果；
+	4、将视图结果通过HttpServletResponse输出到客户端；
+	5、完成
+
+	这样，不管最终生成的视图内容如何，我们都可以以几乎相同的方式输出它们。但唯一的问题在于，我们不可能将每个视图的生成代
+	码都纳入DispatcherServlet的职权范围，毕竟，每种视图技术的生成代码是不同的，而且所使用的视图技术也可能随着具体环境而变
+	化。SpringMVC通过引入View接口定义，来统一地抽象视图的生成策略。之后，DispatcherServlet只需要根据Spring Controller处理
+	完毕后通过ModelAndView返回的逻辑视图名称查找到具体的View实现，然后委派该具体的View实现类来根据模型数据，输出具体的视
+	图内容即可。
+*/
+
 @SuppressWarnings("serial")
 public class DispatcherServlet extends FrameworkServlet {
 
@@ -405,17 +474,17 @@ public class DispatcherServlet extends FrameworkServlet {
 	private void initHandlerMappings(ApplicationContext context) {
 		this.handlerMappings = null;
 
-		//判断是否默认添加所有的HandlerMappings,初始值是默认添加的
+		// 判断是否默认添加所有的HandlerMappings,默认true
 		if (this.detectAllHandlerMappings) {
-			// Find all HandlerMappings in the ApplicationContext, including ancestor contexts.
+			// 在ApplicationContext中找到所有的 HandlerMapping，包括父容器中的 HandlerMapping
 			Map<String, HandlerMapping> matchingBeans = BeanFactoryUtils.beansOfTypeIncludingAncestors(context, HandlerMapping.class, true, false);
 			if (!matchingBeans.isEmpty()) {
 				this.handlerMappings = new ArrayList<HandlerMapping>(matchingBeans.values());
-				//通过@order注解去排序
+				// 通过@order注解去排序
 				OrderComparator.sort(this.handlerMappings);
 			}
 		}
-		//如果不是默认添加所有的，那么就去context中找一个声明的bean
+		// 如果不是默认添加所有的，那么就去context中找一个声明的bean
 		else {
 			try {
 				HandlerMapping hm = context.getBean(HANDLER_MAPPING_BEAN_NAME, HandlerMapping.class);
@@ -426,7 +495,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 		}
 
-		//如果上面两步没有找到可以使用的handlerMapping，那么就采用默认的handlerMapping,默认的HandlerMapping都定义在了DispatcherServlet.properties中，大致定义了如下两个:
+		// 如果上面两步没有找到可以使用的handlerMapping，那么就采用默认的handlerMapping,默认的HandlerMapping都定义在了DispatcherServlet.properties中，大致定义了如下两个:
 		// org.springframework.web.servlet.HandlerMapping=org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping,
 		// org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping
 		if (this.handlerMappings == null) {
@@ -1012,6 +1081,9 @@ public class DispatcherServlet extends FrameworkServlet {
 		return getHandler(request);
 	}
 	protected HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
+		// 这个 handlerMappings 在 DispatcherServlet#initStrategies()方法被初始化，
+		// 该方法是从对应spring容器里获取 HandlerMapping 类型的bean然后放到这个 handlerMappings 此时，请求的映射已经被注册
+		// <mvc:annotation-driven /> 会自动注册DefaultAnnotationHandlerMapping与AnnotationMethodHandlerAdapter 两个bean,是spring MVC为@Controllers分发请求所必须的。
 		for (HandlerMapping hm : this.handlerMappings) {
 			if (logger.isTraceEnabled()) {
 				logger.trace("Testing handler map [" + hm + "] in DispatcherServlet with name '" + getServletName() + "'");
