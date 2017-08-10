@@ -81,61 +81,36 @@ import org.springframework.web.servlet.ModelAndView;
  * @see org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor
  * @see org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter
  */
-public class ServletWrappingController extends AbstractController
-		implements BeanNameAware, InitializingBean, DisposableBean {
+/*
+  	ServletWrappingController：将当前应用中的某个Servlet直接包装为一个Controller，所有到ServletWrappingController的请求
+  		实际上是由它内部所包装的这个Servlet 实例来处理的，也就是说内部封装的Servlet实例并不对外开放，对于程序的其他范围
+  	是不可见的，适配所有的HTTP请求到内部封装的Servlet实例进行处理。它通常用于对已存的Servlet的逻辑重用。
+  	ServletWrappingController是为了Struts专门设计的，作用相当于代理Struts的ActionServlet。请注意，Struts有一个特殊的要求，
+  	因为它解析web.xml找到自己的Servlet映射。因此，你需要指定的DispatherServlet作为“servletName”在这个控制器servlet的名字，
+  	认为这样的Struts的DispatcherServlet的映射 （它指的是ActionServlet的）。
+
+	Servlet转发控制器(ServletForwardingController)：
+		和ServletWrappingController类似，它也是一个Servlet相关的controller，他们都实现将HTTP请求适配到一个已存的Servlet实
+	现。但是，简单Servlet处理器适配器需要在Web应用程序环境中定义Servlet Bean，并且Servlet没有机会进行初始化和析构。和
+	ServletWrappingController不同的是，ServletForwardingController将所有的HTTP请求转发给一个在web.xml中定义的Servlet。
+	Web容器会对这个定义在web.xml的标准Servlet进行初始化和析构。
+ */
+public class ServletWrappingController extends AbstractController implements BeanNameAware, InitializingBean, DisposableBean {
 
 	private Class<?> servletClass;
-
 	private String servletName;
-
 	private Properties initParameters = new Properties();
-
 	private String beanName;
-
 	private Servlet servletInstance;
 
 
-	/**
-	 * Set the class of the servlet to wrap.
-	 * Needs to implement {@code javax.servlet.Servlet}.
-	 * @see javax.servlet.Servlet
-	 */
-	public void setServletClass(Class<?> servletClass) {
-		this.servletClass = servletClass;
-	}
-
-	/**
-	 * Set the name of the servlet to wrap.
-	 * Default is the bean name of this controller.
-	 */
-	public void setServletName(String servletName) {
-		this.servletName = servletName;
-	}
-
-	/**
-	 * Specify init parameters for the servlet to wrap,
-	 * as name-value pairs.
-	 */
-	public void setInitParameters(Properties initParameters) {
-		this.initParameters = initParameters;
-	}
-
-	public void setBeanName(String name) {
-		this.beanName = name;
-	}
-
-
-	/**
-	 * Initialize the wrapped Servlet instance.
-	 * @see javax.servlet.Servlet#init(javax.servlet.ServletConfig)
-	 */
+	// init --------------- 框架调用后处理方法来包装 Servlet 实例
 	public void afterPropertiesSet() throws Exception {
 		if (this.servletClass == null) {
 			throw new IllegalArgumentException("servletClass is required");
 		}
 		if (!Servlet.class.isAssignableFrom(this.servletClass)) {
-			throw new IllegalArgumentException("servletClass [" + this.servletClass.getName() +
-				"] needs to implement interface [javax.servlet.Servlet]");
+			throw new IllegalArgumentException("servletClass [" + this.servletClass.getName() + "] needs to implement interface [javax.servlet.Servlet]");
 		}
 		if (this.servletName == null) {
 			this.servletName = this.beanName;
@@ -143,52 +118,59 @@ public class ServletWrappingController extends AbstractController
 		this.servletInstance = (Servlet) this.servletClass.newInstance();
 		this.servletInstance.init(new DelegatingServletConfig());
 	}
-
-
-	/**
-	 * Invoke the the wrapped Servlet instance.
-	 * @see javax.servlet.Servlet#service(javax.servlet.ServletRequest, javax.servlet.ServletResponse)
-	 */
+	// service ------------ 调用这个 Servlet 实例来处理请求
 	@Override
-	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
-		throws Exception {
-
+	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		this.servletInstance.service(request, response);
 		return null;
 	}
-
-
-	/**
-	 * Destroy the wrapped Servlet instance.
-	 * @see javax.servlet.Servlet#destroy()
-	 */
+	// destroy ------------ 销毁Servlet实例
 	public void destroy() {
 		this.servletInstance.destroy();
 	}
 
 
+
+
+	// Set the class of the servlet to wrap.
+	public void setServletClass(Class<?> servletClass) {
+		this.servletClass = servletClass;
+	}
+	// Set the name of the servlet to wrap. Default is the bean name of this controller.
+	public void setServletName(String servletName) {
+		this.servletName = servletName;
+	}
+	// Specify init parameters for the servlet to wrap, as name-value pairs.
+	public void setInitParameters(Properties initParameters) {
+		this.initParameters = initParameters;
+	}
+	public void setBeanName(String name) {
+		this.beanName = name;
+	}
+
+
+
 	/**
-	 * Internal implementation of the ServletConfig interface, to be passed
-	 * to the wrapped servlet. Delegates to ServletWrappingController fields
-	 * and methods to provide init parameters and other environment info.
+	 * Internal implementation of the ServletConfig interface, to be passed to the wrapped servlet.
+	 * ServletConfig接口的内部实现，用于传递给包装的servlet
+	 * Delegates to ServletWrappingController fields and methods to provide init parameters and other environment info.
+	 * 代表ServletWrappingController字段和方法提供init参数和其他环境信息
 	 */
 	private class DelegatingServletConfig implements ServletConfig {
 
 		public String getServletName() {
 			return servletName;
 		}
-
 		public ServletContext getServletContext() {
 			return ServletWrappingController.this.getServletContext();
 		}
-
 		public String getInitParameter(String paramName) {
 			return initParameters.getProperty(paramName);
 		}
-
 		public Enumeration getInitParameterNames() {
 			return initParameters.keys();
 		}
 	}
+
 
 }

@@ -47,66 +47,39 @@ import org.springframework.web.servlet.HandlerMapping;
  * @see #setPrefix
  * @see #setSuffix
  */
+/*
+	将请求的URL路径转换为逻辑视图名并返回的转换控制器，即不需要功能处理，直接根据URL计算出逻辑视图名，并选择具体视图进行展示：
+
+	根据请求URL路径计算逻辑视图名，如：
+	<bean name="/index1/*"
+	class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
+	<bean name="/index2/**"
+	class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
+	<bean name="/*.html"
+	class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
+	<bean name="/index3/*.html"
+	class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
+	/index1/*：可以匹配/index1/demo，但不匹配/index1/demo/demo，如/index1/demo逻辑视图名为demo；
+	/index2/**：可以匹配/index2路径下的所有子路径，如匹配/index2/demo，或/index2/demo/demo，“/index2/demo”的逻辑视图名为demo，而“/index2/demo/demo”逻辑视图名为demo/demo；
+	/*.html：可以匹配如/abc.html，逻辑视图名为abc，后缀会被删除（不仅仅可以是html）；
+	/index3/*.html：可以匹配/index3/abc.html，逻辑视图名也是abc;
+ */
 public class UrlFilenameViewController extends AbstractUrlViewController {
 
 	private String prefix = "";
-
 	private String suffix = "";
 
-	/** Request URL path String --> view name String */
+	//** Request URL path String --> view name String */
 	private final Map<String, String> viewNameCache = new ConcurrentHashMap<String, String>(256);
 
 
-	/**
-	 * Set the prefix to prepend to the request URL filename
-	 * to build a view name.
-	 */
-	public void setPrefix(String prefix) {
-		this.prefix = (prefix != null ? prefix : "");
-	}
-
-	/**
-	 * Return the prefix to prepend to the request URL filename.
-	 */
-	protected String getPrefix() {
-		return this.prefix;
-	}
-
-	/**
-	 * Set the suffix to append to the request URL filename
-	 * to build a view name.
-	 */
-	public void setSuffix(String suffix) {
-		this.suffix = (suffix != null ? suffix : "");
-	}
-
-	/**
-	 * Return the suffix to append to the request URL filename.
-	 */
-	protected String getSuffix() {
-		return this.suffix;
-	}
-
-
-	/**
-	 * Returns view name based on the URL filename,
-	 * with prefix/suffix applied when appropriate.
-	 * @see #extractViewNameFromUrlPath
-	 * @see #setPrefix
-	 * @see #setSuffix
-	 */
+	// 根据 request 的url结合视图前后缀名返回视图名
 	@Override
 	protected String getViewNameForRequest(HttpServletRequest request) {
 		String uri = extractOperableUrl(request);
 		return getViewNameForUrlPath(uri);
 	}
-
-	/**
-	 * Extract a URL path from the given request,
-	 * suitable for view name extraction.
-	 * @param request current HTTP request
-	 * @return the URL to use for view name extraction
-	 */
+	// 从给定的请求中提取URL路径
 	protected String extractOperableUrl(HttpServletRequest request) {
 		String urlPath = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
 		if (!StringUtils.hasText(urlPath)) {
@@ -114,15 +87,6 @@ public class UrlFilenameViewController extends AbstractUrlViewController {
 		}
 		return urlPath;
 	}
-
-	/**
-	 * Returns view name based on the URL filename,
-	 * with prefix/suffix applied when appropriate.
-	 * @param uri the request URI; for example {@code "/index.html"}
-	 * @return the extracted URI filename; for example {@code "index"}
-	 * @see #extractViewNameFromUrlPath
-	 * @see #postProcessViewName
-	 */
 	protected String getViewNameForUrlPath(String uri) {
 		String viewName = this.viewNameCache.get(uri);
 		if (viewName == null) {
@@ -132,32 +96,31 @@ public class UrlFilenameViewController extends AbstractUrlViewController {
 		}
 		return viewName;
 	}
-
-	/**
-	 * Extract the URL filename from the given request URI.
-	 * @param uri the request URI; for example {@code "/index.html"}
-	 * @return the extracted URI filename; for example {@code "index"}
-	 */
 	protected String extractViewNameFromUrlPath(String uri) {
 		int start = (uri.charAt(0) == '/' ? 1 : 0);
 		int lastIndex = uri.lastIndexOf(".");
 		int end = (lastIndex < 0 ? uri.length() : lastIndex);
 		return uri.substring(start, end);
 	}
-
-	/**
-	 * Build the full view name based on the given view name
-	 * as indicated by the URL path.
-	 * <p>The default implementation simply applies prefix and suffix.
-	 * This can be overridden, for example, to manipulate upper case
-	 * / lower case, etc.
-	 * @param viewName the original view name, as indicated by the URL path
-	 * @return the full view name to use
-	 * @see #getPrefix()
-	 * @see #getSuffix()
-	 */
+	// 返回完整的视图路径
 	protected String postProcessViewName(String viewName) {
 		return getPrefix() + viewName + getSuffix();
+	}
+
+
+
+	// getter and setter ...
+	public void setPrefix(String prefix) {
+		this.prefix = (prefix != null ? prefix : "");
+	}
+	protected String getPrefix() {
+		return this.prefix;
+	}
+	public void setSuffix(String suffix) {
+		this.suffix = (suffix != null ? suffix : "");
+	}
+	protected String getSuffix() {
+		return this.suffix;
 	}
 
 }

@@ -99,7 +99,30 @@ import org.springframework.web.util.WebUtils;
  */
 public abstract class AbstractController extends WebContentGenerator implements Controller {
 
+	// 标识是否在会话中同步执行对应的处理器
 	private boolean synchronizeOnSession = false;
+
+	public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		// 委托给WebContentGenerator检查和准备
+		checkAndPrepare(request, response, this instanceof LastModified);
+
+		// 如果需要在同步块中执行handleRequestInternal()方法
+		if (this.synchronizeOnSession) {
+			HttpSession session = request.getSession(false);
+			if (session != null) {
+				Object mutex = WebUtils.getSessionMutex(session);
+				synchronized (mutex) {
+					return handleRequestInternal(request, response);
+				}
+			}
+		}
+
+		return handleRequestInternal(request, response);
+	}
+	// 模板方法，子类必须实现该方法
+	protected abstract ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) throws Exception;
+
 
 
 	/**
@@ -124,41 +147,9 @@ public abstract class AbstractController extends WebContentGenerator implements 
 	public final void setSynchronizeOnSession(boolean synchronizeOnSession) {
 		this.synchronizeOnSession = synchronizeOnSession;
 	}
-
-	/**
-	 * Return whether controller execution should be synchronized on the session.
-	 */
+	// Return whether controller execution should be synchronized on the session.
 	public final boolean isSynchronizeOnSession() {
 		return this.synchronizeOnSession;
 	}
-
-
-	public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-
-		// Delegate to WebContentGenerator for checking and preparing.
-		checkAndPrepare(request, response, this instanceof LastModified);
-
-		// Execute handleRequestInternal in synchronized block if required.
-		if (this.synchronizeOnSession) {
-			HttpSession session = request.getSession(false);
-			if (session != null) {
-				Object mutex = WebUtils.getSessionMutex(session);
-				synchronized (mutex) {
-					return handleRequestInternal(request, response);
-				}
-			}
-		}
-
-		return handleRequestInternal(request, response);
-	}
-
-	/**
-	 * Template method. Subclasses must implement this.
-	 * The contract is the same as for {@code handleRequest}.
-	 * @see #handleRequest
-	 */
-	protected abstract ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
-	    throws Exception;
 
 }

@@ -109,16 +109,8 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public interface Controller {
 
-	/**
-	 * Process the request and return a ModelAndView object which the DispatcherServlet
-	 * will render. A {@code null} return value is not an error: It indicates that
-	 * this object completed request processing itself, thus there is no ModelAndView
-	 * to render.
-	 * @param request current HTTP request
-	 * @param response current HTTP response
-	 * @return a ModelAndView to render, or {@code null} if handled directly
-	 * @throws Exception in case of errors
-	 */
+	// DispatcherServlet 接收到请求后会根据 HandlerMapping 中注册的请求映射关系，将请求转发到相应的handler（即请求处理器，
+	// 请求处理器都会实现Controller接口，而该接口的方法handleRequest就是用来处理该请求的）
 	ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
 }

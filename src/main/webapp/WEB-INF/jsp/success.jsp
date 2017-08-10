@@ -6,10 +6,10 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>操作成功</title>
 <script language=javascript>
-   setTimeout("window.location.href='index.html'",180)
+   setTimeout("window.location.href='index.html'",3000)
 </script>
 </head>
 <body>
-    操作成功!
+    操作成功! 3秒后跳转到主界面...
 </body>
 </html>

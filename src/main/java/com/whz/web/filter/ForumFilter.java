@@ -2,7 +2,9 @@ package com.whz.web.filter;
 
 import com.whz.constant.CommonConstant;
 import com.whz.domain.User;
+import com.whz.web.controller.TestController;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +13,7 @@ import java.io.IOException;
 import static com.whz.constant.CommonConstant.LOGIN_TO_URL;
 
 public class ForumFilter implements Filter {
+	private final static Logger log = Logger.getLogger(ForumFilter.class);
 	//是否已过滤当前URL
 	private static final String ISFILTERED = "@@isFiltered";
 	//不需要登录即可访问的URI资源
@@ -27,6 +30,7 @@ public class ForumFilter implements Filter {
 
 	public void init(FilterConfig filterConfig) throws ServletException {}
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+		log.info("调用ForumFilter#doFilter方法拦截[" + ((HttpServletRequest) request).getRequestURI() + "]请求");
 		//保证该过滤器在一次请求中只被调用一次
 		if (request.getAttribute(ISFILTERED) == null) {
 			//设置过滤标识，防止一次请求多次过滤

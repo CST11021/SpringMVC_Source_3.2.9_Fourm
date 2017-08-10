@@ -14,11 +14,14 @@
 	   xmlns:context="http://www.springframework.org/schema/context"
 	   xmlns:mvc="http://www.springframework.org/schema/mvc"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans
-           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
            http://www.springframework.org/schema/mvc
-           http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+           http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
            http://www.springframework.org/schema/context
-           http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+           http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+	<import resource="spring-handlermapping.xml"/>
+	<import resource="spring-interceptor.xml"/>
 
 	<!-- 自动扫描 base-package包或子包下的所有java文件，如果扫描到有@Component @Controller @Service等这些注解的类，则把这些类注册为bean -->
 	<context:component-scan base-package="com.whz.web" />
@@ -56,4 +59,8 @@
 			</props>
 		</property>
 	</bean>
+
+
+
+
 </beans>  

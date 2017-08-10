@@ -83,10 +83,23 @@ import org.springframework.web.util.WebUtils;
  * @see org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor
  * @see org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter
  */
+/*
+  	ServletWrappingController：将当前应用中的某个Servlet直接包装为一个Controller，所有到ServletWrappingController的请求
+  		实际上是由它内部所包装的这个Servlet 实例来处理的，也就是说内部封装的Servlet实例并不对外开放，对于程序的其他范围
+  	是不可见的，适配所有的HTTP请求到内部封装的Servlet实例进行处理。它通常用于对已存的Servlet的逻辑重用上。
+  	ServletWrappingController是为了Struts专门设计的，作用相当于代理Struts的ActionServlet。请注意，Struts有一个特殊的要求，
+  	因为它解析web.xml找到紫的Servlet映射。因此，你需要制定的DispatherServlet作为“servletName”在这个控制器servlet的名字，
+  	认为这样的Struts的DispatcherServlet的映射 （它指的是ActionServlet的）。
+
+	Servlet转发控制器(ServletForwardingController)：
+		和ServletWrappingController类似，它也是一个Servlet相关的controller，他们都实现将HTTP请求适配到一个已存的Servlet实
+	现。但是，简单Servlet处理器适配器需要在Web应用程序环境中定义Servlet Bean，并且Servlet没有机会进行初始化和析构。和
+	ServletWrappingController不同的是，ServletForwardingController将所有的HTTP请求转发给一个在web.xml中定义的Servlet。
+	Web容器会对这个定义在web.xml的标准Servlet进行初始化和析构。
+ */
 public class ServletForwardingController extends AbstractController implements BeanNameAware {
 
 	private String servletName;
-
 	private String beanName;
 
 
@@ -98,7 +111,6 @@ public class ServletForwardingController extends AbstractController implements B
 	public void setServletName(String servletName) {
 		this.servletName = servletName;
 	}
-
 	public void setBeanName(String name) {
 		this.beanName = name;
 		if (this.servletName == null) {
@@ -108,8 +120,7 @@ public class ServletForwardingController extends AbstractController implements B
 
 
 	@Override
-	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		RequestDispatcher rd = getServletContext().getNamedDispatcher(this.servletName);
 		if (rd == null) {
@@ -119,15 +130,13 @@ public class ServletForwardingController extends AbstractController implements B
 		if (useInclude(request, response)) {
 			rd.include(request, response);
 			if (logger.isDebugEnabled()) {
-				logger.debug("Included servlet [" + this.servletName +
-						"] in ServletForwardingController '" + this.beanName + "'");
+				logger.debug("Included servlet [" + this.servletName + "] in ServletForwardingController '" + this.beanName + "'");
 			}
 		}
 		else {
 			rd.forward(request, response);
 			if (logger.isDebugEnabled()) {
-				logger.debug("Forwarded to servlet [" + this.servletName +
-						"] in ServletForwardingController '" + this.beanName + "'");
+				logger.debug("Forwarded to servlet [" + this.servletName + "] in ServletForwardingController '" + this.beanName + "'");
 			}
 		}
 		return null;
