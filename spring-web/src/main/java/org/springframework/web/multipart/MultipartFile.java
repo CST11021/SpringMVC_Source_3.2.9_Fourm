@@ -36,69 +36,28 @@ import java.io.InputStream;
  */
 public interface MultipartFile {
 
-	/**
-	 * Return the name of the parameter in the multipart form.
-	 * @return the name of the parameter (never {@code null} or empty)
-	 */
+	// 获取表单中文件组件的名字
 	String getName();
 
-	/**
-	 * Return the original filename in the client's filesystem.
-	 * <p>This may contain path information depending on the browser used,
-	 * but it typically will not with any other than Opera.
-	 * @return the original filename, or the empty String if no file
-	 * has been chosen in the multipart form, or {@code null}
-	 * if not defined or not available
-	 */
+	// 获取上传文件的原名
 	String getOriginalFilename();
 
-	/**
-	 * Return the content type of the file.
-	 * @return the content type, or {@code null} if not defined
-	 * (or no file has been chosen in the multipart form)
-	 */
+	// 获取文件MIME类型，如image/pjpeg、text/plain等
 	String getContentType();
 
-	/**
-	 * Return whether the uploaded file is empty, that is, either no file has
-	 * been chosen in the multipart form or the chosen file has no content.
-	 */
+	// 判断是否有上传文件
 	boolean isEmpty();
 
-	/**
-	 * Return the size of the file in bytes.
-	 * @return the size of the file, or 0 if empty
-	 */
+	// 获取上传文件的字节大小，单位为byte
 	long getSize();
 
-	/**
-	 * Return the contents of the file as an array of bytes.
-	 * @return the contents of the file as bytes, or an empty byte array if empty
-	 * @throws IOException in case of access errors (if the temporary store fails)
-	 */
+	// 将文件的内容作为一个字节数组返回
 	byte[] getBytes() throws IOException;
 
-	/**
-	 * Return an InputStream to read the contents of the file from.
-	 * The user is responsible for closing the stream.
-	 * @return the contents of the file as stream, or an empty stream if empty
-	 * @throws IOException in case of access errors (if the temporary store fails)
-	 */
+	// 获取上传文件的文件流
 	InputStream getInputStream() throws IOException;
 
-	/**
-	 * Transfer the received file to the given destination file.
-	 * <p>This may either move the file in the filesystem, copy the file in the
-	 * filesystem, or save memory-held contents to the destination file.
-	 * If the destination file already exists, it will be deleted first.
-	 * <p>If the file has been moved in the filesystem, this operation cannot
-	 * be invoked again. Therefore, call this method just once to be able to
-	 * work with any storage mechanism.
-	 * @param dest the destination file
-	 * @throws IOException in case of reading or writing errors
-	 * @throws IllegalStateException if the file has already been moved
-	 * in the filesystem and is not available anymore for another transfer
-	 */
+	// 将上传文件保存到一个目标文件中
 	void transferTo(File dest) throws IOException, IllegalStateException;
 
 }

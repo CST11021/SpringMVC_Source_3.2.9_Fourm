@@ -358,6 +358,7 @@ public class ContextLoader {
 	}
 
 	// 该方法是一个静态方法，当Spring容器启动后，我们可以通过ContextLoad.getCurrentWebApplicationContext()方法得到这个Spring容器
+	// 注意：这个获取的只是Spring容器，该容器维护的bean并不包括定义在，WEB-INF/xxx-servlet.xml 中的bean
 	public static WebApplicationContext getCurrentWebApplicationContext() {
 		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 		if (ccl != null) {

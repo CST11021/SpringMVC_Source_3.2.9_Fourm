@@ -59,29 +59,14 @@ import org.springframework.web.util.WebUtils;
  * @see org.apache.commons.fileupload.servlet.ServletFileUpload
  * @see org.apache.commons.fileupload.disk.DiskFileItemFactory
  */
-public class CommonsMultipartResolver extends CommonsFileUploadSupport
-		implements MultipartResolver, ServletContextAware {
+public class CommonsMultipartResolver extends CommonsFileUploadSupport implements MultipartResolver, ServletContextAware {
 
 	private boolean resolveLazily = false;
 
 
-	/**
-	 * Constructor for use as bean. Determines the servlet container's
-	 * temporary directory via the ServletContext passed in as through the
-	 * ServletContextAware interface (typically by a WebApplicationContext).
-	 * @see #setServletContext
-	 * @see org.springframework.web.context.ServletContextAware
-	 * @see org.springframework.web.context.WebApplicationContext
-	 */
 	public CommonsMultipartResolver() {
 		super();
 	}
-
-	/**
-	 * Constructor for standalone usage. Determines the servlet container's
-	 * temporary directory via the given ServletContext.
-	 * @param servletContext the ServletContext to use
-	 */
 	public CommonsMultipartResolver(ServletContext servletContext) {
 		this();
 		setServletContext(servletContext);
@@ -117,7 +102,7 @@ public class CommonsMultipartResolver extends CommonsFileUploadSupport
 		}
 	}
 
-
+	// 判断是否为上传请求
 	public boolean isMultipart(HttpServletRequest request) {
 		return (request != null && ServletFileUpload.isMultipartContent(request));
 	}

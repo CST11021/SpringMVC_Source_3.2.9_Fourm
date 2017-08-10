@@ -49,8 +49,7 @@ public class StandardServletMultipartResolver implements MultipartResolver {
 
 
 	/**
-	 * Set whether to resolve the multipart request lazily at the time of
-	 * file or parameter access.
+	 * Set whether to resolve the multipart request lazily at the time of file or parameter access.
 	 * <p>Default is "false", resolving the multipart elements immediately, throwing
 	 * corresponding exceptions at the time of the {@link #resolveMultipart} call.
 	 * Switch this to "true" for lazy multipart parsing, throwing parse exceptions
