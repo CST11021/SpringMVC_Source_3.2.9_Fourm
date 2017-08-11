@@ -1,5 +1,5 @@
 
-package com.whz.scheduling;
+package com.whz.scheduling.cleanCache;
 
 //import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;

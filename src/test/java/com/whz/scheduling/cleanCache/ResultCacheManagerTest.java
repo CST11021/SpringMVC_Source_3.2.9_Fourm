@@ -1,4 +1,4 @@
-package com.whz.scheduling;
+package com.whz.scheduling.cleanCache;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -14,8 +14,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-import static org.junit.Assert.*;
-
 /**
  * Created by wb-whz291815 on 2017/7/27.
  */
@@ -25,10 +23,10 @@ public class ResultCacheManagerTest {
 
 
     public static void main(String[] args) throws FileNotFoundException {
-        File config = ResourceUtils.getFile(ResourceUtils.CLASSPATH_URL_PREFIX + "com/whz/scheduling/log4j2.xml");
+        File config = ResourceUtils.getFile(ResourceUtils.CLASSPATH_URL_PREFIX + "log4j2.xml");
         ConfigurationSource source = new ConfigurationSource(new FileInputStream(config),config);
         Configurator.initialize(null, source);
-        ApplicationContext context = new ClassPathXmlApplicationContext("com/whz/scheduling/spring-job.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("com/whz/scheduling/cleanCache/spring-job.xml");
         String base = (String) ResultCacheManager.get(CacheKeyPrefix.BASE, new ResultCacheManager.ProceedingJoinPoint() {
             @Override
             public Object proceed() {
@@ -42,14 +40,14 @@ public class ResultCacheManagerTest {
 
     @Before
     public void initLog4j2() throws FileNotFoundException {
-        File config = ResourceUtils.getFile(ResourceUtils.CLASSPATH_URL_PREFIX + "com/whz/scheduling/log4j2.xml");
+        File config = ResourceUtils.getFile(ResourceUtils.CLASSPATH_URL_PREFIX + "log4j2.xml");
         ConfigurationSource source = new ConfigurationSource(new FileInputStream(config),config);
         Configurator.initialize(null, source);
     }
 
     @Test
     public void get() throws Exception {
-        ApplicationContext context = new ClassPathXmlApplicationContext("com/whz/scheduling/spring-job.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("com/whz/scheduling/cleanCache/spring-job.xml");
         String base = (String) ResultCacheManager.get(CacheKeyPrefix.BASE, new ResultCacheManager.ProceedingJoinPoint() {
             @Override
             public Object proceed() {

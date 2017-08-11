@@ -1,4 +1,4 @@
-package com.whz.scheduling;
+package com.whz.scheduling.cleanCache;
 
 public class CacheKeyPrefix {
 
