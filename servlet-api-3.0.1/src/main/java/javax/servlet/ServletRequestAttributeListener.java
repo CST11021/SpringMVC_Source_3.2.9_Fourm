@@ -82,7 +82,7 @@ import java.util.EventListener;
  *
  * @since Servlet 2.4
  */
-
+// 当在ServletRequest中添加、删除或替换掉某个属性时，会调用该监听器的方法
 public interface ServletRequestAttributeListener extends EventListener {
 
     /**

@@ -79,7 +79,6 @@ public interface FilterChain {
 	* @param request the request to pass along the chain.
 	* @param response the response to pass along the chain.
 	*/
-	
     public void doFilter ( ServletRequest request, ServletResponse response ) throws IOException, ServletException;
 
 }

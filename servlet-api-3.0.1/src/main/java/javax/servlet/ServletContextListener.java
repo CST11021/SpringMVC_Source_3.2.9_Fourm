@@ -79,11 +79,11 @@ import java.util.EventListener;
  *
  * @since Servlet 2.3
  */
+// ServletContext生命周期事件监听
 public interface ServletContextListener extends EventListener {
 
     /**
-     * Receives notification that the web application initialization
-     * process is starting.
+     * Receives notification that the web application initialization process is starting.
      *
      * <p>All ServletContextListeners are notified of context
      * initialization before any filters or servlets in the web
@@ -92,6 +92,7 @@ public interface ServletContextListener extends EventListener {
      * @param sce the ServletContextEvent containing the ServletContext
      * that is being initialized
      */
+    // 该方法在web应用启动后（也就是ServletContext启动之后，此时已经创建好了一个ServletContext实例），可以使用sce.getServletContext()获取到
     public void contextInitialized(ServletContextEvent sce);
 
     /**
@@ -105,6 +106,7 @@ public interface ServletContextListener extends EventListener {
      * @param sce the ServletContextEvent containing the ServletContext
      * that is being destroyed
      */
+    // 关闭web应用程序前被调用
     public void contextDestroyed(ServletContextEvent sce);
 }
 

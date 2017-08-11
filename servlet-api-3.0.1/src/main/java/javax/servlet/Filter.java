@@ -88,7 +88,8 @@ import java.io.IOException;
  *
  * @since Servlet 2.3
  */
-
+// 过滤器是用来拦截请求的，并对传给被请求资源的ServletRequest或ServletResponse进行处理的一个对象。过滤器可以用于登录、加
+// 密和解密、会话检查、图片转换等等。过滤器可以配置为拦截一个或多个资源。
 public interface Filter {
 
     /** 
@@ -107,9 +108,10 @@ public interface Filter {
      * <li>Does not return within a time period defined by the web container
      * </ol>
      */
+    // 当过滤器启动服务时，比如应用程序启动时，Servlet容器就会调用init方法。换句话说，不用等到调用与被过滤器相关的资源之后，
+    // 才调用init方法。这个方法只调用一次，并且应该包含该过滤器的初始化代码。另外，当执行init方法时，Servlet容器会给它传递一个FilterConfig对象
     public void init(FilterConfig filterConfig) throws ServletException;
-	
-	
+
     /**
      * The <code>doFilter</code> method of the Filter is called by the
      * container each time a request/response pair is passed through the
@@ -138,10 +140,8 @@ public interface Filter {
      * next entity in the filter chain.
      * </ol>
      */
-    public void doFilter(ServletRequest request, ServletResponse response,
-                         FilterChain chain)
-            throws IOException, ServletException;
-
+    // 过滤处理方法，该方法接受一个ServletRequest、ServletResponse和FilterChain对象，通常该方法处理完后需根据情况判断是否调用过滤链中的下一个过滤器
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException;
 
     /**
      * Called by the web container to indicate to a filter that it is being
@@ -157,6 +157,7 @@ public interface Filter {
      * threads) and make sure that any persistent state is synchronized
      * with the filter's current state in memory.
      */
+    // 该方法在过滤器停止服务之前，由Servlet容器调用，一般发生在应用程序停止的时候
     public void destroy();
 }
 

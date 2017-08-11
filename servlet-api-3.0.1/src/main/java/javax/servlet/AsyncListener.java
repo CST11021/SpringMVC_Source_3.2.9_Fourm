@@ -50,6 +50,7 @@ import java.util.EventListener;
  *
  * @since Servlet 3.0
  */
+// 用于异步操作的监听器
 public interface AsyncListener extends EventListener {
     
     /**

@@ -82,7 +82,7 @@ import java.util.EventListener;
  *
  * @since Servlet 2.4
  */
-
+// 这对ServletRequest的创建和删除做出响应的监听器
 public interface ServletRequestListener extends EventListener {
 
     /**
