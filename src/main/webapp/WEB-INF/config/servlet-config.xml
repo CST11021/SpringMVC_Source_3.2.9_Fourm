@@ -1,0 +1,9 @@
+<!--配置一个测试的Servlet-->
+<servlet>
+    <servlet-name>forwarding</servlet-name>
+    <servlet-class>com.whz.web.controller.test.ForwardingServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+<servlet-name>forwarding</servlet-name>
+<url-pattern>/forwarding.action</url-pattern>
+</servlet-mapping>
