@@ -110,7 +110,9 @@ public interface ServletResponse {
     public String getCharacterEncoding();
     public void setCharacterEncoding(String charset);
 
-    // 返回在此响应中发送的MIME主体所使用的内容类型
+    // 返回在此响应中发送的MIME主体所使用的内容类型，response.setContentType(MIME)的作用是使客户端浏览器，区分不同种类的
+    // 数据，并根据不同的MIME调用浏览器内不同的程序嵌入模块来处理相应的数据。例如web浏览器就是通过MIME类型来判断文件是GIF
+    // 图片。通过MIME类型来处理json字符串。
     public String getContentType();
     public void setContentType(String type);
 

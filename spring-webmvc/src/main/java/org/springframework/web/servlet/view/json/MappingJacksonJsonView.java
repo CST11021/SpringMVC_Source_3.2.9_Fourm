@@ -52,6 +52,7 @@ import org.springframework.web.servlet.view.AbstractView;
  * @since 3.0
  * @see org.springframework.http.converter.json.MappingJacksonHttpMessageConverter
  */
+// JSON 形式的视图实现，可以在Spring中配置该类来进行JSON格式的视图渲染
 public class MappingJacksonJsonView extends AbstractView {
 
 	/**

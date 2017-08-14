@@ -43,13 +43,9 @@ import org.springframework.web.servlet.view.AbstractView;
  * @author Jean-Pierre Pawlak
  * @see AbstractPdfStamperView
  */
+// 我们可以通过继承该抽象类来实现渲染一个 PDF 的视图
 public abstract class AbstractPdfView extends AbstractView {
 
-	/**
-	 * This constructor sets the appropriate content type "application/pdf".
-	 * Note that IE won't take much notice of this, but there's not a lot we
-	 * can do about this. Generated documents should have a ".pdf" extension.
-	 */
 	public AbstractPdfView() {
 		setContentType("application/pdf");
 	}
@@ -59,10 +55,8 @@ public abstract class AbstractPdfView extends AbstractView {
 	protected boolean generatesDownloadContent() {
 		return true;
 	}
-
 	@Override
-	protected final void renderMergedOutputModel(
-			Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	protected final void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		// IE workaround: write into byte array first.
 		ByteArrayOutputStream baos = createTemporaryOutputStream();
@@ -81,7 +75,6 @@ public abstract class AbstractPdfView extends AbstractView {
 		// Flush to HTTP response.
 		writeToResponse(response, baos);
 	}
-
 	/**
 	 * Create a new document to hold the PDF contents.
 	 * <p>By default returns an A4 document, but the subclass can specify any
@@ -92,7 +85,6 @@ public abstract class AbstractPdfView extends AbstractView {
 	protected Document newDocument() {
 		return new Document(PageSize.A4);
 	}
-
 	/**
 	 * Create a new PdfWriter for the given iText Document.
 	 * @param document the iText Document to create a writer for
@@ -103,7 +95,6 @@ public abstract class AbstractPdfView extends AbstractView {
 	protected PdfWriter newWriter(Document document, OutputStream os) throws DocumentException {
 		return PdfWriter.getInstance(document, os);
 	}
-
 	/**
 	 * Prepare the given PdfWriter. Called before building the PDF document,
 	 * that is, before the call to {@code Document.open()}.
@@ -119,12 +110,10 @@ public abstract class AbstractPdfView extends AbstractView {
 	 * @see com.lowagie.text.pdf.PdfWriter#setViewerPreferences
 	 * @see #getViewerPreferences()
 	 */
-	protected void prepareWriter(Map<String, Object> model, PdfWriter writer, HttpServletRequest request)
-			throws DocumentException {
+	protected void prepareWriter(Map<String, Object> model, PdfWriter writer, HttpServletRequest request) throws DocumentException {
 
 		writer.setViewerPreferences(getViewerPreferences());
 	}
-
 	/**
 	 * Return the viewer preferences for the PDF file.
 	 * <p>By default returns {@code AllowPrinting} and
@@ -138,7 +127,6 @@ public abstract class AbstractPdfView extends AbstractView {
 	protected int getViewerPreferences() {
 		return PdfWriter.ALLOW_PRINTING | PdfWriter.PageLayoutSinglePage;
 	}
-
 	/**
 	 * Populate the iText Document's meta fields (author, title, etc.).
 	 * <br>Default is an empty implementation. Subclasses may override this method
@@ -157,9 +145,7 @@ public abstract class AbstractPdfView extends AbstractView {
 	 * @see com.lowagie.text.Document#addCreationDate
 	 * @see com.lowagie.text.Document#addHeader
 	 */
-	protected void buildPdfMetadata(Map<String, Object> model, Document document, HttpServletRequest request) {
-	}
-
+	protected void buildPdfMetadata(Map<String, Object> model, Document document, HttpServletRequest request) {}
 	/**
 	 * Subclasses must implement this method to build an iText PDF document,
 	 * given the model. Called between {@code Document.open()} and
@@ -176,7 +162,6 @@ public abstract class AbstractPdfView extends AbstractView {
 	 * @see com.lowagie.text.Document#open()
 	 * @see com.lowagie.text.Document#close()
 	 */
-	protected abstract void buildPdfDocument(Map<String, Object> model, Document document, PdfWriter writer,
-			HttpServletRequest request, HttpServletResponse response) throws Exception;
+	protected abstract void buildPdfDocument(Map<String, Object> model, Document document, PdfWriter writer, HttpServletRequest request, HttpServletResponse response) throws Exception;
 
 }

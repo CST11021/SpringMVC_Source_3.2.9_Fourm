@@ -852,7 +852,7 @@ public class DispatcherServlet extends FrameworkServlet {
 
 				// 校验是否添加了视图，如果没有视图就会添加一个默认的视图，通过url的规则来拼凑
 				applyDefaultViewName(request, mv);
-				// 这块逻辑是执行HandlerExecutionChain所有Interceptor中的postHandle方法，从这块代码看来，postHandle的执行时机是在执行完方法后，没有把响应写入到response中执行的
+				// 当执行完Handler相对应的处理方法（即Controller中对应的方法）后，需要执行一些的拦截器，这块逻辑是执行HandlerExecutionChain所有Interceptor中的postHandle方法
 				mappedHandler.applyPostHandle(processedRequest, response, mv);
 			}
 			catch (Exception ex) {
@@ -971,7 +971,7 @@ public class DispatcherServlet extends FrameworkServlet {
 
 		throw ex;
 	}
-	//进行视图渲染，并写到 response 中
+	// 进行视图渲染，并写到 response 中
 	protected void render(ModelAndView mv, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// 获取这个请求的区域代码
 		Locale locale = this.localeResolver.resolveLocale(request);

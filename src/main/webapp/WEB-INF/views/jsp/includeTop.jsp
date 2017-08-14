@@ -8,7 +8,7 @@
 </c:if>
 &nbsp;&nbsp;
 <c:if test="${empty sessionScope.CURRENT_ONLINE_USER}">
-   <a href="<c:url value="/login.jsp"/>"  style="color: #2D93CA;">登录</a>&nbsp;&nbsp;
+   <a href="<c:url value="/login.jsp"/>" style="color: #2D93CA;">登录</a>&nbsp;&nbsp;
    <a href="<c:url value="/register.jsp"/>" style="color: #2D93CA;">注册</a>
 </c:if>
 <c:if test="${sessionScope.CURRENT_ONLINE_USER !=null && sessionScope.CURRENT_ONLINE_USER.userType == 2}">

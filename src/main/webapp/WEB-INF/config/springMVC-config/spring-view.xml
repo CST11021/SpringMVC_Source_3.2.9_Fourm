@@ -1,0 +1,93 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:p="http://www.springframework.org/schema/p"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+           http://www.springframework.org/schema/mvc
+           http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+
+
+	<!-- BeanNameViewResolver 这个视图解析器是直接使用Bean的id作为视图名称的，一般这种视图解析器的优先级最高-->
+	<bean class="org.springframework.web.servlet.view.BeanNameViewResolver" p:order="0" />
+	<import resource="spring-beanNameViews.xml"/>
+
+	<!--XmlViewResolver和BeanNameViewResolver功能相似，唯一不同的是它可以将视图Bean定义在一个独立的XML文件中。-->
+	<!--不过定义在views.xml中的Bean不能被Spring Web上下文的其他Bean引用，它是被XmlViewResolver独享的。-->
+	<!--默认情况下，XmlViewResolver在WEB-INF/views.xml中查找视图Bean-->
+	<!--当视图数量太多，直接在baobaotao-servlet.xml中配置会影响配置文件的简洁性，可以使用如下配置，将视图配置分离到baobaotao-views.xml文件，然后通过XmlViewResolver解析器加载-->
+	<!--<bean class="org.springframework.web.servlet.view.XmlViewResolver" p:order="0"-->
+		  <!--p:location="/WEB-INF/config/springMVC-config/spring-beanNameViews.xml" />-->
+
+
+
+
+	<!-- 优先级最高的视图解析器，协商多种视图解析器 -->
+	<bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver" p:order="1"
+		  p:ignoreAcceptHeader="true"
+		  p:favorPathExtension="false"
+		  p:favorParameter="true"
+		  p:parameterName="content"
+		  p:defaultContentType="text/html">
+		<!--配置可以解析的media类型，使用时需要在url后面添加 content=json 参数来识别-->
+		<property name="mediaTypes">
+			<map>
+				<entry key="html" value="text/html" />
+				<entry key="xml" value="application/xml" />
+				<entry key="json" value="application/json" />
+			</map>
+		</property>
+		<property name="defaultViews">
+			<list>
+				<!--为什么要配置这两个视图呢？因为在解析为XML和JSON视图渲染时，只需使用相对应的解析技术即可，而相应的解析技术有多种，这里我们需要配置默认的解析实现
+				而例如Excel和PDF这两种视图是需要我们扩展AbstractExcelView或AbstractPdfView来渲染自定义的视图，所以不需要配置相应的实现-->
+				<bean class="org.springframework.web.servlet.view.json.MappingJacksonJsonView" p:renderedAttributes="userList" />
+				<bean class="org.springframework.web.servlet.view.xml.MarshallingView" p:modelKey="userList" p:marshaller-ref="xmlMarshaller" />
+			</list>
+		</property>
+	</bean>
+
+
+
+
+	<!-- FreeMarker基础设施及视图解析器配置：FreeMarker的视图解析器优先级最高，当解析完视图名后，-->
+	<!-- 会优先去对应的/WEB-INF/ftl路径查询相对的视图，如果没有对应视图，则使用下一级的视图解析器来解析，以此类推-->
+	<bean class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver" p:order="2"
+		  p:suffix=".ftl" p:contentType="text/html;charset=utf-8" />
+	<bean class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer"
+		  p:templateLoaderPath="/WEB-INF/views/ftl"
+		  p:defaultEncoding="UTF-8">
+		<property name="freemarkerSettings">
+			<props>
+				<prop key="classic_compatible">true</prop>
+			</props>
+		</property>
+	</bean>
+
+
+
+
+	<!-- 视图模式配置,velocity配置文件-->
+	<bean class="org.springframework.web.servlet.view.velocity.VelocityViewResolver" p:order="3"
+		p:suffix=".vm" p:contentType="text/html;charset=UTF-8">
+	</bean>
+	<bean class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
+		<property name="resourceLoaderPath" value="/WEB-INF/views/velocity/" />
+		<property name="configLocation" value="classpath:velocity.properties" />
+	</bean>
+
+
+
+	<!-- 对模型视图名称的解析，在请求时模型视图名称添加前后缀 -->
+	<!--这里使用JSP试图技术，JSP使用InternalResourceViewResolver作为视图解析器，InternalResourceViewResolver默认使用InternalResourceView作为视图实现类-->
+	<!--如果JSP文件使用了JSTL国际化功能（即使用JSTL的<fmt:message/>等标签时），则需要使用JstlView替换默认的视图实现类，需添加如下配置：
+	 p:viewClass=”org.springframework.web.servlet.view.JstlView”-->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" p:order="100"
+		  p:prefix="/WEB-INF/views/jsp/" p:suffix=".jsp" />
+
+
+</beans>

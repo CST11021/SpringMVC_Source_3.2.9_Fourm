@@ -93,25 +93,21 @@ import org.springframework.web.servlet.view.AbstractView;
  * @author Juergen Hoeller
  * @see AbstractPdfView
  */
+// 我们可以通过集成该抽象类来实现渲染一个 Excel 的视图
 public abstract class AbstractExcelView extends AbstractView {
 
-	/** The content type for an Excel response */
+	//** The content type for an Excel response */
 	private static final String CONTENT_TYPE = "application/vnd.ms-excel";
-
-	/** The extension to look for existing templates */
+	//** The extension to look for existing templates */
 	private static final String EXTENSION = ".xls";
-
-
 	private String url;
 
 
-	/**
-	 * Default Constructor.
-	 * Sets the content type of the view to "application/vnd.ms-excel".
-	 */
 	public AbstractExcelView() {
 		setContentType(CONTENT_TYPE);
 	}
+
+
 
 	/**
 	 * Set the URL of the Excel workbook source, without localization part nor extension.
@@ -119,19 +115,15 @@ public abstract class AbstractExcelView extends AbstractView {
 	public void setUrl(String url) {
 		this.url = url;
 	}
-
-
 	@Override
 	protected boolean generatesDownloadContent() {
 		return true;
 	}
-
 	/**
 	 * Renders the Excel view, given the specified model.
 	 */
 	@Override
-	protected final void renderMergedOutputModel(
-			Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	protected final void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		HSSFWorkbook workbook;
 		if (this.url != null) {
@@ -155,7 +147,6 @@ public abstract class AbstractExcelView extends AbstractView {
 		workbook.write(out);
 		out.flush();
 	}
-
 	/**
 	 * Creates the workbook from an existing XLS document.
 	 * @param url the URL of the Excel template without localization part nor extension
@@ -175,7 +166,6 @@ public abstract class AbstractExcelView extends AbstractView {
 		POIFSFileSystem fs = new POIFSFileSystem(inputFile.getInputStream());
 		return new HSSFWorkbook(fs);
 	}
-
 	/**
 	 * Subclasses must implement this method to create an Excel HSSFWorkbook document,
 	 * given the model.
@@ -184,11 +174,7 @@ public abstract class AbstractExcelView extends AbstractView {
 	 * @param request in case we need locale etc. Shouldn't look at attributes.
 	 * @param response in case we need to set cookies. Shouldn't write to it.
 	 */
-	protected abstract void buildExcelDocument(
-			Map<String, Object> model, HSSFWorkbook workbook, HttpServletRequest request, HttpServletResponse response)
-			throws Exception;
-
-
+	protected abstract void buildExcelDocument(Map<String, Object> model, HSSFWorkbook workbook, HttpServletRequest request, HttpServletResponse response) throws Exception;
 	/**
 	 * Convenient method to obtain the cell in the given sheet, row and column.
 	 * <p>Creates the row and the cell if they still doesn't already exist.
@@ -209,7 +195,6 @@ public abstract class AbstractExcelView extends AbstractView {
 		}
 		return cell;
 	}
-
 	/**
 	 * Convenient method to set a String as text content in a cell.
 	 * @param cell the cell in which the text must be put

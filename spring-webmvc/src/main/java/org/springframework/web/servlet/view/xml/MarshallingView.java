@@ -42,31 +42,21 @@ import org.springframework.web.servlet.view.AbstractView;
  * @author Juergen Hoeller
  * @since 3.0
  */
+// 表示一个XML类型视图，我们可以在Spring配置该视图来进行xml的渲染
 public class MarshallingView extends AbstractView {
 
-	/**
-	 * Default content type. Overridable as bean property.
-	 */
+	// Default content type. Overridable as bean property.
 	public static final String DEFAULT_CONTENT_TYPE = "application/xml";
-
-
+	// MarshallingView使用Marshaller将模型数据转换为XML
 	private Marshaller marshaller;
-
+	// 默认情况下，MarshallingView会将所有模型数据的所有属性输出为XML，由于模型属性会包含很多隐式数据，所以我们通过modelKey指定模型中的哪些属性输出为MXL
 	private String modelKey;
 
 
-	/**
-	 * Constructs a new {@code MarshallingView} with no {@link Marshaller} set.
-	 * The marshaller must be set after construction by invoking {@link #setMarshaller}.
-	 */
 	public MarshallingView() {
 		setContentType(DEFAULT_CONTENT_TYPE);
 		setExposePathVariables(false);
 	}
-
-	/**
-	 * Constructs a new {@code MarshallingView} with the given {@link Marshaller} set.
-	 */
 	public MarshallingView(Marshaller marshaller) {
 		this();
 		Assert.notNull(marshaller, "Marshaller must not be null");
@@ -74,18 +64,10 @@ public class MarshallingView extends AbstractView {
 	}
 
 
-	/**
-	 * Sets the {@link Marshaller} to be used by this view.
-	 */
+
 	public void setMarshaller(Marshaller marshaller) {
 		this.marshaller = marshaller;
 	}
-
-	/**
-	 * Set the name of the model key that represents the object to be marshalled.
-	 * If not specified, the model map will be searched for a supported value type.
-	 * @see Marshaller#supports(Class)
-	 */
 	public void setModelKey(String modelKey) {
 		this.modelKey = modelKey;
 	}
@@ -94,11 +76,8 @@ public class MarshallingView extends AbstractView {
 	protected void initApplicationContext() {
 		Assert.notNull(this.marshaller, "Property 'marshaller' is required");
 	}
-
-
 	@Override
-	protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request,
-			HttpServletResponse response) throws Exception {
+	protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		Object toBeMarshalled = locateToBeMarshalled(model);
 		if (toBeMarshalled == null) {
@@ -111,7 +90,6 @@ public class MarshallingView extends AbstractView {
 		response.setContentLength(baos.size());
 		baos.writeTo(response.getOutputStream());
 	}
-
 	/**
 	 * Locate the object to be marshalled.
 	 * <p>The default implementation first attempts to look under the configured

@@ -13,7 +13,7 @@ public interface ListableBeanFactory extends BeanFactory {
 	boolean containsBeanDefinition(String beanName);
 	// 返回IOC容器bean的个数
 	int getBeanDefinitionCount();
-	// 获取容器中所有Bean名称
+	// 获取容器中所有Bean名称（这里是指的是当前容器的Bean）
 	String[] getBeanDefinitionNames();
 
 	// 根据指定类型查找bean

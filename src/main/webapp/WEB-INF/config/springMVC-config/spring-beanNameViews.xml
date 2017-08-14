@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+	 http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+
+
+	<!--配置 Excel 视图-->
+	<bean id="showCustomView_Excel" class="com.whz.web.view.ShowCustomView_Excel"/>
+
+	<!--配置 PDF 视图-->
+	<bean id="showCustomView_PDF" class="com.whz.web.view.ShowCustomView_PDF" />
+
+	<!--配置 JSON 视图-->
+	<!--SpringMVC的MappingJacksonJsonView借助Jackson框架的ObjectMapper将模型数据转换为JSON格式输出。默认情况下，-->
+	<!--MappingJacksonJSonView会将模型中的所有数据都输出为JSON，这显然是不合适的，你可以通过renderedAttributes指定模型中哪些属性需要输出。-->
+	<bean id="showJsonView" class="org.springframework.web.servlet.view.json.MappingJacksonJsonView" p:renderedAttributes="userList" />
+
+	<!--配置 XML 视图-->
+	<!--MarshallingView使用Marshaller将模型数据转换为XML，通过marshaller属性注入一个Marshaller实例。-->
+	<!--默认情况下，MarshallingView会将所有模型数据的所有属性输出为XML，由于模型属性会包含很多隐式数据，所以我们通过modelKey指定模型中的哪些属性输出为MXL。-->
+	<bean id="showXmlView" class="org.springframework.web.servlet.view.xml.MarshallingView" p:modelKey="userList" p:marshaller-ref="xmlMarshaller" />
+	<bean id="xmlMarshaller" class="org.springframework.oxm.xstream.XStreamMarshaller">
+		<property name="streamDriver">
+			<bean class="com.thoughtworks.xstream.io.xml.StaxDriver" />
+		</property>
+		<property name="annotatedClasses">
+			<list>
+				<value>com.whz.domain.User</value>
+			</list>
+		</property>
+	</bean>
+
+
+
+
+
+</beans>

@@ -24,6 +24,7 @@
 	<import resource="spring-handlermapping.xml"/>
 	<import resource="spring-interceptor.xml"/>
 	<import resource="spring-multipartResolver.xml"/>
+	<import resource="spring-view.xml"/>
 
 	<!-- 自动扫描 base-package包或子包下的所有java文件，如果扫描到有@Component @Controller @Service等这些注解的类，则把这些类注册为bean -->
 	<context:component-scan base-package="com.whz.web" />
@@ -33,12 +34,7 @@
 	<!--并提供了：数据绑定支持，@NumberFormatannotation支持，@DateTimeFormat支持，@Valid支持，读写XML的支持（JAXB），读写JSON的支持（Jackson）。-->
 	<mvc:annotation-driven/>
 
-	<!-- 对模型视图名称的解析，在请求时模型视图名称添加前后缀 -->
-	<!--这里使用JSP试图技术，JSP使用InternalResourceViewResolver作为视图解析器，InternalResourceViewResolver默认使用InternalResourceView作为视图实现类-->
-	<!--如果JSP文件使用了JSTL国际化功能（即使用JSTL的<fmt:message/>等标签时），则需要使用JstlView替换默认的视图实现类，需添加如下配置：
-	 p:viewClass=”org.springframework.web.servlet.view.JstlView”-->
-	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
-		p:prefix="/WEB-INF/jsp/" p:suffix=".jsp" />
+
 
 	<!--详见第5章 Spring容器高级主题-->
 	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource"
