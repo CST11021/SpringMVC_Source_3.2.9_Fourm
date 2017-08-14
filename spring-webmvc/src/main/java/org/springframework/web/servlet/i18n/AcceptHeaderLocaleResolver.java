@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.servlet.LocaleResolver;
 
-//SpringMVC默认的Locale解析器
+// SpringMVC默认的Locale解析器
 public class AcceptHeaderLocaleResolver implements LocaleResolver {
 
 	public Locale resolveLocale(HttpServletRequest request) {

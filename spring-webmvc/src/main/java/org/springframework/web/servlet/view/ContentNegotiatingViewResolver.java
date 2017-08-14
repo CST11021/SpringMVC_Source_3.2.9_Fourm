@@ -87,6 +87,7 @@ import org.springframework.web.servlet.ViewResolver;
  * @see InternalResourceViewResolver
  * @see BeanNameViewResolver
  */
+// ContentNegotiatingViewResolver会在上下文中查找和MIME类型配置的视图解析器，并委托它们进行视图解析。这样通过content请求参数就可以控制资源的输出格式了。
 public class ContentNegotiatingViewResolver extends WebApplicationObjectSupport implements ViewResolver, Ordered, InitializingBean {
 
 	private static final Log logger = LogFactory.getLog(ContentNegotiatingViewResolver.class);
