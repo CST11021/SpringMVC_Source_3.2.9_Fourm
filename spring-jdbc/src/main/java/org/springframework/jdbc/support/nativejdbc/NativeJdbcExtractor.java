@@ -66,8 +66,16 @@ import java.sql.Statement;
  * @see org.springframework.jdbc.support.lob.OracleLobHandler#setNativeJdbcExtractor
  */
 
-// 从数据源返回的数据连接对象是本地JDBC对象（OracleConnection、SQLServerConnection）的代理类，这是因为数据源需要改变原有的行为以便施加额外的控制：如调用Connection#close()方法时，
-// 将数据连接返回到连接池中而非将其关闭。在某些情况下，我们希望得到被代理前的本地JDBC对象，如OracleConnection何OracleResultSet，以便调用这些驱动程序厂商相关的API以完成一些特殊操作。
+/*
+	从数据源返回的数据连接对象是本地JDBC对象（OracleConnection、SQLServerConnection）的代理类，这是因为数据源需要改变原有
+ 的行为以便施加额外的控制：如调用Connection#close()方法时，将数据连接返回到连接池中而非将其关闭。在某些情况下，我们希望
+ 得到被代理前的本地JDBC对象，如OracleConnection何OracleResultSet，以便调用这些驱动程序厂商相关的API以完成一些特殊操作。
+
+ 	为了获取本地JDBC对象，Spring在org.springframework.jdbc.support.nativejdbc包下定义NativeJdbcExtractor接口并提供了实现类。
+ NativeJdbcExtractor定义了从数据源的JDBC对象抽取本地JDBC对象的方法。不同数据源对JDBC的对象代理不同，需要根据具体的情况
+ 选择抽取器实现类，对于那些仅封装Connection而未包括Statement的简单数据连接池，SimpleNativeJdbcExtractor是效率最高的抽取
+ 器实现类，但具体到appache的BasicDataSource连接池，它封装了所以的JDBC对象（如Connection、Statement等），这时就需要使用
+ CommonsDbcpNativeJdbcExtractor了。Spring针对几个著名的Web服务器的数据源提供了相应的JDBC抽取器。*/
 
 // NativeJdbcExtractor定义了从数据源JDBC对象抽取本地JDBC对象的方法
 public interface NativeJdbcExtractor {
