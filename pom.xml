@@ -13,13 +13,6 @@
     </properties>
 
     <dependencies>
-        <!--junit-->
-        <dependency>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-          <version>3.8.1</version>
-          <scope>test</scope>
-        </dependency>
 
 
         <!--<dependency>-->
@@ -52,11 +45,11 @@
           <artifactId>spring-context-support</artifactId>
           <version>${spring-version}</version>
         </dependency>
-        <dependency>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-web</artifactId>
-          <version>${spring-version}</version>
-        </dependency>
+        <!--<dependency>-->
+          <!--<groupId>org.springframework</groupId>-->
+          <!--<artifactId>spring-web</artifactId>-->
+          <!--<version>${spring-version}</version>-->
+        <!--</dependency>-->
       <!--<dependency>-->
           <!--<groupId>org.springframework</groupId>-->
           <!--<artifactId>spring-core</artifactId>-->
@@ -543,6 +536,29 @@
             <version>1.4.9</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/javax.resource/connector-api -->
+        <dependency>
+            <groupId>javax.resource</groupId>
+            <artifactId>connector-api</artifactId>
+            <version>1.5</version>
+            <scope>provided</scope>
+        </dependency>
+
+
+        <!-- https://mvnrepository.com/artifact/com.ibm.websphere/uow -->
+        <dependency>
+            <groupId>com.ibm.websphere</groupId>
+            <artifactId>uow</artifactId>
+            <version>6.0.2.17</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/junit/junit -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+
 
 
     </dependencies>
@@ -560,6 +576,7 @@
           <resource><directory>servlet-api-3.0.1src/main/resources</directory></resource>
           <resource><directory>spring-beans/src/main/resources</directory></resource>
           <resource><directory>spring-context/src/main/resources</directory></resource>
+          <resource><directory>spring-tx/src/main/resources</directory></resource>
           <resource><directory>spring-aop/src/main/resources</directory></resource>
           <resource><directory>spring-jdbc/src/main/resources</directory></resource>
           <resource><directory>spring-webmvc/src/main/resources</directory></resource>
@@ -569,6 +586,7 @@
       <testResources>
           <testResource><directory>servlet-api-3.0.1/src/test/resources</directory></testResource>
           <testResource><directory>spring-context/src/test/resources</directory></testResource>
+          <testResource><directory>spring-tx/src/test/resources</directory></testResource>
           <testResource><directory>spring-beans/src/test/resources</directory></testResource>
           <testResource><directory>spring-webmvc/src/test/resources</directory></testResource>
           <testResource><directory>spring-web/src/test/resources</directory></testResource>
@@ -606,6 +624,7 @@
                             <source>spring-beans/src/main/java</source>
                             <source>spring-core/src/main/java</source>
                             <source>spring-context/src/main/java</source>
+                            <source>spring-tx/src/main/java</source>
                             <source>spring-aop/src/main/java</source>
                             <source>spring-jdbc/src/main/java</source>
                             <source>spring-webmvc/src/main/java</source>
@@ -625,6 +644,7 @@
                             <source>servlet-api-3.0.1/src/test/java</source>
                             <source>spring-beans/src/test/java</source>
                             <source>spring-core/src/test/java</source>
+                            <!--<source>spring-tx/src/test/java</source>-->
                             <!--<source>spring-context/src/test/java</source>-->
                         </sources>
                     </configuration>

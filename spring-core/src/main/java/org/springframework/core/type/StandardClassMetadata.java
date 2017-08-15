@@ -19,8 +19,6 @@ package org.springframework.core.type;
 import java.lang.reflect.Modifier;
 import java.util.LinkedHashSet;
 
-import com.whz.domain.User;
-import org.junit.Test;
 import org.springframework.util.Assert;
 
 /**
