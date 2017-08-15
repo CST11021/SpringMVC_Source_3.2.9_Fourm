@@ -527,7 +527,9 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			logger.debug("Executing prepared SQL statement" + (sql != null ? " [" + sql + "]" : ""));
 		}
 
-		// 获取数据库连接
+		// 获取数据库连接：
+		// 如果没有配置事务相关的话，这里直接从DataSource取得Connection；
+		// 如果有的话会将取得的Connection绑定到当前线程，以便在使用Spring提供的统一事务抽象层进行事务管理的时候使用。
 		Connection con = DataSourceUtils.getConnection(getDataSource());
 		PreparedStatement ps = null;
 		try {

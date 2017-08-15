@@ -59,9 +59,13 @@ import org.springframework.transaction.TransactionSystemException;
  * @see #setTransactionManager
  * @see org.springframework.transaction.PlatformTransactionManager
  */
+/*
+	鉴于使用PlatformTransactionManager进行事务管理的流程比较固定，各个事务管理期间只有部分逻辑存在差异，我们可以考虑向
+Spring的数据访问层那样，使用模板方法模式与Callback相结合的方式，对直接使用PlatformTransactionManager进行事务管理的代码进
+行封装。这就有了更方便的编程式事务管理方式，即使用TransactionTemplate的编程式事务管理。
+ */
 @SuppressWarnings("serial")
-public class TransactionTemplate extends DefaultTransactionDefinition
-		implements TransactionOperations, InitializingBean {
+public class TransactionTemplate extends DefaultTransactionDefinition implements TransactionOperations, InitializingBean {
 
 	/** Logger available to subclasses */
 	protected final Log logger = LogFactory.getLog(getClass());
@@ -69,30 +73,10 @@ public class TransactionTemplate extends DefaultTransactionDefinition
 	private PlatformTransactionManager transactionManager;
 
 
-	/**
-	 * Construct a new TransactionTemplate for bean usage.
-	 * <p>Note: The PlatformTransactionManager needs to be set before
-	 * any {@code execute} calls.
-	 * @see #setTransactionManager
-	 */
-	public TransactionTemplate() {
-	}
-
-	/**
-	 * Construct a new TransactionTemplate using the given transaction manager.
-	 * @param transactionManager the transaction management strategy to be used
-	 */
+	public TransactionTemplate() {}
 	public TransactionTemplate(PlatformTransactionManager transactionManager) {
 		this.transactionManager = transactionManager;
 	}
-
-	/**
-	 * Construct a new TransactionTemplate using the given transaction manager,
-	 * taking its default settings from the given transaction definition.
-	 * @param transactionManager the transaction management strategy to be used
-	 * @param transactionDefinition the transaction definition to copy the
-	 * default settings from. Local properties can still be set to change values.
-	 */
 	public TransactionTemplate(PlatformTransactionManager transactionManager, TransactionDefinition transactionDefinition) {
 		super(transactionDefinition);
 		this.transactionManager = transactionManager;
@@ -105,7 +89,6 @@ public class TransactionTemplate extends DefaultTransactionDefinition
 	public void setTransactionManager(PlatformTransactionManager transactionManager) {
 		this.transactionManager = transactionManager;
 	}
-
 	/**
 	 * Return the transaction management strategy to be used.
 	 */

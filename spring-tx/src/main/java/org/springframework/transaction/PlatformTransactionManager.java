@@ -44,8 +44,7 @@ package org.springframework.transaction;
 public interface PlatformTransactionManager {
 
 	/**
-	 * Return a currently active transaction or create a new one, according to
-	 * the specified propagation behavior.
+	 * Return a currently active transaction or create a new one, according to the specified propagation behavior.
 	 * <p>Note that parameters like isolation level or timeout will only be applied
 	 * to new transactions, and thus be ignored when participating in active ones.
 	 * <p>Furthermore, not all transaction definition settings will be supported
@@ -66,6 +65,7 @@ public interface PlatformTransactionManager {
 	 * @see TransactionDefinition#getTimeout
 	 * @see TransactionDefinition#isReadOnly
 	 */
+	// 根据指定的事务信息，返回当前活动的事务或创建一个新的事务。
 	TransactionStatus getTransaction(TransactionDefinition definition) throws TransactionException;
 
 	/**
