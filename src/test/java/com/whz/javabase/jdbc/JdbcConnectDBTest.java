@@ -97,6 +97,23 @@ public class JdbcConnectDBTest {
     }
 
 
+    /**
+        这里介绍一下预编译SQL处理的知识：
+            预编译语句PreparedStatement 是Java.sql中的一个接口，它是Statement的子接口。通过Statement对象执行SQL语句时，
+            需要将SQL语句发送给DBMS，由DBMS首先进行编译后再执行。预编译语句和Statement不同，在创建PreparedStatement 对象
+     时就指定了SQL语句，该语句立即发送给DBMS进行编译。当该编译语句被执行时，DBMS直接运行编译后的SQL语句，而不需要像其他
+     SQL语句那样首先将其编译。预编译的SQL语句处理性能稍微高于普通的传递变量的办法。
+
+        预编译语句的作用：
+
+            1、提高效率：当需要对数据库进行数据插入、更新或者删除的时候，程序会发送整个SQL语句给数据库处理和执行。数据库
+               处理一个SQL语句，需要完成解析SQL语句、检查语法和语义以及生成代码；一般说来，处理时间要比执行语句所需要的时
+               间长。预编译语句在创建的时候已经是将指定的SQL语句发送给了DBMS，完成了解析、检查、编译等工作。因此，当一个
+               SQL语句需要执行多次时，使用预编译语句可以减少处理时间，提高执行效率。
+            2、提高安全性：防止sql注入。
+
+     */
+
 
     // 调用 preparedStatement.executeQuery()方法执行查询操作
     @Test
@@ -104,6 +121,8 @@ public class JdbcConnectDBTest {
         Class.forName(driver);
         Connection connection = DriverManager.getConnection(url,username,password);
 
+        // 注意这里创建 PreparedStatement 对象的和上面创建 Statement 对象的区别，这里创建的时候就指定了sql语句，创建时该
+        // 语句会立即发送给数据库进行编译，而不是等到执行的时候在编译
         PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM USER WHERE age=? AND sex=?");
         preparedStatement.setInt(1, 20);
         preparedStatement.setString(2, "男");
