@@ -2,6 +2,10 @@ package com.whz.beanLifecycle;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.*;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 public class Car implements BeanFactoryAware, BeanNameAware, InitializingBean, DisposableBean {
    private String brand;
@@ -49,6 +53,10 @@ public class Car implements BeanFactoryAware, BeanNameAware, InitializingBean, D
       this.beanFactory = beanFactory;
    }
 
+   @PostConstruct
+   public void testPostConstruct() {
+      System.out.println("测试@PostConstruct注解");
+   }
    public void myInit() {
       System.out.println("6、调用<bean>配置中init-method");
       System.out.println("---执行Car.myInit()，将maxSpeed设置为240。");
@@ -79,6 +87,10 @@ public class Car implements BeanFactoryAware, BeanNameAware, InitializingBean, D
 
    public void myDestory() {
       System.out.println("调用myDestroy()。");
+   }
+   @PreDestroy
+   public void testPreDestory() {
+      System.out.println("测试@PreDestroy注解");
    }
 
 }
