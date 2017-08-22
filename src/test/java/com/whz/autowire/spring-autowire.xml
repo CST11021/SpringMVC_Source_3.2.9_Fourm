@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+    <context:component-scan base-package="com.whz.autowire.*"/>
+
+
+    <bean id="address" class="com.whz.autowire.Address"
+          p:city="厦门" p:street="思明区">
+    </bean>
+    <bean id="addr" class="com.whz.autowire.Address"
+          p:city="北京" p:street="回笼滚">
+    </bean>
+    <!--id和name都没有配置时，Spring会为它生成一个name，如："com.whz.autowire.Address#0"-->
+    <bean class="com.whz.autowire.Address"/>
+
+    <bean id="car2" class="com.whz.autowire.Car" p:brand="奥迪2" p:price="300000"/>
+    <bean id="car" class="com.whz.autowire.Car" p:brand="奥迪" p:price="300000"/>
+    <bean id="c" class="com.whz.autowire.Car" p:brand="奥迪c" p:price="300000"/>
+    <bean class="com.whz.autowire.Car" p:brand="AoDi" p:price="300000"/>
+
+
+    <bean id="person" class="com.whz.autowire.Person">
+        <!--注意这里的 personName 对应的是 setPersonName() 方法的驼峰命名规则，而不是对应类的属性名-->
+        <property name="personName" value="Tom"/>
+        <!--当同时使用注解和xml配置时，以xml配置为主-->
+        <!--<property name="car" ref="car"/>-->
+        <!--因为Person类中没有setAddress()方法，所以不能使用该标签配置，否则会报错-->
+        <!--<property name="address" ref="address"/>-->
+    </bean>
+
+
+
+</beans>
