@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.concurrent.*;
 
 public class MultiThreadExecutor<V> {
-	//记录线程池中任务数
+	// 记录线程池中任务数
 	private int count;
-	//线程池服务类
+	// 线程池服务类
 	private ThreadPoolService threadPoolService;
-	//用于存放查询结果
+	// 用于存放查询结果
 	private final BlockingQueue<Future<V>> completionQueue;
 
 	
@@ -22,8 +22,8 @@ public class MultiThreadExecutor<V> {
 	public void submit(Callable<V> task){
 		if (task != null) {
 			count ++;
-			//new QueueingFuture(task)会把任务加入到completionQueue
-			threadPoolService.forceExecute(new QueueingFuture(task));
+			//new QueueingFutureTask(task)会把任务加入到completionQueue
+			threadPoolService.forceExecute(new QueueingFutureTask(task));
 		}
 	}
 
@@ -66,8 +66,8 @@ public class MultiThreadExecutor<V> {
 	}
 
 
-	private class QueueingFuture extends FutureTask<V> {
-        QueueingFuture(Callable<V> task) {
+	private class QueueingFutureTask extends FutureTask<V> {
+		QueueingFutureTask(Callable<V> task) {
             super(task);
         }
 

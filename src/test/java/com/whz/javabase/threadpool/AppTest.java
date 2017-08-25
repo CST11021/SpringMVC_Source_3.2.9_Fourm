@@ -14,7 +14,7 @@ public class AppTest {
 		MultiThreadExecutor executor = new MultiThreadExecutor<QueryResult>();
 		//先将所有的任务都提交给线程池，具体的执行顺序由线程池解决，这样多个任务便可以异步执行
 		for(int i=1;i<10;i++){
-			executor.submit(new QueryRemoteExecutor("res_"+i));
+			executor.submit(new QueryRemoteTask("res_"+i));
 		}
 
 		//获取结果时executor.getAllResult()方法将遍历completionQueue队列，将里面的结果一个个get出来，

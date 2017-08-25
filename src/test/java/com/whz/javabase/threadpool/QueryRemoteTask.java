@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-//用于封装提交给线程池的任务，我们实现Callable接口，在call()方法中调用其他服务，然后将返回结果封装到QueryResult对象中
-public class QueryRemoteExecutor implements Callable<QueryResult> {
+// 用于封装提交给线程池的任务，我们实现Callable接口，在call()方法中调用其他服务，然后将返回结果封装到QueryResult对象中
+public class QueryRemoteTask implements Callable<QueryResult> {
 
     private String resId;
 
-    public QueryRemoteExecutor(String resId) {
+    public QueryRemoteTask(String resId) {
 //        System.out.println("初始化QueryRemoteExecutor："+queryExp);
         this.resId = resId;
     }
