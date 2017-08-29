@@ -95,7 +95,24 @@ public class JdbcConnectDBTest {
         statement.close();
         connection.close();
     }
+    // 测试statement.execute()方法
+    @Test
+    public void testStatement3() throws SQLException, ClassNotFoundException {
+        Class.forName(driver);
+        Connection connection = DriverManager.getConnection(url,username,password);
+        Statement statement = connection.createStatement();
 
+        statement.execute("SELECT * FROM USER");
+        ResultSet resultSet = statement.getResultSet();
+        while(resultSet.next()){
+            System.out.println("name: " + resultSet.getString("name"));
+        }
+
+        resultSet.close();
+        statement.close();
+        connection.close();
+
+    }
 
     /**
         这里介绍一下预编译SQL处理的知识：
