@@ -230,9 +230,26 @@ public class DateUtil {
         return StringUtils.replaceChars(date, "年月日时分秒 :-/.", "");
     }
 
+    /**
+     * 根据给定的date获取当前星期几
+     * @param date
+     * @return
+     */
+    public static String getWeekOfDate(Date date) {
+        String[] weekDays = {"星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"};
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int weekIndex = cal.get(Calendar.DAY_OF_WEEK) - 1;
+        if (weekIndex < 0)
+            weekIndex = 0;
+        return weekDays[weekIndex];
+    }
+
+
     public static void main(String[] args) throws ParseException {
         Date date = new Date();
-        System.out.print(currentTimeMillis());
+        System.out.println(currentTimeMillis());
+        System.out.println(getWeekOfDate(date));
     }
 }
 
