@@ -16,9 +16,9 @@
   <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
   <meta http-equiv="description" content="This is my page">
 
-  <link rel="stylesheet" type="text/css" href="<c:url value="/components/layui/css/layui.css"/>"/>
-  <script type="text/javascript" src="<c:url value='/js/jquery-1.9.1.min.js'/>"></script>
-  <script type="text/javascript" src="<c:url value="/components/layui/layui.js"/>"></script>
+  <link rel="stylesheet" type="text/css" href="<c:url value="/static/components/layui/css/layui.css"/>"/>
+  <script type="text/javascript" src="<c:url value='/static/js/jquery-1.9.1.min.js'/>"></script>
+  <script type="text/javascript" src="<c:url value="/static/components/layui/layui.js"/>"></script>
   <script>
     //Demo
     layui.use('form', function(){

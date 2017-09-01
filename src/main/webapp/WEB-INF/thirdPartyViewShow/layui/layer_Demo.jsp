@@ -17,9 +17,9 @@
   <meta http-equiv="description" content="This is my page">
 
   <%--作为独立组件引入时jQuery要在比layer.js先引入，jQuery要求1.8以上--%>
-  <link rel="stylesheet" type="text/css" href="<c:url value="/components/layer/skin/default/layer.css"/>"/>
-  <script type="text/javascript" src="<c:url value='/js/jquery-1.9.1.min.js'/>"></script>
-  <script type="text/javascript" src="<c:url value="/components/layer/layer.js"/>"></script>
+  <link rel="stylesheet" type="text/css" href="<c:url value="/static/components/layer/skin/default/layer.css"/>"/>
+  <script type="text/javascript" src="<c:url value='/static/js/jquery-1.9.1.min.js'/>"></script>
+  <script type="text/javascript" src="<c:url value="/static/components/layer/layer.js"/>"></script>
 
   <%--引入layui模块化组件--%>
   <%--<link rel="stylesheet" type="text/css" href="<c:url value="/components/layui/css/layui.css"/>"/>--%>

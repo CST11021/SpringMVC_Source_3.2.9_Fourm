@@ -98,8 +98,8 @@
             color: #FF0000;
         }
     </style>
-    <script type="text/javascript" src="<c:url value="/js/jquery-1.9.1.min.js"/>"></script>
-    <script type="text/javascript" src="<c:url value="/js/jquery.tablesorter.js"/>"></script>
+    <script type="text/javascript" src="<c:url value="/static/js/jquery-1.9.1.min.js"/>"></script>
+    <script type="text/javascript" src="<c:url value="/static/js/jquery.tablesorter.js"/>"></script>
 </head>
 <script type="text/javascript">
     $(function() {
