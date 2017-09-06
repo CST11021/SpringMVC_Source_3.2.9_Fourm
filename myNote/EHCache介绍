@@ -1,8 +1,0 @@
-	<!--定义fixedRegion缓存区：该缓冲区中的对象永不过期且不适用硬盘缓存，而是使用内存缓存，所有对象都在内存中-->
-	<cache name="fixedRegion" maxElementsInMemory="100" eternal="true" overflowToDisk="false"/>
-
-	<!--定义freqChangeRegion缓存区：该缓存区通常较大，且经常发生改变。
-		freChangeRegion缓存区使用硬盘缓存，对象在闲置300秒后就从缓存中清除，且对象的最大存活期限为30分钟，缓存区中最大的缓存实例个数为5000个，超出
-		此限的实例将被写到硬盘中。。
-	-->
-	<cache name="freqChangeRegion" maxElementsInMemory="5000" eternal="false" overflowToDisk="true" timeToIdleSeconds="300" timeToLiveSeconds="1800"/>
