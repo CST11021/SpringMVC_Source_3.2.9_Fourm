@@ -9,7 +9,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>Insert title here</title>
-	<script type="text/javascript" src="<c:url value='/js/jquery-1.9.1.min.js'/>"></script>
+	<script type="text/javascript" src="<c:url value='/static/js/jquery-1.9.1.min.js'/>"></script>
 	<script type="text/javascript">
 		i = 1;j = 1;
 		$(document).ready(function(){

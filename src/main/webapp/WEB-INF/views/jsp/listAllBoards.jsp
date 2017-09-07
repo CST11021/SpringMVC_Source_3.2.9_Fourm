@@ -7,10 +7,10 @@
 	<title>论坛首页</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-	<link rel="stylesheet" type="text/css" href="<c:url value="/components/layui/css/layui.css"/>"/>
-	<script type="text/javascript" src="<c:url value='/js/jquery-1.9.1.min.js'/>"></script>
-	<script type="text/javascript" src="<c:url value="/components/layui/layui.js"/>"></script>
-	<script type="text/javascript" src="<c:url value="/js/jquery.tablesorter.js"/>"></script>
+	<link rel="stylesheet" type="text/css" href="<c:url value="/static/components/layui/css/layui.css"/>"/>
+	<script type="text/javascript" src="<c:url value='/static/js/jquery-1.9.1.min.js'/>"></script>
+	<script type="text/javascript" src="<c:url value="/static/components/layui/layui.js"/>"></script>
+	<script type="text/javascript" src="<c:url value="/static/js/jquery.tablesorter.js"/>"></script>
 
 	<script type="text/javascript">
 		$(function() {
