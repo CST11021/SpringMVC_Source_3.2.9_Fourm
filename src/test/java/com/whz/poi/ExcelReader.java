@@ -34,18 +34,18 @@ public class ExcelReader {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        // 获取第一个页签
         sheet = wb.getSheetAt(0);
         row = sheet.getRow(0);
         // 标题总列数
         int colNum = row.getPhysicalNumberOfCells();
-        System.out.println("colNum:" + colNum);
-        String[] title = new String[colNum];
+        String[] headFields = new String[colNum];
         for (int i = 0; i < colNum; i++) {
-            //title[i] = getStringCellValue(row.getCell((short) i));
-            title[i] = getCellFormatValue(row.getCell((short) i));
+            headFields[i] = getCellFormatValue(row.getCell((short) i));
         }
-        return title;
+        return headFields;
     }
+
     /**
      * 读取Excel数据内容
      *
@@ -83,6 +83,7 @@ public class ExcelReader {
         }
         return content;
     }
+
     /**
      * 获取单元格数据内容为字符串类型的数据
      *
@@ -187,22 +188,16 @@ public class ExcelReader {
             // 对读取Excel表格标题测试
             InputStream is = new FileInputStream("d:\\a.xls");
             ExcelReader excelReader = new ExcelReader();
-            String[] title = excelReader.readExcelTitle(is);
-            System.out.println("获得Excel表格的标题:");
-            for (String s : title) {
-                System.out.print(s + " ");
-            }
+            String[] headFields = excelReader.readExcelTitle(is);
 
             // 对读取Excel表格内容测试
             InputStream is2 = new FileInputStream("d:\\a.xls");
             Map<Integer, String> map = excelReader.readExcelContent(is2);
-            System.out.println("获得Excel表格的内容:");
             for (int i = 1; i <= map.size(); i++) {
                 System.out.println(map.get(i));
             }
 
         } catch (FileNotFoundException e) {
-            System.out.println("未找到指定路径的文件!");
             e.printStackTrace();
         }
     }
