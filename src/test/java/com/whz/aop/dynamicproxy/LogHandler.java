@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 
 // 使用JDK动态代理，将增强代码织入目标类
 public class LogHandler implements InvocationHandler {
+    // 表示将要被代理的目标类
     Object obj;
 
     LogHandler(Object obj) {
