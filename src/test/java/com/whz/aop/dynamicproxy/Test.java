@@ -24,16 +24,30 @@ public class Test {
         calculator.add(1,1);
     }
 
-    // 测试JDK动态代理
+    // 1、测试JDK动态代理（为实现类创建代理对象）
     @org.junit.Test
-    public void testJDK_DynamicProxy() {
+    public void testJDK_DynamicProxy1() {
         Calculator calculator = new CalculatorImpl();
-        InvocationHandler logHandler = new LogHandler(calculator);
+        InvocationHandler logHandler = new CalculatorImplProxyHandler(calculator);
         Calculator proxy = (Calculator) Proxy.newProxyInstance(
                 calculator.getClass().getClassLoader(),
                 calculator.getClass().getInterfaces(),// 获取被代理的接口
                 logHandler);
         proxy.add(1, 1);
+        proxy.sub(1, 1);
+    }
+
+    ///2、测试JDK动态代理（为接口创建代理对象）
+    @org.junit.Test
+    public void testJDK_DynamicProxy2() {
+        Class<Calculator> targetInterface = Calculator.class;
+        InvocationHandler logHandler = new CalculatorProxyHandler();
+        Calculator proxy = (Calculator) Proxy.newProxyInstance(
+                targetInterface.getClassLoader(),
+                new Class[]{targetInterface},// 获取被代理的接口
+                logHandler);
+        System.out.println(proxy.add(1, 1));
+        System.out.println(proxy.sub(1, 1));
     }
 
 }

@@ -4,15 +4,16 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
 // 使用JDK动态代理，将增强代码织入目标类
-public class LogHandler implements InvocationHandler {
+public class CalculatorImplProxyHandler implements InvocationHandler {
     // 表示将要被代理的目标类
     Object obj;
 
-    LogHandler(Object obj) {
+    CalculatorImplProxyHandler(Object obj) {
         this.obj = obj;
     }
 
-    public Object invoke(Object obj1, Method method, Object[] args) throws Throwable {
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         this.doBefore();
         Object o = method.invoke(obj, args);
         this.doAfter();
