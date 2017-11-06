@@ -53,12 +53,38 @@ import org.springframework.util.StringUtils;
 // 该类主要用来解析<context:component-scan/>标签。例如，扫描com.whz.service包下所有使用Spring的注解，如@Service，则需配置：<context:component-scan base-package="com.whz.service"/>
 public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 
+	// 表示要扫描的包路径
 	private static final String BASE_PACKAGE_ATTRIBUTE = "base-package";
+	// 可以使用resource-pattern来过滤出特定的类，如：<context:component-scan base-package="cn.lovepi.spring" resource-pattern="anno/*.class"/>
+	// 默认情况下加载的是package下的*.class即扫描全部类，在使用了resource-pattern之后，则只扫描package下的anno子包下的所有类。
 	private static final String RESOURCE_PATTERN_ATTRIBUTE = "resource-pattern";
+	// 在context:component-scan可以添加use-default-filters，spring配置中的use-default-filters用来指示是否自动扫描带
+	// 有@Component、@Repository、@Service和@Controller的类。默认为true，即默认扫描。
 	private static final String USE_DEFAULT_FILTERS_ATTRIBUTE = "use-default-filters";
+	// 当我们需要使用BeanPostProcessor时，直接在Spring配置文件中定义这些Bean显得比较笨拙，例如：
+	// 使用@Autowired注解，必须事先在Spring容器中声明AutowiredAnnotationBeanPostProcessor的Bean：
+	//	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor "/>
+	//
+	//使用 @Required注解，就必须声明RequiredAnnotationBeanPostProcessor的Bean：
+	//<bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor"/>
+	//		　　
+	//类似地，使用@Resource、@PostConstruct、@PreDestroy等注解就必须声明 CommonAnnotationBeanPostProcessor；使用@PersistenceContext注解，
+	//就必须声明 PersistenceAnnotationBeanPostProcessor的Bean。这样的声明未免太不优雅，而Spring为我们提供了一种极为方便注册这些BeanPostProcessor的方式，
+	//即使用<context:annotation- config/>隐式地向 Spring容器注册AutowiredAnnotationBeanPostProcessor、RequiredAnnotationBeanPostProcessor、
+	//CommonAnnotationBeanPostProcessor以及PersistenceAnnotationBeanPostProcessor这4个BeanPostProcessor。如下：
+    //
+	//<context:annotation-config/>
+	//		　　
+	//另外，在我们使用注解时一般都会配置扫描包路径选项：
+    //
+	//<context:component-scan base-package="pack.pack"/>
+	//该配置项其实也包含了自动注入上述processor的功能，因此当使用<context:component-scan/>后，即可将<context:annotation-config/>省去。
 	private static final String ANNOTATION_CONFIG_ATTRIBUTE = "annotation-config";
+	// 为注解的bean生成命名规则，该属性具体作用请参考：http://blog.csdn.net/lsm135/article/details/52756683
 	private static final String NAME_GENERATOR_ATTRIBUTE = "name-generator";
+	// 为注解的bean配置作用域规则，该属性具体作用请参考：http://doc.okbase.net/alanzyy/archive/94368.html
 	private static final String SCOPE_RESOLVER_ATTRIBUTE = "scope-resolver";
+	//
 	private static final String SCOPED_PROXY_ATTRIBUTE = "scoped-proxy";
 	private static final String EXCLUDE_FILTER_ELEMENT = "exclude-filter";
 	private static final String INCLUDE_FILTER_ELEMENT = "include-filter";
@@ -66,6 +92,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 	private static final String FILTER_EXPRESSION_ATTRIBUTE = "expression";
 
 
+	// element表示 <context:component-scan/> 配置节点
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
 		String[] basePackages = StringUtils.tokenizeToStringArray(element.getAttribute(BASE_PACKAGE_ATTRIBUTE),
 				ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
@@ -116,6 +143,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 		return scanner;
 	}
 
+	// 根据 BeanDefinitionRegistry 和 use-default-filters 属性创建一个 ClassPathBeanDefinitionScanner 实例
 	protected ClassPathBeanDefinitionScanner createScanner(XmlReaderContext readerContext, boolean useDefaultFilters) {
 		return new ClassPathBeanDefinitionScanner(readerContext.getRegistry(), useDefaultFilters);
 	}

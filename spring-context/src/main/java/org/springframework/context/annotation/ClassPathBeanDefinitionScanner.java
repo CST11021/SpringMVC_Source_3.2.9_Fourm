@@ -74,66 +74,12 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	private boolean includeAnnotationConfig = true;
 
 
-	/**
-	 * Create a new {@code ClassPathBeanDefinitionScanner} for the given bean factory.
-	 * @param registry the {@code BeanFactory} to load bean definitions into, in the form
-	 * of a {@code BeanDefinitionRegistry}
-	 */
 	public ClassPathBeanDefinitionScanner(BeanDefinitionRegistry registry) {
 		this(registry, true);
 	}
-
-	/**
-	 * Create a new {@code ClassPathBeanDefinitionScanner} for the given bean factory.
-	 * <p>If the passed-in bean factory does not only implement the
-	 * {@code BeanDefinitionRegistry} interface but also the {@code ResourceLoader}
-	 * interface, it will be used as default {@code ResourceLoader} as well. This will
-	 * usually be the case for {@link org.springframework.context.ApplicationContext}
-	 * implementations.
-	 * <p>If given a plain {@code BeanDefinitionRegistry}, the default {@code ResourceLoader}
-	 * will be a {@link org.springframework.core.io.support.PathMatchingResourcePatternResolver}.
-	 * <p>If the the passed-in bean factory also implements {@link EnvironmentCapable} its
-	 * environment will be used by this reader.  Otherwise, the reader will initialize and
-	 * use a {@link org.springframework.core.env.StandardEnvironment}. All
-	 * {@code ApplicationContext} implementations are {@code EnvironmentCapable}, while
-	 * normal {@code BeanFactory} implementations are not.
-	 * @param registry the {@code BeanFactory} to load bean definitions into, in the form
-	 * of a {@code BeanDefinitionRegistry}
-	 * @param useDefaultFilters whether to include the default filters for the
-	 * {@link org.springframework.stereotype.Component @Component},
-	 * {@link org.springframework.stereotype.Repository @Repository},
-	 * {@link org.springframework.stereotype.Service @Service}, and
-	 * {@link org.springframework.stereotype.Controller @Controller} stereotype
-	 * annotations.
-	 * @see #setResourceLoader
-	 * @see #setEnvironment
-	 */
 	public ClassPathBeanDefinitionScanner(BeanDefinitionRegistry registry, boolean useDefaultFilters) {
 		this(registry, useDefaultFilters, getOrCreateEnvironment(registry));
 	}
-
-	/**
-	 * Create a new {@code ClassPathBeanDefinitionScanner} for the given bean factory and
-	 * using the given {@link Environment} when evaluating bean definition profile metadata.
-	 * <p>If the passed-in bean factory does not only implement the {@code
-	 * BeanDefinitionRegistry} interface but also the {@link ResourceLoader} interface, it
-	 * will be used as default {@code ResourceLoader} as well. This will usually be the
-	 * case for {@link org.springframework.context.ApplicationContext} implementations.
-	 * <p>If given a plain {@code BeanDefinitionRegistry}, the default {@code ResourceLoader}
-	 * will be a {@link org.springframework.core.io.support.PathMatchingResourcePatternResolver}.
-	 * @param registry the {@code BeanFactory} to load bean definitions into, in the form
-	 * of a {@code BeanDefinitionRegistry}
-	 * @param useDefaultFilters whether to include the default filters for the
-	 * @param environment the Spring {@link Environment} to use when evaluating bean
-	 * definition profile metadata.
-	 * {@link org.springframework.stereotype.Component @Component},
-	 * {@link org.springframework.stereotype.Repository @Repository},
-	 * {@link org.springframework.stereotype.Service @Service}, and
-	 * {@link org.springframework.stereotype.Controller @Controller} stereotype
-	 * annotations.
-	 * @since 3.1
-	 * @see #setResourceLoader
-	 */
 	public ClassPathBeanDefinitionScanner(BeanDefinitionRegistry registry, boolean useDefaultFilters, Environment environment) {
 		super(useDefaultFilters, environment);
 
