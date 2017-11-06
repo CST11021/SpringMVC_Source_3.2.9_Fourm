@@ -5,6 +5,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 
 public class MyBeanPostProcessor implements BeanPostProcessor{
 
+   // Bean 调用构造函数，实例化之前执行该方法
    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {       
       if(beanName.equals("car")){
          Car car = (Car)bean;
@@ -17,6 +18,7 @@ public class MyBeanPostProcessor implements BeanPostProcessor{
       return bean;
    }
 
+   // Bean 调用构造函数，实例化之后执行该方法
    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {    
       if(beanName.equals("car")){
          Car car = (Car)bean;

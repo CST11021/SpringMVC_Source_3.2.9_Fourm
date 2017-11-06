@@ -2,8 +2,11 @@ package com.whz.beanLifecycle;
 
 import org.junit.Test;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessorAdapter;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -18,13 +21,13 @@ public class BeanLifeCycle {
         BeanFactory bf = new XmlBeanFactory(res);
 
         // 注册 BeanDefinition 之后，在实例化 BeanDefinition之前调用
-        MyBeanFactoryPostProcessor beanFactoryPostProcessor = new MyBeanFactoryPostProcessor();
+        BeanFactoryPostProcessor beanFactoryPostProcessor = new MyBeanFactoryPostProcessor();
         beanFactoryPostProcessor.postProcessBeanFactory((XmlBeanFactory) bf);
 
-        MyInstantiationAwareBeanPostProcessor instantiationAwareBeanPostProcessor = new MyInstantiationAwareBeanPostProcessor();
+        InstantiationAwareBeanPostProcessorAdapter instantiationAwareBeanPostProcessor = new MyInstantiationAwareBeanPostProcessor();
         ((ConfigurableBeanFactory)bf).addBeanPostProcessor(instantiationAwareBeanPostProcessor);
 
-        MyBeanPostProcessor beanPostProcessor = new MyBeanPostProcessor();
+        BeanPostProcessor beanPostProcessor = new MyBeanPostProcessor();
         ((ConfigurableBeanFactory)bf).addBeanPostProcessor(beanPostProcessor);
 
         Car car1 = (Car)bf.getBean("car");
