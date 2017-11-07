@@ -34,10 +34,8 @@ import org.springframework.core.io.ResourceLoader;
  */
 public class CachingMetadataReaderFactory extends SimpleMetadataReaderFactory {
 
-	/** Default maximum number of entries for the MetadataReader cache: 256 */
+	//** Default maximum number of entries for the MetadataReader cache: 256 */
 	public static final int DEFAULT_CACHE_LIMIT = 256;
-
-
 	private volatile int cacheLimit = DEFAULT_CACHE_LIMIT;
 
 	@SuppressWarnings("serial")
@@ -50,44 +48,15 @@ public class CachingMetadataReaderFactory extends SimpleMetadataReaderFactory {
 			};
 
 
-	/**
-	 * Create a new CachingMetadataReaderFactory for the default class loader.
-	 */
+
 	public CachingMetadataReaderFactory() {
 		super();
 	}
-
-	/**
-	 * Create a new CachingMetadataReaderFactory for the given resource loader.
-	 * @param resourceLoader the Spring ResourceLoader to use
-	 * (also determines the ClassLoader to use)
-	 */
 	public CachingMetadataReaderFactory(ResourceLoader resourceLoader) {
 		super(resourceLoader);
 	}
-
-	/**
-	 * Create a new CachingMetadataReaderFactory for the given class loader.
-	 * @param classLoader the ClassLoader to use
-	 */
 	public CachingMetadataReaderFactory(ClassLoader classLoader) {
 		super(classLoader);
-	}
-
-
-	/**
-	 * Specify the maximum number of entries for the MetadataReader cache.
-	 * Default is 256.
-	 */
-	public void setCacheLimit(int cacheLimit) {
-		this.cacheLimit = cacheLimit;
-	}
-
-	/**
-	 * Return the maximum number of entries for the MetadataReader cache.
-	 */
-	public int getCacheLimit() {
-		return this.cacheLimit;
 	}
 
 
@@ -105,14 +74,18 @@ public class CachingMetadataReaderFactory extends SimpleMetadataReaderFactory {
 			return metadataReader;
 		}
 	}
-
-	/**
-	 * Clear the entire MetadataReader cache, removing all cached class metadata.
-	 */
 	public void clearCache() {
 		synchronized (this.metadataReaderCache) {
 			this.metadataReaderCache.clear();
 		}
+	}
+
+	// getter and setter ...
+	public void setCacheLimit(int cacheLimit) {
+		this.cacheLimit = cacheLimit;
+	}
+	public int getCacheLimit() {
+		return this.cacheLimit;
 	}
 
 }

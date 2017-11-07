@@ -40,40 +40,19 @@ import static org.springframework.context.annotation.MetadataUtils.*;
 public class AnnotationScopeMetadataResolver implements ScopeMetadataResolver {
 
 	private final ScopedProxyMode defaultProxyMode;
-
 	protected Class<? extends Annotation> scopeAnnotationType = Scope.class;
 
 
-	/**
-	 * Create a new instance of the {@code AnnotationScopeMetadataResolver} class.
-	 * @see #AnnotationScopeMetadataResolver(ScopedProxyMode)
-	 * @see ScopedProxyMode#NO
-	 */
 	public AnnotationScopeMetadataResolver() {
 		this.defaultProxyMode = ScopedProxyMode.NO;
 	}
-
-	/**
-	 * Create a new instance of the {@code AnnotationScopeMetadataResolver} class.
-	 * @param defaultProxyMode the desired scoped-proxy mode
-	 */
 	public AnnotationScopeMetadataResolver(ScopedProxyMode defaultProxyMode) {
 		Assert.notNull(defaultProxyMode, "'defaultProxyMode' must not be null");
 		this.defaultProxyMode = defaultProxyMode;
 	}
 
 
-	/**
-	 * Set the type of annotation that is checked for by this
-	 * {@link AnnotationScopeMetadataResolver}.
-	 * @param scopeAnnotationType the target annotation type
-	 */
-	public void setScopeAnnotationType(Class<? extends Annotation> scopeAnnotationType) {
-		Assert.notNull(scopeAnnotationType, "'scopeAnnotationType' must not be null");
-		this.scopeAnnotationType = scopeAnnotationType;
-	}
-
-
+	// 解析BeanDefinition 作用域元数据信息（包括作用域类型和作用域代理模式）
 	public ScopeMetadata resolveScopeMetadata(BeanDefinition definition) {
 		ScopeMetadata metadata = new ScopeMetadata();
 		if (definition instanceof AnnotatedBeanDefinition) {
@@ -89,6 +68,12 @@ public class AnnotationScopeMetadataResolver implements ScopeMetadataResolver {
 			}
 		}
 		return metadata;
+	}
+
+
+	public void setScopeAnnotationType(Class<? extends Annotation> scopeAnnotationType) {
+		Assert.notNull(scopeAnnotationType, "'scopeAnnotationType' must not be null");
+		this.scopeAnnotationType = scopeAnnotationType;
 	}
 
 }

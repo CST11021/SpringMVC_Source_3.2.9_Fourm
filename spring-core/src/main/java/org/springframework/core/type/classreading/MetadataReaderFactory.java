@@ -32,20 +32,11 @@ import org.springframework.core.io.Resource;
 // 元素数据读取器工厂接口
 public interface MetadataReaderFactory {
 
-	/**
-	 * Obtain a MetadataReader for the given class name.
-	 * @param className the class name (to be resolved to a ".class" file)
-	 * @return a holder for the ClassReader instance (never {@code null})
-	 * @throws IOException in case of I/O failure
-	 */
+
+	// 根据 className 获取类的MetadataReader对象
 	MetadataReader getMetadataReader(String className) throws IOException;
 
-	/**
-	 * Obtain a MetadataReader for the given resource.
-	 * @param resource the resource (pointing to a ".class" file)
-	 * @return a holder for the ClassReader instance (never {@code null})
-	 * @throws IOException in case of I/O failure
-	 */
+	// 根据 resource 获取类的MetadataReader对象，resource表示一个.class文件
 	MetadataReader getMetadataReader(Resource resource) throws IOException;
 
 }

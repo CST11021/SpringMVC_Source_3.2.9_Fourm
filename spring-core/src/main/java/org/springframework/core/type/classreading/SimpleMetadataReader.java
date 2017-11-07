@@ -40,9 +40,7 @@ import org.springframework.core.type.ClassMetadata;
 final class SimpleMetadataReader implements MetadataReader {
 
 	private final Resource resource;
-
 	private final ClassMetadata classMetadata;
-
 	private final AnnotationMetadata annotationMetadata;
 
 

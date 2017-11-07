@@ -91,7 +91,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 	private static final String FILTER_TYPE_ATTRIBUTE = "type";
 	private static final String FILTER_EXPRESSION_ATTRIBUTE = "expression";
 
-
+	// 解析节点
 	// element表示 <context:component-scan/> 配置节点
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
 		String[] basePackages = StringUtils.tokenizeToStringArray(element.getAttribute(BASE_PACKAGE_ATTRIBUTE),
@@ -99,12 +99,14 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 
 		// Actually scan for bean definitions and register them.
 		ClassPathBeanDefinitionScanner scanner = configureScanner(parserContext, element);
+		// 扫描器的 doScan 是核心方法，用于扫描指定包路径下的注解，并注册BeanDefinition
 		Set<BeanDefinitionHolder> beanDefinitions = scanner.doScan(basePackages);
 		registerComponents(parserContext.getReaderContext(), beanDefinitions, element);
 
 		return null;
 	}
 
+	// 配置扫描器
 	protected ClassPathBeanDefinitionScanner configureScanner(ParserContext parserContext, Element element) {
 		XmlReaderContext readerContext = parserContext.getReaderContext();
 
@@ -142,12 +144,11 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 
 		return scanner;
 	}
-
 	// 根据 BeanDefinitionRegistry 和 use-default-filters 属性创建一个 ClassPathBeanDefinitionScanner 实例
 	protected ClassPathBeanDefinitionScanner createScanner(XmlReaderContext readerContext, boolean useDefaultFilters) {
 		return new ClassPathBeanDefinitionScanner(readerContext.getRegistry(), useDefaultFilters);
 	}
-
+	// 注册bean
 	protected void registerComponents(XmlReaderContext readerContext, Set<BeanDefinitionHolder> beanDefinitions, Element element) {
 
 		Object source = readerContext.extractSource(element);
@@ -172,7 +173,6 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 
 		readerContext.fireComponentRegistered(compositeDef);
 	}
-
 	// 解析 name-generator 属性，并设置名称生成器
 	protected void parseBeanNameGenerator(Element element, ClassPathBeanDefinitionScanner scanner) {
 		if (element.hasAttribute(NAME_GENERATOR_ATTRIBUTE)) {
@@ -182,7 +182,6 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 			scanner.setBeanNameGenerator(beanNameGenerator);
 		}
 	}
-
 	protected void parseScope(Element element, ClassPathBeanDefinitionScanner scanner) {
 		// Register ScopeMetadataResolver if class name provided.
 		if (element.hasAttribute(SCOPE_RESOLVER_ATTRIBUTE)) {
@@ -212,7 +211,6 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 			}
 		}
 	}
-
 	protected void parseTypeFilters(Element element, ClassPathBeanDefinitionScanner scanner, XmlReaderContext readerContext, ParserContext parserContext) {
 
 		// Parse exclude and include filter elements.
@@ -238,7 +236,6 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 			}
 		}
 	}
-
 	@SuppressWarnings("unchecked")
 	protected TypeFilter createTypeFilter(Element element, ClassLoader classLoader) {
 		String filterType = element.getAttribute(FILTER_TYPE_ATTRIBUTE);
@@ -272,7 +269,6 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 			throw new FatalBeanException("Type filter class not found: " + expression, ex);
 		}
 	}
-
 	// 使用指定的策略类型创建一个类
 	@SuppressWarnings("unchecked")
 	private Object instantiateUserDefinedStrategy(String className, Class<?> strategyType, ClassLoader classLoader) {

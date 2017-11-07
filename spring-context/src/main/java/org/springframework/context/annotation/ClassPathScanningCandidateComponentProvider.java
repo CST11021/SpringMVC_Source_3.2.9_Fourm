@@ -218,8 +218,10 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	public Set<BeanDefinition> findCandidateComponents(String basePackage) {
 		Set<BeanDefinition> candidates = new LinkedHashSet<BeanDefinition>();
 		try {
+			// 例如：classpath*:com.whz.test/**/*.class
 			String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
 					resolveBasePackage(basePackage) + "/" + this.resourcePattern;
+			// 这里resources表示一个个.class文件
 			Resource[] resources = this.resourcePatternResolver.getResources(packageSearchPath);
 			boolean traceEnabled = logger.isTraceEnabled();
 			boolean debugEnabled = logger.isDebugEnabled();

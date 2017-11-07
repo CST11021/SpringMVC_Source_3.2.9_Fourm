@@ -29,20 +29,11 @@ import org.springframework.core.type.ClassMetadata;
  */
 public interface MetadataReader {
 
-	/**
-	 * Return the resource reference for the class file.
-	 */
+	// 表示一个.class文件的Resource对象
 	Resource getResource();
-
-	/**
-	 * Read basic class metadata for the underlying class.
-	 */
+	// 返回类的元数据对象
 	ClassMetadata getClassMetadata();
-
-	/**
-	 * Read full annotation metadata for the underlying class,
-	 * including metadata for annotated methods.
-	 */
+	// 为底层类读取完整的注释元数据，包括用于标注方法的元数据
 	AnnotationMetadata getAnnotationMetadata();
 
 }
