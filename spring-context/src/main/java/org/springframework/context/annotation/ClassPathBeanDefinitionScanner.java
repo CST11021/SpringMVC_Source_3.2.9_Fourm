@@ -62,18 +62,14 @@ import org.springframework.util.PatternMatchUtils;
 public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateComponentProvider {
 
 	private final BeanDefinitionRegistry registry;
-
 	private BeanDefinitionDefaults beanDefinitionDefaults = new BeanDefinitionDefaults();
-
 	private String[] autowireCandidatePatterns;
-
 	private BeanNameGenerator beanNameGenerator = new AnnotationBeanNameGenerator();
-
 	private ScopeMetadataResolver scopeMetadataResolver = new AnnotationScopeMetadataResolver();
-
 	private boolean includeAnnotationConfig = true;
 
 
+	// 构造器
 	public ClassPathBeanDefinitionScanner(BeanDefinitionRegistry registry) {
 		this(registry, true);
 	}
@@ -93,73 +89,32 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	}
 
 
-	/**
-	 * Return the BeanDefinitionRegistry that this scanner operates on.
-	 */
+
 	public final BeanDefinitionRegistry getRegistry() {
 		return this.registry;
 	}
-
-	/**
-	 * Set the defaults to use for detected beans.
-	 * @see BeanDefinitionDefaults
-	 */
 	public void setBeanDefinitionDefaults(BeanDefinitionDefaults beanDefinitionDefaults) {
 		this.beanDefinitionDefaults =
 				(beanDefinitionDefaults != null ? beanDefinitionDefaults : new BeanDefinitionDefaults());
 	}
-
-	/**
-	 * Set the name-matching patterns for determining autowire candidates.
-	 * @param autowireCandidatePatterns the patterns to match against
-	 */
 	public void setAutowireCandidatePatterns(String[] autowireCandidatePatterns) {
 		this.autowireCandidatePatterns = autowireCandidatePatterns;
 	}
-
-	/**
-	 * Set the BeanNameGenerator to use for detected bean classes.
-	 * <p>Default is a {@link AnnotationBeanNameGenerator}.
-	 */
 	public void setBeanNameGenerator(BeanNameGenerator beanNameGenerator) {
 		this.beanNameGenerator = (beanNameGenerator != null ? beanNameGenerator : new AnnotationBeanNameGenerator());
 	}
-
-	/**
-	 * Set the ScopeMetadataResolver to use for detected bean classes.
-	 * Note that this will override any custom "scopedProxyMode" setting.
-	 * <p>The default is an {@link AnnotationScopeMetadataResolver}.
-	 * @see #setScopedProxyMode
-	 */
 	public void setScopeMetadataResolver(ScopeMetadataResolver scopeMetadataResolver) {
 		this.scopeMetadataResolver = (scopeMetadataResolver != null ? scopeMetadataResolver : new AnnotationScopeMetadataResolver());
 	}
-
-	/**
-	 * Specify the proxy behavior for non-singleton scoped beans.
-	 * Note that this will override any custom "scopeMetadataResolver" setting.
-	 * <p>The default is {@link ScopedProxyMode#NO}.
-	 * @see #setScopeMetadataResolver
-	 */
 	public void setScopedProxyMode(ScopedProxyMode scopedProxyMode) {
 		this.scopeMetadataResolver = new AnnotationScopeMetadataResolver(scopedProxyMode);
 	}
-
-	/**
-	 * Specify whether to register annotation config post-processors.
-	 * <p>The default is to register the post-processors. Turn this off
-	 * to be able to ignore the annotations or to process them differently.
-	 */
 	public void setIncludeAnnotationConfig(boolean includeAnnotationConfig) {
 		this.includeAnnotationConfig = includeAnnotationConfig;
 	}
 
 
-	/**
-	 * Perform a scan within the specified base packages.
-	 * @param basePackages the packages to check for annotated classes
-	 * @return number of beans registered
-	 */
+	// 设置要扫描的包路径
 	public int scan(String... basePackages) {
 		int beanCountAtScanStart = this.registry.getBeanDefinitionCount();
 
@@ -173,14 +128,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 		return this.registry.getBeanDefinitionCount() - beanCountAtScanStart;
 	}
 
-	/**
-	 * Perform a scan within the specified base packages,
-	 * returning the registered bean definitions.
-	 * <p>This method does <i>not</i> register an annotation config processor
-	 * but rather leaves this up to the caller.
-	 * @param basePackages the packages to check for annotated classes
-	 * @return set of beans registered if any for tooling registration purposes (never {@code null})
-	 */
+	// 核心方法，扫描指定包路径下的注解，并注册BeanDefinition
 	protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
 		Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<BeanDefinitionHolder>();
@@ -231,7 +179,6 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, registry);
 	}
 
-
 	/**
 	 * Check the given candidate's bean name, determining whether the corresponding
 	 * bean definition needs to be registered or conflicts with an existing definition.
@@ -276,7 +223,6 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 				newDefinition.getSource().equals(existingDefinition.getSource()) ||  // scanned same file twice
 				newDefinition.equals(existingDefinition));  // scanned equivalent class twice
 	}
-
 
 	/**
 	 * Get the Environment from the given registry if possible, otherwise return a new

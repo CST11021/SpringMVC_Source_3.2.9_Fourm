@@ -72,44 +72,19 @@ import org.springframework.util.ClassUtils;
 public class ClassPathScanningCandidateComponentProvider implements EnvironmentCapable, ResourceLoaderAware {
 
 	static final String DEFAULT_RESOURCE_PATTERN = "**/*.class";
-
 	protected final Log logger = LogFactory.getLog(getClass());
-
 	private Environment environment;
-
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
-
-	private MetadataReaderFactory metadataReaderFactory =
-			new CachingMetadataReaderFactory(this.resourcePatternResolver);
-
+	private MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(this.resourcePatternResolver);
 	private String resourcePattern = DEFAULT_RESOURCE_PATTERN;
-
 	private final List<TypeFilter> includeFilters = new LinkedList<TypeFilter>();
-
 	private final List<TypeFilter> excludeFilters = new LinkedList<TypeFilter>();
 
 
-	/**
-	 * Create a ClassPathScanningCandidateComponentProvider with a {@link StandardEnvironment}.
-	 * @param useDefaultFilters whether to register the default filters for the
-	 * {@link Component @Component}, {@link Repository @Repository},
-	 * {@link Service @Service}, and {@link Controller @Controller}
-	 * stereotype annotations
-	 * @see #registerDefaultFilters()
-	 */
+	// 构造器
 	public ClassPathScanningCandidateComponentProvider(boolean useDefaultFilters) {
 		this(useDefaultFilters, new StandardEnvironment());
 	}
-
-	/**
-	 * Create a ClassPathScanningCandidateComponentProvider with the given {@link Environment}.
-	 * @param useDefaultFilters whether to register the default filters for the
-	 * {@link Component @Component}, {@link Repository @Repository},
-	 * {@link Service @Service}, and {@link Controller @Controller}
-	 * stereotype annotations
-	 * @param environment the Environment to use
-	 * @see #registerDefaultFilters()
-	 */
 	public ClassPathScanningCandidateComponentProvider(boolean useDefaultFilters, Environment environment) {
 		if (useDefaultFilters) {
 			registerDefaultFilters();
@@ -130,7 +105,6 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 		this.resourcePatternResolver = ResourcePatternUtils.getResourcePatternResolver(resourceLoader);
 		this.metadataReaderFactory = new CachingMetadataReaderFactory(resourceLoader);
 	}
-
 	/**
 	 * Return the ResourceLoader that this component provider uses.
 	 */
@@ -148,7 +122,6 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	public void setMetadataReaderFactory(MetadataReaderFactory metadataReaderFactory) {
 		this.metadataReaderFactory = metadataReaderFactory;
 	}
-
 	/**
 	 * Return the MetadataReaderFactory used by this component provider.
 	 */
@@ -165,7 +138,6 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	public void setEnvironment(Environment environment) {
 		this.environment = environment;
 	}
-
 	public final Environment getEnvironment() {
 		return this.environment;
 	}
@@ -187,14 +159,12 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	public void addIncludeFilter(TypeFilter includeFilter) {
 		this.includeFilters.add(includeFilter);
 	}
-
 	/**
 	 * Add an exclude type filter to the <i>front</i> of the exclusion list.
 	 */
 	public void addExcludeFilter(TypeFilter excludeFilter) {
 		this.excludeFilters.add(0, excludeFilter);
 	}
-
 	/**
 	 * Reset the configured type filters.
 	 * @param useDefaultFilters whether to re-register the default filters for
@@ -244,11 +214,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	}
 
 
-	/**
-	 * Scan the class path for candidate components.
-	 * @param basePackage the package to check for annotated classes
-	 * @return a corresponding Set of autodetected bean definitions
-	 */
+	// 查询指定包路径下符合条件的Bean
 	public Set<BeanDefinition> findCandidateComponents(String basePackage) {
 		Set<BeanDefinition> candidates = new LinkedHashSet<BeanDefinition>();
 		try {
@@ -303,8 +269,6 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 		}
 		return candidates;
 	}
-
-
 	/**
 	 * Resolve the specified base package into a pattern specification for
 	 * the package search path.
@@ -316,7 +280,6 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	protected String resolveBasePackage(String basePackage) {
 		return ClassUtils.convertClassNameToResourcePath(environment.resolveRequiredPlaceholders(basePackage));
 	}
-
 	/**
 	 * Determine whether the given class does not match any exclude filter
 	 * and does match at least one include filter.
@@ -341,7 +304,6 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 		}
 		return false;
 	}
-
 	/**
 	 * Determine whether the given bean definition qualifies as candidate.
 	 * <p>The default implementation checks whether the class is concrete

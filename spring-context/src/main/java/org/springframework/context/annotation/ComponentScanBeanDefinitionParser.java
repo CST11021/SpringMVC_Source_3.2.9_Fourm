@@ -173,6 +173,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 		readerContext.fireComponentRegistered(compositeDef);
 	}
 
+	// 解析 name-generator 属性，并设置名称生成器
 	protected void parseBeanNameGenerator(Element element, ClassPathBeanDefinitionScanner scanner) {
 		if (element.hasAttribute(NAME_GENERATOR_ATTRIBUTE)) {
 			BeanNameGenerator beanNameGenerator = (BeanNameGenerator) instantiateUserDefinedStrategy(
@@ -272,6 +273,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 		}
 	}
 
+	// 使用指定的策略类型创建一个类
 	@SuppressWarnings("unchecked")
 	private Object instantiateUserDefinedStrategy(String className, Class<?> strategyType, ClassLoader classLoader) {
 		Object result;
