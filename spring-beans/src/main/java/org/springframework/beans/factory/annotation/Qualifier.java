@@ -24,6 +24,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 // Spring自动依赖注入装配默认是按类型装配，如果使用@Qualifier则按名称
+// 当容器中存在多个Address.class 类型的bean时：@Autowired 会根据Bean名称进行注入，并且需要特别注意的是，beanName
+// 必须是注入的属性名，而不是setter()方法对应的驼峰命名规则；另外，在这种情况下，我们可以使用 @Qualifier("address")
+// 注解加上指定beanName的方式来指定要注入的bean；
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited

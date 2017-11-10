@@ -21,7 +21,7 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.StandardAnnotationMetadata;
 import org.springframework.util.Assert;
 
-// 封装了GenericBeanDefinition和注解元数据对象
+// 封装了GenericBeanDefinition和注解元数据对象，如果Bean定义是通过注解的形式定义的，那么spring就将其解析为一个AnnotatedGenericBeanDefinition
 @SuppressWarnings("serial")
 public class AnnotatedGenericBeanDefinition extends GenericBeanDefinition implements AnnotatedBeanDefinition {
 

@@ -109,7 +109,8 @@ public class BeanFactoryAnnotationUtils {
 	private static boolean isQualifierMatch(String qualifier, String beanName, ConfigurableListableBeanFactory bf) {
 		if (bf.containsBean(beanName)) {
 			try {
-				BeanDefinition bd = bf.getMergedBeanDefinition(beanName);// 从工厂中获取这个Bean
+				// 从工厂中获取这个Bean
+				BeanDefinition bd = bf.getMergedBeanDefinition(beanName);
 
 				if (bd instanceof AbstractBeanDefinition) {
 					AbstractBeanDefinition abd = (AbstractBeanDefinition) bd;

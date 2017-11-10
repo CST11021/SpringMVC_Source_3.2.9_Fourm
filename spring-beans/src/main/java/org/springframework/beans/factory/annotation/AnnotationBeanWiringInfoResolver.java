@@ -36,18 +36,12 @@ import org.springframework.util.ClassUtils;
  */
 public class AnnotationBeanWiringInfoResolver implements BeanWiringInfoResolver {
 
+	// 返回这个bean实例的自动注入信息
 	public BeanWiringInfo resolveWiringInfo(Object beanInstance) {
 		Assert.notNull(beanInstance, "Bean instance must not be null");
 		Configurable annotation = beanInstance.getClass().getAnnotation(Configurable.class);
 		return (annotation != null ? buildWiringInfo(beanInstance, annotation) : null);
 	}
-
-	/**
-	 * Build the BeanWiringInfo for the given Configurable annotation.
-	 * @param beanInstance the bean instance
-	 * @param annotation the Configurable annotation found on the bean class
-	 * @return the resolved BeanWiringInfo
-	 */
 	protected BeanWiringInfo buildWiringInfo(Object beanInstance, Configurable annotation) {
 		if (!Autowire.NO.equals(annotation.autowire())) {
 			return new BeanWiringInfo(annotation.autowire().value(), annotation.dependencyCheck());
@@ -63,15 +57,6 @@ public class AnnotationBeanWiringInfoResolver implements BeanWiringInfoResolver 
 			}
 		}
 	}
-
-	/**
-	 * Determine the default bean name for the specified bean instance.
-	 * <p>The default implementation returns the superclass name for a CGLIB
-	 * proxy and the name of the plain bean class else.
-	 * @param beanInstance the bean instance to build a default name for
-	 * @return the default bean name to use
-	 * @see org.springframework.util.ClassUtils#getUserClass(Class)
-	 */
 	protected String getDefaultBeanName(Object beanInstance) {
 		return ClassUtils.getUserClass(beanInstance).getName();
 	}

@@ -821,15 +821,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		return getFactoryBean(beanName, instance);
 	}
 
-	/**
-	 * Apply MergedBeanDefinitionPostProcessors to the specified bean definition,
-	 * invoking their {@code postProcessMergedBeanDefinition} methods.
-	 * @param mbd the merged bean definition for the bean
-	 * @param beanType the actual type of the managed bean instance
-	 * @param beanName the name of the bean
-	 * @throws BeansException if any post-processing failed
-	 * @see MergedBeanDefinitionPostProcessor#postProcessMergedBeanDefinition
-	 */
+	// bean 被包装为 BeanWrapper 后，会调用该方法，将执行MergedBeanDefinitionPostProcessor#postProcessMergedBeanDefinition 方法
 	protected void applyMergedBeanDefinitionPostProcessors(RootBeanDefinition mbd, Class<?> beanType, String beanName) throws BeansException {
 
 		try {

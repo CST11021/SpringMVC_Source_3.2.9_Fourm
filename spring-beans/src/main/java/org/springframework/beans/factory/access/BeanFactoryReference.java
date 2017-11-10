@@ -18,7 +18,7 @@ package org.springframework.beans.factory.access;
 
 import org.springframework.beans.factory.BeanFactory;
 
-// BeanFactoryReference接口通常被BeanFactory实现，用于返回依赖的BeanFactory
+// BeanFactoryReference接口通常被BeanFactory实现，用于返回当前BeanFactory依赖的BeanFactory
 public interface BeanFactoryReference {
 
 	// 返回依赖的BeanFactory

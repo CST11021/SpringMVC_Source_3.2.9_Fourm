@@ -19,27 +19,14 @@ package org.springframework.beans;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
-/**
- * Holder for a key-value style attribute that is part of a bean definition.
- * Keeps track of the definition source in addition to the key-value pair.
- *
- * @author Juergen Hoeller
- * @since 2.5
- */
+// 封装bean元数据的属性：name表示属性名、value表示属性值、source表示这个bean的配置源
 public class BeanMetadataAttribute implements BeanMetadataElement {
 
 	private final String name;
-
 	private final Object value;
-
 	private Object source;
 
 
-	/**
-	 * Create a new AttributeValue instance.
-	 * @param name the name of the attribute (never {@code null})
-	 * @param value the value of the attribute (possibly before type conversion)
-	 */
 	public BeanMetadataAttribute(String name, Object value) {
 		Assert.notNull(name, "Name must not be null");
 		this.name = name;
@@ -47,28 +34,15 @@ public class BeanMetadataAttribute implements BeanMetadataElement {
 	}
 
 
-	/**
-	 * Return the name of the attribute.
-	 */
 	public String getName() {
 		return this.name;
 	}
-
-	/**
-	 * Return the value of the attribute.
-	 */
 	public Object getValue() {
 		return this.value;
 	}
-
-	/**
-	 * Set the configuration source {@code Object} for this metadata element.
-	 * <p>The exact type of the object will depend on the configuration mechanism used.
-	 */
 	public void setSource(Object source) {
 		this.source = source;
 	}
-
 	public Object getSource() {
 		return this.source;
 	}
@@ -87,12 +61,10 @@ public class BeanMetadataAttribute implements BeanMetadataElement {
 				ObjectUtils.nullSafeEquals(this.value, otherMa.value) &&
 				ObjectUtils.nullSafeEquals(this.source, otherMa.source));
 	}
-
 	@Override
 	public int hashCode() {
 		return this.name.hashCode() * 29 + ObjectUtils.nullSafeHashCode(this.value);
 	}
-
 	@Override
 	public String toString() {
 		return "metadata attribute '" + this.name + "'";

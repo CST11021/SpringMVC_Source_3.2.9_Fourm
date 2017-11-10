@@ -19,16 +19,6 @@ package org.springframework.beans.factory.annotation;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.core.type.AnnotationMetadata;
 
-/**
- * Extended {@link org.springframework.beans.factory.config.BeanDefinition}
- * interface that exposes {@link org.springframework.core.type.AnnotationMetadata}
- * about its bean class - without requiring the class to be loaded yet.
- *
- * @author Juergen Hoeller
- * @since 2.5
- * @see AnnotatedGenericBeanDefinition
- * @see org.springframework.core.type.AnnotationMetadata
- */
 public interface AnnotatedBeanDefinition extends BeanDefinition {
 
 	// 返回注解的元数据对象

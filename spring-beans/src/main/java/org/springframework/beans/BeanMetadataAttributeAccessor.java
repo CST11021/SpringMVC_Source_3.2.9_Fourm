@@ -9,7 +9,6 @@ public class BeanMetadataAttributeAccessor extends AttributeAccessorSupport impl
 
 	private Object source;
 
-
 	public void setSource(Object source) {
 		this.source = source;
 	}
