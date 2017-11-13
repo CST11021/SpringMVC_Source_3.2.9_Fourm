@@ -126,6 +126,7 @@ class ExtendedBeanInfo implements BeanInfo {
 		return matches;
 	}
 
+	// 判断method是否是可写的方法，比如setXxx方法
 	public static boolean isCandidateWriteMethod(Method method) {
 		String methodName = method.getName();
 		Class<?>[] parameterTypes = method.getParameterTypes();

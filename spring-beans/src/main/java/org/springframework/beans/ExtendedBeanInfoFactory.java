@@ -45,10 +45,7 @@ public class ExtendedBeanInfoFactory implements BeanInfoFactory, Ordered {
 		return (supports(beanClass) ? new ExtendedBeanInfo(Introspector.getBeanInfo(beanClass)) : null);
 	}
 
-	/**
-	 * Return whether the given bean class declares or inherits any non-void
-	 * returning bean property or indexed property setter methods.
-	 */
+	// 判断这个beanClass 是否有可写的方法（比如：set方法）
 	private boolean supports(Class<?> beanClass) {
 		for (Method method : beanClass.getMethods()) {
 			if (ExtendedBeanInfo.isCandidateWriteMethod(method)) {

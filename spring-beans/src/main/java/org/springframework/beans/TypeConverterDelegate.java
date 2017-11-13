@@ -53,65 +53,22 @@ class TypeConverterDelegate {
 		this.targetObject = targetObject;
 	}
 
-	/**
-	 * Convert the value to the specified required type.
-	 * @param newValue the proposed new value
-	 * @param requiredType the type we must convert to
-	 * (or {@code null} if not known, for example in case of a collection element)
-	 * @param methodParam the method parameter that is the target of the conversion
-	 * (may be {@code null})
-	 * @return the new value, possibly the result of type conversion
-	 * @throws IllegalArgumentException if type conversion failed
-	 */
+
+
 	public <T> T convertIfNecessary(Object newValue, Class<T> requiredType, MethodParameter methodParam) throws IllegalArgumentException {
 
 		return convertIfNecessary(null, null, newValue, requiredType,
 				(methodParam != null ? new TypeDescriptor(methodParam) : TypeDescriptor.valueOf(requiredType)));
 	}
-
-	/**
-	 * Convert the value to the specified required type.
-	 * @param newValue the proposed new value
-	 * @param requiredType the type we must convert to
-	 * (or {@code null} if not known, for example in case of a collection element)
-	 * @param field the reflective field that is the target of the conversion
-	 * (may be {@code null})
-	 * @return the new value, possibly the result of type conversion
-	 * @throws IllegalArgumentException if type conversion failed
-	 */
 	public <T> T convertIfNecessary(Object newValue, Class<T> requiredType, Field field) throws IllegalArgumentException {
 
 		return convertIfNecessary(null, null, newValue, requiredType,
 				(field != null ? new TypeDescriptor(field) : TypeDescriptor.valueOf(requiredType)));
 	}
-
-	/**
-	 * Convert the value to the required type for the specified property.
-	 * @param propertyName name of the property
-	 * @param oldValue the previous value, if available (may be {@code null})
-	 * @param newValue the proposed new value
-	 * @param requiredType the type we must convert to
-	 * (or {@code null} if not known, for example in case of a collection element)
-	 * @return the new value, possibly the result of type conversion
-	 * @throws IllegalArgumentException if type conversion failed
-	 */
 	public <T> T convertIfNecessary(String propertyName, Object oldValue, Object newValue, Class<T> requiredType) throws IllegalArgumentException {
 
 		return convertIfNecessary(propertyName, oldValue, newValue, requiredType, TypeDescriptor.valueOf(requiredType));
 	}
-
-	/**
-	 * Convert the value to the required type (if necessary from a String),
-	 * for the specified property.
-	 * @param propertyName name of the property
-	 * @param oldValue the previous value, if available (may be {@code null})
-	 * @param newValue the proposed new value
-	 * @param requiredType the type we must convert to
-	 * (or {@code null} if not known, for example in case of a collection element)
-	 * @param typeDescriptor the descriptor for the target property or field
-	 * @return the new value, possibly the result of type conversion
-	 * @throws IllegalArgumentException if type conversion failed
-	 */
 	@SuppressWarnings("unchecked")
 	public <T> T convertIfNecessary(String propertyName, Object oldValue, Object newValue, Class<T> requiredType, TypeDescriptor typeDescriptor) throws IllegalArgumentException {
 
@@ -250,6 +207,9 @@ class TypeConverterDelegate {
 
 		return (T) convertedValue;
 	}
+
+
+
 
 	private Object attemptToConvertStringToEnum(Class<?> requiredType, String trimmedValue, Object currentConvertedValue) {
 		Object convertedValue = currentConvertedValue;
