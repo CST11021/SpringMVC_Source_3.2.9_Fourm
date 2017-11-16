@@ -29,38 +29,31 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 
 	// 一个空对象内部标记：用于标记concurrent Maps的值（不支持空值）
 	protected static final Object NULL_OBJECT = new Object();
-
-	// 单例bean的缓存池，BeanName --> beaninstance（表示已经注册）
+	// BeanName --> beanInstance ：单例bean的缓存池（或称单例注册表），被实例化后的单例都会缓存到 singletonObjects
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<String, Object>(64);
-	//用于保存BeanName和创建bean的工厂之间的关系，BeanName-->ObjectFactory，对于singletonFactories的理解请参考《Spring源码深度解析》113页
+	// BeanName --> ObjectFactory ：表示BeanName对应的Bean是由ObjectFactory创建的，对于singletonFactories的理解请参考《Spring源码深度解析》113页
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<String, ObjectFactory<?>>(16);
 
-	// 不同于singletonObjects在于，当一个单例bean被放到这里后，那么当bean还处在被实例化的过程中，就可以通过getBean方法获取了，
+	// 不同于 singletonObjects 在于，当一个单例bean被放到这里后，那么当bean还处在被实例化的过程中，就可以通过getBean方法获取了，
 	// 其目的是用来检测循环引用，是存放 singletonFactory 制造出来的 singleton 的缓存
 	// earlySingletonObjects 缓存的是由 singletonFactory 产生的singleton
 	private final Map<String, Object> earlySingletonObjects = new HashMap<String, Object>(16);
-
-	//用来保存当前所有已注册的bean(即：单例bean的注册表)
+	// 用来保存当前所有已注册的bean(即：单例bean的注册表)
 	private final Set<String> registeredSingletons = new LinkedHashSet<String>(64);
-
-
 
 	// Spring 中一个bean A 正在被实例化的过程中可能会引用其他的bean B，这种情况下，这个A会暂时存放到这里，表示这个bean正在被创建
 	// 这个bean A 在创建结束后会被移除（请看beforeSingletonCreation()和afterSingletonCreation()方法）
 	private final Map<String, Boolean> singletonsCurrentlyInCreation = new ConcurrentHashMap<String, Boolean>(16);
 	// bean在被创建的时候会被缓存到 singletonsCurrentlyInCreation，Spring创建bean的时候会去检查这个bean是否正在被创建，
-	// 而这个 inCreationCheckExclusions 用来存放不被检查的bean (使用ConcurrentHashMap存储)
+	// 而这个 inCreationCheckExclusions 用来存放不被检查的bean
 	private final Map<String, Boolean> inCreationCheckExclusions = new ConcurrentHashMap<String, Boolean>(16);
 
-
-
-	//存放异常出现的相关的原因的集合
+	// 存放异常出现的相关的原因的集合
 	private Set<Exception> suppressedExceptions;
-	//标志，指示我们目前是否在销毁单例中
+	// 状态标识，表示当前的单例注册表是否正在销毁单例
 	private boolean singletonsCurrentlyInDestruction = false;
-	//存放一次性bean的缓存（实现了 DisposableBean 接口的bean都会放到这里）
+	// 存放一次性bean的缓存（实现了 DisposableBean 接口的bean都会放到这里）
 	private final Map<String, Object> disposableBeans = new LinkedHashMap<String, Object>();
-	//** Map between containing bean names: bean name --> Set of bean names that the bean contains */
 	// 用于表示bean之间的内部包含关系
 	private final Map<String, Set<String>> containedBeanMap = new ConcurrentHashMap<String, Set<String>>(16);
 
@@ -68,6 +61,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	private final Map<String, Set<String>> dependentBeanMap = new ConcurrentHashMap<String, Set<String>>(64);
 	// Set<String>中的所有bean需要依赖这个key对应的bean
 	private final Map<String, Set<String>> dependenciesForBeanMap = new ConcurrentHashMap<String, Set<String>>(64);
+
+
 
 	// 将 singletonObject 注册到 this.singletonObjects
 	public void registerSingleton(String beanName, Object singletonObject) throws IllegalStateException {
@@ -95,7 +90,6 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 			this.registeredSingletons.add(beanName);
 		}
 	}
-
 
 
 	public Object getSingleton(String beanName) {
