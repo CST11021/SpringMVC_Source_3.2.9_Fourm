@@ -34,6 +34,8 @@ import java.lang.annotation.Target;
  * @author Ramnivas Laddad
  * @since 2.0
  */
+// @Configurable 声明当前类是一个配置类
+// spring的一个注解，用来自动注入bean的注解，不需要通过BeanFactory去获取
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited

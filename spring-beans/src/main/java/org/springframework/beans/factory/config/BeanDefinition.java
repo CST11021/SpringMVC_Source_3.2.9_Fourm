@@ -59,6 +59,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	String[] getDependsOn();
 	void setDependsOn(String[] dependsOn);
 
+	// 表示bean中的所有属性是否可自动注入
 	boolean isAutowireCandidate();
 	void setAutowireCandidate(boolean autowireCandidate);
 

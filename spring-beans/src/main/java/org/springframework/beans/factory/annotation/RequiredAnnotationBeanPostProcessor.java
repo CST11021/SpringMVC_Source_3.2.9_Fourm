@@ -81,7 +81,6 @@ public class RequiredAnnotationBeanPostProcessor extends InstantiationAwareBeanP
 	public static final String SKIP_REQUIRED_CHECK_ATTRIBUTE =
 			Conventions.getQualifiedAttributeName(RequiredAnnotationBeanPostProcessor.class, "skipRequiredCheck");
 
-
 	private Class<? extends Annotation> requiredAnnotationType = Required.class;
 
 	private int order = Ordered.LOWEST_PRECEDENCE - 1;
@@ -135,8 +134,7 @@ public class RequiredAnnotationBeanPostProcessor extends InstantiationAwareBeanP
 	}
 
 	@Override
-	public PropertyValues postProcessPropertyValues(
-			PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName)
+	public PropertyValues postProcessPropertyValues(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName)
 			throws BeansException {
 
 		if (!this.validatedBeanNames.containsKey(beanName)) {

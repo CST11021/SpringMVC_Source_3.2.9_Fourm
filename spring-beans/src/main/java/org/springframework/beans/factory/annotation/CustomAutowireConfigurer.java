@@ -49,45 +49,14 @@ import org.springframework.util.ClassUtils;
 public class CustomAutowireConfigurer implements BeanFactoryPostProcessor, BeanClassLoaderAware, Ordered {
 
 	private int order = Ordered.LOWEST_PRECEDENCE;  // default: same as non-Ordered
-
 	private Set customQualifierTypes;
-
 	private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
-
-
-	public void setOrder(int order) {
-		this.order = order;
-	}
-
-	public int getOrder() {
-		return this.order;
-	}
-
-	public void setBeanClassLoader(ClassLoader beanClassLoader) {
-		this.beanClassLoader = beanClassLoader;
-	}
-
-	/**
-	 * Register custom qualifier annotation types to be considered
-	 * when autowiring beans. Each element of the provided set may
-	 * be either a Class instance or a String representation of the
-	 * fully-qualified class name of the custom annotation.
-	 * <p>Note that any annotation that is itself annotated with Spring's
-	 * {@link org.springframework.beans.factory.annotation.Qualifier}
-	 * does not require explicit registration.
-	 * @param customQualifierTypes the custom types to register
-	 */
-	public void setCustomQualifierTypes(Set customQualifierTypes) {
-		this.customQualifierTypes = customQualifierTypes;
-	}
-
 
 	@SuppressWarnings("unchecked")
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		if (this.customQualifierTypes != null) {
 			if (!(beanFactory instanceof DefaultListableBeanFactory)) {
-				throw new IllegalStateException(
-						"CustomAutowireConfigurer needs to operate on a DefaultListableBeanFactory");
+				throw new IllegalStateException("CustomAutowireConfigurer needs to operate on a DefaultListableBeanFactory");
 			}
 			DefaultListableBeanFactory dlbf = (DefaultListableBeanFactory) beanFactory;
 			if (!(dlbf.getAutowireCandidateResolver() instanceof QualifierAnnotationAutowireCandidateResolver)) {
@@ -117,4 +86,16 @@ public class CustomAutowireConfigurer implements BeanFactoryPostProcessor, BeanC
 		}
 	}
 
+	public void setOrder(int order) {
+		this.order = order;
+	}
+	public int getOrder() {
+		return this.order;
+	}
+	public void setBeanClassLoader(ClassLoader beanClassLoader) {
+		this.beanClassLoader = beanClassLoader;
+	}
+	public void setCustomQualifierTypes(Set customQualifierTypes) {
+		this.customQualifierTypes = customQualifierTypes;
+	}
 }

@@ -39,16 +39,7 @@ import org.springframework.util.ObjectUtils;
  */
 public class BeanFactoryAnnotationUtils {
 
-	/**
-	 * Obtain a bean of type {@code T} from the given {@code BeanFactory} declaring a
-	 * qualifier (e.g. via {@code <qualifier>} or {@code @Qualifier}) matching the given
-	 * qualifier, or having a bean name matching the given qualifier.
-	 * @param beanFactory the BeanFactory to get the target bean from
-	 * @param beanType the type of bean to retrieve
-	 * @param qualifier the qualifier for selecting between multiple bean matches
-	 * @return the matching bean of type {@code T} (never {@code null})
-	 * @throws NoSuchBeanDefinitionException if no matching bean of type {@code T} found
-	 */
+	// 从beanFactory获取beanName为qualifier，类型为beanType的bean
 	public static <T> T qualifiedBeanOfType(BeanFactory beanFactory, Class<T> beanType, String qualifier) {
 		if (beanFactory instanceof ConfigurableListableBeanFactory) {
 			// Full qualifier matching supported.
@@ -65,16 +56,6 @@ public class BeanFactoryAnnotationUtils {
 					"BeanFactory does not implement ConfigurableListableBeanFactory.)");
 		}
 	}
-
-	/**
-	 * Obtain a bean of type {@code T} from the given {@code BeanFactory} declaring a qualifier
-	 * (e.g. {@code <qualifier>} or {@code @Qualifier}) matching the given qualifier).
-	 * @param bf the BeanFactory to get the target bean from
-	 * @param beanType the type of bean to retrieve
-	 * @param qualifier the qualifier for selecting between multiple bean matches
-	 * @return the matching bean of type {@code T} (never {@code null})
-	 * @throws NoSuchBeanDefinitionException if no matching bean of type {@code T} found
-	 */
 	private static <T> T qualifiedBeanOfType(ConfigurableListableBeanFactory bf, Class<T> beanType, String qualifier) {
 		// 获取beanType类型的所有bean
 		Map<String, T> candidateBeans = BeanFactoryUtils.beansOfTypeIncludingAncestors(bf, beanType);
@@ -96,16 +77,6 @@ public class BeanFactoryAnnotationUtils {
 					" bean found for qualifier '" + qualifier + "' - neither qualifier " + "match nor bean name match!");
 		}
 	}
-
-	/**
-	 * Check whether the named bean declares a qualifier of the given name.
-	 * @param qualifier the qualifier to match
-	 * @param beanName the name of the candidate bean
-	 * @param bf the {@code BeanFactory} from which to retrieve the named bean
-	 * @return {@code true} if either the bean definition (in the XML case)
-	 * or the bean's factory method (in the {@code @Bean} case) defines a matching
-	 * qualifier value (through {@code <qualifier>} or {@code @Qualifier})
-	 */
 	private static boolean isQualifierMatch(String qualifier, String beanName, ConfigurableListableBeanFactory bf) {
 		if (bf.containsBean(beanName)) {
 			try {

@@ -61,8 +61,15 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
-// whz todo
-// 当 Spring 容器启动时，AutowiredAnnotationBeanPostProcessor 将扫描 Spring 容器中所有 Bean，当发现 Bean 中拥有@Autowired 注释时就找到和其匹配（默认按类型匹配）的 Bean，并注入到对应的地方中去。
+// 当 Spring 容器启动时，AutowiredAnnotationBeanPostProcessor 将扫描 Spring 容器中所有 Bean，当发现 Bean 中拥有@Autowired
+// 注释时就找到和其匹配（默认按类型匹配）的 Bean，并注入到对应的地方中去。
+// Bean的属性注入是将Bean包装为BeanWrapper后才将其对应配置的属性注入的，而@Autowired注解的注入时间也是在将Bean包装为BeanWrapper
+// 后，AutowiredAnnotationBeanPostProcessor实现了MergedBeanDefinitionPostProcessor接口，改接口是一个后处理接口，在bean包装
+// 为 BeanWrapper后执行相应的后处理器，详见：AbstractAutowireCapableBeanFactory#doCreateBean方法
+// 使用方法：
+//	AutowiredAnnotationBeanPostProcessor postProcessor = new AutowiredAnnotationBeanPostProcessor();
+//	postProcessor.setBeanFactory(factory);
+//	factory.addBeanPostProcessor(postProcessor);
 public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter
 		implements MergedBeanDefinitionPostProcessor, PriorityOrdered, BeanFactoryAware {
 
@@ -132,7 +139,9 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 		}
 		this.beanFactory = (ConfigurableListableBeanFactory) beanFactory;
 	}
-	// BeanDefinition 被包装为 BeanWrapper 后，会调用该方法，将执行MergedBeanDefinitionPostProcessor#postProcessMergedBeanDefinition 方法
+	// BeanDefinition 被包装为 BeanWrapper 后，会调用该方法，将执行
+	// MergedBeanDefinitionPostProcessor#postProcessMergedBeanDefinition 方法
+	// 将类型为beanType和beanName对应的bean注入到beanDefinition
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
 		if (beanType != null) {
 			InjectionMetadata metadata = findAutowiringMetadata(beanName, beanType);

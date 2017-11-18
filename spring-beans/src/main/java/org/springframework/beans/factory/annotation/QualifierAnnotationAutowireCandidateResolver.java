@@ -57,17 +57,9 @@ import org.springframework.util.StringUtils;
 public class QualifierAnnotationAutowireCandidateResolver implements AutowireCandidateResolver, BeanFactoryAware {
 
 	private final Set<Class<? extends Annotation>> qualifierTypes = new LinkedHashSet<Class<? extends Annotation>>();
-
 	private Class<? extends Annotation> valueAnnotationType = Value.class;
-
 	private BeanFactory beanFactory;
 
-
-	/**
-	 * Create a new QualifierAnnotationAutowireCandidateResolver
-	 * for Spring's standard {@link Qualifier} annotation.
-	 * <p>Also supports JSR-330's {@link javax.inject.Qualifier} annotation, if available.
-	 */
 	@SuppressWarnings("unchecked")
 	public QualifierAnnotationAutowireCandidateResolver() {
 		this.qualifierTypes.add(Qualifier.class);
@@ -79,27 +71,14 @@ public class QualifierAnnotationAutowireCandidateResolver implements AutowireCan
 			// JSR-330 API not available - simply skip.
 		}
 	}
-
-	/**
-	 * Create a new QualifierAnnotationAutowireCandidateResolver
-	 * for the given qualifier annotation type.
-	 * @param qualifierType the qualifier annotation to look for
-	 */
 	public QualifierAnnotationAutowireCandidateResolver(Class<? extends Annotation> qualifierType) {
 		Assert.notNull(qualifierType, "'qualifierType' must not be null");
 		this.qualifierTypes.add(qualifierType);
 	}
-
-	/**
-	 * Create a new QualifierAnnotationAutowireCandidateResolver
-	 * for the given qualifier annotation types.
-	 * @param qualifierTypes the qualifier annotations to look for
-	 */
 	public QualifierAnnotationAutowireCandidateResolver(Set<Class<? extends Annotation>> qualifierTypes) {
 		Assert.notNull(qualifierTypes, "'qualifierTypes' must not be null");
 		this.qualifierTypes.addAll(qualifierTypes);
 	}
-
 
 	/**
 	 * Register the given type to be used as a qualifier when autowiring.
@@ -114,7 +93,6 @@ public class QualifierAnnotationAutowireCandidateResolver implements AutowireCan
 	public void addQualifierType(Class<? extends Annotation> qualifierType) {
 		this.qualifierTypes.add(qualifierType);
 	}
-
 	/**
 	 * Set the 'value' annotation type, to be used on fields, method parameters
 	 * and constructor parameters.
@@ -127,12 +105,9 @@ public class QualifierAnnotationAutowireCandidateResolver implements AutowireCan
 	public void setValueAnnotationType(Class<? extends Annotation> valueAnnotationType) {
 		this.valueAnnotationType = valueAnnotationType;
 	}
-
 	public void setBeanFactory(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 	}
-
-
 	/**
 	 * Determine whether the provided bean definition is an autowire candidate.
 	 * <p>To be considered a candidate the bean's <em>autowire-candidate</em>
@@ -166,7 +141,6 @@ public class QualifierAnnotationAutowireCandidateResolver implements AutowireCan
 		}
 		return match;
 	}
-
 	/**
 	 * Match the given qualifier annotations against the candidate bean definition.
 	 */
@@ -208,7 +182,6 @@ public class QualifierAnnotationAutowireCandidateResolver implements AutowireCan
 		}
 		return true;
 	}
-
 	/**
 	 * Checks whether the given annotation type is a recognized qualifier type.
 	 */
@@ -220,12 +193,10 @@ public class QualifierAnnotationAutowireCandidateResolver implements AutowireCan
 		}
 		return false;
 	}
-
 	/**
 	 * Match the given qualifier annotation against the candidate bean definition.
 	 */
-	protected boolean checkQualifier(
-			BeanDefinitionHolder bdHolder, Annotation annotation, TypeConverter typeConverter) {
+	protected boolean checkQualifier(BeanDefinitionHolder bdHolder, Annotation annotation, TypeConverter typeConverter) {
 
 		Class<? extends Annotation> type = annotation.annotationType();
 		RootBeanDefinition bd = (RootBeanDefinition) bdHolder.getBeanDefinition();
@@ -295,7 +266,6 @@ public class QualifierAnnotationAutowireCandidateResolver implements AutowireCan
 		}
 		return true;
 	}
-
 	protected RootBeanDefinition getResolvedDecoratedDefinition(RootBeanDefinition rbd) {
 		BeanDefinitionHolder decDef = rbd.getDecoratedDefinition();
 		if (decDef != null && this.beanFactory instanceof ConfigurableListableBeanFactory) {
@@ -309,13 +279,10 @@ public class QualifierAnnotationAutowireCandidateResolver implements AutowireCan
 		}
 		return null;
 	}
-
 	protected Annotation getFactoryMethodAnnotation(RootBeanDefinition bd, Class<? extends Annotation> type) {
 		Method resolvedFactoryMethod = bd.getResolvedFactoryMethod();
 		return (resolvedFactoryMethod != null ? AnnotationUtils.getAnnotation(resolvedFactoryMethod, type) : null);
 	}
-
-
 	/**
 	 * Determine whether the given dependency carries a value annotation.
 	 * @see Value
@@ -330,7 +297,6 @@ public class QualifierAnnotationAutowireCandidateResolver implements AutowireCan
 		}
 		return value;
 	}
-
 	/**
 	 * Determine a suggested value from any of the given candidate annotations.
 	 */
@@ -348,10 +314,7 @@ public class QualifierAnnotationAutowireCandidateResolver implements AutowireCan
 		}
 		return null;
 	}
-
-	/**
-	 * Extract the value attribute from the given annotation.
-	 */
+	// 从给定的注解中获取value属性的值
 	protected Object extractValue(Annotation valueAnnotation) {
 		Object value = AnnotationUtils.getValue(valueAnnotation);
 		if (value == null) {

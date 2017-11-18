@@ -60,57 +60,32 @@ import org.springframework.util.ReflectionUtils;
 public abstract class AbstractFactoryBean<T>
 		implements FactoryBean<T>, BeanClassLoaderAware, BeanFactoryAware, InitializingBean, DisposableBean {
 
-	/** Logger available to subclasses */
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	private boolean singleton = true;
-
 	private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
-
 	private BeanFactory beanFactory;
-
 	private boolean initialized = false;
-
 	private T singletonInstance;
-
 	private T earlySingletonInstance;
 
 
-	/**
-	 * Set if a singleton should be created, or a new object on each request
-	 * otherwise. Default is {@code true} (a singleton).
-	 */
+	// 设置该工厂是否生成单例bean
 	public void setSingleton(boolean singleton) {
 		this.singleton = singleton;
 	}
-
 	public boolean isSingleton() {
 		return this.singleton;
 	}
-
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.beanClassLoader = classLoader;
 	}
-
 	public void setBeanFactory(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 	}
-
-	/**
-	 * Return the BeanFactory that this bean runs in.
-	 */
 	protected BeanFactory getBeanFactory() {
 		return this.beanFactory;
 	}
-
-	/**
-	 * Obtain a bean type converter from the BeanFactory that this bean
-	 * runs in. This is typically a fresh instance for each call,
-	 * since TypeConverters are usually <i>not</i> thread-safe.
-	 * <p>Falls back to a SimpleTypeConverter when not running in a BeanFactory.
-	 * @see ConfigurableBeanFactory#getTypeConverter()
-	 * @see org.springframework.beans.SimpleTypeConverter
-	 */
 	protected TypeConverter getBeanTypeConverter() {
 		BeanFactory beanFactory = getBeanFactory();
 		if (beanFactory instanceof ConfigurableBeanFactory) {
@@ -120,10 +95,6 @@ public abstract class AbstractFactoryBean<T>
 			return new SimpleTypeConverter();
 		}
 	}
-
-	/**
-	 * Eagerly create the singleton instance, if necessary.
-	 */
 	public void afterPropertiesSet() throws Exception {
 		if (isSingleton()) {
 			this.initialized = true;
@@ -131,13 +102,6 @@ public abstract class AbstractFactoryBean<T>
 			this.earlySingletonInstance = null;
 		}
 	}
-
-
-	/**
-	 * Expose the singleton instance or create a new prototype instance.
-	 * @see #createInstance()
-	 * @see #getEarlySingletonInterfaces()
-	 */
 	public final T getObject() throws Exception {
 		if (isSingleton()) {
 			return (this.initialized ? this.singletonInstance : getEarlySingletonInstance());
@@ -155,8 +119,7 @@ public abstract class AbstractFactoryBean<T>
 	private T getEarlySingletonInstance() throws Exception {
 		Class[] ifcs = getEarlySingletonInterfaces();
 		if (ifcs == null) {
-			throw new FactoryBeanNotInitializedException(
-					getClass().getName() + " does not support circular references");
+			throw new FactoryBeanNotInitializedException(getClass().getName() + " does not support circular references");
 		}
 		if (this.earlySingletonInstance == null) {
 			this.earlySingletonInstance = (T) Proxy.newProxyInstance(
@@ -177,33 +140,15 @@ public abstract class AbstractFactoryBean<T>
 		return this.singletonInstance;
 	}
 
-	/**
-	 * Destroy the singleton instance, if any.
-	 * @see #destroyInstance(Object)
-	 */
+	// 销毁所有的单例bean
 	public void destroy() throws Exception {
 		if (isSingleton()) {
 			destroyInstance(this.singletonInstance);
 		}
 	}
-
-
-	/**
-	 * This abstract method declaration mirrors the method in the FactoryBean
-	 * interface, for a consistent offering of abstract template methods.
-	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
-	 */
+	// 获取该工厂创建的bean的类型
 	public abstract Class<?> getObjectType();
-
-	/**
-	 * Template method that subclasses must override to construct
-	 * the object returned by this factory.
-	 * <p>Invoked on initialization of this FactoryBean in case of
-	 * a singleton; else, on each {@link #getObject()} call.
-	 * @return the object returned by this factory
-	 * @throws Exception if an exception occured during object creation
-	 * @see #getObject()
-	 */
+	// 创建bean实例的逻辑留给子类实现
 	protected abstract T createInstance() throws Exception;
 
 	/**

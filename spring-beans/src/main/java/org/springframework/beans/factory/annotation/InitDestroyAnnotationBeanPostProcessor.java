@@ -77,14 +77,9 @@ public class InitDestroyAnnotationBeanPostProcessor
 	protected transient Log logger = LogFactory.getLog(getClass());
 
 	private Class<? extends Annotation> initAnnotationType;
-
 	private Class<? extends Annotation> destroyAnnotationType;
-
 	private int order = Ordered.LOWEST_PRECEDENCE;
-
-	private transient final Map<Class<?>, LifecycleMetadata> lifecycleMetadataCache =
-			new ConcurrentHashMap<Class<?>, LifecycleMetadata>(64);
-
+	private transient final Map<Class<?>, LifecycleMetadata> lifecycleMetadataCache = new ConcurrentHashMap<Class<?>, LifecycleMetadata>(64);
 
 	/**
 	 * Specify the init annotation to check for, indicating initialization
@@ -96,7 +91,6 @@ public class InitDestroyAnnotationBeanPostProcessor
 	public void setInitAnnotationType(Class<? extends Annotation> initAnnotationType) {
 		this.initAnnotationType = initAnnotationType;
 	}
-
 	/**
 	 * Specify the destroy annotation to check for, indicating destruction
 	 * methods to call when the context is shutting down.
@@ -107,23 +101,18 @@ public class InitDestroyAnnotationBeanPostProcessor
 	public void setDestroyAnnotationType(Class<? extends Annotation> destroyAnnotationType) {
 		this.destroyAnnotationType = destroyAnnotationType;
 	}
-
 	public void setOrder(int order) {
 		this.order = order;
 	}
-
 	public int getOrder() {
 		return this.order;
 	}
-
-
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
 		if (beanType != null) {
 			LifecycleMetadata metadata = findLifecycleMetadata(beanType);
 			metadata.checkConfigMembers(beanDefinition);
 		}
 	}
-
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		LifecycleMetadata metadata = findLifecycleMetadata(bean.getClass());
 		try {
@@ -137,11 +126,9 @@ public class InitDestroyAnnotationBeanPostProcessor
 		}
 		return bean;
 	}
-
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		return bean;
 	}
-
 	public void postProcessBeforeDestruction(Object bean, String beanName) throws BeansException {
 		LifecycleMetadata metadata = findLifecycleMetadata(bean.getClass());
 		try {
@@ -160,8 +147,6 @@ public class InitDestroyAnnotationBeanPostProcessor
 			logger.error("Couldn't invoke destroy method on bean with name '" + beanName + "'", ex);
 		}
 	}
-
-
 	private LifecycleMetadata findLifecycleMetadata(Class<?> clazz) {
 		if (this.lifecycleMetadataCache == null) {
 			// Happens after deserialization, during destruction...
@@ -181,7 +166,6 @@ public class InitDestroyAnnotationBeanPostProcessor
 		}
 		return metadata;
 	}
-
 	private LifecycleMetadata buildLifecycleMetadata(Class<?> clazz) {
 		final boolean debug = logger.isDebugEnabled();
 		LinkedList<LifecycleElement> initMethods = new LinkedList<LifecycleElement>();
@@ -219,11 +203,7 @@ public class InitDestroyAnnotationBeanPostProcessor
 		return new LifecycleMetadata(clazz, initMethods, destroyMethods);
 	}
 
-
-	//---------------------------------------------------------------------
 	// Serialization support
-	//---------------------------------------------------------------------
-
 	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
 		// Rely on default serialization; just initialize state after deserialization.
 		ois.defaultReadObject();
@@ -231,8 +211,6 @@ public class InitDestroyAnnotationBeanPostProcessor
 		// Initialize transient fields.
 		this.logger = LogFactory.getLog(getClass());
 	}
-
-
 	/**
 	 * Class representing information about annotated init and destroy methods.
 	 */
@@ -311,8 +289,6 @@ public class InitDestroyAnnotationBeanPostProcessor
 			}
 		}
 	}
-
-
 	/**
 	 * Class representing injection information about an annotated method.
 	 */

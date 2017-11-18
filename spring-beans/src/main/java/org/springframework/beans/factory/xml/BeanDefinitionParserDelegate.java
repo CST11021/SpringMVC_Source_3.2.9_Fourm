@@ -433,7 +433,7 @@ public class BeanDefinitionParserDelegate {
 	// 解析这个bean的scope、singleton、abstract、lazy-init、autowire、dependency-check、depends-on、primary、init-method、destory-method、factory-create、factory-bean 属性
 	public AbstractBeanDefinition parseBeanDefinitionAttributes(Element ele, String beanName, BeanDefinition containingBean, AbstractBeanDefinition bd) {
 
-		// scope
+		// 解析bean的scope属性
 		if (ele.hasAttribute(SCOPE_ATTRIBUTE)) {
 			// Spring 2.x "scope" attribute
 			bd.setScope(ele.getAttribute(SCOPE_ATTRIBUTE));
