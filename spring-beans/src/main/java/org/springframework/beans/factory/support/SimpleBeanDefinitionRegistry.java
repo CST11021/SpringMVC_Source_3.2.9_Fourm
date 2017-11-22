@@ -26,34 +26,27 @@ import org.springframework.core.SimpleAliasRegistry;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-/**
- * Simple implementation of the {@link BeanDefinitionRegistry} interface.
- * Provides registry capabilities only, with no factory capabilities built in.
- * Can for example be used for testing bean definition readers.
- *
- * @author Juergen Hoeller
- * @since 2.5.2
- */
+// 一个简单的BeanDefinition的注册表的实现
 public class SimpleBeanDefinitionRegistry extends SimpleAliasRegistry implements BeanDefinitionRegistry {
 
-	/** Map of bean definition objects, keyed by bean name */
+	// 用于缓存已经注册了的BeanDefinition
 	private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<String, BeanDefinition>(64);
 
-
-	public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
-			throws BeanDefinitionStoreException {
-
+	// 根据beanName注册一个BeanDefinition
+	public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition) throws BeanDefinitionStoreException {
 		Assert.hasText(beanName, "'beanName' must not be empty");
 		Assert.notNull(beanDefinition, "BeanDefinition must not be null");
 		this.beanDefinitionMap.put(beanName, beanDefinition);
 	}
 
+	// 根据beanName从当前注册表中移除BeanDefinition，如果移除失败则抛异常
 	public void removeBeanDefinition(String beanName) throws NoSuchBeanDefinitionException {
 		if (this.beanDefinitionMap.remove(beanName) == null) {
 			throw new NoSuchBeanDefinitionException(beanName);
 		}
 	}
 
+	// 根据beanName从当前注册表中获取BeanDefinition，如果没有这个BeanDefinition则抛异常
 	public BeanDefinition getBeanDefinition(String beanName) throws NoSuchBeanDefinitionException {
 		BeanDefinition bd = this.beanDefinitionMap.get(beanName);
 		if (bd == null) {
@@ -62,18 +55,22 @@ public class SimpleBeanDefinitionRegistry extends SimpleAliasRegistry implements
 		return bd;
 	}
 
+	// 判断当前的注册表是否已经注册了该beanName
 	public boolean containsBeanDefinition(String beanName) {
 		return this.beanDefinitionMap.containsKey(beanName);
 	}
 
+	// 获取所有已经注册的beanName
 	public String[] getBeanDefinitionNames() {
 		return StringUtils.toStringArray(this.beanDefinitionMap.keySet());
 	}
 
+	// 获取已经注册的beanDefinition的个数
 	public int getBeanDefinitionCount() {
 		return this.beanDefinitionMap.size();
 	}
 
+	// 判断这个beanName是否已经被使用（比如：是否已经做为别名被使用，或是已经被注册了）
 	public boolean isBeanNameInUse(String beanName) {
 		return isAlias(beanName) || containsBeanDefinition(beanName);
 	}

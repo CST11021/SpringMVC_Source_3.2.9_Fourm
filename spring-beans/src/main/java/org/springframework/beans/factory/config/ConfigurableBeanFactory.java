@@ -52,11 +52,7 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	void setTypeConverter(TypeConverter typeConverter);
 	TypeConverter getTypeConverter();
 
-	/**
-	 * Add a String resolver for embedded values such as annotation attributes.
-	 * @param valueResolver the String resolver to apply to embedded values
-	 * @since 3.0
-	 */
+	// 添加一个占位符解析器
 	void addEmbeddedValueResolver(StringValueResolver valueResolver);
 
 	/**
@@ -84,10 +80,12 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	// 合并其他ConfigurableBeanFactory的配置,包括上面说到的BeanPostProcessor,作用域等
 	void copyConfigurationFrom(ConfigurableBeanFactory otherFactory);
 
-	// bean定义处理
+	// 注册别名
 	void registerAlias(String beanName, String alias) throws BeanDefinitionStoreException;
 	void resolveAliases(StringValueResolver valueResolver);
+	// 根据beanName获取一个BeanDefinition，如果指定的bean对应的是一个子bean，则需合并父bean的信息
 	BeanDefinition getMergedBeanDefinition(String beanName) throws NoSuchBeanDefinitionException;
+	// 判断这个name对应的bean是否为一个工厂bean
 	boolean isFactoryBean(String name) throws NoSuchBeanDefinitionException;
 
 	// bean创建状态控制.在解决循环依赖时有使用
@@ -100,8 +98,11 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	String[] getDependenciesForBean(String beanName);
 
 	//bean生命周期管理 ----- 销毁bean
+	//
 	void destroyBean(String beanName, Object beanInstance);
+	// 从作用域缓存中移除这个bean
 	void destroyScopedBean(String beanName);
+	// 销毁所有的单例对象
 	void destroySingletons();
 
 }

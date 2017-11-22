@@ -95,6 +95,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	public Object getSingleton(String beanName) {
 		return getSingleton(beanName, true);
 	}
+	// 根据beanName获取一个单例对象
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 		// 首先从单例bean的缓存池获取这个bean
 		Object singletonObject = this.singletonObjects.get(beanName);
@@ -106,7 +107,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				singletonObject = this.earlySingletonObjects.get(beanName);
 
 				if (singletonObject == null && allowEarlyReference) {
-					// singletonFactories 是用来缓存FactoryBean 的，（singletonFactories 其实是用来解析循环依赖的，它的作用请参考《Spring源码深度解析》113页
+					// singletonFactories 是用来缓存FactoryBean 的，（singletonFactories 其实是用来解析循环依赖的，
+					// 它的作用请参考《Spring源码深度解析》113页
 					ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
 					// 如果存在指定beanName的singletonFactory对象
 					if (singletonFactory != null) {
@@ -233,6 +235,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		return (!this.inCreationCheckExclusions.containsKey(beanName) && isActuallyInCreation(beanName));
 	}
 
+	// 判断这个单例bean是否正在实例化
 	protected boolean isActuallyInCreation(String beanName) {
 		return isSingletonCurrentlyInCreation(beanName);
 	}
@@ -332,7 +335,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		return dependenciesForBean.toArray(new String[dependenciesForBean.size()]);
 	}
 
-	// 销毁单例
+	// 销毁所有的单例
 	public void destroySingletons() {
 		if (logger.isInfoEnabled()) {
 			logger.info("Destroying singletons in " + this);

@@ -56,7 +56,7 @@ public class BeanDefinitionVisitor {
 	}
 	protected BeanDefinitionVisitor() {}
 
-
+	// 解析BeanDefinition中的占位符为相应的字符串
 	public void visitBeanDefinition(BeanDefinition beanDefinition) {
 		visitParentName(beanDefinition);
 		visitBeanClassName(beanDefinition);
@@ -68,6 +68,7 @@ public class BeanDefinitionVisitor {
 		visitIndexedArgumentValues(cas.getIndexedArgumentValues());
 		visitGenericArgumentValues(cas.getGenericArgumentValues());
 	}
+	// 解析parentName占位符
 	protected void visitParentName(BeanDefinition beanDefinition) {
 		String parentName = beanDefinition.getParentName();
 		if (parentName != null) {
@@ -77,6 +78,7 @@ public class BeanDefinitionVisitor {
 			}
 		}
 	}
+	// 解析className占位符
 	protected void visitBeanClassName(BeanDefinition beanDefinition) {
 		String beanClassName = beanDefinition.getBeanClassName();
 		if (beanClassName != null) {
@@ -86,6 +88,7 @@ public class BeanDefinitionVisitor {
 			}
 		}
 	}
+	// 解析factoryBeanName占位符
 	protected void visitFactoryBeanName(BeanDefinition beanDefinition) {
 		String factoryBeanName = beanDefinition.getFactoryBeanName();
 		if (factoryBeanName != null) {
@@ -95,6 +98,7 @@ public class BeanDefinitionVisitor {
 			}
 		}
 	}
+	// 解析FactoryMethodName占位符
 	protected void visitFactoryMethodName(BeanDefinition beanDefinition) {
 		String factoryMethodName = beanDefinition.getFactoryMethodName();
 		if (factoryMethodName != null) {
@@ -104,6 +108,7 @@ public class BeanDefinitionVisitor {
 			}
 		}
 	}
+	// 解析scope占位符
 	protected void visitScope(BeanDefinition beanDefinition) {
 		String scope = beanDefinition.getScope();
 		if (scope != null) {
@@ -113,6 +118,7 @@ public class BeanDefinitionVisitor {
 			}
 		}
 	}
+	// 解析所有属性配置占位符
 	protected void visitPropertyValues(MutablePropertyValues pvs) {
 		PropertyValue[] pvArray = pvs.getPropertyValues();
 		for (PropertyValue pv : pvArray) {
@@ -122,6 +128,7 @@ public class BeanDefinitionVisitor {
 			}
 		}
 	}
+	// 解析构造器入参的占位符
 	protected void visitIndexedArgumentValues(Map<Integer, ConstructorArgumentValues.ValueHolder> ias) {
 		for (ConstructorArgumentValues.ValueHolder valueHolder : ias.values()) {
 			Object newVal = resolveValue(valueHolder.getValue());
@@ -130,6 +137,7 @@ public class BeanDefinitionVisitor {
 			}
 		}
 	}
+	// 解析构造器入参的占位符
 	protected void visitGenericArgumentValues(List<ConstructorArgumentValues.ValueHolder> gas) {
 		for (ConstructorArgumentValues.ValueHolder valueHolder : gas) {
 			Object newVal = resolveValue(valueHolder.getValue());

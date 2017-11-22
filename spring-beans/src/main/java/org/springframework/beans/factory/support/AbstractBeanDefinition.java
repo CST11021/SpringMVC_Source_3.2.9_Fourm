@@ -61,6 +61,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	// 表示这个依赖的所有bean
 	private String[] dependsOn;
 	private boolean autowireCandidate = true;
+	// 自动装配时当出现多个Bean候选者时，被注解为@Primary的Bean将作为首选者，否则将抛出异常（@Primary对应bean配置的中primary属性配置）
 	private boolean primary = false;
 	private final Map<String, AutowireCandidateQualifier> qualifiers = new LinkedHashMap<String, AutowireCandidateQualifier>(0);
 	private boolean nonPublicAccessAllowed = true;

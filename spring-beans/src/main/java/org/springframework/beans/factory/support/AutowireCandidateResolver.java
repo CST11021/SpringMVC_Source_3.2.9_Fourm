@@ -20,25 +20,21 @@ import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.DependencyDescriptor;
 
 /**
- * Strategy interface for determining whether a specific bean definition
- * qualifies as an autowire candidate for a specific dependency.
+ * Strategy interface for determining whether a specific bean definition qualifies as an autowire candidate for a specific dependency.
  *
  * @author Mark Fisher
  * @author Juergen Hoeller
  * @since 2.5
  */
+// AutowireCandidateResolver是一个策略接口，由它来决定特定的bean definition对特定的依赖是否可以作为一个自动绑定的候选项
+// QualifierAnnotationAutowireCandidateResolver间接实现了AutowireCandidateResolver，对要自动绑定的field或者参数和bean definition
+// 根据@qualifier注解进行匹配。同时也支持通过@value注解来绑定表达式的值。
 public interface AutowireCandidateResolver {
 
 	// 判断bdHodler对应的bean是否可自动注入
 	boolean isAutowireCandidate(BeanDefinitionHolder bdHolder, DependencyDescriptor descriptor);
 
-	/**
-	 * Determine whether a default value is suggested for the given dependency.
-	 * @param descriptor the descriptor for the target method parameter or field
-	 * @return the value suggested (typically an expression String),
-	 * or {@code null} if none found
-	 * @since 3.0
-	 */
+	// 为给定的依赖项提供一个默认值
 	Object getSuggestedValue(DependencyDescriptor descriptor);
 
 }

@@ -36,74 +36,12 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	//-----------Bean实例生命周期相关方法-------------------
 	// 根据给定的类型和指定的装配策略，创建一个新的Bean实例
 	Object createBean(Class<?> beanClass, int autowireMode, boolean dependencyCheck) throws BeansException;
-	/**
-	 * Instantiate a new bean instance of the given class with the specified autowire
-	 * strategy. All constants defined in this interface are supported here.
-	 * Can also be invoked with {@code AUTOWIRE_NO} in order to just apply
-	 * before-instantiation callbacks (e.g. for annotation-driven injection).
-	 * <p>Does <i>not</i> apply standard {@link BeanPostProcessor BeanPostProcessors}
-	 * callbacks or perform any further initialization of the bean. This interface
-	 * offers distinct, fine-grained operations for those purposes, for example
-	 * {@link #initializeBean}. However, {@link InstantiationAwareBeanPostProcessor}
-	 * callbacks are applied, if applicable to the construction of the instance.
-	 * @param beanClass the class of the bean to instantiate
-	 * @param autowireMode by name or type, using the constants in this interface
-	 * @param dependencyCheck whether to perform a dependency check for object
-	 * references in the bean instance (not applicable to autowiring a constructor,
-	 * thus ignored there)
-	 * @return the new bean instance
-	 * @throws BeansException if instantiation or wiring failed
-	 * @see #AUTOWIRE_NO
-	 * @see #AUTOWIRE_BY_NAME
-	 * @see #AUTOWIRE_BY_TYPE
-	 * @see #AUTOWIRE_CONSTRUCTOR
-	 * @see #AUTOWIRE_AUTODETECT
-	 * @see #initializeBean
-	 * @see #applyBeanPostProcessorsBeforeInitialization
-	 * @see #applyBeanPostProcessorsAfterInitialization
-	 */
+	// // 根据指定autowireMode实例化策略，初始化这个bean，bean的初始化有多种方式，比如利用反射机制调用构造器实例化，或
+	// 通过动态代理的方式实例化，或通过工厂模式进行创建等
 	Object autowire(Class<?> beanClass, int autowireMode, boolean dependencyCheck) throws BeansException;
-	/**
-	 * Autowire the bean properties of the given bean instance by name or type.
-	 * Can also be invoked with {@code AUTOWIRE_NO} in order to just apply
-	 * after-instantiation callbacks (e.g. for annotation-driven injection).
-	 * <p>Does <i>not</i> apply standard {@link BeanPostProcessor BeanPostProcessors}
-	 * callbacks or perform any further initialization of the bean. This interface
-	 * offers distinct, fine-grained operations for those purposes, for example
-	 * {@link #initializeBean}. However, {@link InstantiationAwareBeanPostProcessor}
-	 * callbacks are applied, if applicable to the configuration of the instance.
-	 * @param existingBean the existing bean instance
-	 * @param autowireMode by name or type, using the constants in this interface
-	 * @param dependencyCheck whether to perform a dependency check for object
-	 * references in the bean instance
-	 * @throws BeansException if wiring failed
-	 * @see #AUTOWIRE_BY_NAME
-	 * @see #AUTOWIRE_BY_TYPE
-	 * @see #AUTOWIRE_NO
-	 */
+	// 给这个已经实例化的bean进行属性注入
 	void autowireBeanProperties(Object existingBean, int autowireMode, boolean dependencyCheck) throws BeansException;
-	/**
-	 * Apply the property values of the bean definition with the given name to
-	 * the given bean instance. The bean definition can either define a fully
-	 * self-contained bean, reusing its property values, or just property values
-	 * meant to be used for existing bean instances.
-	 * <p>This method does <i>not</i> autowire bean properties; it just applies
-	 * explicitly defined property values. Use the {@link #autowireBeanProperties}
-	 * method to autowire an existing bean instance.
-	 * <b>Note: This method requires a bean definition for the given name!</b>
-	 * <p>Does <i>not</i> apply standard {@link BeanPostProcessor BeanPostProcessors}
-	 * callbacks or perform any further initialization of the bean. This interface
-	 * offers distinct, fine-grained operations for those purposes, for example
-	 * {@link #initializeBean}. However, {@link InstantiationAwareBeanPostProcessor}
-	 * callbacks are applied, if applicable to the configuration of the instance.
-	 * @param existingBean the existing bean instance
-	 * @param beanName the name of the bean definition in the bean factory
-	 * (a bean definition of that name has to be available)
-	 * @throws org.springframework.beans.factory.NoSuchBeanDefinitionException
-	 * if there is no bean definition with the given name
-	 * @throws BeansException if applying the property values failed
-	 * @see #autowireBeanProperties
-	 */
+	// 给这个已经实例化的bean进行属性注入
 	void applyBeanPropertyValues(Object existingBean, String beanName) throws BeansException;
 
 	// 初始化一个Bean...
@@ -112,8 +50,7 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName) throws BeansException;
 	// 初始化之后执行BeanPostProcessors
 	Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName) throws BeansException;
-
-	// 根据工厂中定义的bean来解决指定的依赖项。
+	// 根据工厂中定义的bean来解决指定的依赖项
 	Object resolveDependency(DependencyDescriptor descriptor, String beanName, Set<String> autowiredBeanNames, TypeConverter typeConverter) throws BeansException;
 
 }

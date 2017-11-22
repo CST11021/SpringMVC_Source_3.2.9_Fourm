@@ -24,6 +24,7 @@ public interface ListableBeanFactory extends BeanFactory {
 
 	// 查找注解类型的bean
 	Map<String, Object> getBeansWithAnnotation(Class<? extends Annotation> annotationType) throws BeansException;
+	// 判断这个bean是否带有annotationType类型的注解，如果有，则返回配置的注解信息；否则返回null
 	<A extends Annotation> A findAnnotationOnBean(String beanName, Class<A> annotationType);
 
 }

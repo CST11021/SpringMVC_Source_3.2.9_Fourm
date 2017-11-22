@@ -29,7 +29,7 @@ import org.springframework.beans.BeansException;
  * @author Juergen Hoeller
  * @since 3.0
  */
-// 一个策略接口通过解析表达式来获取一个值
+// 一个策略接口通过解析表达式来获取一个值，比如使用#{bean.xxx}的形式来调用相关属性值
 public interface BeanExpressionResolver {
 
 	// 解析Bean中的一些表达，并返回解析后的值

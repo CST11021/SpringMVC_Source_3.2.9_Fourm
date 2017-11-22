@@ -106,6 +106,7 @@ public class PropertyPlaceholderConfigurer extends PlaceholderConfigurerSupport 
 		this.searchSystemEnvironment = searchSystemEnvironment;
 	}
 
+	// 占位符解析器
 	private class PlaceholderResolvingStringValueResolver implements StringValueResolver {
 
 		private final PropertyPlaceholderHelper helper;

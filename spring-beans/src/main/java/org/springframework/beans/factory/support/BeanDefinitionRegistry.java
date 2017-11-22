@@ -18,7 +18,7 @@ public interface BeanDefinitionRegistry extends AliasRegistry {
 	BeanDefinition getBeanDefinition(String beanName) throws NoSuchBeanDefinitionException;
 	// 判断是否包含beanDefinition
 	boolean containsBeanDefinition(String beanName);
-	// 获取有已经注册的beanName
+	// 获取所有已经注册的beanName
 	String[] getBeanDefinitionNames();
 	// 获取已经注册的beanDefinition的个数
 	int getBeanDefinitionCount();

@@ -100,25 +100,21 @@ import org.springframework.util.ClassUtils;
  * @see org.springframework.web.servlet.mvc.BaseCommandController#setPropertyEditorRegistrars
  * @see org.springframework.web.servlet.mvc.BaseCommandController#initBinder
  */
+// whz todo
 public class CustomEditorConfigurer implements BeanFactoryPostProcessor, BeanClassLoaderAware, Ordered {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	private int order = Ordered.LOWEST_PRECEDENCE;  // default: same as non-Ordered
-
 	private PropertyEditorRegistrar[] propertyEditorRegistrars;
-
 	private Map<String, ?> customEditors;
-
 	private boolean ignoreUnresolvableEditors = false;
-
 	private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
 
 	public void setOrder(int order) {
 		this.order = order;
 	}
-
 	public int getOrder() {
 		return this.order;
 	}
@@ -165,7 +161,7 @@ public class CustomEditorConfigurer implements BeanFactoryPostProcessor, BeanCla
 		this.beanClassLoader = beanClassLoader;
 	}
 
-
+	// 在spring容器解析完配置文件（注册了BeanDefinition）之后，在bean实例化之前被调用的。
 	@SuppressWarnings("unchecked")
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		if (this.propertyEditorRegistrars != null) {

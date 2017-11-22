@@ -57,15 +57,20 @@ import org.springframework.util.ReflectionUtils;
  * @see #setSingleton
  * @see #createInstance()
  */
+// 工厂bean的接口抽象基类
 public abstract class AbstractFactoryBean<T>
 		implements FactoryBean<T>, BeanClassLoaderAware, BeanFactoryAware, InitializingBean, DisposableBean {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	// 表示该工厂创建的是否为单例对象
 	private boolean singleton = true;
 	private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
+	// 表示该工厂bean所在的IOC容器
 	private BeanFactory beanFactory;
+	// 表示要创建的实例对象是否已经被创建
 	private boolean initialized = false;
+	// 缓存工厂创建的单例（如果工厂创建的是单例对象，则缓存该对象，第二次创建的时候直接返回该对象）
 	private T singletonInstance;
 	private T earlySingletonInstance;
 
@@ -110,36 +115,6 @@ public abstract class AbstractFactoryBean<T>
 			return createInstance();
 		}
 	}
-
-	/**
-	 * Determine an 'eager singleton' instance, exposed in case of a
-	 * circular reference. Not called in a non-circular scenario.
-	 */
-	@SuppressWarnings("unchecked")
-	private T getEarlySingletonInstance() throws Exception {
-		Class[] ifcs = getEarlySingletonInterfaces();
-		if (ifcs == null) {
-			throw new FactoryBeanNotInitializedException(getClass().getName() + " does not support circular references");
-		}
-		if (this.earlySingletonInstance == null) {
-			this.earlySingletonInstance = (T) Proxy.newProxyInstance(
-					this.beanClassLoader, ifcs, new EarlySingletonInvocationHandler());
-		}
-		return this.earlySingletonInstance;
-	}
-
-	/**
-	 * Expose the singleton instance (for access through the 'early singleton' proxy).
-	 * @return the singleton instance that this FactoryBean holds
-	 * @throws IllegalStateException if the singleton instance is not initialized
-	 */
-	private T getSingletonInstance() throws IllegalStateException {
-		if (!this.initialized) {
-			throw new IllegalStateException("Singleton instance not initialized yet");
-		}
-		return this.singletonInstance;
-	}
-
 	// 销毁所有的单例bean
 	public void destroy() throws Exception {
 		if (isSingleton()) {
@@ -150,42 +125,40 @@ public abstract class AbstractFactoryBean<T>
 	public abstract Class<?> getObjectType();
 	// 创建bean实例的逻辑留给子类实现
 	protected abstract T createInstance() throws Exception;
-
-	/**
-	 * Return an array of interfaces that a singleton object exposed by this
-	 * FactoryBean is supposed to implement, for use with an 'early singleton
-	 * proxy' that will be exposed in case of a circular reference.
-	 * <p>The default implementation returns this FactoryBean's object type,
-	 * provided that it is an interface, or {@code null} else. The latter
-	 * indicates that early singleton access is not supported by this FactoryBean.
-	 * This will lead to a FactoryBeanNotInitializedException getting thrown.
-	 * @return the interfaces to use for 'early singletons',
-	 * or {@code null} to indicate a FactoryBeanNotInitializedException
-	 * @see org.springframework.beans.factory.FactoryBeanNotInitializedException
-	 */
+	// 返回该工厂要创建的实例，是否为一个接口的实例，如果是则返回接口，否则返回null
 	protected Class[] getEarlySingletonInterfaces() {
 		Class type = getObjectType();
 		return (type != null && type.isInterface() ? new Class[] {type} : null);
 	}
-
-	/**
-	 * Callback for destroying a singleton instance. Subclasses may
-	 * override this to destroy the previously created instance.
-	 * <p>The default implementation is empty.
-	 * @param instance the singleton instance, as returned by
-	 * {@link #createInstance()}
-	 * @throws Exception in case of shutdown errors
-	 * @see #createInstance()
-	 */
+	// 销毁实例
 	protected void destroyInstance(T instance) throws Exception {
+	}
+	// 使用JDK 动态代理创建一个实例
+	@SuppressWarnings("unchecked")
+	private T getEarlySingletonInstance() throws Exception {
+		Class[] ifcs = getEarlySingletonInterfaces();
+		if (ifcs == null) {
+			throw new FactoryBeanNotInitializedException(getClass().getName() + " does not support circular references");
+		}
+		if (this.earlySingletonInstance == null) {
+			// JDK 动态代理
+			this.earlySingletonInstance = (T) Proxy.newProxyInstance(
+				this.beanClassLoader, ifcs, new EarlySingletonInvocationHandler());
+		}
+		return this.earlySingletonInstance;
+	}
+	// 如果该工厂的单例对象已经创建好了则返回，否则抛异常
+	private T getSingletonInstance() throws IllegalStateException {
+		if (!this.initialized) {
+			throw new IllegalStateException("Singleton instance not initialized yet");
+		}
+		return this.singletonInstance;
 	}
 
 
-	/**
-	 * Reflective InvocationHandler for lazy access to the actual singleton object.
-	 */
-	private class EarlySingletonInvocationHandler implements InvocationHandler {
 
+	// JDK 动态代理的一个调用处理器实现
+	private class EarlySingletonInvocationHandler implements InvocationHandler {
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			if (ReflectionUtils.isEqualsMethod(method)) {
 				// Only consider equal when proxies are identical.

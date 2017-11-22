@@ -28,7 +28,7 @@ public interface ConfigurableListableBeanFactory extends ListableBeanFactory, Au
 	// 返回该工厂的bean定义是否被冻结(也就是说，不应该被修改或后处理。)
 	boolean isConfigurationFrozen();
 
-	// 预加载不是懒加载的单例.用于解决循环依赖问题
+	// 实例化所有的单例bean（配置了lazy-init="true"的bean除外），用于解决循环依赖问题
 	void preInstantiateSingletons() throws BeansException;
 
 }

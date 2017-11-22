@@ -68,7 +68,7 @@ public interface Scope {
 	// 设置一个回调接口，当销毁这个指定bean的时候来调用这个回调接口
 	void registerDestructionCallback(String name, Runnable callback);
 
-	// 更具这个key解析出一个上下文对象，比如：request --> HttpServletRequest
+	// 根据这个key解析出一个上下文对象，比如：request --> HttpServletRequest
 	Object resolveContextualObject(String key);
 
 	/**

@@ -36,7 +36,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 	// 缓存被工厂bean创建的单例对象，Map：FactoryBean name --> object
 	private final Map<String, Object> factoryBeanObjectCache = new ConcurrentHashMap<String, Object>(16);
 
-	// 判断factoryBean的类型
+	// 判断这个工厂bean创建的bean的类型
 	protected Class<?> getTypeForFactoryBean(final FactoryBean<?> factoryBean) {
 		try {
 			if (System.getSecurityManager() != null) {
