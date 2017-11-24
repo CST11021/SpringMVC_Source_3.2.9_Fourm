@@ -724,12 +724,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Obtain a reference for early access to the specified bean,
-	 * typically for the purpose of resolving a circular reference.
-	 * @param beanName the name of the bean (for error handling purposes)
-	 * @param mbd the merged bean definition for the bean
-	 * @param bean the raw bean instance
-	 * @return the object to expose as bean reference
+	 	   比如：CircularityA引用CircularityB，CircularityB引用CircularityC，CircularityC引用CircularityA
+	 （1） Spring容器创建单例“circularityA” Bean。首先依据无參构造器创建“circularityA” Bean， 并暴露一个exposedObject
+	 	   用于返回提前暴露的Bean。并将“circularityA”Bean放到Catch中。然后进行setter注入“circularityB”;
+	 （2） Spring容器创建单例“circularityB" Bean。首先依据无參构造器创建“circularityB" Bean，并暴露一个exposedObject用
+	 	   于返回提前暴露的Bean。并将“circularityB” Bean放到Catch中，然后进行setter注入“circularityC”;
+	 （3） Spring容器创建单例“circularityC” Bean，首先依据无參构造器创建“circularityC” Bean，并暴露一个exposedObject
+	 	   用于返回暴露的Bean。并将“circularityC” Bean放入Catch中， 然后进行setter注入“circularityA”。进行注入“circularityA”
+	 	   时因为步骤1提前暴露了exposedObject所以从之前的catch里面拿Bean不用反复创建。
+	 （4） 最后在依赖注入“circularityB”和“circularityA”也是从catch里面拿提前暴露的bean。 完毕setter注入。
+	 可是对于“prototype”作用域Bean。Spring容器无法完毕依赖注入，由于“prototype”作用域的Bean，Spring容器不进行缓存，因此无法提前暴露一个创建中的Bean。
 	 */
 	protected Object getEarlyBeanReference(String beanName, RootBeanDefinition mbd, Object bean) {
 		Object exposedObject = bean;
