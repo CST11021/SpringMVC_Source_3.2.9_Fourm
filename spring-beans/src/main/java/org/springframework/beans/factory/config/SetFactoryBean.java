@@ -24,34 +24,50 @@ import org.springframework.beans.TypeConverter;
 import org.springframework.core.GenericCollectionTypeResolver;
 
 /**
- * Simple factory for shared Set instances. Allows for central setup
- * of Sets via the "set" element in XML bean definitions.
- *
- * @author Juergen Hoeller
- * @since 09.12.2003
- * @see ListFactoryBean
- * @see MapFactoryBean
+ 使用示例：
+
+ <bean id="CustomerBean" class="com.mkyong.common.Customer">
+	 <property name="sets">
+		 <bean class="org.springframework.beans.factory.config.SetFactoryBean">
+			 <property name="targetSetClass">
+			 	<value>java.util.HashSet</value>
+			 </property>
+			 <property name="sourceSet">
+				 <list>
+					 <value>1</value>
+					 <value>2</value>
+					 <value>3</value>
+				 </list>
+			 </property>
+		 </bean>
+	 </property>
+ </bean>
+
+ 使用util命名空间：
+ <bean id="CustomerBean" class="com.mkyong.common.Customer">
+	 <property name="sets">
+		 <util:set set-class="java.util.HashSet">
+			 <value>1</value>
+			 <value>2</value>
+			 <value>3</value>
+		 </util:set>
+	 </property>
+ </bean>
+
+ 作者：lovePython
+ 链接：http://www.jianshu.com/p/90710a6e918c
+ 來源：简书
+ 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
  */
 public class SetFactoryBean extends AbstractFactoryBean<Set> {
 
 	private Set sourceSet;
-
 	private Class targetSetClass;
 
-
-	/**
-	 * Set the source Set, typically populated via XML "set" elements.
-	 */
 	public void setSourceSet(Set sourceSet) {
 		this.sourceSet = sourceSet;
 	}
-
-	/**
-	 * Set the class to use for the target Set. Can be populated with a fully
-	 * qualified class name when defined in a Spring application context.
-	 * <p>Default is a linked HashSet, keeping the registration order.
-	 * @see java.util.LinkedHashSet
-	 */
 	public void setTargetSetClass(Class targetSetClass) {
 		if (targetSetClass == null) {
 			throw new IllegalArgumentException("'targetSetClass' must not be null");
@@ -61,7 +77,6 @@ public class SetFactoryBean extends AbstractFactoryBean<Set> {
 		}
 		this.targetSetClass = targetSetClass;
 	}
-
 
 	@Override
 	public Class<Set> getObjectType() {

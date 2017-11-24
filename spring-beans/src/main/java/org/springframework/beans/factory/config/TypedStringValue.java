@@ -37,41 +37,18 @@ import org.springframework.util.ObjectUtils;
 public class TypedStringValue implements BeanMetadataElement {
 
 	private String value;
-
 	private volatile Object targetType;
-
 	private Object source;
-
 	private String specifiedTypeName;
-
 	private volatile boolean dynamic;
 
-
-	/**
-	 * Create a new {@link TypedStringValue} for the given String value.
-	 * @param value the String value
-	 */
 	public TypedStringValue(String value) {
 		setValue(value);
 	}
-
-	/**
-	 * Create a new {@link TypedStringValue} for the given String value
-	 * and target type.
-	 * @param value the String value
-	 * @param targetType the type to convert to
-	 */
 	public TypedStringValue(String value, Class<?> targetType) {
 		setValue(value);
 		setTargetType(targetType);
 	}
-
-	/**
-	 * Create a new {@link TypedStringValue} for the given String value
-	 * and target type.
-	 * @param value the String value
-	 * @param targetTypeName the type to convert to
-	 */
 	public TypedStringValue(String value, String targetTypeName) {
 		setValue(value);
 		setTargetTypeName(targetTypeName);
@@ -217,12 +194,10 @@ public class TypedStringValue implements BeanMetadataElement {
 		return (ObjectUtils.nullSafeEquals(this.value, otherValue.value) &&
 				ObjectUtils.nullSafeEquals(this.targetType, otherValue.targetType));
 	}
-
 	@Override
 	public int hashCode() {
 		return ObjectUtils.nullSafeHashCode(this.value) * 29 + ObjectUtils.nullSafeHashCode(this.targetType);
 	}
-
 	@Override
 	public String toString() {
 		return "TypedStringValue: value [" + this.value + "], target type [" + this.targetType + "]";

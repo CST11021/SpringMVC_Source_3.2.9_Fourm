@@ -107,12 +107,6 @@ public class PreferencesPlaceholderConfigurer extends PropertyPlaceholderConfigu
 		}
 	}
 
-
-	public static void main(String[] args) {
-
-	}
-
-
 	// Set the path in the system preferences tree to use for resolving placeholders. Default is the root node.
 	// 在系统首选项树中设置路径，用于解析占位符。默认是根节点。
 	public void setSystemTreePath(String systemTreePath) {

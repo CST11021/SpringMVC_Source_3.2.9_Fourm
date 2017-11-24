@@ -36,23 +36,10 @@ import org.springframework.beans.BeansException;
  */
 public interface SmartInstantiationAwareBeanPostProcessor extends InstantiationAwareBeanPostProcessor {
 
-	/**
-	 * Predict the type of the bean to be eventually returned from this
-	 * processor's {@link #postProcessBeforeInstantiation} callback.
-	 * @param beanClass the raw class of the bean
-	 * @param beanName the name of the bean
-	 * @return the type of the bean, or {@code null} if not predictable
-	 * @throws org.springframework.beans.BeansException in case of errors
-	 */
+	/** 在调用{@link #postProcessBeforeInstantiation}前预测这个bean的类型*/
 	Class<?> predictBeanType(Class<?> beanClass, String beanName) throws BeansException;
 
-	/**
-	 * Determine the candidate constructors to use for the given bean.
-	 * @param beanClass the raw class of the bean (never {@code null})
-	 * @param beanName the name of the bean
-	 * @return the candidate constructors, or {@code null} if none specified
-	 * @throws org.springframework.beans.BeansException in case of errors
-	 */
+	// 确定一个实例化时要用的构造器方法
 	Constructor<?>[] determineCandidateConstructors(Class<?> beanClass, String beanName) throws BeansException;
 
 	/**

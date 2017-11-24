@@ -87,6 +87,21 @@ import org.springframework.util.ClassUtils;
  * @author Juergen Hoeller
  * @since 21.11.2003
  */
+
+/**
+ 通过MethodInvokingFactoryBean工厂Bean，可将目标方法的返回值注入为Bean的属性值。这个工厂Bean用来获取指定方法的返回值，该
+ 方法既可以是静态方法，也可以是实例方法；这个值既可以被注入到指定Bean实例的指定属性，也可以直接定义成Bean实例。看例子：
+ <bean id="valueGenerator" class="com.abc.util.ValueGenerator" />
+ <bean id="son1" class="com.abc.service.Son">
+	 <property name="age">
+		 <!-- 获取方法返回值：调用valueGenerator的getValue方法 -->
+		 <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+			 <property name="targetObject" ref="valueGenerator" />
+			 <property name="targetMethod" value="getValue" />
+		 </bean>
+	 </property>
+ </bean>
+ */
 public class MethodInvokingFactoryBean extends ArgumentConvertingMethodInvoker
 		implements FactoryBean<Object>, BeanClassLoaderAware, BeanFactoryAware, InitializingBean {
 

@@ -500,7 +500,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 				((BeanDefinitionResource) this.resource).getBeanDefinition() : null);
 	}
 
-	// 校验这个bean
+	// 校验这个bean，如果methodOverrides和factoryMethodName同时存在则抛异常
 	public void validate() throws BeanDefinitionValidationException {
 		if (!getMethodOverrides().isEmpty() && getFactoryMethodName() != null) {
 			throw new BeanDefinitionValidationException(

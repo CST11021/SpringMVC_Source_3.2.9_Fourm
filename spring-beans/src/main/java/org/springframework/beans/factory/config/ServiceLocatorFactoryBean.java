@@ -186,64 +186,17 @@ import org.springframework.util.StringUtils;
  * @see #setServiceMappings
  * @see ObjectFactoryCreatingFactoryBean
  */
+// 首先ServiceLocatorFactoryBean的使用场景是这样的， 如果你有一个对象是从spring的beanfactory拿出来，spring的bean一般分为
+// singleton和prototype， singleton是整个spring容器中只有一个实例，prototype是每次注入的时候new一个新实例。但注入一般是
+// 注入到对象的属性中，那对于一个对象一般只会注入一次。假如我每次call一个方法的时候希望都使用的是新的实例， 这时就要靠
+// ServiceLocatorFactoryBean出场了。
 public class ServiceLocatorFactoryBean implements FactoryBean<Object>, BeanFactoryAware, InitializingBean {
 
 	private Class serviceLocatorInterface;
-
 	private Constructor serviceLocatorExceptionConstructor;
-
 	private Properties serviceMappings;
-
 	private ListableBeanFactory beanFactory;
-
 	private Object proxy;
-
-
-	/**
-	 * Set the service locator interface to use, which must have one or more methods with
-	 * the signatures {@code MyType xxx()} or {@code MyType xxx(MyIdType id)}
-	 * (typically, {@code MyService getService()} or {@code MyService getService(String id)}).
-	 * See the {@link ServiceLocatorFactoryBean class-level Javadoc} for
-	 * information on the semantics of such methods.
-	 */
-	public void setServiceLocatorInterface(Class interfaceType) {
-		this.serviceLocatorInterface = interfaceType;
-	}
-
-	/**
-	 * Set the exception class that the service locator should throw if service
-	 * lookup failed. The specified exception class must have a constructor
-	 * with one of the following parameter types: {@code (String, Throwable)}
-	 * or {@code (Throwable)} or {@code (String)}.
-	 * <p>If not specified, subclasses of Spring's BeansException will be thrown,
-	 * for example NoSuchBeanDefinitionException. As those are unchecked, the
-	 * caller does not need to handle them, so it might be acceptable that
-	 * Spring exceptions get thrown as long as they are just handled generically.
-	 * @see #determineServiceLocatorExceptionConstructor
-	 * @see #createServiceLocatorException
-	 */
-	public void setServiceLocatorExceptionClass(Class serviceLocatorExceptionClass) {
-		if (serviceLocatorExceptionClass != null && !Exception.class.isAssignableFrom(serviceLocatorExceptionClass)) {
-			throw new IllegalArgumentException(
-					"serviceLocatorException [" + serviceLocatorExceptionClass.getName() + "] is not a subclass of Exception");
-		}
-		this.serviceLocatorExceptionConstructor =
-				determineServiceLocatorExceptionConstructor(serviceLocatorExceptionClass);
-	}
-
-	/**
-	 * Set mappings between service ids (passed into the service locator)
-	 * and bean names (in the bean factory). Service ids that are not defined
-	 * here will be treated as bean names as-is.
-	 * <p>The empty string as service id key defines the mapping for {@code null} and
-	 * empty string, and for factory methods without parameter. If not defined,
-	 * a single matching bean will be retrieved from the bean factory.
-	 * @param serviceMappings mappings between service ids and bean names,
-	 * with service ids as keys as bean names as values
-	 */
-	public void setServiceMappings(Properties serviceMappings) {
-		this.serviceMappings = serviceMappings;
-	}
 
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
 		if (!(beanFactory instanceof ListableBeanFactory)) {
@@ -252,19 +205,41 @@ public class ServiceLocatorFactoryBean implements FactoryBean<Object>, BeanFacto
 		}
 		this.beanFactory = (ListableBeanFactory) beanFactory;
 	}
-
 	public void afterPropertiesSet() {
 		if (this.serviceLocatorInterface == null) {
 			throw new IllegalArgumentException("Property 'serviceLocatorInterface' is required");
 		}
 
-		// Create service locator proxy.
+		// 使用JDK 动态代理，创建proxy对象
 		this.proxy = Proxy.newProxyInstance(
 				this.serviceLocatorInterface.getClassLoader(),
 				new Class[] {this.serviceLocatorInterface},
 				new ServiceLocatorInvocationHandler());
 	}
+	public Object getObject() {
+		return this.proxy;
+	}
+	public Class<?> getObjectType() {
+		return this.serviceLocatorInterface;
+	}
+	public boolean isSingleton() {
+		return true;
+	}
 
+	public void setServiceLocatorInterface(Class interfaceType) {
+		this.serviceLocatorInterface = interfaceType;
+	}
+	public void setServiceLocatorExceptionClass(Class serviceLocatorExceptionClass) {
+		if (serviceLocatorExceptionClass != null && !Exception.class.isAssignableFrom(serviceLocatorExceptionClass)) {
+			throw new IllegalArgumentException(
+				"serviceLocatorException [" + serviceLocatorExceptionClass.getName() + "] is not a subclass of Exception");
+		}
+		this.serviceLocatorExceptionConstructor =
+			determineServiceLocatorExceptionConstructor(serviceLocatorExceptionClass);
+	}
+	public void setServiceMappings(Properties serviceMappings) {
+		this.serviceMappings = serviceMappings;
+	}
 
 	/**
 	 * Determine the constructor to use for the given service locator exception
@@ -296,7 +271,6 @@ public class ServiceLocatorFactoryBean implements FactoryBean<Object>, BeanFacto
 			}
 		}
 	}
-
 	/**
 	 * Create a service locator exception for the given cause.
 	 * Only called in case of a custom service locator exception.
@@ -321,23 +295,7 @@ public class ServiceLocatorFactoryBean implements FactoryBean<Object>, BeanFacto
 		return (Exception) BeanUtils.instantiateClass(exceptionConstructor, args);
 	}
 
-
-	public Object getObject() {
-		return this.proxy;
-	}
-
-	public Class<?> getObjectType() {
-		return this.serviceLocatorInterface;
-	}
-
-	public boolean isSingleton() {
-		return true;
-	}
-
-
-	/**
-	 * Invocation handler that delegates service locator calls to the bean factory.
-	 */
+	// JDK动态代理的方法调用处理器
 	private class ServiceLocatorInvocationHandler implements InvocationHandler {
 
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {

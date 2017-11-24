@@ -32,26 +32,46 @@ import org.springframework.core.GenericCollectionTypeResolver;
  * @see SetFactoryBean
  * @see MapFactoryBean
  */
+
+/**
+ ListFactoryBean”类为开发者提供了一种在Spring的bean配置文件中创建一个具体的列表集合类(ArrayList和LinkedList)。
+ 这里有一个 ListFactoryBean 示例，在运行时它将实例化一个ArrayList，并注入到一个 bean 属性。
+
+ <bean id="CustomerBean" class="com.yiibai.common.Customer">
+	 <property name="lists">
+		 <bean class="org.springframework.beans.factory.config.ListFactoryBean">
+			 <property name="targetListClass">
+			 	<value>java.util.ArrayList</value>
+			 </property>
+			 <property name="sourceList">
+				 <list>
+					 <value>one</value>
+					 <value>2</value>
+					 <value>three</value>
+				 </list>
+			 </property>
+		 </bean>
+	 </property>
+ </bean>
+ 另外，还可以使用 util 模式和<util:list> 来达到同样的目的：
+ <bean id="CustomerBean" class="com.yiibai.common.Customer">
+	 <property name="lists">
+		 <util:list list-class="java.util.ArrayList">
+			 <value>one</value>
+			 <value>2</value>
+			 <value>three</value>
+		 </util:list>
+	 </property>
+ </bean>
+ */
 public class ListFactoryBean extends AbstractFactoryBean<List> {
 
 	private List sourceList;
-
 	private Class targetListClass;
 
-
-	/**
-	 * Set the source List, typically populated via XML "list" elements.
-	 */
 	public void setSourceList(List sourceList) {
 		this.sourceList = sourceList;
 	}
-
-	/**
-	 * Set the class to use for the target List. Can be populated with a fully
-	 * qualified class name when defined in a Spring application context.
-	 * <p>Default is a {@code java.util.ArrayList}.
-	 * @see java.util.ArrayList
-	 */
 	public void setTargetListClass(Class targetListClass) {
 		if (targetListClass == null) {
 			throw new IllegalArgumentException("'targetListClass' must not be null");

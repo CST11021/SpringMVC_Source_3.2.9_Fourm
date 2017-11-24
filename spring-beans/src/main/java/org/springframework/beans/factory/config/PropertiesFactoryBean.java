@@ -63,7 +63,6 @@ public class PropertiesFactoryBean extends PropertiesLoaderSupport
 		return this.singleton;
 	}
 
-
 	public final void afterPropertiesSet() throws IOException {
 		if (this.singleton) {
 			this.singletonInstance = createProperties();

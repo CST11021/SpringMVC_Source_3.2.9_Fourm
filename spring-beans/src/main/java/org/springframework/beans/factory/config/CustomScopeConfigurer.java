@@ -50,19 +50,7 @@ public class CustomScopeConfigurer implements BeanFactoryPostProcessor, BeanClas
 	private int order = Ordered.LOWEST_PRECEDENCE;
 	private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
-	public void setScopes(Map<String, Object> scopes) {
-		this.scopes = scopes;
-	}
-	public void setOrder(int order) {
-		this.order = order;
-	}
-	public int getOrder() {
-		return this.order;
-	}
-	public void setBeanClassLoader(ClassLoader beanClassLoader) {
-		this.beanClassLoader = beanClassLoader;
-	}
-
+	// 该方法是在spring容器解析完配置文件（注册了BeanDefinition）之后，在bean实例化之前被调用的
 	@SuppressWarnings("unchecked")
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		if (this.scopes != null) {
@@ -89,6 +77,19 @@ public class CustomScopeConfigurer implements BeanFactoryPostProcessor, BeanClas
 				}
 			}
 		}
+	}
+
+	public void setScopes(Map<String, Object> scopes) {
+		this.scopes = scopes;
+	}
+	public void setOrder(int order) {
+		this.order = order;
+	}
+	public int getOrder() {
+		return this.order;
+	}
+	public void setBeanClassLoader(ClassLoader beanClassLoader) {
+		this.beanClassLoader = beanClassLoader;
 	}
 
 }

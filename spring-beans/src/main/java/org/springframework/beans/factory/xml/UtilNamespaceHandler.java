@@ -46,11 +46,17 @@ public class UtilNamespaceHandler extends NamespaceHandlerSupport {
 
 
 	public void init() {
+		// 解析<util:constant>标签
 		registerBeanDefinitionParser("constant", new ConstantBeanDefinitionParser());
+		// 解析<util:property-path>标签
 		registerBeanDefinitionParser("property-path", new PropertyPathBeanDefinitionParser());
+		// 解析<util:list>标签
 		registerBeanDefinitionParser("list", new ListBeanDefinitionParser());
+		// 解析<util:set>标签
 		registerBeanDefinitionParser("set", new SetBeanDefinitionParser());
+		// 解析<util:map>标签
 		registerBeanDefinitionParser("map", new MapBeanDefinitionParser());
+		// 解析<util:properties>标签
 		registerBeanDefinitionParser("properties", new PropertiesBeanDefinitionParser());
 	}
 
@@ -71,8 +77,6 @@ public class UtilNamespaceHandler extends NamespaceHandlerSupport {
 			return id;
 		}
 	}
-
-
 	private static class PropertyPathBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 		@Override
@@ -108,8 +112,6 @@ public class UtilNamespaceHandler extends NamespaceHandlerSupport {
 			return id;
 		}
 	}
-
-
 	private static class ListBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 		@Override
@@ -131,8 +133,6 @@ public class UtilNamespaceHandler extends NamespaceHandlerSupport {
 			}
 		}
 	}
-
-
 	private static class SetBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 		@Override
@@ -154,8 +154,6 @@ public class UtilNamespaceHandler extends NamespaceHandlerSupport {
 			}
 		}
 	}
-
-
 	private static class MapBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 		@Override
@@ -177,8 +175,6 @@ public class UtilNamespaceHandler extends NamespaceHandlerSupport {
 			}
 		}
 	}
-
-
 	private static class PropertiesBeanDefinitionParser extends AbstractSimpleBeanDefinitionParser {
 
 		@Override

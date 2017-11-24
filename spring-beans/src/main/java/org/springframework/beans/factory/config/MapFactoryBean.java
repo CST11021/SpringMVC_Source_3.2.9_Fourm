@@ -24,34 +24,32 @@ import org.springframework.beans.TypeConverter;
 import org.springframework.core.GenericCollectionTypeResolver;
 
 /**
- * Simple factory for shared Map instances. Allows for central setup
- * of Maps via the "map" element in XML bean definitions.
- *
- * @author Juergen Hoeller
- * @since 09.12.2003
- * @see SetFactoryBean
- * @see ListFactoryBean
+ 使用示例：
+
+ <bean id="partnerBean" class="org.springframework.beans.factory.config.MapFactoryBean">
+	 <property name="targetMapClass">
+		 <value>java.util.HashMap</value>
+ 	</property>
+ 	<property name="sourceMap">
+		 <map>
+			 <entry key="base" value-ref="baseService"></entry>
+			 <entry key="baidu" value-ref="baiduService"></entry>
+			 <entry key="tencent" value-ref="tencentService"></entry>
+			 <entry key="taobao" value-ref="taobaoService"></entry>
+		 </map>
+	 </property>
+ </bean>
+
  */
 public class MapFactoryBean extends AbstractFactoryBean<Map> {
 
 	private Map<?, ?> sourceMap;
-
 	private Class targetMapClass;
 
 
-	/**
-	 * Set the source Map, typically populated via XML "map" elements.
-	 */
 	public void setSourceMap(Map sourceMap) {
 		this.sourceMap = sourceMap;
 	}
-
-	/**
-	 * Set the class to use for the target Map. Can be populated with a fully
-	 * qualified class name when defined in a Spring application context.
-	 * <p>Default is a linked HashMap, keeping the registration order.
-	 * @see java.util.LinkedHashMap
-	 */
 	public void setTargetMapClass(Class targetMapClass) {
 		if (targetMapClass == null) {
 			throw new IllegalArgumentException("'targetMapClass' must not be null");
@@ -61,7 +59,6 @@ public class MapFactoryBean extends AbstractFactoryBean<Map> {
 		}
 		this.targetMapClass = targetMapClass;
 	}
-
 
 	@Override
 	public Class<Map> getObjectType() {
