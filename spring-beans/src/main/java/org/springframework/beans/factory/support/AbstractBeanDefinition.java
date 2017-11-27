@@ -457,6 +457,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 		return this.enforceDestroyMethod;
 	}
 
+	// 标识这个BeanDefinition是否是“合成”的（合成的意思：不是由应用程序本身定义的）
 	public void setSynthetic(boolean synthetic) {
 		this.synthetic = synthetic;
 	}
