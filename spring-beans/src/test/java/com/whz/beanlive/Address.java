@@ -1,4 +1,4 @@
-package com.whz.autowire;
+package com.whz.beanlive;
 
 public class Address {
     private String city;

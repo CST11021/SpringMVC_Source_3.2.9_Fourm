@@ -1,4 +1,4 @@
-package com.whz.autowire;
+package com.whz.beanlive;
 
 public class Car {
     private String brand;

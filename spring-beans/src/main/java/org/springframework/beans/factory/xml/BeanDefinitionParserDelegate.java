@@ -299,15 +299,15 @@ public class BeanDefinitionParserDelegate {
 		// <bean>的name属性
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
 
-		// <bean>的别名，name属性可以设置多个值，用",; "进行分隔
+		// <bean>的别名，name属性可以设置多个值，用",; "进行分隔，如果name属性配置了多个名字，则第一个作为beanName，其他的作为别名
 		List<String> aliases = new ArrayList<String>();
 		if (StringUtils.hasLength(nameAttr)) {
 			String[] nameArr = StringUtils.tokenizeToStringArray(nameAttr, MULTI_VALUE_ATTRIBUTE_DELIMITERS);
 			aliases.addAll(Arrays.asList(nameArr));
 		}
 
+		// 默认使用id作为beanName，如果有配置别名，则使用第一个别名作为beanName,其他的别名仍然作为别名
 		String beanName = id;
-		// 如果有配置别名
 		if (!StringUtils.hasText(beanName) && !aliases.isEmpty()) {
 			beanName = aliases.remove(0);
 			if (logger.isDebugEnabled()) {
@@ -323,6 +323,7 @@ public class BeanDefinitionParserDelegate {
 		// 解析这个bean，如果解析出问题返回null
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
 		if (beanDefinition != null) {
+			// 没有配置beanName的情况，就使用BeanName生成器生成name，然后Bean的全限定类名作为别名
 			if (!StringUtils.hasText(beanName)) {
 				try {
 					if (containingBean != null) {

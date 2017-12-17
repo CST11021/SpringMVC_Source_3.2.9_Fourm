@@ -34,11 +34,11 @@ public class BeanDefinitionReaderUtils {
 
 	// 为 BeanDefinition 生成一个唯一的BeanName
 	public static String generateBeanName(BeanDefinition beanDefinition, BeanDefinitionRegistry registry) throws BeanDefinitionStoreException {
-
 		return generateBeanName(beanDefinition, registry, false);
 	}
+	// 生成规则：全限定类名 + "#" + 数字（从0开始）
 	public static String generateBeanName(BeanDefinition definition, BeanDefinitionRegistry registry, boolean isInnerBean) throws BeanDefinitionStoreException {
-
+		// 首先获取bean类的全限定类名
 		String generatedBeanName = definition.getBeanClassName();
 		if (generatedBeanName == null) {
 			if (definition.getParentName() != null) {

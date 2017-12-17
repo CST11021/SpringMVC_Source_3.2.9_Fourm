@@ -1,4 +1,4 @@
-package com.whz.autowire;
+package com.whz.beanlive;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,7 +30,7 @@ public class Test {
 
         ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
         Resource[] configResources = resourcePatternResolver.getResources(
-                "classpath*:com/whz/autowire/spring-autowire.xml");
+                "classpath*:com/whz/beanlive/spring-autowire.xml");
 
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(factory);
         reader.loadBeanDefinitions(configResources);
@@ -38,7 +38,7 @@ public class Test {
         List<String> beanNames = CollectionUtils.arrayToList(factory.getBeanDefinitionNames());
         System.out.println(beanNames);
 
-        Person person = (Person) factory.getBean("person");
+        com.whz.beanlive.Person person = (com.whz.beanlive.Person) factory.getBean("person");
         System.out.println(person);
     }
 
