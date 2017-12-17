@@ -54,13 +54,7 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 
 	// 添加一个占位符解析器
 	void addEmbeddedValueResolver(StringValueResolver valueResolver);
-
-	/**
-	 * Resolve the given embedded value, e.g. an annotation attribute.
-	 * @param value the value to resolve
-	 * @return the resolved value (may be the original value as-is)
-	 * @since 3.0
-	 */
+	// 将value占位符解析为字符串
 	String resolveEmbeddedValue(String value);
 
 	// Bean处理器

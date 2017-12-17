@@ -7,12 +7,23 @@ import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostP
 import org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.util.CollectionUtils;
 
 public class Test {
+
+    @org.junit.Test
+    public void test1() throws IOException {
+        Resource[] configResources = new PathMatchingResourcePatternResolver().getResources(
+            "classpath*:com/whz/autowire/spring-autowire.xml");
+        XmlBeanFactory xmlBeanFactory = new XmlBeanFactory(configResources[0]);
+
+
+    }
 
     @org.junit.Test
     public void test() throws IOException {

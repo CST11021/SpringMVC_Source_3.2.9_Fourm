@@ -330,6 +330,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		return beanInstance;
 	}
+	// 进行常规bean的创建
 	protected Object doCreateBean(final String beanName, final RootBeanDefinition mbd, final Object[] args) {
 
 		//////////////////////步骤一：如果单例则需要首先清除缓存
@@ -865,7 +866,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	// 在bean实例化前调用，也就是将AbstractBeanDefinition转换为BeanWrapper前的处理。给子类一个修改BeanDefinition的机会，
 	// 也就说程序经过这个方法后，Bean可能已经不是我们的认为的Bean了，而是或许成为了一个经过处理的代理bean，可能是通过cglib生成的，也可能是通过其他技术生成的。
 	protected Object applyBeanPostProcessorsBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
-		// 执行这个Bean 的一系列后处理器
+		// 执行这个Bean 的一系列后处理器，如果执行处理器方法的过程中，这个bean就被实例化了，则不再执行后续的处理器方法
 		for (BeanPostProcessor bp : getBeanPostProcessors()) {
 			if (bp instanceof InstantiationAwareBeanPostProcessor) {
 				InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) bp;

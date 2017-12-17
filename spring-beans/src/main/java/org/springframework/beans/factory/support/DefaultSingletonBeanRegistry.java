@@ -44,7 +44,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	// Spring 中一个bean A 正在被实例化的过程中可能会引用其他的bean B，这种情况下，这个A会暂时存放到这里，表示这个bean正在被创建
 	// 这个bean A 在创建结束后会被移除（请看beforeSingletonCreation()和afterSingletonCreation()方法）
 	private final Map<String, Boolean> singletonsCurrentlyInCreation = new ConcurrentHashMap<String, Boolean>(16);
-	// bean在被创建的时候会被缓存到 singletonsCurrentlyInCreation，Spring创建bean的时候会去检查这个bean是否正在被创建，
+	// bean在被创建前的时候会被缓存到 singletonsCurrentlyInCreation 表示这个当前正在被创建，Spring创建bean的时候会去检查这个bean是否正在被创建，
 	// 而这个 inCreationCheckExclusions 用来存放不被检查的bean
 	private final Map<String, Boolean> inCreationCheckExclusions = new ConcurrentHashMap<String, Boolean>(16);
 
@@ -100,7 +100,11 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		// 首先从单例bean的缓存池获取这个bean
 		Object singletonObject = this.singletonObjects.get(beanName);
 
-		// 如果 singletonObject==null 的话，则说明这个bean可能是由 FactoryBean 生成的
+		/**
+		 * 如果 singletonObject==null 的话，则说明这个bean可能是由 FactoryBean 生成的(其实所有的单例bean都是通过
+		 * {@Link getSingleton(String beanName, ObjectFactory<?> singletonFactory)}由ObjectFactory工厂创建的，
+		 *  调用方法，详见{@Link AbstractBeanFactory)的{@Link doGetBean}方法
+		 * */
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
 			synchronized (this.singletonObjects) {
 				// earlySingletonObjects 是缓存由 FactoryBean 产生的单例bean的缓存
