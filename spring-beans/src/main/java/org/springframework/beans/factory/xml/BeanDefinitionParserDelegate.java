@@ -403,6 +403,7 @@ public class BeanDefinitionParserDelegate {
 			parseConstructorArgElements(ele, bd);
 			// 解析property标签
 			parsePropertyElements(ele, bd);
+			// 解析<qualifier>标签
 			parseQualifierElements(ele, bd);
 
 			bd.setResource(this.readerContext.getResource());
@@ -625,8 +626,10 @@ public class BeanDefinitionParserDelegate {
 	// Parse qualifier sub-elements of the given bean element.
 	public void parseQualifierElements(Element beanEle, AbstractBeanDefinition bd) {
 		NodeList nl = beanEle.getChildNodes();
+		// 遍历bean标签的子节点
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
+			// 如果是<qualifier>标签
 			if (isCandidateElement(node) && nodeNameEquals(node, QUALIFIER_ELEMENT)) {
 				parseQualifierElement((Element) node, bd);
 			}
@@ -713,7 +716,7 @@ public class BeanDefinitionParserDelegate {
 			this.parseState.pop();
 		}
 	}
-	// Parse a qualifier element.
+	// 解析一个<qualifier>标签
 	public void parseQualifierElement(Element ele, AbstractBeanDefinition bd) {
 		String typeName = ele.getAttribute(TYPE_ATTRIBUTE);
 		if (!StringUtils.hasLength(typeName)) {
@@ -729,8 +732,10 @@ public class BeanDefinitionParserDelegate {
 				qualifier.setAttribute(AutowireCandidateQualifier.VALUE_KEY, value);
 			}
 			NodeList nl = ele.getChildNodes();
+			// 遍历<qualifier>标签的子元素
 			for (int i = 0; i < nl.getLength(); i++) {
 				Node node = nl.item(i);
+				// 如果是<attribute>标签
 				if (isCandidateElement(node) && nodeNameEquals(node, QUALIFIER_ATTRIBUTE_ELEMENT)) {
 					Element attributeEle = (Element) node;
 					String attributeName = attributeEle.getAttribute(KEY_ATTRIBUTE);
