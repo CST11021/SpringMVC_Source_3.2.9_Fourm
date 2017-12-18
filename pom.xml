@@ -642,8 +642,8 @@
                         <sources>
                             <source>src/test/java</source>
                             <source>servlet-api-3.0.1/src/test/java</source>
-                            <source>spring-beans/src/test/java</source>
-                            <source>spring-core/src/test/java</source>
+                            <!--<source>spring-beans/src/test/java</source>-->
+                            <!--<source>spring-core/src/test/java</source>-->
                             <!--<source>spring-tx/src/test/java</source>-->
                             <!--<source>spring-context/src/test/java</source>-->
                         </sources>
