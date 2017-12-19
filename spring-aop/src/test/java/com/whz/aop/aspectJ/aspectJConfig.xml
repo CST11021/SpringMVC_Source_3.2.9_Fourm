@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- 开启基于@AspectJ切面的驱动器-->
+    <!-- 通过aop命名空间的<aop:aspectj-autoproxy />声明自动为spring容器中那些配置@aspectJ切面的bean创建代理，织入切面。-->
+    <!-- 当然，spring在内部依旧采用 AnnotationAwareAspectJAutoProxyCreator 进行自动代理的创建工作，但具体实现的细节已经被<aop:aspectj-autoproxy />隐藏起来了-->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+    <!--声明一个目标类-->
+    <bean id="testBean" class="com.whz.aop.aspectJ.TestBean"/>
+    <!--使用@Aspect注解定义的横切逻辑也需要声明为bean-->
+    <bean class="com.whz.aop.aspectJ.AspectBean1"/>
+
+
+
+    <!-- ================================================================================================ -->
+    <!-- 使用配置的方式将环绕增强织入目标类 -->
+    <bean id="aroundAspect" class="com.whz.aop.aspectJ.AroundAspect"/>
+    <aop:config>
+        <aop:aspect ref="aroundAspect">
+            <aop:around method="process" pointcut="execution(* com.whz.aop.aspectJ.*.*(..))"/>
+        </aop:aspect>
+    </aop:config>
+
+
+
+    <!-- ================================================================================================ -->
+    <!--测试引介增强-->
+    <bean id="waiter" class="com.whz.aop.aspectJ.NaiveWaiter"/>
+    <bean class="com.whz.aop.aspectJ.AspectBean2"/>
+
+
+
+</beans>
