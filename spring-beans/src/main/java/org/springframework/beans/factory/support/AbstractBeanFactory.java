@@ -160,7 +160,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					logger.debug("Returning cached instance of singleton bean '" + beanName + "'");
 				}
 			}
-			// 我们要获取的这个bean它有可能是一个由 FactoryBean 类型的bean创建的，如果是这种情况，那我们上面获取的这个 sharedInstance 对象实际上是一个 FactoryBean 对象，这时候并不是直接返回实例本身而是返回指定方法返回的实例
+			// 我们要获取的这个bean它有可能是一个由 FactoryBean 类型的bean创建的，如果是这种情况，那我们上面获取的这个
+			// sharedInstance 对象实际上是一个 FactoryBean 对象，这时候并不是直接返回实例本身而是返回指定方法返回的实例
 			bean = getObjectForBeanInstance(sharedInstance, name, beanName, null);
 		}
 		// 如果这个 sharedInstance!=null 直接到步骤9，做下类型检查就可以返回了，否则继续
@@ -171,7 +172,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 
 
-		//步骤四： 这里的情况是bean是一个原型bean，或是一个未被加载的单例bean，并这个bean它不是由 FactoryBean 生成的，但是这个bean可能是一个FactoryBean
+		//步骤四： 这里的情况是bean是一个原型bean，或是一个未被加载的单例bean，并这个bean它不是由 FactoryBean 生成的，
+		// 但是这个bean可能是一个FactoryBean
 		else {
 
 			// 这里判断是否是原型bean，和是否存在循环依赖，如果原型模式存在循环依赖，则抛出异常，原型模式不允许循环依赖
@@ -181,10 +183,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 			//步骤五：
 			// 这里对IOC容器里的BeanDefinition是否存在进行检查，检查是否能在当前的BeanFactory中取到我们需要的bean。
-			// 如果在当前的工厂中取不到，则到双亲BeanFactory中去取；如果当前的双亲工厂取不到，那就顺着双亲BeanFactory链一直向上查找
+			// 如果在当前的工厂中取不到，则到双亲BeanFactory中去取；如果当前的双亲工厂取不到，那就顺着双亲BeanFactory链
+			// 一直向上查找
 
 			// 如果BeanDefinitionMap中也就是在所有已经加载的类中不包括beanName则尝试从ParentBeanFactory中检测，
-			// containsBeanDefinition它是在检测当前加载的xml文件中是否包含BeanName对应的配置，如果不包含就到parentBeanFactory去尝试去获取bean了
+			// containsBeanDefinition它是在检测当前加载的xml文件中是否包含BeanName对应的配置，如果不包含就到
+			// parentBeanFactory去尝试去获取bean了
 			BeanFactory parentBeanFactory = getParentBeanFactory();
 			if (parentBeanFactory != null && !containsBeanDefinition(beanName)) {
 				// Not found -> check parent.
@@ -1217,15 +1221,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			throw new BeanIsNotAFactoryException(transformedBeanName(name), beanInstance.getClass());
 		}
 
+		// 这个已经实例化的bean不是一个 FactoryBean 类型的bean，那么它可以直接返回
 		if (!(beanInstance instanceof FactoryBean) || BeanFactoryUtils.isFactoryDereference(name)) {
-			// 这个已经实例化的bean不是一个 FactoryBean 类型的bean，那么它可以直接返回，
 			return beanInstance;
 		}
 
-
-
-
-		// 程序至此的情况是：这个已经实例化的bean是一个 FactoryBean 类型的bean，如果是用户想要直接获取工厂实例而不是工厂的getObject方法对应的实例那么传入的那么应该加入&前缀
+		// 程序至此的情况是：这个已经实例化的bean是一个 FactoryBean 类型的bean，如果是用户想要直接获取工厂实例而不是工厂
+		// 的getObject方法对应的实例那么传入的那么应该加入&前缀
 		Object object = null;
 		if (mbd == null) {
 			// 尝试从factoryBeanObjectCache缓存加载bean
