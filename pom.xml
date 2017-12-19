@@ -27,7 +27,6 @@
           <version>${spring-version}</version>
         </dependency>
         <!--org.springframework-->
-
         <dependency>
             <groupId>aopalliance</groupId>
             <artifactId>aopalliance</artifactId>
@@ -99,16 +98,7 @@
                     <configuration>
                         <sources>
                             <!-- 在此加入源文件夹 -->
-                            <source>src/main/java</source>
-                            <source>servlet-api-3.0.1/src/main/java</source>
-                            <source>spring-beans/src/main/java</source>
-                            <source>spring-core/src/main/java</source>
-                            <source>spring-context/src/main/java</source>
-                            <source>spring-tx/src/main/java</source>
                             <source>spring-aop/src/main/java</source>
-                            <source>spring-jdbc/src/main/java</source>
-                            <source>spring-webmvc/src/main/java</source>
-                            <source>spring-web/src/main/java</source>
                         </sources>
                     </configuration>
                 </execution>
@@ -120,12 +110,7 @@
                     <goals><goal>add-test-source</goal></goals>
                     <configuration>
                         <sources>
-                            <source>src/test/java</source>
-                            <source>servlet-api-3.0.1/src/test/java</source>
-                            <!--<source>spring-beans/src/test/java</source>-->
-                            <!--<source>spring-core/src/test/java</source>-->
-                            <!--<source>spring-tx/src/test/java</source>-->
-                            <!--<source>spring-context/src/test/java</source>-->
+                            <source>spring-aop/src/test/java</source>
                         </sources>
                     </configuration>
                 </execution>
