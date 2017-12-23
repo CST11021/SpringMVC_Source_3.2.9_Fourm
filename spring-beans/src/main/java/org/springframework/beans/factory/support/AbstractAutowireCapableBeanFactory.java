@@ -727,12 +727,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	/**
 	 	   比如：CircularityA引用CircularityB，CircularityB引用CircularityC，CircularityC引用CircularityA
 	 （1） Spring容器创建单例“circularityA” Bean。首先依据无參构造器创建“circularityA” Bean， 并暴露一个exposedObject
-	 	   用于返回提前暴露的Bean。并将“circularityA”Bean放到Catch中。然后进行setter注入“circularityB”;
+	 	   用于返回提前暴露的Bean。并将“circularityA”Bean放到Cache中。然后进行setter注入“circularityB”;
 	 （2） Spring容器创建单例“circularityB" Bean。首先依据无參构造器创建“circularityB" Bean，并暴露一个exposedObject用
-	 	   于返回提前暴露的Bean。并将“circularityB” Bean放到Catch中，然后进行setter注入“circularityC”;
+	 	   于返回提前暴露的Bean。并将“circularityB” Bean放到Cache中，然后进行setter注入“circularityC”;
 	 （3） Spring容器创建单例“circularityC” Bean，首先依据无參构造器创建“circularityC” Bean，并暴露一个exposedObject
-	 	   用于返回暴露的Bean。并将“circularityC” Bean放入Catch中， 然后进行setter注入“circularityA”。进行注入“circularityA”
-	 	   时因为步骤1提前暴露了exposedObject所以从之前的catch里面拿Bean不用反复创建。
+	 	   用于返回暴露的Bean。并将“circularityC” Bean放入Cache中， 然后进行setter注入“circularityA”。进行注入“circularityA”
+	 	   时因为步骤1提前暴露了exposedObject所以从之前的Cache里面拿Bean不用反复创建。
 	 （4） 最后在依赖注入“circularityB”和“circularityA”也是从catch里面拿提前暴露的bean。 完毕setter注入。
 	 可是对于“prototype”作用域Bean。Spring容器无法完毕依赖注入，由于“prototype”作用域的Bean，Spring容器不进行缓存，因此无法提前暴露一个创建中的Bean。
 	 */
@@ -918,8 +918,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 	// 用给定的包装器填充bean实例中的属性
 	// populateBean函数的处理流程：
-	// 一、InstantiationAwareBeanPostProcessor处理器的postProcessAfterInstantiation函数的应用，次函数可以控制程序是否继续进行属性填充。
-	// 二、根据注入类型(byName/byType)，提取依赖的bean，并同意存入PropertyValues中。
+	// 一、InstantiationAwareBeanPostProcessor处理器的postProcessAfterInstantiation函数的应用，改函数可以控制程序是否继续进行属性填充。
+	// 二、根据注入类型(byName/byType)，提取依赖的bean，并统一存入PropertyValues中。
 	// 三、应用InstantiationAwareBeanPostProcessor处理器的 postProcessPropertyValues 方法，对属性获取完毕填充前对属性的再次处理，典型应用是 requiredAnnotationBeanPostProcessor 类中对属性的验证。
 	// 四、将所有PropertyValues中的属性填充至BeanWrapper中
 	protected void populateBean(String beanName, RootBeanDefinition mbd, BeanWrapper bw) {

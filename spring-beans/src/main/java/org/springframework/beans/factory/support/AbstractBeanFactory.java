@@ -1216,8 +1216,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	// 用于检测当前bean是否是FactoryBean类型的Bean，如果是，那么需要调用该bean对应的FactoryBean实例中的getObject方法作为返回值
 	protected Object getObjectForBeanInstance(Object beanInstance, String name, String beanName, RootBeanDefinition mbd) {
 
+		// 如果这个bean是工厂bean，那么它必须实现 FactoryBean 接口，否则抛异常
 		if (BeanFactoryUtils.isFactoryDereference(name) && !(beanInstance instanceof FactoryBean)) {
-			// 如果这个bean是工厂bean，那么它必须实现 FactoryBean 接口，否则抛异常
 			throw new BeanIsNotAFactoryException(transformedBeanName(name), beanInstance.getClass());
 		}
 
