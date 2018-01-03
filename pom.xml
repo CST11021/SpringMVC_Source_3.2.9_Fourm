@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.whz</groupId>
-  <artifactId>SpringMVC_Source_3.2.9_Fourm</artifactId>
-  <packaging>war</packaging>
-  <version>1.0-SNAPSHOT</version>
-  <name>SpringMVC_Source_3.2.9_Fourm Maven Webapp</name>
-  <url>http://maven.apache.org</url>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.whz</groupId>
+    <artifactId>SpringMVC_Source_3.2.9_Fourm</artifactId>
+    <packaging>war</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <name>SpringMVC_Source_3.2.9_Fourm Maven Webapp</name>
+    <url>http://maven.apache.org</url>
 
     <properties>
         <spring-version>3.2.9.RELEASE</spring-version>
@@ -16,144 +16,205 @@
 
         <!--org.springframework-->
         <dependency>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-test</artifactId>
-          <version>${spring-version}</version>
-          <scope>test</scope>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring-version}</version>
+            <scope>test</scope>
         </dependency>
-
-      <dependency>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-core</artifactId>
-          <version>${spring-version}</version>
-      </dependency>
-
-      <dependency>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-aop</artifactId>
-          <version>${spring-version}</version>
-      </dependency>
         <dependency>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-expression</artifactId>
-          <version>${spring-version}</version>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${spring-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+            <version>${spring-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-expression</artifactId>
+            <version>${spring-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-instrument</artifactId>
+            <version>${spring-version}</version>
         </dependency>
 
         <!--org.springframework-->
 
+        <!--第三方依赖-->
+        <dependency>
+            <groupId>backport-util-concurrent</groupId>
+            <artifactId>backport-util-concurrent</artifactId>
+            <version>3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.ejb</groupId>
+            <artifactId>ejb-api</artifactId>
+            <version>3.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>persistence-api</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>1.0.0.GA</version>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.9.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jms_1.1_spec</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>1.8.13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.beanshell</groupId>
+            <artifactId>bsh</artifactId>
+            <version>2.0b4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>2.4.13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>4.2.0.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jruby</groupId>
+            <artifactId>jruby</artifactId>
+            <version>1.7.27</version>
+        </dependency>
+        <!--第三方依赖-->
+
+        <!--测试-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring-version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring-version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!--测试-->
 
     </dependencies>
-  <build>
-    <finalName>SpringMVC_Source_3.2.9_Fourm</finalName>
+    <build>
 
-      <!--默认源代码目录-->
-      <!--<sourceDirectory>src/main</sourceDirectory>-->
-      <!--默认测试源代码目录-->
-      <!--<testSourceDirectory>src/test</testSourceDirectory>-->
+        <!--默认资源目录-->
+        <resources>
+            <resource>
+                <directory>spring-context/src/main/resources</directory>
+            </resource>
+        </resources>
+        <!--默认测试资源目录-->
+        <testResources>
+            <testResource>
+                <directory>spring-context/src/test/resources</directory>
+            </testResource>
+            <testResource>
+                <directory>src/test/java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                    <include>**/*.properties</include>
+                </includes>
+            </testResource>
+        </testResources>
 
-      <!--默认资源目录-->
-      <resources>
-          <resource><directory>spring-context/src/main/resources</directory></resource>
-      </resources>
-      <!--默认测试资源目录-->
-      <testResources>
-          <testResource><directory>spring-context/src/test/resources</directory></testResource>
-          <testResource>
-              <directory>src/test/java</directory>
-              <includes>
-                  <include>**/*.xml</include>
-                  <include>**/*.properties</include>
-              </includes>
-          </testResource>
-      </testResources>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.1</version>
 
-    <plugins>
+                <executions>
+                    <!-- 配置多个目录的源码 -->
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <!-- 在此加入源文件夹 -->
+                                <source>spring-context/src/main/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
 
-        <!--在上面的配置中，<sourceDirectory>只能指定一个源代码目录，不能指定多个。
-        使用 build-helper-maven-plugin 这个插件可以指定多个源代码目录、多个资源目录，用法如下：
-        （顺便说下，在多模块项目中，我们不能通过配置模块间的依赖管理来引入其他模块的测试类，Maven的工作机制实际上是包的依赖管理。在规定的标准目录下，能够在模块之间引用的代码只能存在于main目录下。而单元测试（test目录下的代码）模型是建立在“独立”的思想之上的，目的就是不受其他环境的干扰从而纯粹地验证自身模块的可用性和正确性。因此单元测试代码之间是不能被其他模块引用的。）
-        -->
-        <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <version>1.1</version>
+                    <!-- 配置多个测试的源码路径 -->
+                    <execution>
+                        <id>add-testSource</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <!--<source>spring-context/src/test/java</source>-->
+                            </sources>
+                        </configuration>
+                    </execution>
 
-            <executions>
-                <!-- 配置多个目录的源码 -->
-                <execution>
-                    <id>add-source</id>
-                    <phase>generate-sources</phase>
-                    <goals><goal>add-source</goal></goals>
-                    <configuration>
-                        <sources>
-                            <!-- 在此加入源文件夹 -->
-                            <source>src/main/java</source>
-                            <source>spring-context/src/main/java</source>
-                        </sources>
-                    </configuration>
-                </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/spring.handlers</resource>
+                                </transformer>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/spring.schemas</resource>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
 
-                <!-- 配置多个测试的源码路径 -->
-                <execution>
-                    <id>add-testSource</id>
-                    <phase>generate-test-sources</phase>
-                    <goals><goal>add-test-source</goal></goals>
-                    <configuration>
-                        <sources>
-                            <source>src/test/java</source>
-                            <source>spring-context/src/test/java</source>
-                        </sources>
-                    </configuration>
-                </execution>
-
-            </executions>
-        </plugin>
-
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-shade-plugin</artifactId>
-            <executions>
-                <execution>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>shade</goal>
-                    </goals>
-                    <configuration>
-                        <transformers>
-                            <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-                                <resource>META-INF/spring.handlers</resource>
-                            </transformer>
-                            <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-                                <resource>META-INF/spring.schemas</resource>
-                            </transformer>
-                        </transformers>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
-
-        <!--配置编译器-->
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <version>3.3</version>
-            <configuration>
-                <source>1.8</source>
-                <target>1.8</target>
-            </configuration>
-        </plugin>
-
-        <!--maven打包或编译时跳过单元测试代码（或使用命令：mvn -U clean package -Dmaven.test.skip）-->
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-                <skip>true</skip>
-            </configuration>
-        </plugin>
-
-    </plugins>
-
-
-  </build>
+    </build>
 </project>
