@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
-@Service("accountService1")
 public class AccountService1 {
 
     private final Logger logger = LoggerFactory.getLogger(AccountService1.class);
