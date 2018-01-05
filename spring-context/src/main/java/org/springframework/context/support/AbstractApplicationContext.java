@@ -336,7 +336,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 *     }
 	 * }
 	 *
-	 * 这样当容器初始化的时候，程序执行到 getEnvironment().validateRequiredProperties(); 代码的时候，如果系统没有检测到对VAR的环境变量，那么将抛出异常。
+	 * 这样当容器初始化的时候，程序执行到 getEnvironment().validateRequiredProperties(); 代码的时候，如果系统没有检测到
+	 * 对VAR的环境变量，那么将抛出异常。
 	 */
 	protected void initPropertySources() {
 		// For subclasses: do nothing by default.
@@ -410,10 +411,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
 			List<BeanFactoryPostProcessor> regularPostProcessors = new LinkedList<BeanFactoryPostProcessor>();
 			List<BeanDefinitionRegistryPostProcessor> registryPostProcessors = new LinkedList<BeanDefinitionRegistryPostProcessor>();
-			// 遍历 BeanFactoryPostProcessor
+			// 遍历 BeanFactoryPostProcessor 给IOC注册后处理器
 			for (BeanFactoryPostProcessor postProcessor : getBeanFactoryPostProcessors()) {
 				if (postProcessor instanceof BeanDefinitionRegistryPostProcessor) {
 					BeanDefinitionRegistryPostProcessor registryPostProcessor = (BeanDefinitionRegistryPostProcessor) postProcessor;
+					// 注册后处理器
 					registryPostProcessor.postProcessBeanDefinitionRegistry(registry);
 					registryPostProcessors.add(registryPostProcessor);
 				}
@@ -421,6 +423,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 					regularPostProcessors.add(postProcessor);
 				}
 			}
+
 
 			Map<String, BeanDefinitionRegistryPostProcessor> beanMap = beanFactory.getBeansOfType(BeanDefinitionRegistryPostProcessor.class, true, false);
 			List<BeanDefinitionRegistryPostProcessor> registryPostProcessorBeans = new ArrayList<BeanDefinitionRegistryPostProcessor>(beanMap.values());
@@ -439,11 +442,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		}
 
 		// 不要在这里初始化factorybean:我们需要让所有的常规bean都没有初始化，以便对它们使用bean工厂的后处理程序
-		// Spring中通过配置一些实现了BeanFactoryPostProcessor后处理接口的Bean，来进行一些操作，这些对于使用Spring的用户来说是透明，所有有时候会让用户觉得，Spring好神奇。
-		// 这里举一个例子，我们常常会配置像 <context:property-placeholder location="classpath:jdbc.properties"/> 这样的配置，Spring解析这个配置的时候会注册一个名称为
-		// “org.springframework.beans.factory.config.PropertyPlaceholderConfigurer#0”这样的bean，这样我们就可以在引用占位符进行配置了。因为解析占位符的操作是通过后处理器
-		// 来进行处理的，我们会发现在 PreferencesPlaceholderConfigurer 类中，该类实现了一个 BeanFactoryPostProcessor 接口。
-		// Spring在启动的过程中会去调用所有后处理器bean，并执行相应的处理，所以说像这种由框架为我们处理的一些我们看不见的操作，对我们来说是透明的。
+		// Spring中通过配置一些实现了BeanFactoryPostProcessor后处理接口的Bean，来进行一些操作，这些对于使用Spring的用户来
+		// 说是透明，所有有时候会让用户觉得，Spring好神奇。
+		// 这里举一个例子，我们常常会配置像 <context:property-placeholder location="classpath:jdbc.properties"/> 这样的
+		// 配置，Spring解析这个配置的时候会注册一个名称为“org.springframework.beans.factory.config.PropertyPlaceholderConfigurer#0”
+		// 这样的bean，这样我们就可以在引用占位符进行配置了。因为解析占位符的操作是通过后处理器来进行处理的，我们会发现
+		// 在 PreferencesPlaceholderConfigurer 类中，该类实现了一个 BeanFactoryPostProcessor 接口。Spring在启动的过程中
+		// 会去调用所有后处理器bean，并执行相应的处理，所以说像这种由框架为我们处理的一些我们看不见的操作，对我们来说是透明的。
 		String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanFactoryPostProcessor.class, true, false);
 
 		// 实现优先级排序
@@ -927,11 +932,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	public boolean containsLocalBean(String name) {
 		return getBeanFactory().containsLocalBean(name);
 	}
-	/**
-	 * Return the internal bean factory of the parent context if it implements ConfigurableApplicationContext; else, return the parent context itself.
-	 * 返回父上下文的内部bean工厂如果它实现了ConfigurableApplicationContext;返回父上下文中本身。
-	 * @see org.springframework.context.ConfigurableApplicationContext#getBeanFactory
-	 */
+	// 返回父容器，如果父容器是ConfigurableApplicationContext的对象，则返回一个ConfigurableApplicationContext对象
 	protected BeanFactory getInternalParentBeanFactory() {
 		return (getParent() instanceof ConfigurableApplicationContext) ?
 				((ConfigurableApplicationContext) getParent()).getBeanFactory() : getParent();

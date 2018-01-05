@@ -97,17 +97,20 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 			closeBeanFactory();
 		}
 		try {
-			// 1、xmlBeanFactory继承自DefaultListtableBeanFactoryBean，并提供了XMLBeanDefinitionReader类型的属性，也就是说DefaultListableBeanFactory是容器的基础，必须首先实例化。
+			// 1、xmlBeanFactory继承自DefaultListtableBeanFactoryBean，并提供了XMLBeanDefinitionReader类型的属性，也就是
+			// 说DefaultListableBeanFactory是容器的基础，必须首先实例化。
 			// 这里仅仅只是初始化一个DefaultListableBeanFactory实例，还未进行xml解析、初始化Bean等操作
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
 			// 2、为了序列化指定id，如果需要的话，让这个BeanFactory从id反序列化到BeanFactory对象
 			beanFactory.setSerializationId(getId());
-			// 3、定制BeanFactory，设置相关属性，包括是否允许覆盖同名称的不同定义的对象以及循环依赖，以及设置@Autowired和@Qualifier注解的解析器 QualifierAnnotationAutowireCandidateResolver
+			// 3、定制BeanFactory，设置相关属性，包括是否允许覆盖同名称的不同定义的对象以及循环依赖，以及设置@Autowired
+			// 和@Qualifier注解的解析器 QualifierAnnotationAutowireCandidateResolver
 			customizeBeanFactory(beanFactory);
 			// 4、加载BeanDefinition，初始化DocumentReader，并进行XML文件读取及解析和注册BeanDefinition
 			loadBeanDefinitions(beanFactory);
 			synchronized (this.beanFactoryMonitor) {
-				// 5、使用全局变量记录BeanFactory类实例，因为DefaultListableBeanFactory类型的变量BeanFactory是函数内的局部变量，所以要使用全局变量记录解析结果
+				// 5、使用全局变量记录BeanFactory类实例，因为DefaultListableBeanFactory类型的变量BeanFactory是函数内的
+				// 局部变量，所以要使用全局变量记录解析结果
 				this.beanFactory = beanFactory;
 			}
 		}
@@ -152,22 +155,27 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	}
 
 
-	// 创建这个上下文的内部IOC容器（BeanFactory）,默认实现创建一个DefaultListableBeanFactory实例，
+	// 创建Spring容器的内部IOC容器（BeanFactory）,默认实现创建一个DefaultListableBeanFactory实例，该实例会指定一个父容器，
+	// 该父容器指向Spring容器的父容器
 	protected DefaultListableBeanFactory createBeanFactory() {
 		return new DefaultListableBeanFactory(getInternalParentBeanFactory());
 	}
 
-	// 给底层的BeanFactory设置是否覆盖同名的bean 以及 是否允许循环依赖
+	// 给内部的IOC容器设置：1、是否覆盖同名的bean；2、是否允许循环依赖；3、设置@Qualifier和@Autowire的解析处理器
 	protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
-		// 如果属性allowBeanDefinitionOverriding不为空，设置给BeanFactory对象相应的属性，此属性的含义：是否允许覆盖同名称的不同定义的对象
+		// 1、如果属性allowBeanDefinitionOverriding不为空，设置给BeanFactory对象相应的属性，
+		// 此属性的含义：是否允许覆盖同名称的不同定义的对象
 		if (this.allowBeanDefinitionOverriding != null) {
 			beanFactory.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 		}
-		// 如果属性allowCircularReference不为空，设置给BeanFactory对象相应属性，此属性的含义：是否允许bean之间存在循环依赖
+
+		// 2、如果属性allowCircularReference不为空，设置给BeanFactory对象相应属性，
+		// 此属性的含义：是否允许bean之间存在循环依赖
 		if (this.allowCircularReferences != null) {
 			beanFactory.setAllowCircularReferences(this.allowCircularReferences);
 		}
-		// 用于@Qualifier和@Autowire
+
+		// 3、用于@Qualifier和@Autowire
 		beanFactory.setAutowireCandidateResolver(new QualifierAnnotationAutowireCandidateResolver());
 	}
 
