@@ -100,7 +100,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
 	// 容器是否处于“活动”状态的同步监视器
 	private final Object activeMonitor = new Object();
-	//AtomicBoolean用于比较两个Boolean类型的值，如果一致，执行方法内的语句。其实就是一个if语句，值得注意的是比较和执行两个操作是作为一个原子性的事务操作，中间不会出现线程暂停的情况，主要为多线程的控制提供解决的方案。
+	//AtomicBoolean用于比较两个Boolean类型的值，如果一致，执行方法内的语句。其实就是一个if语句，值得注意的是比较和执行两
+	// 个操作是作为一个原子性的事务操作，中间不会出现线程暂停的情况，主要为多线程的控制提供解决的方案。
 	private boolean active = false;// 标记容器是否正在启动
 	private boolean closed = false;// 标记容器是否是关闭状态
 
@@ -170,7 +171,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	public long getStartupDate() {
 		return this.startupDate;
 	}
-	// 当完成ApplicationContext初始化的时候，要通过Spring中的重要事件发布机制来发出ContextRefreshedEvent事件，以保证对应的监听器可以做进一步的逻辑处理
+	// 当完成ApplicationContext初始化的时候，要通过Spring中的重要事件发布机制来发出ContextRefreshedEvent事件，以保证对应
+	// 的监听器可以做进一步的逻辑处理
 	public void publishEvent(ApplicationEvent event) {
 		Assert.notNull(event, "Event must not be null");
 		if (logger.isTraceEnabled()) {
@@ -246,16 +248,17 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
-			// 1、准备刷新的上下文环境：例如对系统属性及环境变量的初始化及验证
-			// 在某种情况下项目的使用需要读取某些系统变量，而这个变量的设置很可能会影响着系统的正确性，
-			// 那么 ClassPathXMLApplicationContext 为我们提供的这个准备函数就显得非常必要，他可以在Spring启动的时候提前对必须的变量存在性验证
+			// 1、准备刷新的上下文环境：例如对系统属性及环境变量的初始化及验证，在某种情况下项目的使用需要读取某些系统变
+			// 量，而这个变量的设置很可能会影响着系统的正确性，那么 ClassPathXMLApplicationContext 为我们提供的这个准备
+			// 函数就显得非常必要，他可以在Spring启动的时候提前对必须的变量存在性验证
 			prepareRefresh();
 
 			// 2、初始化BeanFactory，执行obtainFreshBeanFactory()方法后ApplicationContext就拥有BeanFactory的功能
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
-			// 3、注意，程序至此时，配置的Bean还没有进行实例化，只是以BeanDefinition 的形式存储的注册表中，对BeanFactory进行各种功能模式填充，@Qualifier和@Autowired应该是大家非常熟悉的注解，那么这两个注解正是在这一步骤中增加的支持。
-			//该方法主要功能：设置类加载器、添加SPEL表达式语言的处理器、设置属性编辑器、
+			// 3、注意，程序至此时，配置的Bean还没有进行实例化，只是以BeanDefinition 的形式存储的注册表中，对BeanFactory
+			// 进行各种功能模式填充，@Qualifier和@Autowired应该是大家非常熟悉的注解，那么这两个注解正是在这一步骤中增加
+			// 的支持。该方法主要功能：设置类加载器、添加SPEL表达式语言的处理器、设置属性编辑器、
 			prepareBeanFactory(beanFactory);
 
 			try {
@@ -263,8 +266,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 				postProcessBeanFactory(beanFactory);
 
 				// 5、激活各种BeanFactory处理器
-				// 其中的一个应用是运用后处理器，处理BeanDefinition注册表中的一些占位符，因为Spring在解析Bean的时候时候如果有引用占位符，在解析阶段占位符是不会被翻译的，
-				// ApplicationContext 通过后处理器的方式来进行翻译相应的占位符，如果你使用BeanFactory级别的容器，那么调用getBean方法返回的Bean的属性信息是永远不会被解析的。
+				// 其中的一个应用是运用后处理器，处理BeanDefinition注册表中的一些占位符，因为Spring在解析Bean的时候时候
+				// 如果有引用占位符，在解析阶段占位符是不会被翻译的，ApplicationContext 通过后处理器的方式来进行翻译相应
+				// 的占位符，如果你使用BeanFactory级别的容器，那么调用getBean方法返回的Bean的属性信息是永远不会被解析的。
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// 6、注册拦截Bean创建的Bean处理器，这里只是注册，真正的调用是在getBean时候
@@ -282,8 +286,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 				// 10、在所有注册的bean中查找Listener bean，注册到消息广播器中
 				registerListeners();
 
-				// 11、初始化剩下的单实例（非惰性）
-				//完成BeanFactoryBean的初始化工作，其中包括ConversionService的设置，配置冻结以及非延迟加载的bean的初始化工作。
+				// 11、初始化剩下的单实例（非惰性）：完成BeanFactoryBean的初始化工作，其中包括ConversionService的设置，
+				// 配置冻结以及非延迟加载的bean的初始化工作。
 				finishBeanFactoryInitialization(beanFactory);
 
 				// 12、完成刷新过程，通知生命周期处理器lifecycleProcessor 刷新过程，同时发出ContextRefreshEvent通知别人
@@ -348,8 +352,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		}
 		return beanFactory;
 	}
-	// 3、在实例化bean前，我们需要做一些准备工作，如：设置类装载器、BeanDefinition的解析器、添加SPEL表达式语言的处理器、注册属性编辑器等工作。
-	// 对BeanFactory进行各种功能模式填充，@Qualifier和@Autowired应该是大家非常熟悉的注解，那么这两个注解正是在这一步骤中增加的支持。
+	// 3、在实例化bean前，我们需要做一些准备工作，如：设置类装载器、BeanDefinition的解析器、添加SPEL表达式语言的处理器、
+	// 注册属性编辑器等工作。对BeanFactory进行各种功能模式填充，@Qualifier和@Autowired应该是大家非常熟悉的注解，那么这两
+	// 个注解正是在这一步骤中增加的支持。
 	protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		// 告诉内部 beanFactory 使用上下文的类装载器
 		beanFactory.setBeanClassLoader(getClassLoader());
@@ -662,8 +667,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	// 11、初始化剩下的单实例（非惰性）
 	// 完成BeanFactoryBean的初始化工作，其中包括ConversionService的设置，配置冻结以及非延迟加载的bean的初始化工作。
 	// ApplicationContext 实现的默认行为就是在启动时将所有单例bean提前进行实例化。提前实例化意味着作为初始化过程的一部分，
-	// ApplicationContext实例会创建并配置所有的单例bean。通常情况下这时一件好事，因为这样在配置中的任何错误就会即刻被发现（否则的化可能要花很长时间来排查）。
-	// 而这个实例化的过程就是在finishBeanFactoryInitialization中完成的。
+	// ApplicationContext实例会创建并配置所有的单例bean。通常情况下这时一件好事，因为这样在配置中的任何错误就会即刻被发现
+	// （否则的化可能要花很长时间来排查）。而这个实例化的过程就是在finishBeanFactoryInitialization中完成的。
 	protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
 		// Initialize conversion service for this context.
 		if (beanFactory.containsBean(CONVERSION_SERVICE_BEAN_NAME) && beanFactory.isTypeMatch(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class)) {
