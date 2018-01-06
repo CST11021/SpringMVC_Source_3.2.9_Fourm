@@ -1,24 +1,22 @@
 package com.whz.spring.cache;
 
-import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
-
+@Service
 public class AccountService1 {
 
     private final Logger logger = LoggerFactory.getLogger(AccountService1.class);
 
-    @Resource
+    @Autowired
     private CacheContext<Account> accountCacheContext;
 
     public Account getAccountByName(String accountName) {
         Account result = accountCacheContext.get(accountName);
         if (result != null) {
-            logger.info("get from cache... {}", accountName);
+            logger.info("从缓存获取： {}", accountName);
             return result;
         }
 
@@ -32,8 +30,7 @@ public class AccountService1 {
     }
 
     private Account getFromDB(String accountName) {
-        logger.info("real querying db... {}", accountName);
-        //Todo query data from database
+        logger.info("从DB获取： {}", accountName);
         return new Account(accountName);
     }
 

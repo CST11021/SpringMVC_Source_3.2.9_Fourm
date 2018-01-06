@@ -3,6 +3,9 @@ package com.whz.spring.cache;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class CacheContext<T> {
 
     private Map<String, T> cache = new ConcurrentHashMap<String, T>();
