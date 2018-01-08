@@ -30,6 +30,9 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
  * @since 3.0.1
  * @see org.springframework.context.annotation.ConfigurationClassPostProcessor
  */
+// BeanDefinitionRegistryPostProcessor 的一个典型应用是扫描指定包及其子包下面拥有指定注解的类，你会发现在BeanFactory中并没有
+// 使用到该后处理器，该后处理器为Spring容器扩展而设计的，IOC容器只加载一些常规的Bean配置，而像@Service、@Repository等这些注解
+// 定义的Bean是Spring容器中才扩展出来的，其中 BeanDefinitionRegistryPostProcessor 还有一个典型的应用是Mybatis中的@Mapper.
 public interface BeanDefinitionRegistryPostProcessor extends BeanFactoryPostProcessor {
 
 	/**
