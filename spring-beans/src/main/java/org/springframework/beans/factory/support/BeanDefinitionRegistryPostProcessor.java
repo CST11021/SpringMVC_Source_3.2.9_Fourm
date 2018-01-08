@@ -30,6 +30,10 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
  * @since 3.0.1
  * @see org.springframework.context.annotation.ConfigurationClassPostProcessor
  */
+// 应用及其作用：Application Contexts会通过注册表首先检测该工厂后处理器并使用它。对注册表中的BeanDefinition的属性进行后期加工，
+// 负责把XML中有些占位符式的属性还原成真实值。意思是说，有时候，XML中<bean>的属性值不固定，会随着外界因素变化，这时候，在<bean>
+// 中配置占位符，而另外定义一个属性文件来控制<bean>的属性。
+
 // BeanDefinitionRegistryPostProcessor 的一个典型应用是扫描指定包及其子包下面拥有指定注解的类，你会发现在BeanFactory中并没有
 // 使用到该后处理器，该后处理器为Spring容器扩展而设计的，IOC容器只加载一些常规的Bean配置，而像@Service、@Repository等这些注解
 // 定义的Bean是Spring容器中才扩展出来的，其中 BeanDefinitionRegistryPostProcessor 还有一个典型的应用是Mybatis中的@Mapper.
