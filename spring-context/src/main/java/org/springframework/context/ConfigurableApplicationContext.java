@@ -28,7 +28,8 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	void setParent(ApplicationContext parent);
 	ConfigurableEnvironment getEnvironment();
 	void setEnvironment(ConfigurableEnvironment environment);
-	// 添加一个Bean工厂后处理器：BeanFactoryPostProcessor是在spring容器加载了bean的定义文件之后，在bean实例化之前执行的
+	// 添加一个BeanFactory后处理器：BeanFactoryPostProcessor是在解析完配置文件并注册了BeanDefinition后，并在所有的bean实例化
+	// 之前执行的调用的，一个典型的应用就是解析Bean配置时使用的占位符
 	void addBeanFactoryPostProcessor(BeanFactoryPostProcessor beanFactoryPostProcessor);
 	// 添加一个上下文监听
 	void addApplicationListener(ApplicationListener<?> listener);
