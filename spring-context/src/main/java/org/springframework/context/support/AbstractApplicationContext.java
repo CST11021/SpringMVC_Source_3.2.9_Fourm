@@ -414,11 +414,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			// 保存Spring容器中BeanDefinitionRegistryPostProcessor类型的处理器（在完成 BeanDefinition 注册后，实例化bean之前调用）
 			List<BeanDefinitionRegistryPostProcessor> registryPostProcessors = new LinkedList<BeanDefinitionRegistryPostProcessor>();
 
-			// 1、将Spring容器中的BeanDefinitionRegistryPostProcessor后处理器应用到BeanDefinition注册
+			// 1、执行Spring容器中的BeanDefinitionRegistryPostProcessor后处理器
 			for (BeanFactoryPostProcessor postProcessor : getBeanFactoryPostProcessors()) {
 				if (postProcessor instanceof BeanDefinitionRegistryPostProcessor) {
 					BeanDefinitionRegistryPostProcessor registryPostProcessor = (BeanDefinitionRegistryPostProcessor) postProcessor;
-					// 将BeanDefinitionRegistryPostProcessor类型的处理器注册到 BeanDefinition 注册表中
+					// 执行BeanDefinitionRegistryPostProcessor类型的处理器
 					registryPostProcessor.postProcessBeanDefinitionRegistry(registry);
 					registryPostProcessors.add(registryPostProcessor);
 				}
@@ -427,7 +427,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 				}
 			}
 
-			// 2、将IOC容器中找出所有 BeanDefinitionRegistryPostProcessor 类型的Bean，并注册到 BeanDefinition 注册表中
+			// 2、执行IOC容器中的 BeanDefinitionRegistryPostProcessor 类型的处理器
 			Map<String, BeanDefinitionRegistryPostProcessor> beanMap = beanFactory.getBeansOfType(BeanDefinitionRegistryPostProcessor.class, true, false);
 			List<BeanDefinitionRegistryPostProcessor> registryPostProcessorBeans = new ArrayList<BeanDefinitionRegistryPostProcessor>(beanMap.values());
 			OrderComparator.sort(registryPostProcessorBeans);
@@ -436,6 +436,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			}
 
 
+			// 3、注意：invokeBeanFactoryPostProcessors()执行的是处理器的postProcessBeanFactory()方法
 			// 将Spring容器中BeanDefinitionRegistryPostProcessor类型的处理器应用到IOC容器中
 			invokeBeanFactoryPostProcessors(registryPostProcessors, beanFactory);
 			// 将IOC容器中BeanDefinitionRegistryPostProcessor类型的处理器Bean应用到IOC容器中
