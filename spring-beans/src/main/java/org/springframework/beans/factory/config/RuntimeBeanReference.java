@@ -27,6 +27,7 @@ import org.springframework.util.Assert;
  * @see org.springframework.beans.factory.BeanFactory#getBean
  */
 // 当占位符类用于属性值的对象时，它指向工厂中另一个bean的引用，并在运行时被解析的。
+// 比如Bean A 依赖 B，当Bean还没有实例化之前是以BeanDefinition的形式存在，此时指向B的引用（变量）用一个BeanReference对象来表示
 public class RuntimeBeanReference implements BeanReference {
 
 	// 这个运行时bean引用指向的bean名称
