@@ -308,8 +308,11 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	}
 	/**
 	 * Determine whether the given bean definition qualifies as candidate.
+	 * 确定给定的bean定义是否具有候选资格。
 	 * <p>The default implementation checks whether the class is concrete
+	 * 默认实现检查类是否是具体的。
 	 * (i.e. not abstract and not an interface). Can be overridden in subclasses.
+	 * (例如：即不是抽象的，也不是接口)。可以在子类中重写。
 	 * @param beanDefinition the bean definition to check
 	 * @return whether the bean definition qualifies as a candidate component
 	 */
