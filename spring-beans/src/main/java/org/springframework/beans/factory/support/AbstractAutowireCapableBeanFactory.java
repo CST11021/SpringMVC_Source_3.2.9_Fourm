@@ -918,9 +918,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 	// 用给定的包装器填充bean实例中的属性
 	// populateBean函数的处理流程：
-	// 一、InstantiationAwareBeanPostProcessor处理器的postProcessAfterInstantiation函数的应用，改函数可以控制程序是否继续进行属性填充。
+	// 一、执行InstantiationAwareBeanPostProcessor处理器的postProcessAfterInstantiation方法，该函数可以控制程序是否继
+	// 续进行属性填充。
 	// 二、根据注入类型(byName/byType)，提取依赖的bean，并统一存入PropertyValues中。
-	// 三、应用InstantiationAwareBeanPostProcessor处理器的 postProcessPropertyValues 方法，对属性获取完毕填充前对属性的再次处理，典型应用是 requiredAnnotationBeanPostProcessor 类中对属性的验证。
+	// 三、执行InstantiationAwareBeanPostProcessor处理器的postProcessPropertyValues方法，对属性获取完毕填充前对属性的
+	// 再次处理，典型应用是 requiredAnnotationBeanPostProcessor 类中对属性的验证。
 	// 四、将所有PropertyValues中的属性填充至BeanWrapper中
 	protected void populateBean(String beanName, RootBeanDefinition mbd, BeanWrapper bw) {
 		// 获取配置中property的值，PropertyValues封装了bean中一个属性
@@ -936,7 +938,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
-		// 给 InstantiationAwareBeanPostProcessors 最后一次机会在属性设置前来改变bean，如：可以支持属性注入的类型
+		// 第一步：给 InstantiationAwareBeanPostProcessors 最后一次机会在属性设置前来改变bean，如：可以支持属性注入的类型
 		boolean continueWithPropertyPopulation = true;
 
 		if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
@@ -957,7 +959,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			return;
 		}
 
-		//开始进行依赖注入的过程，这里先处理autowire的注入，默认不使用自动装配
+		// 第二步：开始进行依赖注入的过程，这里先处理autowire的注入，默认不使用自动装配
 		if (mbd.getResolvedAutowireMode() == RootBeanDefinition.AUTOWIRE_BY_NAME || mbd.getResolvedAutowireMode() == RootBeanDefinition.AUTOWIRE_BY_TYPE) {
 			MutablePropertyValues newPvs = new MutablePropertyValues(pvs);
 
@@ -974,7 +976,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			pvs = newPvs;
 		}
 
-		//后处理器已经初始化
+		//第三步：执行InstantiationAwareBeanPostProcessor处理器的postProcessPropertyValues方法
 		boolean hasInstAwareBpps = hasInstantiationAwareBeanPostProcessors();
 		//需要依赖检查
 		boolean needsDepCheck = (mbd.getDependencyCheck() != RootBeanDefinition.DEPENDENCY_CHECK_NONE);
@@ -999,7 +1001,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
-		// 对属性进行注入
+		// 第四步：对属性进行注入
 		applyPropertyValues(beanName, mbd, bw, pvs);
 	}
 	// 如果将autowire设置为“byName”，则在该工厂中填充任何缺失的属性值。
@@ -1184,7 +1186,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	// 将属性注入到bean：
-	// 程序运行到这里，已经完成了对所有注入属性的获取，但是获取的属性是以PropertyValues形式存在的，还并没有应用到已经实例化的bean中，这一工作是在applyPropertyValues中。
+	// 程序运行到这里，已经完成了对所有注入属性的获取，但是获取的属性是以PropertyValues形式存在的，还并没有应用到已经
+	// 实例化的bean中，这一工作是在applyPropertyValues中。
 	protected void applyPropertyValues(String beanName, BeanDefinition mbd, BeanWrapper bw, PropertyValues pvs) {
 		if (pvs == null || pvs.isEmpty()) {
 			return;

@@ -34,6 +34,7 @@ import org.springframework.util.ObjectUtils;
  * @see BeanDefinition#getPropertyValues
  * @see org.springframework.beans.MutablePropertyValues#addPropertyValue
  */
+// TypedStringValue用来表示Bean属性配置中的value属性，如：<bean><property name="" value=""></property></bean>
 public class TypedStringValue implements BeanMetadataElement {
 
 	private String value;
@@ -54,38 +55,16 @@ public class TypedStringValue implements BeanMetadataElement {
 		setTargetTypeName(targetTypeName);
 	}
 
-
-	/**
-	 * Set the String value.
-	 * <p>Only necessary for manipulating a registered value,
-	 * for example in BeanFactoryPostProcessors.
-	 * @see PropertyPlaceholderConfigurer
-	 */
 	public void setValue(String value) {
 		this.value = value;
 	}
-
-	/**
-	 * Return the String value.
-	 */
 	public String getValue() {
 		return this.value;
 	}
-
-	/**
-	 * Set the type to convert to.
-	 * <p>Only necessary for manipulating a registered value,
-	 * for example in BeanFactoryPostProcessors.
-	 * @see PropertyPlaceholderConfigurer
-	 */
 	public void setTargetType(Class<?> targetType) {
 		Assert.notNull(targetType, "'targetType' must not be null");
 		this.targetType = targetType;
 	}
-
-	/**
-	 * Return the type to convert to.
-	 */
 	public Class<?> getTargetType() {
 		Object targetTypeValue = this.targetType;
 		if (!(targetTypeValue instanceof Class)) {
@@ -93,18 +72,10 @@ public class TypedStringValue implements BeanMetadataElement {
 		}
 		return (Class) targetTypeValue;
 	}
-
-	/**
-	 * Specify the type to convert to.
-	 */
 	public void setTargetTypeName(String targetTypeName) {
 		Assert.notNull(targetTypeName, "'targetTypeName' must not be null");
 		this.targetType = targetTypeName;
 	}
-
-	/**
-	 * Return the type to convert to.
-	 */
 	public String getTargetTypeName() {
 		Object targetTypeValue = this.targetType;
 		if (targetTypeValue instanceof Class) {
@@ -114,22 +85,9 @@ public class TypedStringValue implements BeanMetadataElement {
 			return (String) targetTypeValue;
 		}
 	}
-
-	/**
-	 * Return whether this typed String value carries a target type .
-	 */
 	public boolean hasTargetType() {
 		return (this.targetType instanceof Class);
 	}
-
-	/**
-	 * Determine the type to convert to, resolving it from a specified class name
-	 * if necessary. Will also reload a specified Class from its name when called
-	 * with the target type already resolved.
-	 * @param classLoader the ClassLoader to use for resolving a (potential) class name
-	 * @return the resolved type to convert to
-	 * @throws ClassNotFoundException if the type cannot be resolved
-	 */
 	public Class<?> resolveTargetType(ClassLoader classLoader) throws ClassNotFoundException {
 		if (this.targetType == null) {
 			return null;
@@ -138,49 +96,24 @@ public class TypedStringValue implements BeanMetadataElement {
 		this.targetType = resolvedClass;
 		return resolvedClass;
 	}
-
-
-	/**
-	 * Set the configuration source {@code Object} for this metadata element.
-	 * <p>The exact type of the object will depend on the configuration mechanism used.
-	 */
 	public void setSource(Object source) {
 		this.source = source;
 	}
-
 	public Object getSource() {
 		return this.source;
 	}
-
-	/**
-	 * Set the type name as actually specified for this particular value, if any.
-	 */
 	public void setSpecifiedTypeName(String specifiedTypeName) {
 		this.specifiedTypeName = specifiedTypeName;
 	}
-
-	/**
-	 * Return the type name as actually specified for this particular value, if any.
-	 */
 	public String getSpecifiedTypeName() {
 		return this.specifiedTypeName;
 	}
-
-	/**
-	 * Mark this value as dynamic, i.e. as containing an expression
-	 * and hence not being subject to caching.
-	 */
 	public void setDynamic() {
 		this.dynamic = true;
 	}
-
-	/**
-	 * Return whether this value has been marked as dynamic.
-	 */
 	public boolean isDynamic() {
 		return this.dynamic;
 	}
-
 
 	@Override
 	public boolean equals(Object other) {
