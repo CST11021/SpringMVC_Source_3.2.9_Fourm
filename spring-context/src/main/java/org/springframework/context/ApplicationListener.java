@@ -18,7 +18,8 @@ package org.springframework.context;
 
 import java.util.EventListener;
 
-// spring中的事件监听接口，该监听用来监听 E 事件，当E事件触发
+// spring中的事件监听接口，该监听用来监听 E 事件，当E事件发生后，Spring会通过ApplicationEventMulticaster来广播该事件，就
+// 是通知所有的监听了该事件的监听器，然后调用监听器的onApplicationEvent()方法
 public interface ApplicationListener<E extends ApplicationEvent> extends EventListener {
 
 	// 当该监听器监听到对应的事件发生时，会调用该方法进行相应的处理

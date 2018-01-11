@@ -41,6 +41,8 @@ import org.springframework.context.ApplicationListener;
  */
 public class SimpleApplicationEventMulticaster extends AbstractApplicationEventMulticaster {
 
+	// 线程池服务，Spring默认监听机制默认是同步的，我们可以通过声明一个事件广播器Bean，并注入一个Executor的形式
+	// 来实现异步事件监听
 	private Executor taskExecutor;
 
 	public SimpleApplicationEventMulticaster() {}
