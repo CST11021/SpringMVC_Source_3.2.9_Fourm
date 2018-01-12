@@ -54,6 +54,8 @@ import org.springframework.util.ObjectUtils;
  */
 public abstract class AbstractFallbackCacheOperationSource implements CacheOperationSource {
 
+	protected final Log logger = LogFactory.getLog(getClass());
+
 	/**
 	 * Canonical value held in cache to indicate no caching attribute was
 	 * found for this method and we don't need to look again.
@@ -61,19 +63,11 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 	private final static Collection<CacheOperation> NULL_CACHING_ATTRIBUTE = Collections.emptyList();
 
 	/**
-	 * Logger available to subclasses.
-	 * <p>As this base class is not marked Serializable, the logger will be recreated
-	 * after serialization - provided that the concrete subclass is Serializable.
-	 */
-	protected final Log logger = LogFactory.getLog(getClass());
-
-	/**
 	 * Cache of CacheOperations, keyed by DefaultCacheKey (Method + target Class).
 	 * <p>As this base class is not marked Serializable, the cache will be recreated
 	 * after serialization - provided that the concrete subclass is Serializable.
 	 */
-	final Map<Object, Collection<CacheOperation>> attributeCache =
-			new ConcurrentHashMap<Object, Collection<CacheOperation>>(1024);
+	final Map<Object, Collection<CacheOperation>> attributeCache = new ConcurrentHashMap<Object, Collection<CacheOperation>>(1024);
 
 
 	/**
@@ -189,13 +183,10 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 	}
 
 
-	/**
-	 * Default cache key for the CacheOperation cache.
-	 */
+	// 默认将一个目标类和目标方法，作为缓存Key
 	private static class DefaultCacheKey {
 
 		private final Method method;
-
 		private final Class<?> targetClass;
 
 		public DefaultCacheKey(Method method, Class<?> targetClass) {
@@ -215,7 +206,6 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 			return (this.method.equals(otherKey.method) && ObjectUtils.nullSafeEquals(this.targetClass,
 					otherKey.targetClass));
 		}
-
 		@Override
 		public int hashCode() {
 			return this.method.hashCode() * 29 + (this.targetClass != null ? this.targetClass.hashCode() : 0);

@@ -29,7 +29,7 @@ package org.springframework.cache;
 // 一个公共的缓存操作接口
 public interface Cache {
 
-	// Return the cache name.
+	// 返回缓存名
 	String getName();
 
 	// Return the the underlying native cache provider.

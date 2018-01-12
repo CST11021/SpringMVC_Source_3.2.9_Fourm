@@ -11,7 +11,7 @@ public interface Lifecycle {
 	// Stop this component
 	void stop();
 
-	// Check whether this component is currently running.
+	// 判断该组件是否启动，返回true的时候，容器销毁时会调用stop()方法
 	boolean isRunning();
 
 }

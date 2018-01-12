@@ -31,9 +31,7 @@ public class SimpleCacheManager extends AbstractCacheManager {
 
 	private Collection<? extends Cache> caches;
 
-	/**
-	 * Specify the collection of Cache instances to use for this CacheManager.
-	 */
+	// 一般Spring配置CacheManager时，都会注入一些缓存对象
 	public void setCaches(Collection<? extends Cache> caches) {
 		this.caches = caches;
 	}

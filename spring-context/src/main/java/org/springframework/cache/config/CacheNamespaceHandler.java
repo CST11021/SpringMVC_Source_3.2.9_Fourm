@@ -37,12 +37,14 @@ public class CacheNamespaceHandler extends NamespaceHandlerSupport {
 	static final String CACHE_MANAGER_ATTRIBUTE = "cache-manager";
 	static final String DEFAULT_CACHE_MANAGER_BEAN_NAME = "cacheManager";
 
+	// 从该标签中抽取cache-manager属性配置的值，如果没有配置，则返回cacheManager
 	static String extractCacheManager(Element element) {
 		return (element.hasAttribute(CacheNamespaceHandler.CACHE_MANAGER_ATTRIBUTE) ? element
 				.getAttribute(CacheNamespaceHandler.CACHE_MANAGER_ATTRIBUTE)
 				: CacheNamespaceHandler.DEFAULT_CACHE_MANAGER_BEAN_NAME);
 	}
 
+	// 解析“key-generator”属性，并设置到BeanDefinition中
 	static BeanDefinition parseKeyGenerator(Element element, BeanDefinition def) {
 		String name = element.getAttribute("key-generator");
 		if (StringUtils.hasText(name)) {

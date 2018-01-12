@@ -58,24 +58,10 @@ package org.springframework.context;
  */
 public interface SmartLifecycle extends Lifecycle, Phased {
 
-	/**
-	 * Return whether this Lifecycle component should be started automatically
-	 * by the container when the ApplicationContext is refreshed. A value of
-	 * "false" indicates that the component is intended to be started manually.
-	 */
+	// isAutoStartup()返回true时，Spring容器启动时会去执行Lifecycle#start()方法
 	boolean isAutoStartup();
 
-	/**
-	 * Indicates that a Lifecycle component must stop if it is currently running.
-	 * <p>The provided callback is used by the {@link LifecycleProcessor} to support an
-	 * ordered, and potentially concurrent, shutdown of all components having a
-	 * common shutdown order value. The callback <b>must</b> be executed after
-	 * the SmartLifecycle component does indeed stop.
-	 * <p>The {@code LifecycleProcessor} will call <i>only</i> this variant of the
-	 * {@code stop} method; i.e. {@link Lifecycle#stop()} will not be called for
-	 * {@link SmartLifecycle} implementations unless explicitly delegated to within
-	 * this method.
-	 */
+	// 销毁组件时的回调方法
 	void stop(Runnable callback);
 
 }

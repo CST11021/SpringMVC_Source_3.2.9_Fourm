@@ -43,49 +43,25 @@ import org.springframework.util.Assert;
  * @since 3.1
  */
 @SuppressWarnings("serial")
-public class AnnotationCacheOperationSource extends AbstractFallbackCacheOperationSource
-		implements Serializable {
+public class AnnotationCacheOperationSource extends AbstractFallbackCacheOperationSource implements Serializable {
 
 	private final boolean publicMethodsOnly;
-
 	private final Set<CacheAnnotationParser> annotationParsers;
 
-
-	/**
-	 * Create a default AnnotationCacheOperationSource, supporting public methods
-	 * that carry the {@code Cacheable} and {@code CacheEvict} annotations.
-	 */
+	// 构造器
 	public AnnotationCacheOperationSource() {
 		this(true);
 	}
-
-	/**
-	 * Create a default {@code AnnotationCacheOperationSource}, supporting public methods
-	 * that carry the {@code Cacheable} and {@code CacheEvict} annotations.
-	 * @param publicMethodsOnly whether to support only annotated public methods
-	 * typically for use with proxy-based AOP), or protected/private methods as well
-	 * (typically used with AspectJ class weaving)
-	 */
 	public AnnotationCacheOperationSource(boolean publicMethodsOnly) {
 		this.publicMethodsOnly = publicMethodsOnly;
 		this.annotationParsers = new LinkedHashSet<CacheAnnotationParser>(1);
 		this.annotationParsers.add(new SpringCacheAnnotationParser());
 	}
-
-	/**
-	 * Create a custom AnnotationCacheOperationSource.
-	 * @param annotationParser the CacheAnnotationParser to use
-	 */
 	public AnnotationCacheOperationSource(CacheAnnotationParser annotationParser) {
 		this.publicMethodsOnly = true;
 		Assert.notNull(annotationParser, "CacheAnnotationParser must not be null");
 		this.annotationParsers = Collections.singleton(annotationParser);
 	}
-
-	/**
-	 * Create a custom AnnotationCacheOperationSource.
-	 * @param annotationParsers the CacheAnnotationParser to use
-	 */
 	public AnnotationCacheOperationSource(CacheAnnotationParser... annotationParsers) {
 		this.publicMethodsOnly = true;
 		Assert.notEmpty(annotationParsers, "At least one CacheAnnotationParser needs to be specified");
@@ -93,11 +69,6 @@ public class AnnotationCacheOperationSource extends AbstractFallbackCacheOperati
 		Collections.addAll(parsers, annotationParsers);
 		this.annotationParsers = parsers;
 	}
-
-	/**
-	 * Create a custom AnnotationCacheOperationSource.
-	 * @param annotationParsers the CacheAnnotationParser to use
-	 */
 	public AnnotationCacheOperationSource(Set<CacheAnnotationParser> annotationParsers) {
 		this.publicMethodsOnly = true;
 		Assert.notEmpty(annotationParsers, "At least one CacheAnnotationParser needs to be specified");
@@ -109,7 +80,6 @@ public class AnnotationCacheOperationSource extends AbstractFallbackCacheOperati
 	protected Collection<CacheOperation> findCacheOperations(Class<?> clazz) {
 		return determineCacheOperations(clazz);
 	}
-
 	@Override
 	protected Collection<CacheOperation> findCacheOperations(Method method) {
 		return determineCacheOperations(method);
@@ -160,7 +130,6 @@ public class AnnotationCacheOperationSource extends AbstractFallbackCacheOperati
 		return (this.annotationParsers.equals(otherCos.annotationParsers) &&
 				this.publicMethodsOnly == otherCos.publicMethodsOnly);
 	}
-
 	@Override
 	public int hashCode() {
 		return this.annotationParsers.hashCode();

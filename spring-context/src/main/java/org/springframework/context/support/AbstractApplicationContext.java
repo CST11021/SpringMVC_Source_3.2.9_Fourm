@@ -131,7 +131,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	//** Statically specified listeners
 	private Set<ApplicationListener<?>> applicationListeners = new LinkedHashSet<ApplicationListener<?>>();
 
-	//初始化时使用标准的Envirionment实现类 StandardEnvironment
+	// 初始化时使用标准的Envirionment实现类 StandardEnvironment
 	private ConfigurableEnvironment environment;
 
 

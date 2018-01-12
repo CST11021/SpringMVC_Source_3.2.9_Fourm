@@ -44,13 +44,10 @@ import org.w3c.dom.Element;
  * @author Costin Leau
  * @since 3.1
  */
+// 用来解析<cache:annotation-driven>标签
 class AnnotationDrivenCacheBeanDefinitionParser implements BeanDefinitionParser {
 
-	/**
-	 * Parses the '{@code <cache:annotation-driven>}' tag. Will
-	 * {@link AopNamespaceUtils#registerAutoProxyCreatorIfNecessary
-	 * register an AutoProxyCreator} with the container as necessary.
-	 */
+	// 解析<cache:annotation-driven>标签
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
 		String mode = element.getAttribute("mode");
 		if ("aspectj".equals(mode)) {
@@ -65,11 +62,13 @@ class AnnotationDrivenCacheBeanDefinitionParser implements BeanDefinitionParser 
 		return null;
 	}
 
+	// 向指定的BeanDefinition添加一个cacheManager的属性
 	private static void parseCacheManagerProperty(Element element, BeanDefinition def) {
 		def.getPropertyValues().add("cacheManager",
 				new RuntimeBeanReference(CacheNamespaceHandler.extractCacheManager(element)));
 	}
 
+	// 注册一个 internalCacheAspect 组件
 	/**
 	 * Registers a
 	 * <pre>
@@ -87,31 +86,36 @@ class AnnotationDrivenCacheBeanDefinitionParser implements BeanDefinitionParser 
 			RootBeanDefinition def = new RootBeanDefinition();
 			def.setBeanClassName(CACHE_ASPECT_CLASS_NAME);
 			def.setFactoryMethodName("aspectOf");
+			// 解析 cache-manager 属性
 			parseCacheManagerProperty(element, def);
+			// 解析 key-generator 属性
 			CacheNamespaceHandler.parseKeyGenerator(element, def);
+			// 向IOC中注册一个名为“org.springframework.cache.config.internalCacheAspect”的组件
 			parserContext.registerBeanComponent(new BeanComponentDefinition(def, CACHE_ASPECT_BEAN_NAME));
 		}
 	}
 
-
-	/**
-	 * Inner class to just introduce an AOP framework dependency when actually in proxy mode.
-	 */
+	// 该内部类用于创建CacheOperationSource、CacheInterceptor和CacheAdvisor这几个Spring内部BeanDefinition，然后封装为一个
+	// CompositeComponentDefinition对象后注册到IOC
 	private static class AopAutoProxyConfigurer {
-
 		public static void configureAutoProxyCreator(Element element, ParserContext parserContext) {
 			AopNamespaceUtils.registerAutoProxyCreatorIfNecessary(parserContext, element);
 
+			// 判断BeanDefinition注册表是否注册了缓存增强Bean（cache_advisor_bean）
 			if (!parserContext.getRegistry().containsBeanDefinition(CACHE_ADVISOR_BEAN_NAME)) {
+				// 获取该标签的所在配置源，通常情况下返回空
 				Object eleSource = parserContext.extractSource(element);
 
-				// Create the CacheOperationSource definition.
+				// 1、创建一个 CacheOperationSource 的 BeanDefinition 并注册到IOC容器中
 				RootBeanDefinition sourceDef = new RootBeanDefinition(AnnotationCacheOperationSource.class);
 				sourceDef.setSource(eleSource);
+				// BeanDefinition.ROLE_INFRASTRUCTURE表示该bean是Spring内部使用的bean
 				sourceDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+				// 将 sourceDef 注册到BeanDefinition注册表，并返回由Spring生成的beanName
+				// 这里返回的sourceName是“org.springframework.cache.annotation.AnnotationCacheOperationSource#0”
 				String sourceName = parserContext.getReaderContext().registerWithGeneratedName(sourceDef);
 
-				// Create the CacheInterceptor definition.
+				// 2、创建一个 CacheInterceptor 的 BeanDefinition 并注册到IOC容器中
 				RootBeanDefinition interceptorDef = new RootBeanDefinition(CacheInterceptor.class);
 				interceptorDef.setSource(eleSource);
 				interceptorDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
@@ -120,7 +124,7 @@ class AnnotationDrivenCacheBeanDefinitionParser implements BeanDefinitionParser 
 				interceptorDef.getPropertyValues().add("cacheOperationSources", new RuntimeBeanReference(sourceName));
 				String interceptorName = parserContext.getReaderContext().registerWithGeneratedName(interceptorDef);
 
-				// Create the CacheAdvisor definition.
+				// 3、创建一个 CacheAdvisor 的 BeanDefinition 并注册到IOC容器中
 				RootBeanDefinition advisorDef = new RootBeanDefinition(BeanFactoryCacheOperationSourceAdvisor.class);
 				advisorDef.setSource(eleSource);
 				advisorDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
@@ -131,6 +135,7 @@ class AnnotationDrivenCacheBeanDefinitionParser implements BeanDefinitionParser 
 				}
 				parserContext.getRegistry().registerBeanDefinition(CACHE_ADVISOR_BEAN_NAME, advisorDef);
 
+				// 4、最后一步：将CacheOperationSource、CacheInterceptor和CacheAdvisor封装为一个组件注册到IOC
 				CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(element.getTagName(),
 						eleSource);
 				compositeDef.addNestedComponent(new BeanComponentDefinition(sourceDef, sourceName));

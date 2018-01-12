@@ -25,6 +25,7 @@ import java.util.Collection;
  * @author Costin Leau
  * @since 3.1
  */
+// 缓存管理器接口
 public interface CacheManager {
 
 	// 根据这个name获取一个Cache对象，name参数不能为空
