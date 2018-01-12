@@ -34,10 +34,12 @@ import org.springframework.beans.factory.config.BeanDefinition;
  * @see NamespaceHandler
  * @see AbstractBeanDefinitionParser
  */
-// 该接口是用于解析位于<beans/>内的自定义级别的标签，所有的自定义解析器都会来实现该接口
+// 该接口是用于解析位于<beans/>内的自定义级别的标签，一个自定义的命名空间下通常会有多个不同的配置标签，每个标签对应不同的
+// 解析器，而这些解析都需要来实现 BeanDefinitionParser 接口，并调用parse()方法解析对应的标签
 public interface BeanDefinitionParser {
 
-	// 解析指定的节点元素，并返回一个BeanDefinition
+	// 解析自定义命名空间下对应的标签，并返回一个BeanDefinition，如果该标签不是一个Bean配置标签
+	// 比如：<cache:annotation-driven/>等，则返回null
 	BeanDefinition parse(Element element, ParserContext parserContext);
 
 }

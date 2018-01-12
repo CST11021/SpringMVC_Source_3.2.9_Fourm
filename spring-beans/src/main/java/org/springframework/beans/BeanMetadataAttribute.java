@@ -19,7 +19,8 @@ package org.springframework.beans;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
-// 封装bean元数据的属性：name表示属性名、value表示属性值、source表示这个bean的配置源
+// 封装Bean的属性元数据：name表示属性名、value表示属性值、source表示这个bean的配置源
+// 元数据 = bean定义文件资源 + bean中定义的属性集合
 public class BeanMetadataAttribute implements BeanMetadataElement {
 
 	private final String name;

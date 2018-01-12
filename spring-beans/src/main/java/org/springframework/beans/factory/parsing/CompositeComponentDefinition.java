@@ -30,20 +30,17 @@ import org.springframework.util.Assert;
  * @since 2.0.1
  * @see #getNestedComponents()
  */
+// 内部封装了多个Bean组件，来用将多个不同组件封装为一个功能更强大的组件
 public class CompositeComponentDefinition extends AbstractComponentDefinition {
 
+	// 表示该组合组件的名称
 	private final String name;
-
+	// 表示该组合组件的配置源
 	private final Object source;
-
+	// 用来保存该组合组件内部包含的组件
 	private final List<ComponentDefinition> nestedComponents = new LinkedList<ComponentDefinition>();
 
 
-	/**
-	 * Create a new CompositeComponentDefinition.
-	 * @param name the name of the composite component
-	 * @param source the source element that defines the root of the composite component
-	 */
 	public CompositeComponentDefinition(String name, Object source) {
 		Assert.notNull(name, "Name must not be null");
 		this.name = name;
@@ -51,30 +48,21 @@ public class CompositeComponentDefinition extends AbstractComponentDefinition {
 	}
 
 
-	public String getName() {
-		return this.name;
-	}
-
-	public Object getSource() {
-		return this.source;
-	}
-
-
-	/**
-	 * Add the given component as nested element of this composite component.
-	 * @param component the nested component to add
-	 */
+	// 添加一个Bean组件
 	public void addNestedComponent(ComponentDefinition component) {
 		Assert.notNull(component, "ComponentDefinition must not be null");
 		this.nestedComponents.add(component);
 	}
-
-	/**
-	 * Return the nested components that this composite component holds.
-	 * @return the array of nested components, or an empty array if none
-	 */
+	// 获取所有的内部组件
 	public ComponentDefinition[] getNestedComponents() {
 		return this.nestedComponents.toArray(new ComponentDefinition[this.nestedComponents.size()]);
+	}
+
+	public String getName() {
+		return this.name;
+	}
+	public Object getSource() {
+		return this.source;
 	}
 
 }

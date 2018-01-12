@@ -10,15 +10,22 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
-// 解析xml配置文件，并完成向IOC的注入
+// 该类用于解析xml配置文件，注意继承自 ReaderContext
 public class XmlReaderContext extends ReaderContext {
 
 	// 载入配置文件和解析配置文件
 	private final XmlBeanDefinitionReader reader;
-	// 对一些特殊的命名空间做处理
+	// 用来解析自定义命名空间对应的处理器，例如：命名空间为：http://www.springframework.org/schema/context 对应的处理器
+	// 是 ContextNamespaceHandler.java，该映射关系保存在对应jar包中/META-INF/spring.handlers文件中
 	private final NamespaceHandlerResolver namespaceHandlerResolver;
 
 
+	// 构造器：在解析 XmlBeanDefinitionReader 解析配置文件的时候，会实例化一个 XmlReaderContext 对象
+	// ReaderEventListener默认使用：EmptyReaderEventListener
+	// ProblemReporter默认使用：FailFastProblemReporter
+	// SourceExtractor默认使用：NullSourceExtractor
+	// NamespaceHandlerResolver默认使用：DefaultNamespaceHandlerResolver
+	// 这些入参对象都在 XmlBeanDefinitionReader 中创建的
 	public XmlReaderContext(Resource resource,
 							ProblemReporter problemReporter,
 							ReaderEventListener eventListener,

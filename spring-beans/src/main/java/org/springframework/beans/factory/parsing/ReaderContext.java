@@ -3,9 +3,11 @@ package org.springframework.beans.factory.parsing;
 
 import org.springframework.core.io.Resource;
 
-// Spring 配置解析上下文：主要是解析过程中，一系列的事件监听机制
+// Spring 配置解析上下文：主要是解析过程中，一系列的事件监听机制，XmlReaderContext 就是继承自该类
+// 而 XmlReaderContext 封装了 XmlBeanDefinitionReader 和 NamespaceHandlerResolver 对象
 public class ReaderContext {
 
+	// 表示一个要解析的配置文件
 	private final Resource resource;
 	private final ProblemReporter problemReporter;
 	private final ReaderEventListener eventListener;

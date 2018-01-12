@@ -30,9 +30,7 @@ import org.springframework.core.io.Resource;
  */
 public class NullSourceExtractor implements SourceExtractor {
 
-	/**
-	 * This implementation simply returns {@code null} for any input.
-	 */
+	// 对于任何输入返回null
 	public Object extractSource(Object sourceCandidate, Resource definitionResource) {
 		return null;
 	}

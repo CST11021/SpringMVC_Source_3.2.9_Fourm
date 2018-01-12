@@ -36,14 +36,16 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
  * @see XmlReaderContext
  * @see BeanDefinitionParserDelegate
  */
-// 通过beanDefinition解析过程传递的上下文,封装所有相关的配置和状态。另外，当BeanDefinition完成注册后，会通知相应的监听器，该操作也是由 ParserContext 来完成的
+// 通过beanDefinition解析过程传递的上下文,封装所有相关的配置和状态。另外，当BeanDefinition完成注册后，会通知相应的监听器，
+// 该操作也是由 ParserContext 来完成的
 public final class ParserContext {
 
-	// 该对象可用于解析和注册bean
+	// 该对象用于解析整个配置文件和注册BeanDefinition，如果遇到<bean>标签会委托BeanDefinitionParserDelegate来解析
 	private final XmlReaderContext readerContext;
-	// 专门用于解析bean标签
+	// BeanDefinitionParserDelegate专门用于解析<bean>标签
 	private final BeanDefinitionParserDelegate delegate;
 
+	// 该对象通常为null
 	private BeanDefinition containingBeanDefinition;
 	private final Stack<ComponentDefinition> containingComponents = new Stack<ComponentDefinition>();
 
@@ -112,7 +114,7 @@ public final class ParserContext {
 		}
 	}
 
-	// 注册这个bean组件
+	// 注册对应的bean组件到BeanDefinition注册表中
 	public void registerBeanComponent(BeanComponentDefinition component) {
 		BeanDefinitionReaderUtils.registerBeanDefinition(component, getRegistry());
 		registerComponent(component);

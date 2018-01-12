@@ -13,7 +13,8 @@ import org.springframework.beans.factory.config.BeanDefinitionHolder;
 
 // spring创建NamespaceHandler实现类有两种方式，
 // 第一种是直接实现NamespaceHandler接口提供的方法，这种方式适合于命名空间中标签只有一个或者解析标签和属性的过程很简单，比如p命名空间；
-// 第二种是继承抽象类NamespaceHandlerSupport 并实现init方法，在init方法中注册标签的解析器和装饰器以及属性的装饰器，spring中大多数命名空间处理器都使用这种方式
+// 第二种是继承抽象类NamespaceHandlerSupport 并实现init方法，在init方法中注册标签的解析器和装饰器以及属性的装饰器，spring
+// 中大多数命名空间处理器都使用这种方式
 public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 
 	// 保存相应的命名空间下对应标签的解析器，例如：ContextNamespaceHandler类中init()方法
@@ -70,7 +71,8 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 
 
 
-	// 注册标签的解析器BeanDefinitionParser对象
+	// 该方法用于注册不同类型标签对应的解析器对象：一个自定义的命名空间下通常会有多个不同的配置标签，每个标签对应不同的
+	// 解析器，而这些解析都需要实现 BeanDefinitionParser 接口，该方法
 	protected final void registerBeanDefinitionParser(String elementName, BeanDefinitionParser parser) {
 		this.parsers.put(elementName, parser);
 	}

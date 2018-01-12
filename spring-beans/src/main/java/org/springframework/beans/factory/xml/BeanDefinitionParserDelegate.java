@@ -1238,7 +1238,10 @@ public class BeanDefinitionParserDelegate {
 		return parseCustomElement(ele, null);
 	}
 	public BeanDefinition parseCustomElement(Element ele, BeanDefinition containingBd) {
+		// 获取这个自定义标签的命名空间
 		String namespaceUri = getNamespaceURI(ele);
+		// 根据命名空间URI获取相应的处理器，例如：命名空间为：http://www.springframework.org/schema/context 对应的处理器
+		// 是 ContextNamespaceHandler.java，该映射关系保存在对应jar包中/META-INF/spring.handlers文件中
 		NamespaceHandler handler = this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);
 		if (handler == null) {
 			error("Unable to locate Spring NamespaceHandler for XML schema namespace [" + namespaceUri + "]", ele);
