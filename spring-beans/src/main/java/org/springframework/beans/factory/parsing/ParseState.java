@@ -52,6 +52,9 @@ public final class ParseState {
 		}
 		return sb.toString();
 	}
+
+	// 实现了该接口才可以放入ParseState解析栈，该接口的实现有：
+	// BeanEntry、PropertyEntry、ConstructorArgumentEntry和QualifierEntry
 	public interface Entry {
 
 	}
