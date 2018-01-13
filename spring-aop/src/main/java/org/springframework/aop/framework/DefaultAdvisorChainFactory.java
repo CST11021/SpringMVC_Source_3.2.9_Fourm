@@ -46,6 +46,7 @@ import org.springframework.aop.support.MethodMatchers;
 @SuppressWarnings("serial")
 public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializable {
 
+	// 通过给定的配置，为目标类的指定方法配置一个方法拦截器对象列表
 	public List<Object> getInterceptorsAndDynamicInterceptionAdvice(
 			Advised config, Method method, Class targetClass) {
 
@@ -55,6 +56,7 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 		boolean hasIntroductions = hasMatchingIntroductions(config, targetClass);
 		AdvisorAdapterRegistry registry = GlobalAdvisorAdapterRegistry.getInstance();
 		for (Advisor advisor : config.getAdvisors()) {
+			// 如果是非引介类型的增强
 			if (advisor instanceof PointcutAdvisor) {
 				// Add it conditionally.
 				PointcutAdvisor pointcutAdvisor = (PointcutAdvisor) advisor;
@@ -75,6 +77,7 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 					}
 				}
 			}
+			// 如果是引介增强
 			else if (advisor instanceof IntroductionAdvisor) {
 				IntroductionAdvisor ia = (IntroductionAdvisor) advisor;
 				if (config.isPreFiltered() || ia.getClassFilter().matches(targetClass)) {
@@ -90,9 +93,8 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 		return interceptorList;
 	}
 
-	/**
-	 * Determine whether the Advisors contain matching introductions.
-	 */
+
+	// 判断目标类是否有配置引介增强
 	private static boolean hasMatchingIntroductions(Advised config, Class targetClass) {
 		for (int i = 0; i < config.getAdvisors().length; i++) {
 			Advisor advisor = config.getAdvisors()[i];

@@ -165,11 +165,11 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 
 
 
-
+	// 获取所有被代理的接口
 	public Class<?>[] getProxiedInterfaces() {
 		return this.interfaces.toArray(new Class[this.interfaces.size()]);
 	}
-
+	// 确定给定的class是否为被代理接口的一个对象或子类
 	public boolean isInterfaceProxied(Class<?> intf) {
 		for (Class proxyIntf : this.interfaces) {
 			if (intf.isAssignableFrom(proxyIntf)) {

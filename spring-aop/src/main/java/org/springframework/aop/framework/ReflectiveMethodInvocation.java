@@ -61,46 +61,18 @@ import org.springframework.core.BridgeMethodResolver;
 public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Cloneable {
 
 	protected final Object proxy;
-
 	protected final Object target;
-
 	protected final Method method;
-
 	protected Object[] arguments;
-
 	private final Class targetClass;
-
-	/**
-	 * Lazily initialized map of user-specific attributes for this invocation.
-	 */
+	/** Lazily initialized map of user-specific attributes for this invocation. */
 	private Map<String, Object> userAttributes;
-
-	/**
-	 * List of MethodInterceptor and InterceptorAndDynamicMethodMatcher
-	 * that need dynamic checks.
-	 */
+	/** List of MethodInterceptor and InterceptorAndDynamicMethodMatcher that need dynamic checks. */
 	protected final List interceptorsAndDynamicMethodMatchers;
-
-	/**
-	 * Index from 0 of the current interceptor we're invoking.
-	 * -1 until we invoke: then the current interceptor.
-	 */
+	/** Index from 0 of the current interceptor we're invoking. -1 until we invoke: then the current interceptor. */
 	private int currentInterceptorIndex = -1;
 
 
-	/**
-	 * Construct a new ReflectiveMethodInvocation with the given arguments.
-	 * @param proxy the proxy object that the invocation was made on
-	 * @param target the target object to invoke
-	 * @param method the method to invoke
-	 * @param arguments the arguments to invoke the method with
-	 * @param targetClass the target class, for MethodMatcher invocations
-	 * @param interceptorsAndDynamicMethodMatchers interceptors that should be applied,
-	 * along with any InterceptorAndDynamicMethodMatchers that need evaluation at runtime.
-	 * MethodMatchers included in this struct must already have been found to have matched
-	 * as far as was possibly statically. Passing an array might be about 10% faster,
-	 * but would complicate the code. And it would work only for static pointcuts.
-	 */
 	protected ReflectiveMethodInvocation(
 			Object proxy, Object target, Method method, Object[] arguments,
 			Class targetClass, List<Object> interceptorsAndDynamicMethodMatchers) {

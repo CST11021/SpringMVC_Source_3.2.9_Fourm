@@ -69,24 +69,20 @@ public abstract class AopProxyUtils {
 		return result;
 	}
 
-	/**
-	 * Determine the complete set of interfaces to proxy for the given AOP configuration.
-	 * <p>This will always add the {@link Advised} interface unless the AdvisedSupport's
-	 * {@link AdvisedSupport#setOpaque "opaque"} flag is on. Always adds the
-	 * {@link org.springframework.aop.SpringProxy} marker interface.
-	 * @return the complete set of interfaces to proxy
-	 * @see Advised
-	 * @see org.springframework.aop.SpringProxy
-	 */
+	// 根据代理配置advised，返回要代理的接口
 	public static Class[] completeProxiedInterfaces(AdvisedSupport advised) {
+		// 1、获取要被代理接口
 		Class[] specifiedInterfaces = advised.getProxiedInterfaces();
 		if (specifiedInterfaces.length == 0) {
 			// No user-specified interfaces: check whether target class is an interface.
+			// 如果目标类没有要代理的接口，就判断下目标类是不是接口
 			Class targetClass = advised.getTargetClass();
 			if (targetClass != null && targetClass.isInterface()) {
 				specifiedInterfaces = new Class[] {targetClass};
 			}
 		}
+
+		// 2、判断SpringProxy接口和Advised接口是否为被代理接口的子类，如果不是将这两个接口添加到被代理接口的集合中返回
 		boolean addSpringProxy = !advised.isInterfaceProxied(SpringProxy.class);
 		boolean addAdvised = !advised.isOpaque() && !advised.isInterfaceProxied(Advised.class);
 		int nonUserIfcCount = 0;

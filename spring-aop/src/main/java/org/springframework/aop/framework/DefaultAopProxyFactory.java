@@ -49,7 +49,7 @@ import org.springframework.aop.SpringProxy;
 public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 
 
-	/*
+	/**
 	对于Spring的代理中JDKProxy的实现和CGLIBProxy的实现。Spring是如果选取的呢？从if中的判断条件可以看到3个方面的影响设Spring的判断。
 	1、optimize:用来控制通过CGLIB创建的代理是否使用激进的优化策略。除非完全了解AOP代理如果处理优化，否则不推荐用户使用这个设置。目前这个属性仅用于CGLIB代理，对于JDK动态代理（缺省代理）无效。
 	2、proxyTargetClass：这个属性为true时，目标类本身被代理而不是目标类的接口。如果这个属性被设置为true，CGLIB代理将被创建，设置方式：<aop:aspectj-autoproxy proxy-target-class="true"/>。
@@ -70,18 +70,21 @@ public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 
 	 */
 	public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {
+		// 如果：optimize、proxyTargetClass或hasNoUserSuppliedProxyInterfaces()为true，将使用CGLIB代理
 		if (config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config)) {
 			Class targetClass = config.getTargetClass();
 			if (targetClass == null) {
 				throw new AopConfigException("TargetSource cannot determine target class: " +
 						"Either an interface or a target is required for proxy creation.");
 			}
+			// 如果目标类是接口的话还是会使用JDK代理
 			if (targetClass.isInterface()) {
 				return new JdkDynamicAopProxy(config);
 			}
 			return CglibProxyFactory.createCglibProxy(config);
 		}
 		else {
+			// 使用JDK代理
 			return new JdkDynamicAopProxy(config);
 		}
 	}

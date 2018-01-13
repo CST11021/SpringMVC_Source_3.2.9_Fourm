@@ -61,7 +61,7 @@ import org.springframework.util.ClassUtils;
  */
 
 
-/*
+/**
   使用JDK代理示例：
 
 	  public class PerformaceHandler implements InvocationHandler {
@@ -101,13 +101,11 @@ import org.springframework.util.ClassUtils;
 
  */
 final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializable {
-	/** We use a static Log to avoid serialization issues */
+
 	private static Log logger = LogFactory.getLog(JdkDynamicAopProxy.class);
-	/** use serialVersionUID from Spring 1.2 for interoperability */
 	private static final long serialVersionUID = 5531744639992436476L;
 
-
-	/*
+	/**
 	 * NOTE: We could avoid the code duplication between this class and the CGLIB
 	 * proxies by refactoring "invoke" into a template method. However, this approach
 	 * adds at least 10% performance overhead versus a copy-paste solution, so we sacrifice
@@ -118,12 +116,10 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 
 	//** Config used to configure this proxy */
 	private final AdvisedSupport advised;
-
-	// Is the {@link #equals} method defined on the proxied interfaces?
+	// 判断被代理的接口中是否有equals()方法
 	private boolean equalsDefined;
-	// Is the {@link #hashCode} method defined on the proxied interfaces?
+	// 判断被代理的接口中是否有hashCode()方法
 	private boolean hashCodeDefined;
-
 
 
 	public JdkDynamicAopProxy(AdvisedSupport config) throws AopConfigException {
@@ -149,6 +145,7 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 		// 所以，当执行代理类方法时，如果，这个方法是被代理的接口方法，就会自动来调用 this.invoke()这个方法，这个方法将调用目标类的原始方法
 		return Proxy.newProxyInstance(classLoader, proxiedInterfaces, this);
 	}
+	// 判断被代理的接口中是否有equals()和hashCode()方法
 	private void findDefinedEqualsAndHashCodeMethods(Class[] proxiedInterfaces) {
 		for (Class proxiedInterface : proxiedInterfaces) {
 			Method[] methods = proxiedInterface.getDeclaredMethods();
@@ -165,18 +162,13 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 			}
 		}
 	}
-
-
-	/**
-	 * Implementation of {@code InvocationHandler.invoke}.
-	 * <p>Callers will see exactly the exception thrown by the target,
-	 * unless a hook method throws an exception.
-	 */
+	// 实现JDK动态代理的InvocationHandler接口
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		MethodInvocation invocation;
 		Object oldProxy = null;
 		boolean setProxyContext = false;
 
+		// 获取要带被代理的目标类对象
 		TargetSource targetSource = this.advised.targetSource;
 		Class targetClass = null;
 		Object target = null;
@@ -192,7 +184,7 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 				// The target does not implement the hashCode() method itself.
 				return hashCode();
 			}
-			/*
+			/**
 			 Class类的isAssignableFrom(Class cls)方法：
 			 如果调用这个方法的Class或接口与参数cls 表示的类或接口相同，或者是参数cls表示的类或接口的父类，则返回true。
 			 形象地：自身类.class.isAssignableFrom(自身类或子类.class)返回true
@@ -200,6 +192,7 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 			 	System.out.println(ArrayList.class.isAssignableFrom(Object.class));// false
 			 	System.out.println(Object.class.isAssignableFrom(ArrayList.class));// true
 			 */
+			// 如果调用的是Advised接口的方法
 			if (!this.advised.opaque && method.getDeclaringClass().isInterface() &&
 					method.getDeclaringClass().isAssignableFrom(Advised.class)) {
 				// Service invocations on ProxyConfig with the proxy config...
@@ -221,7 +214,6 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 				targetClass = target.getClass();
 			}
 
-			// Get the interception chain for this method.
 			// 获取当前方法的拦截器链
 			List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);
 

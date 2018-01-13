@@ -43,7 +43,7 @@ public interface Advised extends TargetClassAware {
 	boolean isProxyTargetClass();
 	// 返回代理接口
 	Class<?>[] getProxiedInterfaces();
-	// 确定给定的接口是否被代理
+	// 确定给定的class是否为被代理接口的一个对象或子类
 	boolean isInterfaceProxied(Class<?> intf);
 
 	// 设置这个增强对象的目标类，只有在配置没有冻结时才会起作用。
