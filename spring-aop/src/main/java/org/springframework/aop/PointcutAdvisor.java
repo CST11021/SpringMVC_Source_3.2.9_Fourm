@@ -28,9 +28,7 @@ package org.springframework.aop;
 // PointcutAdvisor定义了一个Pointcut和一个Advice的Advisor，大部分的Advisor实现都属于 PointcutAdvisor 这一分支的
 public interface PointcutAdvisor extends Advisor {
 
-	/**
-	 * Get the Pointcut that drives this advisor.
-	 */
+	// 获取增强的织入切点
 	Pointcut getPointcut();
 
 }

@@ -37,13 +37,13 @@ import org.springframework.util.ObjectUtils;
 @SuppressWarnings("serial")
 public abstract class AbstractPointcutAdvisor implements PointcutAdvisor, Ordered, Serializable {
 
+	// 该属性用来表示增强织入的顺序
 	private Integer order;
 
 
 	public void setOrder(int order) {
 		this.order = order;
 	}
-
 	public int getOrder() {
 		if (this.order != null) {
 			return this.order;
@@ -54,7 +54,6 @@ public abstract class AbstractPointcutAdvisor implements PointcutAdvisor, Ordere
 		}
 		return Ordered.LOWEST_PRECEDENCE;
 	}
-
 	public boolean isPerInstance() {
 		return true;
 	}
@@ -72,7 +71,6 @@ public abstract class AbstractPointcutAdvisor implements PointcutAdvisor, Ordere
 		return (ObjectUtils.nullSafeEquals(getAdvice(), otherAdvisor.getAdvice()) &&
 				ObjectUtils.nullSafeEquals(getPointcut(), otherAdvisor.getPointcut()));
 	}
-
 	@Override
 	public int hashCode() {
 		return PointcutAdvisor.class.hashCode();

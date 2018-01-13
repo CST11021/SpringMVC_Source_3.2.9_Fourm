@@ -33,7 +33,8 @@ import org.aopalliance.aop.Advice;
 /*
 	Advisor代表Spring中的Aspect，但是，与正常的Aspect不同，Advisor通常只持有一个Pointcut和一个Advice。
 	而理论上，Aspect定义中可以有多个Pointcut和多个Advice，所以，我们可以认为Advisor是一种特殊的Aspect。
-	为了能够更清楚Advisor的实现结构体系，我们可以将Advisor简单划分为两个分支，一个是PointcutAdvisor，另一个是IntroductionAdvisor
+	为了能够更清楚Advisor的实现结构体系，我们可以将Advisor简单划分为两个分支，一个是PointcutAdvisor，
+	另一个是IntroductionAdvisor
  */
 // 支持AOP 增强的接口(采取在连接点上的操作)和一个过滤器来决定增强的适用性(比如切入点)
 // 这个接口不是供Spring用户使用的，而是允许为不同类型的增强提供支持。

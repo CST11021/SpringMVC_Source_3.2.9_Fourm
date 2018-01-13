@@ -68,7 +68,6 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 
 	// 当没有目标类时，使用 EmptyTargetSource 规范目标类
 	public static final TargetSource EMPTY_TARGET_SOURCE = EmptyTargetSource.INSTANCE;
-	//** Package-protected to allow direct access for efficiency */
 	// 表示要带被代理的目标类
 	TargetSource targetSource = EMPTY_TARGET_SOURCE;
 	//** Whether the Advisors are already filtered for the specific target class */
@@ -307,20 +306,19 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 	public void addAdvice(int pos, Advice advice) throws AopConfigException {
 		Assert.notNull(advice, "Advice must not be null");
-		// 实现Introduction型的Advice的有两条分支，以DynamicIntroductionAdvice为首的动态分支和以IntroductionInfo为首的静态分支。
+		// 实现Introduction型的Advice的有两条分支，以DynamicIntroductionAdvice为首的动态分支和以IntroductionInfo为首的静
+		// 态分支。
 
+		// 判断是否为 IntroductionInfo 类型的引介增强
 		if (advice instanceof IntroductionInfo) {
-			// 判断是否为 IntroductionInfo 类型的引介增强
-			// We don't need an IntroductionAdvisor for this kind of introduction: It's fully self-describing.
 			addAdvisor(pos, new DefaultIntroductionAdvisor(advice, (IntroductionInfo) advice));
 		}
+		// 判断是否为 DynamicIntroductionAdvice 类型的引介增强
 		else if (advice instanceof DynamicIntroductionAdvice) {
-			// 判断是否为 DynamicIntroductionAdvice 类型的引介增强
-			// We need an IntroductionAdvisor for this kind of introduction.
 			throw new AopConfigException("DynamicIntroductionAdvice may only be added as part of IntroductionAdvisor");
 		}
+		// 这里是将advice封装为 DefaultPointcutAdvisor 实例，Spring中同时使用Advisor来包装增强
 		else {
-			// 这里是将advice封装为 DefaultPointcutAdvisor 实例，Spring中同时使用Advisor来包装增强
 			addAdvisor(pos, new DefaultPointcutAdvisor(advice));
 		}
 	}
