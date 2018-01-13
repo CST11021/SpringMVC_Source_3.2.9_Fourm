@@ -49,6 +49,9 @@ class AnnotationDrivenCacheBeanDefinitionParser implements BeanDefinitionParser 
 
 	// 解析<cache:annotation-driven>标签
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
+		// 根据annotation-driven标签中的model属性决定是通过代理的方式实现aop还是通过aspectj的方式进行切面拦截(默认采用
+		// proxy代理方式)。对于代理方式，会一个注册缓存Advisor和一个CacheInterceptor类型的拦截器。这就实现了对业务方法
+		// 的切面拦截
 		String mode = element.getAttribute("mode");
 		if ("aspectj".equals(mode)) {
 			// mode="aspectj"

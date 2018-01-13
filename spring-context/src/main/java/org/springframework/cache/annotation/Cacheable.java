@@ -33,6 +33,10 @@ import java.lang.annotation.Target;
  * @author Phillip Webb
  * @since 3.1
  */
+// 当一个方法上配置了Cacheable之类的注解后，这个方法被调用时，就会被一个叫CacheInterceptor的拦截器拦截，进入该类的invoke()
+// 方法中，如果当前context已经初始化完成，该方法紧接着会调用execute()。execute()方法中会读取原来被调用业务方法上的注解信
+// 息，通过这些信息进行相应的缓存操作，再跟据操作的结果决定是否调用原方法中的业务逻辑。这就是spring通过注解操作缓存的总
+// 体流程。
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited

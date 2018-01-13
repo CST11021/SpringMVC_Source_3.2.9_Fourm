@@ -34,24 +34,22 @@ import org.springframework.cache.CacheManager;
  * @author Juergen Hoeller
  * @since 3.1
  */
+// 在ConcurrentMapCacheManager内置的缓存管理器中，可以通过配置指定一个boolean类型的allowNullValues属性，用于指定缓存中能
+// 否保存null值。因为该管理器是用于spring通过Map实现的内置缓存的管理器实现。在对应的Cache实现类ConcurrentMapCache中可以
+// 看到，它是通过ConcurrentHashMap保存所有建值对数据的。然而ConcurrentHashMap并不支持保存null值，直接在ConcurrentHashMap
+// 中put空值会抛空指针异常。然而，往缓存中保存空值有时候确实也是有必要的。比如，在从数据库查询某项数据时，因数据不存在，
+// 返回了null。这时候如果不把这个null值保存到缓存中去，那么下次再作查询时，缓存就无法命中，从而导致重复查询数据库，这就
+// 是所谓的缓存穿透。为了防止这种情况，这就要对null值做一个包装，把它包装成一个非null的而且在业务上认为是无效的对像保存
+// 到缓存里面。ConcurrentMapCacheManager中的allowNullValues就是用于指定能否缓存null，如果此值为true，将把自动把null包装
+// 成无效对像缓存起来，如果为false，那么需要开发人员自行从业务层上保证不往缓存中保存null数据。
 public class ConcurrentMapCacheManager implements CacheManager {
 
 	private final ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<String, Cache>(16);
-
 	private boolean dynamic = true;
 
 
-	/**
-	 * Construct a dynamic ConcurrentMapCacheManager,
-	 * lazily creating cache instances as they are being requested.
-	 */
 	public ConcurrentMapCacheManager() {
 	}
-
-	/**
-	 * Construct a static ConcurrentMapCacheManager,
-	 * managing caches for the specified cache names only.
-	 */
 	public ConcurrentMapCacheManager(String... cacheNames) {
 		setCacheNames(Arrays.asList(cacheNames));
 	}

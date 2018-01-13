@@ -61,24 +61,15 @@ import org.springframework.util.StringUtils;
  * @since 3.1
  */
 public abstract class CacheAspectSupport implements InitializingBean {
-
-	private static final String CACHEABLE = "cacheable";
-
-	private static final String UPDATE = "cacheupdate";
-
-	private static final String EVICT = "cacheevict";
-
-
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	private static final String CACHEABLE = "cacheable";
+	private static final String UPDATE = "cacheupdate";
+	private static final String EVICT = "cacheevict";
 	private final ExpressionEvaluator evaluator = new ExpressionEvaluator();
-
 	private CacheManager cacheManager;
-
 	private CacheOperationSource cacheOperationSource;
-
 	private KeyGenerator keyGenerator = new DefaultKeyGenerator();
-
 	private boolean initialized = false;
 
 
