@@ -14,9 +14,9 @@ public class GreetingInterceptor implements MethodInterceptor {
       Object[] args = invocation.getArguments();
       String clientName = (String)args[0];
       
-      System.out.println("2.How are you！Mr."+clientName+".");
+      System.out.println("GreetingInterceptor：How are you！Mr."+clientName+".");
       Object obj = invocation.proceed();
-      System.out.println("2.Please enjoy yourself!");
+      System.out.println("GreetingInterceptor：Please enjoy yourself!");
       
       return obj;
    }

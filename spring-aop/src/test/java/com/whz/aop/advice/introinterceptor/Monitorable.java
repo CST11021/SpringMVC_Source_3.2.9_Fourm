@@ -1,4 +1,4 @@
-package com.whz.aop.advice;
+package com.whz.aop.advice.introinterceptor;
 
 /**
  * Created by wb-whz291815 on 2017/7/27.

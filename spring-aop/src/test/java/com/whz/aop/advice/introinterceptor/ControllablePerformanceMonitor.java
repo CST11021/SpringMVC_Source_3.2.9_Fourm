@@ -1,4 +1,4 @@
-package com.whz.aop.advice;
+package com.whz.aop.advice.introinterceptor;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.support.DelegatingIntroductionInterceptor;

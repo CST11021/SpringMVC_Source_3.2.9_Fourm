@@ -30,9 +30,7 @@ import org.springframework.util.ClassUtils;
  * @author Rob Harrop
  * @since 14.03.2003
  */
-/*
-
- */
+// 代理工厂类，该类只有一个作用，就是创建一个代理了目标类的代理对象
 @SuppressWarnings("serial")
 public class ProxyFactory extends ProxyCreatorSupport {
 

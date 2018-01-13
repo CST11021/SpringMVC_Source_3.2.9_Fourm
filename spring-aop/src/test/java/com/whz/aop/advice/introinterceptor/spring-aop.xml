@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+    <!--要被织入的增强-->
+    <bean id="interceptorAdvice" class="com.whz.aop.advice.introinterceptor.ControllablePerformanceMonitor" />
+    <!--被织入的目标类-->
+    <bean id="forumServiceTarget" class="com.whz.aop.advice.introinterceptor.ForumService" />
+    <!--被织入增强后的代理类-->
+    <bean id="forumServiceProxy" class="org.springframework.aop.framework.ProxyFactoryBean"
+          p:interfaces="com.whz.aop.advice.introinterceptor.Monitorable"
+          p:target-ref="forumServiceTarget"
+          p:interceptorNames="interceptorAdvice"
+          p:proxyTargetClass="true" />
+
+
+</beans>

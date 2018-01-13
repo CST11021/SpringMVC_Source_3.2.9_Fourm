@@ -4,7 +4,7 @@
        xmlns:p="http://www.springframework.org/schema/p"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
-    <bean id="target" class="com.whz.aop.advice.NaiveWaiter"/>
+    <bean id="target" class="com.whz.aop.advice.WaiterImpl"/>
     <bean id="greetingBefore" class="com.whz.aop.advice.GreetingBeforeAdvice"/>
     <bean id="greetingAfter" class="com.whz.aop.advice.GreetingAfterAdvice"/>
     <bean id="greetAround" class="com.whz.aop.advice.GreetingInterceptor"/>
@@ -16,21 +16,5 @@
         p:proxyInterfaces="com.whz.aop.advice.Waiter"
         p:interceptorNames="greetingBefore,greetingAfter,greetAround"
         p:target-ref="target"/>
-
-
-    <!--要被织入的增强-->
-    <bean id="pmonitor" class="com.whz.aop.advice.ControllablePerformanceMonitor" />
-    <!--被织入的目标类-->
-    <bean id="forumServiceTarget" class="com.whz.aop.advice.ForumService" />
-    <!--被织入增强后的代理类-->
-    <bean id="forumService" class="org.springframework.aop.framework.ProxyFactoryBean"
-          p:interfaces="com.whz.aop.advice.Monitorable"
-          p:target-ref="forumServiceTarget"
-          p:interceptorNames="pmonitor"
-          p:proxyTargetClass="true" />
-
-
-
-
 
 </beans>

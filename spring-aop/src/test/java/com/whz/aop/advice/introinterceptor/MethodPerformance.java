@@ -1,4 +1,4 @@
-package com.whz.aop.advice;
+package com.whz.aop.advice.introinterceptor;
 
 // 打印监视器信息
 public class MethodPerformance{

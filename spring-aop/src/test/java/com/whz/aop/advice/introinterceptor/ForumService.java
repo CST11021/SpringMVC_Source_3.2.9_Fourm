@@ -1,4 +1,4 @@
-package com.whz.aop.advice;
+package com.whz.aop.advice.introinterceptor;
 
 public class ForumService {
 

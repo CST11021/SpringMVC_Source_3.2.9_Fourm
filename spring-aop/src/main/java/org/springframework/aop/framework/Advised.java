@@ -50,7 +50,7 @@ public interface Advised extends TargetClassAware {
 	void setTargetSource(TargetSource targetSource);
 	TargetSource getTargetSource();
 
-	/*
+	/**
 	expose-proxy：有时候目标对象内部的自动调用将无法实施切面中的增强，如下示例：
 	public interface AService{
 		public void a();

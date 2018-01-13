@@ -1,4 +1,4 @@
-package com.whz.aop.advice;
+package com.whz.aop.advice.introinterceptor;
 
 // 该类用于被织入目标类
 public class PerformanceMonitor{
