@@ -36,6 +36,7 @@ public class ProxyCreatorSupport extends AdvisedSupport {
 	private boolean active = false;
 	// AOP代理工厂，在构造器中被初始化，默认实现是：DefaultAopProxyFactory
 	private AopProxyFactory aopProxyFactory;
+
 	private List<AdvisedSupportListener> listeners = new LinkedList<AdvisedSupportListener>();
 
 
@@ -48,6 +49,7 @@ public class ProxyCreatorSupport extends AdvisedSupport {
 		this.aopProxyFactory = aopProxyFactory;
 	}
 
+	// 设置Aop代理工厂
 	public void setAopProxyFactory(AopProxyFactory aopProxyFactory) {
 		Assert.notNull(aopProxyFactory, "AopProxyFactory must not be null");
 		this.aopProxyFactory = aopProxyFactory;

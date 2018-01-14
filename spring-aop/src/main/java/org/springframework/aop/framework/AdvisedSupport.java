@@ -72,21 +72,17 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	TargetSource targetSource = EMPTY_TARGET_SOURCE;
 	//** Whether the Advisors are already filtered for the specific target class */
 	private boolean preFiltered = false;
-
 	AdvisorChainFactory advisorChainFactory = new DefaultAdvisorChainFactory();
-
-	// 以方法为键，增强链为值，进行缓存
+	// 增强不一定可以作用在所有的方法中，这里用户缓存每个方法对应的方法拦截器
 	private transient Map<MethodCacheKey, List<Object>> methodCache;
-
 	// 保存代理类将要实现的接口。保存在列表中以保持注册顺序，用指定的接口顺序创建JDK代理
 	private List<Class> interfaces = new ArrayList<Class>();
-
 	// 表示增强链，在增强Advice添加到 advisors 前都会被包装成 Advisor 的实例
 	private List<Advisor> advisors = new LinkedList<Advisor>();
 	// 数组更新了对 advisors 列表的更改，这在内部更容易操作
 	private Advisor[] advisorArray = new Advisor[0];
 
-
+	// 构造器
 	public AdvisedSupport() {
 		initMethodCache();
 	}
@@ -96,26 +92,17 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 
-	// Initialize the method cache.
-	private void initMethodCache() {
-		this.methodCache = new ConcurrentHashMap<MethodCacheKey, List<Object>>(32);
-	}
-
-
-	// ------------------------------------------ getter and setter ... ------------------------------------------
-
-	// 设置目标类
+	/** -------------------------------- 代理目标对象相关 -------------------------------- */
+	// 设置目标类接目标类对象
 	public void setTarget(Object target) {
 		setTargetSource(new SingletonTargetSource(target));
 	}
-
 	public void setTargetSource(TargetSource targetSource) {
 		this.targetSource = (targetSource != null ? targetSource : EMPTY_TARGET_SOURCE);
 	}
 	public TargetSource getTargetSource() {
 		return this.targetSource;
 	}
-
 	public void setTargetClass(Class<?> targetClass) {
 		this.targetSource = EmptyTargetSource.forClass(targetClass);
 	}
@@ -123,21 +110,8 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 		return this.targetSource.getTargetClass();
 	}
 
-	public void setPreFiltered(boolean preFiltered) {
-		this.preFiltered = preFiltered;
-	}
-	public boolean isPreFiltered() {
-		return this.preFiltered;
-	}
 
-	public void setAdvisorChainFactory(AdvisorChainFactory advisorChainFactory) {
-		Assert.notNull(advisorChainFactory, "AdvisorChainFactory must not be null");
-		this.advisorChainFactory = advisorChainFactory;
-	}
-	public AdvisorChainFactory getAdvisorChainFactory() {
-		return this.advisorChainFactory;
-	}
-
+	/** -------------------------------- 代理接口相关 -------------------------------- */
 	// 设置代理类要实现的接口
 	public void setInterfaces(Class<?>... interfaces) {
 		Assert.notNull(interfaces, "Interfaces must not be null");
@@ -159,11 +133,6 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	public boolean removeInterface(Class<?> intf) {
 		return this.interfaces.remove(intf);
 	}
-	// ------------------------------------------ getter and setter ... ------------------------------------------
-
-
-
-
 	// 获取所有被代理的接口
 	public Class<?>[] getProxiedInterfaces() {
 		return this.interfaces.toArray(new Class[this.interfaces.size()]);
@@ -179,7 +148,8 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 
-	// ----------- 关于增强 -----------------------------------------------
+	/** -------------------------------- Advisor相关 -------------------------------- */
+	// 返回用于此代理配置的Advisor，Advisor封装了Advice和Pointcut信息
 	public final Advisor[] getAdvisors() {
 		return this.advisorArray;
 	}
@@ -241,8 +211,6 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 		addAdvisor(index, b);
 		return true;
 	}
-
-
 	@Deprecated
 	public void addAllAdvisors(Advisor[] advisors) {
 		addAdvisors(Arrays.asList(advisors));
@@ -266,48 +234,24 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 			adviceChanged();
 		}
 	}
-
-
-	private void validateIntroductionAdvisor(IntroductionAdvisor advisor) {
-		advisor.validateInterfaces();
-		// If the advisor passed validation, we can make the change.
-		Class[] ifcs = advisor.getInterfaces();
-		for (Class ifc : ifcs) {
-			addInterface(ifc);
-		}
-	}
-	private void addAdvisorInternal(int pos, Advisor advisor) throws AopConfigException {
-		Assert.notNull(advisor, "Advisor must not be null");
-		if (isFrozen()) {
-			throw new AopConfigException("Cannot add advisor: Configuration is frozen.");
-		}
-		if (pos > this.advisors.size()) {
-			throw new IllegalArgumentException("Illegal position " + pos + " in advisor list with size " + this.advisors.size());
-		}
-		this.advisors.add(pos, advisor);
-		updateAdvisorArray();
-		adviceChanged();
-	}
-
 	// 更新advisorArray数组和advisors列表
 	protected final void updateAdvisorArray() {
 		this.advisorArray = this.advisors.toArray(new Advisor[this.advisors.size()]);
 	}
-
 	// 返回 advisors
 	protected final List<Advisor> getAdvisorsInternal() {
 		return this.advisors;
 	}
 
 
+	/** -------------------------------- Advice 相关 -------------------------------- */
 	public void addAdvice(Advice advice) throws AopConfigException {
 		int pos = this.advisors.size();
 		addAdvice(pos, advice);
 	}
 	public void addAdvice(int pos, Advice advice) throws AopConfigException {
 		Assert.notNull(advice, "Advice must not be null");
-		// 实现Introduction型的Advice的有两条分支，以DynamicIntroductionAdvice为首的动态分支和以IntroductionInfo为首的静
-		// 态分支。
+		// 实现Introduction型的Advice的有两条分支，以DynamicIntroductionAdvice为首的动态分支和以IntroductionInfo为首的静态分支。
 
 		// 判断是否为 IntroductionInfo 类型的引介增强
 		if (advice instanceof IntroductionInfo) {
@@ -319,6 +263,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 		}
 		// 这里是将advice封装为 DefaultPointcutAdvisor 实例，Spring中同时使用Advisor来包装增强
 		else {
+			// PointcutAdvisor 封装了增强和切入点信息
 			addAdvisor(pos, new DefaultPointcutAdvisor(advice));
 		}
 	}
@@ -342,12 +287,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 		}
 		return -1;
 	}
-
-	/**
-	 * Is the given advice included in any advisor within this proxy configuration?
-	 * @param advice the advice to check inclusion of
-	 * @return whether this advice instance is included
-	 */
+	// 判断是否已经配置了指定的Advice
 	public boolean adviceIncluded(Advice advice) {
 		if (advice != null) {
 			for (Advisor advisor : this.advisors) {
@@ -358,12 +298,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 		}
 		return false;
 	}
-
-	/**
-	 * Count advices of the given class.
-	 * @param adviceClass the advice class to check
-	 * @return the count of the interceptors of this class or subclasses
-	 */
+	// 返回是adviceClass对象实例的增强个数
 	public int countAdvicesOfType(Class adviceClass) {
 		int count = 0;
 		if (adviceClass != null) {
@@ -375,8 +310,6 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 		}
 		return count;
 	}
-
-
 	/**
 	 * Determine a list of {@link org.aopalliance.intercept.MethodInterceptor} objects
 	 * for the given method, based on this configuration.
@@ -388,35 +321,24 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 		MethodCacheKey cacheKey = new MethodCacheKey(method);
 		List<Object> cached = this.methodCache.get(cacheKey);
 		if (cached == null) {
-			cached = this.advisorChainFactory.getInterceptorsAndDynamicInterceptionAdvice(
-					this, method, targetClass);
+			// 返回目标类指定方法的一个方法拦截器对象列表
+			cached = this.advisorChainFactory.getInterceptorsAndDynamicInterceptionAdvice(this, method, targetClass);
 			this.methodCache.put(cacheKey, cached);
 		}
 		return cached;
 	}
-
 	// 当织入的增强链改变时，该方法被调用
 	protected void adviceChanged() {
 		this.methodCache.clear();
 	}
 
-	/**
-	 * Call this method on a new instance created by the no-arg constructor
-	 * to create an independent copy of the configuration from the given object.
-	 * @param other the AdvisedSupport object to copy configuration from
-	 */
+
+	/** -------------------------------- 复制增强配置 -------------------------------- */
 	protected void copyConfigurationFrom(AdvisedSupport other) {
 		copyConfigurationFrom(other, other.targetSource, new ArrayList<Advisor>(other.advisors));
 	}
-
-	/**
-	 * Copy the AOP configuration from the given AdvisedSupport object,
-	 * but allow substitution of a fresh TargetSource and a given interceptor chain.
-	 * @param other the AdvisedSupport object to take proxy configuration from
-	 * @param targetSource the new TargetSource
-	 * @param advisors the Advisors for the chain
-	 */
 	protected void copyConfigurationFrom(AdvisedSupport other, TargetSource targetSource, List<Advisor> advisors) {
+		// 复制增强配置
 		copyFrom(other);
 		this.targetSource = targetSource;
 		this.advisorChainFactory = other.advisorChainFactory;
@@ -431,11 +353,6 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 		updateAdvisorArray();
 		adviceChanged();
 	}
-
-	/**
-	 * Build a configuration-only copy of this AdvisedSupport,
-	 * replacing the TargetSource
-	 */
 	AdvisedSupport getConfigurationOnlyCopy() {
 		AdvisedSupport copy = new AdvisedSupport();
 		copy.copyFrom(this);
@@ -448,6 +365,49 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 
+	/** -------------------------------- 其他 -------------------------------- */
+	// 初始化this.methodCache
+	private void initMethodCache() {
+		this.methodCache = new ConcurrentHashMap<MethodCacheKey, List<Object>>(32);
+	}
+
+	public void setPreFiltered(boolean preFiltered) {
+		this.preFiltered = preFiltered;
+	}
+	public boolean isPreFiltered() {
+		return this.preFiltered;
+	}
+
+	// 将引介增强指定的接口添加到代理接口集合中
+	private void validateIntroductionAdvisor(IntroductionAdvisor advisor) {
+		// 判断将要织入的接口是否有被增强实现
+		advisor.validateInterfaces();
+		// If the advisor passed validation, we can make the change.
+		Class[] ifcs = advisor.getInterfaces();
+		for (Class ifc : ifcs) {
+			addInterface(ifc);
+		}
+	}
+	private void addAdvisorInternal(int pos, Advisor advisor) throws AopConfigException {
+		Assert.notNull(advisor, "Advisor must not be null");
+		if (isFrozen()) {
+			throw new AopConfigException("Cannot add advisor: Configuration is frozen.");
+		}
+		if (pos > this.advisors.size()) {
+			throw new IllegalArgumentException("Illegal position " + pos + " in advisor list with size " + this.advisors.size());
+		}
+		this.advisors.add(pos, advisor);
+		updateAdvisorArray();
+		adviceChanged();
+	}
+
+	public void setAdvisorChainFactory(AdvisorChainFactory advisorChainFactory) {
+		Assert.notNull(advisorChainFactory, "AdvisorChainFactory must not be null");
+		this.advisorChainFactory = advisorChainFactory;
+	}
+	public AdvisorChainFactory getAdvisorChainFactory() {
+		return this.advisorChainFactory;
+	}
 
 	// 序列化相关
 	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {

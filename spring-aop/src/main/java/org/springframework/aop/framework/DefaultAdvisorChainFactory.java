@@ -47,12 +47,9 @@ import org.springframework.aop.support.MethodMatchers;
 public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializable {
 
 	// 通过给定的配置，为目标类的指定方法配置一个方法拦截器对象列表
-	public List<Object> getInterceptorsAndDynamicInterceptionAdvice(
-			Advised config, Method method, Class targetClass) {
-
-		// This is somewhat tricky... we have to process introductions first,
-		// but we need to preserve order in the ultimate list.
+	public List<Object> getInterceptorsAndDynamicInterceptionAdvice(Advised config, Method method, Class targetClass) {
 		List<Object> interceptorList = new ArrayList<Object>(config.getAdvisors().length);
+		// 判断目标类是否有配置引介增强
 		boolean hasIntroductions = hasMatchingIntroductions(config, targetClass);
 		AdvisorAdapterRegistry registry = GlobalAdvisorAdapterRegistry.getInstance();
 		for (Advisor advisor : config.getAdvisors()) {
@@ -60,13 +57,13 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 			if (advisor instanceof PointcutAdvisor) {
 				// Add it conditionally.
 				PointcutAdvisor pointcutAdvisor = (PointcutAdvisor) advisor;
+				// 如果这个增强可以织入目标类
 				if (config.isPreFiltered() || pointcutAdvisor.getPointcut().getClassFilter().matches(targetClass)) {
 					MethodInterceptor[] interceptors = registry.getInterceptors(advisor);
 					MethodMatcher mm = pointcutAdvisor.getPointcut().getMethodMatcher();
 					if (MethodMatchers.matches(mm, method, targetClass, hasIntroductions)) {
 						if (mm.isRuntime()) {
-							// Creating a new object instance in the getInterceptors() method
-							// isn't a problem as we normally cache created chains.
+							// Creating a new object instance in the getInterceptors() method isn't a problem as we normally cache created chains.
 							for (MethodInterceptor interceptor : interceptors) {
 								interceptorList.add(new InterceptorAndDynamicMethodMatcher(interceptor, mm));
 							}
@@ -80,11 +77,13 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 			// 如果是引介增强
 			else if (advisor instanceof IntroductionAdvisor) {
 				IntroductionAdvisor ia = (IntroductionAdvisor) advisor;
+				// 如果这个引介增强可以织入到目标类中，则将引介增强直接返回
 				if (config.isPreFiltered() || ia.getClassFilter().matches(targetClass)) {
 					Interceptor[] interceptors = registry.getInterceptors(advisor);
 					interceptorList.addAll(Arrays.asList(interceptors));
 				}
 			}
+			// 既不是PointcutAdvisor，也不是 IntroductionAdvisor的情况
 			else {
 				Interceptor[] interceptors = registry.getInterceptors(advisor);
 				interceptorList.addAll(Arrays.asList(interceptors));

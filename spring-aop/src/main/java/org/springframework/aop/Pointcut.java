@@ -31,26 +31,28 @@ package org.springframework.aop;
  * @see org.springframework.aop.support.MethodMatchers
  */
 
-/*
-	Spring AOP中的Joinpoint可以有许多种类型，如果构造方法调用、字段的设置及获取、方法调用、方法执行等。
-但是，在Spring AOP中，仅支持方法级别的Joinpoint。更确切地说，只支持方法执行类型的Joinpoint。虽然Spring AOP仅提供方法拦截，
-但是在实际的开发过程中，这已经可以满足80%的开发需求了。所以，我们不用过于担心Spring AOP的能力。
+// Spring AOP中的Joinpoint（连接点）可以有许多种类型，如果构造方法调用、字段的设置及获取、方法调用、方法执行等。但是，在
+// Spring AOP 中，仅支持方法级别的Joinpoint。更确切地说，只支持方法执行类型的Joinpoint。虽然Spring AOP仅提供方法拦截，但
+// 是在实际的开发过程中，这已经可以满足80%的开发需求了。所以，我们不用过于担心Spring AOP的能力。
 
- */
+//连接点由两个信息确定：第一是用方法表示的程序执行点；第二是用相对点表示的方位。例如在Test.foo()方法执行前的连接点，执行
+// 点就是Test.foo()，方位是该方法执行前的位置。Spring使用切点提供执行点信息，而方位信息由增强提供。
 
-// Pointcut接口是Spring AOP中所有切点的最顶层抽象，该接口定义了两个方法用来帮助捕捉系统中相应的切入点，
-// 并提供了一个TruePointcut实现。如果Pointcut类型为TruePointcut，默认会对系统中的所有对象，以及对象上所有被支持的切点进行匹配。
+// 切点通过org.springframework.aop.Pointcut接口进行描述，它是指用来定位到某个方法上的信息。（如果要定位到具体连接点，还
+// 需提供方位信息，方位信息保存由增强提供org.aopalliance.aop.Advice，Spring中所有的增强都继承自aopalliance.jar包中的Advice）
 
 // ClassFilter和MethodMatcher分别用于匹配将被执行织入操作的对象以及相应的方法。
-// 之所以将类型匹配和方法匹配分开定义，是因为可以重用不同级别的匹配定义，并且可以在不同的界别或者相同的级别上进行组合操作，或者强制让某个子类只覆写相应的方法定义等。
+// 之所以将类型匹配和方法匹配分开定义，是因为可以重用不同级别的匹配定义，并且可以在不同的界别或者相同的级别上进行组合操作，
+// 或者强制让某个子类只覆写相应的方法定义等。
 public interface Pointcut {
 
-	// 通常匹配的规范切入点实例
+	// 如果Pointcut类型为TruePointcut，默认会对系统中的所有对象，以及对象上所有被支持的切点进行匹配。
 	Pointcut TRUE = TruePointcut.INSTANCE;
 
-	// 返回这个切入点的 ClassFilter
+	// ClassFilter 是用来过滤目标对象，只有匹配了才能给目标对象织入增强逻辑
 	ClassFilter getClassFilter();
-	// 返回这个切入点的 MethodMatcher
+
+	// 用来过滤为目标方法，只有匹配了的方法才能织入增强逻辑
 	MethodMatcher getMethodMatcher();
 
 }

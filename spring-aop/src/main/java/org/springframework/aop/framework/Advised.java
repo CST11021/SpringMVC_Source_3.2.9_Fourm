@@ -37,16 +37,16 @@ import org.springframework.aop.TargetSource;
 // 该接口是由具有AOP代理工厂的配置类实现的。该配置包括Interceptors和advice、Advisors和代理接口。
 public interface Advised extends TargetClassAware {
 
-	// 返回增强配置是否被冻结，在这种情况下，增强将不再有任何改变
+	// 返回代理配置是否被冻结，在这种情况下，增强将不再有任何改变
 	boolean isFrozen();
 	// 是否代理整个目标类
 	boolean isProxyTargetClass();
-	// 返回代理接口
+	// 返回要代理的所有接口
 	Class<?>[] getProxiedInterfaces();
 	// 确定给定的class是否为被代理接口的一个对象或子类
 	boolean isInterfaceProxied(Class<?> intf);
 
-	// 设置这个增强对象的目标类，只有在配置没有冻结时才会起作用。
+	// 设置这个要代理的目标类，只有在配置没有冻结时才会起作用。
 	void setTargetSource(TargetSource targetSource);
 	TargetSource getTargetSource();
 
@@ -68,7 +68,8 @@ public interface Advised extends TargetClassAware {
 		}
 	}
 
-		此处的this指向目标对象，因此调用this.b()将不会执行b事务切面，即不会执行事务增强，因此b方法的事务定义“@Transactional(propagation = Propagation.REQUIRES_NEW)”将不会实施，为了解决这个问题，我们可以这样做：
+		此处的this指向目标对象，因此调用this.b()将不会执行b事务切面，即不会执行事务增强，因此b方法的事务定义
+	“@Transactional(propagation = Propagation.REQUIRES_NEW)”将不会实施，为了解决这个问题，我们可以这样做：
 		<aop:aspectj-autoproxy expose-proxy="true"/>
 	然后将以上代码中的“this.b();”修改为“((AService)AopContext.currentProxy()).b();”即可。
 	通过以上的修改便可以完成对a和b方法的同时增强。
@@ -77,25 +78,20 @@ public interface Advised extends TargetClassAware {
 	boolean isExposeProxy();
 
 
-	// 设置这个代理配置是否预先过滤，以便它只包含适用的advisors(匹配这个代理的目标类)。
-	// 默认设置是“false”。如果顾问已经预先过滤了，那就把它设为“true”，这意味着在构建代理调用的实际advisor链时，可以跳过ClassFilter检查
+	// 设置这个代理配置是否预先过滤，以便它只包含适用的advisors(匹配这个代理的目标类)，默认设置是“false”。
+	// 如果advisor已经预先过滤了，那就把它设为“true”，这意味着在构建代理调用的实际advisor链时，可以跳过ClassFilter检查
 	void setPreFiltered(boolean preFiltered);
 	boolean isPreFiltered();
 
-
-	// 返回用于此代理的advisor
+	// 返回用于此代理配置的Advisor，Advisor封装了Advice和Pointcut信息
 	Advisor[] getAdvisors();
-
 	// 添加此代理的advisor
 	void addAdvisor(Advisor advisor) throws AopConfigException;
 	void addAdvisor(int pos, Advisor advisor) throws AopConfigException;
-
 	boolean removeAdvisor(Advisor advisor);
 	void removeAdvisor(int index) throws AopConfigException;
-
 	// 返回给定advisor的索引(从0开始)，如果没有这样的advisor应用于此代理，则返回-1。
 	int indexOf(Advisor advisor);
-
 	// b替换a
 	boolean replaceAdvisor(Advisor a, Advisor b) throws AopConfigException;
 

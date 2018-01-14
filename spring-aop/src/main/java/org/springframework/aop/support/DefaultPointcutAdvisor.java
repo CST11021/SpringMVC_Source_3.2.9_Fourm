@@ -34,11 +34,13 @@ import org.springframework.aop.Pointcut;
  * @see #setPointcut
  * @see #setAdvice
  */
-// 这是最常用的 advisor 实现
+// Advisor用于把Advice和Pointcut结合起来，在DefaultPointcutAdvisor中，有两个属性，分别是Advice和Pointcut，通过这两个属性
+// 可以分别配置增强逻辑和要织入的切点信息
 @SuppressWarnings("serial")
 public class DefaultPointcutAdvisor extends AbstractGenericPointcutAdvisor implements Serializable {
 
 	private Pointcut pointcut = Pointcut.TRUE;
+
 
 	public DefaultPointcutAdvisor() {}
 	public DefaultPointcutAdvisor(Advice advice) {

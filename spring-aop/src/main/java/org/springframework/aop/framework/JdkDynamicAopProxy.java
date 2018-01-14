@@ -59,8 +59,6 @@ import org.springframework.util.ClassUtils;
  * @see AdvisedSupport
  * @see ProxyFactory
  */
-
-
 /**
   使用JDK代理示例：
 
@@ -105,16 +103,7 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 	private static Log logger = LogFactory.getLog(JdkDynamicAopProxy.class);
 	private static final long serialVersionUID = 5531744639992436476L;
 
-	/**
-	 * NOTE: We could avoid the code duplication between this class and the CGLIB
-	 * proxies by refactoring "invoke" into a template method. However, this approach
-	 * adds at least 10% performance overhead versus a copy-paste solution, so we sacrifice
-	 * elegance for performance. (We have a good test suite to ensure that the different
-	 * proxies behave the same :-)
-	 * This way, we can also more easily take advantage of minor optimizations in each class.
-	 */
-
-	//** Config used to configure this proxy */
+	// AdvisedSupport 封装了代理的相关配置信息
 	private final AdvisedSupport advised;
 	// 判断被代理的接口中是否有equals()方法
 	private boolean equalsDefined;
@@ -130,7 +119,6 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 		this.advised = config;
 	}
 
-
 	public Object getProxy() {
 		return getProxy(ClassUtils.getDefaultClassLoader());
 	}
@@ -138,11 +126,13 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 		if (logger.isDebugEnabled()) {
 			logger.debug("Creating JDK dynamic proxy: target source is " + this.advised.getTargetSource());
 		}
-		// 获取要代理接口
+		// 首先从配置中获取所有要代理的接口
 		Class[] proxiedInterfaces = AopProxyUtils.completeProxiedInterfaces(this.advised);
+		// 标记状态：判断被代理的接口中是否有equals()和hashCode()方法
 		findDefinedEqualsAndHashCodeMethods(proxiedInterfaces);
-		// 我们可以看到，底层使用的是JDK代理的方式，这里传入了一个this参数，它实现了 InvocationHandler 接口
-		// 所以，当执行代理类方法时，如果，这个方法是被代理的接口方法，就会自动来调用 this.invoke()这个方法，这个方法将调用目标类的原始方法
+		// 我们可以看到，底层使用的是JDK代理的方式，这里传入了一个this参数，它实现了 InvocationHandler 接口，所以，当执
+		// 行代理类方法时，如果这个方法是被代理的接口方法，就会自动来调用 this.invoke()这个方法，这个方法将调用目标类的
+		// 原始方法
 		return Proxy.newProxyInstance(classLoader, proxiedInterfaces, this);
 	}
 	// 判断被代理的接口中是否有equals()和hashCode()方法
@@ -174,25 +164,24 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 		Object target = null;
 
 		try {
-			// equals方法的处理
+			// 1、如果代理的接口没有定义equals方法，而当前执行又是equals方法
 			if (!this.equalsDefined && AopUtils.isEqualsMethod(method)) {
 				// The target does not implement the equals(Object) method itself.
 				return equals(args[0]);
 			}
-			// hash方法的处理
+			///2、如果代理的接口没有定义hash方法，而当前执行又是hash方法
 			if (!this.hashCodeDefined && AopUtils.isHashCodeMethod(method)) {
 				// The target does not implement the hashCode() method itself.
 				return hashCode();
 			}
-			/**
-			 Class类的isAssignableFrom(Class cls)方法：
-			 如果调用这个方法的Class或接口与参数cls 表示的类或接口相同，或者是参数cls表示的类或接口的父类，则返回true。
-			 形象地：自身类.class.isAssignableFrom(自身类或子类.class)返回true
-			 例如：
-			 	System.out.println(ArrayList.class.isAssignableFrom(Object.class));// false
-			 	System.out.println(Object.class.isAssignableFrom(ArrayList.class));// true
-			 */
-			// 如果调用的是Advised接口的方法
+
+			///3、如果调用的是Advised接口的方法（比如织入的是引介增强）
+			// Class类的isAssignableFrom(Class cls)方法：
+			// 如果调用这个方法的Class或接口与参数cls 表示的类或接口相同，或者是参数cls表示的类或接口的父类，则返回true。
+			// 形象地：自身类.class.isAssignableFrom(自身类或子类.class)返回true
+			// 例如：
+			// System.out.println(ArrayList.class.isAssignableFrom(Object.class));// false
+			// System.out.println(Object.class.isAssignableFrom(ArrayList.class));// true
 			if (!this.advised.opaque && method.getDeclaringClass().isInterface() &&
 					method.getDeclaringClass().isAssignableFrom(Advised.class)) {
 				// Service invocations on ProxyConfig with the proxy config...
@@ -200,10 +189,9 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 			}
 
 			Object retVal;
-
 			// 有时候目标对象内部的自我调用将无法实施切面中的增强则需要通过此属性暴露代理
 			if (this.advised.exposeProxy) {
-				// Make invocation available if necessary.
+				// 将当前的代理对象记录在当前线程的AopContext中
 				oldProxy = AopContext.setCurrentProxy(proxy);
 				setProxyContext = true;
 			}
@@ -214,24 +202,15 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 				targetClass = target.getClass();
 			}
 
-			// 获取当前方法的拦截器链
+			// 获取当前方法的拦截器，方法拦截器用户过滤增强是否只可以织入目标方法
 			List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);
-
-			// Check whether we have any advice. If we don't, we can fallback on direct
-			// reflective invocation of the target, and avoid creating a MethodInvocation.
 			if (chain.isEmpty()) {
-				// We can skip creating a MethodInvocation: just invoke the target directly
-				// Note that the final invoker must be an InvokerInterceptor so we know it does
-				// nothing but a reflective operation on the target, and no hot swapping or fancy proxying.
 				// 如果没有发现任何拦截器那么直接调用切点方法
 				retVal = AopUtils.invokeJoinpointUsingReflection(target, method, args);
 			}
 			else {
-				// We need to create a method invocation...
-				// 将拦截器封装在ReflectiveMethodInvocation，以便于使用其proceed进行链接表用拦截器
+				// 如果当前方法有拦截器，则将拦截器封装为ReflectiveMethodInvocation，以便于调用proceed方法执行拦截器
 				invocation = new ReflectiveMethodInvocation(proxy, target, method, args, targetClass, chain);
-				// Proceed to the joinpoint through the interceptor chain.
-				// 执行拦截器链
 				retVal = invocation.proceed();
 			}
 
