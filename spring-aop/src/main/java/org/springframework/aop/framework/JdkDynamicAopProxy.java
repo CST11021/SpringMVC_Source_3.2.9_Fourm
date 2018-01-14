@@ -211,6 +211,7 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 			else {
 				// 如果当前方法有拦截器，则将拦截器封装为ReflectiveMethodInvocation，以便于调用proceed方法执行拦截器
 				invocation = new ReflectiveMethodInvocation(proxy, target, method, args, targetClass, chain);
+				// 执行代理方法：该方法调用完后就相当于执行的代理后的方法，即执行了增强代码也执行了目标方法的代码
 				retVal = invocation.proceed();
 			}
 

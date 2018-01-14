@@ -310,13 +310,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 		}
 		return count;
 	}
-	/**
-	 * Determine a list of {@link org.aopalliance.intercept.MethodInterceptor} objects
-	 * for the given method, based on this configuration.
-	 * @param method the proxied method
-	 * @param targetClass the target class
-	 * @return List of MethodInterceptors (may also include InterceptorAndDynamicMethodMatchers)
-	 */
+	// 获取拦截器
 	public List<Object> getInterceptorsAndDynamicInterceptionAdvice(Method method, Class targetClass) {
 		MethodCacheKey cacheKey = new MethodCacheKey(method);
 		List<Object> cached = this.methodCache.get(cacheKey);

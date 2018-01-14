@@ -60,21 +60,25 @@ import org.springframework.core.BridgeMethodResolver;
  */
 public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Cloneable {
 
+	// 代理目标对象的代理对象
 	protected final Object proxy;
+	// 目标对象
 	protected final Object target;
+	// 代理的方法
 	protected final Method method;
+	// 代理的方法的入参
 	protected Object[] arguments;
+	// 目标对象类型
 	private final Class targetClass;
 	/** Lazily initialized map of user-specific attributes for this invocation. */
 	private Map<String, Object> userAttributes;
-	/** List of MethodInterceptor and InterceptorAndDynamicMethodMatcher that need dynamic checks. */
+	// 表示方法的拦截器
 	protected final List interceptorsAndDynamicMethodMatchers;
 	/** Index from 0 of the current interceptor we're invoking. -1 until we invoke: then the current interceptor. */
 	private int currentInterceptorIndex = -1;
 
-
-	protected ReflectiveMethodInvocation(
-			Object proxy, Object target, Method method, Object[] arguments,
+	// 构造器
+	protected ReflectiveMethodInvocation(Object proxy, Object target, Method method, Object[] arguments,
 			Class targetClass, List<Object> interceptorsAndDynamicMethodMatchers) {
 
 		this.proxy = proxy;
@@ -86,14 +90,15 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 	}
 
 
+	// 获取代理目标对象后的代理对象
 	public final Object getProxy() {
 		return this.proxy;
 	}
-
+	// 获取目标对象
 	public final Object getThis() {
 		return this.target;
 	}
-
+	//
 	public final AccessibleObject getStaticPart() {
 		return this.method;
 	}
@@ -110,54 +115,40 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 	public final Object[] getArguments() {
 		return (this.arguments != null ? this.arguments : new Object[0]);
 	}
-
 	public void setArguments(Object[] arguments) {
 		this.arguments = arguments;
 	}
 
-
+	// 执行代理方法：该方法调用完后就相当于执行的代理后的方法，即执行了增强代码也执行了目标方法的代码
 	public Object proceed() throws Throwable {
-		//	We start with an index of -1 and increment early.
-		// 执行完所有增强后执行切点方法
+		// 如果一个拦截器都没有，则直接执行代理方法
 		if (this.currentInterceptorIndex == this.interceptorsAndDynamicMethodMatchers.size() - 1) {
 			return invokeJoinpoint();
 		}
 
 		// 获取下一个要执行的拦截器
 		Object interceptorOrInterceptionAdvice = this.interceptorsAndDynamicMethodMatchers.get(++this.currentInterceptorIndex);
+		// 是否为动态的拦截器：动态拦截器会根据运行时的方法入参进行方法过滤，看看是否可以织入增强
 		if (interceptorOrInterceptionAdvice instanceof InterceptorAndDynamicMethodMatcher) {
-			// Evaluate dynamic method matcher here: static part will already have
-			// been evaluated and found to match.
-			// 动态匹配
 			InterceptorAndDynamicMethodMatcher dm = (InterceptorAndDynamicMethodMatcher) interceptorOrInterceptionAdvice;
 			if (dm.methodMatcher.matches(this.method, this.targetClass, this.arguments)) {
 				return dm.interceptor.invoke(this);
 			}
+			// 不匹配则不执行拦截器
 			else {
-				// Dynamic matching failed.
-				// Skip this interceptor and invoke the next in the chain.
-				// 不匹配则不执行拦截器
 				return proceed();
 			}
 		}
+		// 如果是静态的拦截器
 		else {
-			// It's an interceptor, so we just invoke it: The pointcut will have
-			// been evaluated statically before this object was constructed.
-			/*
-			 普通拦截器，直接调用拦截器，比如：
-			 ExposeInvocationInterceptor、DelegatePerTargetObjectIntroductionInterceptor、MethodBeforeAdviceInterceptor、AspectJAroundAdvice、AspectJAfterAdvice
-			 */
-			// 将this作为参数传递以保证当前实例中调用链的执行
+			// 普通拦截器，直接调用拦截器，比如：ExposeInvocationInterceptor、DelegatePerTargetObjectIntroductionInterceptor、
+			// MethodBeforeAdviceInterceptor、AspectJAroundAdvice、AspectJAfterAdvice
+			// 将this作为参数传递以保证当前实例中调用链的执行，invoke()方法调用完后就相当于执行的代理后的方法，即执行了增强
+			// 代码也执行了目标方法的代码
 			return ((MethodInterceptor) interceptorOrInterceptionAdvice).invoke(this);
 		}
 	}
-
-	/**
-	 * Invoke the joinpoint using reflection.
-	 * Subclasses can override this to use custom invocation.
-	 * @return the return value of the joinpoint
-	 * @throws Throwable if invoking the joinpoint resulted in an exception
-	 */
+	// 执行指定的方法
 	protected Object invokeJoinpoint() throws Throwable {
 		return AopUtils.invokeJoinpointUsingReflection(this.target, this.method, this.arguments);
 	}
@@ -180,7 +171,6 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 		}
 		return invocableClone(cloneArguments);
 	}
-
 	/**
 	 * This implementation returns a shallow copy of this invocation object,
 	 * using the given arguments array for the clone.
@@ -222,11 +212,9 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 			}
 		}
 	}
-
 	public Object getUserAttribute(String key) {
 		return (this.userAttributes != null ? this.userAttributes.get(key) : null);
 	}
-
 	/**
 	 * Return user attributes associated with this invocation.
 	 * This method provides an invocation-bound alternative to a ThreadLocal.

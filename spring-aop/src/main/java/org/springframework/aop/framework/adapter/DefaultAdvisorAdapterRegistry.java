@@ -42,17 +42,14 @@ public class DefaultAdvisorAdapterRegistry implements AdvisorAdapterRegistry, Se
 
 	private final List<AdvisorAdapter> adapters = new ArrayList<AdvisorAdapter>(3);
 
-
-	/**
-	 * Create a new DefaultAdvisorAdapterRegistry, registering well-known adapters.
-	 */
+	// 初始化时默认注册MethodBeforeAdviceAdapter、AfterReturningAdviceAdapter和ThrowsAdviceAdapter适配器
 	public DefaultAdvisorAdapterRegistry() {
 		registerAdvisorAdapter(new MethodBeforeAdviceAdapter());
 		registerAdvisorAdapter(new AfterReturningAdviceAdapter());
 		registerAdvisorAdapter(new ThrowsAdviceAdapter());
 	}
 
-
+	// adviceObject包装为一个Advisor对象
 	public Advisor wrap(Object adviceObject) throws UnknownAdviceTypeException {
 		// 如果要封装的对象本身就是Advisor类型的那么无需在做过多处理
 		if (adviceObject instanceof Advisor) {
@@ -78,6 +75,7 @@ public class DefaultAdvisorAdapterRegistry implements AdvisorAdapterRegistry, Se
 		throw new UnknownAdviceTypeException(advice);
 	}
 
+	// 获取该advisor的拦截器
 	public MethodInterceptor[] getInterceptors(Advisor advisor) throws UnknownAdviceTypeException {
 		List<MethodInterceptor> interceptors = new ArrayList<MethodInterceptor>(3);
 		Advice advice = advisor.getAdvice();
@@ -95,6 +93,7 @@ public class DefaultAdvisorAdapterRegistry implements AdvisorAdapterRegistry, Se
 		return interceptors.toArray(new MethodInterceptor[interceptors.size()]);
 	}
 
+	// 注册一个适配器
 	public void registerAdvisorAdapter(AdvisorAdapter adapter) {
 		this.adapters.add(adapter);
 	}

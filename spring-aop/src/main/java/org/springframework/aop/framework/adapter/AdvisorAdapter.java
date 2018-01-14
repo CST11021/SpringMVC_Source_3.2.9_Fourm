@@ -34,30 +34,17 @@ import org.springframework.aop.Advisor;
  *
  * @author Rod Johnson
  */
+// 连接点由两个信息确定：
+// 第一是用方法表示的程序执行点；
+// 第二是用相对点表示的方位。
+// 例如在Test.foo()方法执行前的连接点，执行点就是Test.foo()，方位是该方法执行前的位置。Spring使用切点提供执行点信息，而方位信息由增强提供。
+// Pointcut接口是指用来定位到某个方法上的信息，如果要定位到具体连接点，还需提供方位信息，方位信息由Advice提供
 public interface AdvisorAdapter {
 
-	/**
-	 * Does this adapter understand this advice object? Is it valid to
-	 * invoke the {@code getInterceptors} method with an Advisor that
-	 * contains this advice as an argument?
-	 * @param advice an Advice such as a BeforeAdvice
-	 * @return whether this adapter understands the given advice object
-	 * @see #getInterceptor(org.springframework.aop.Advisor)
-	 * @see org.springframework.aop.BeforeAdvice
-	 */
+	// 判断这个Advisor是否支持Advice，Advisor封装了Advice和Pointcut对象
 	boolean supportsAdvice(Advice advice);
 
-	/**
-	 * Return an AOP Alliance MethodInterceptor exposing the behavior of
-	 * the given advice to an interception-based AOP framework.
-	 * <p>Don't worry about any Pointcut contained in the Advisor;
-	 * the AOP framework will take care of checking the pointcut.
-	 * @param advisor the Advisor. The supportsAdvice() method must have
-	 * returned true on this object
-	 * @return an AOP Alliance interceptor for this Advisor. There's
-	 * no need to cache instances for efficiency, as the AOP framework
-	 * caches advice chains.
-	 */
+	// 获取advisor的增强对象，并封装为一个拦截器对象返回
 	MethodInterceptor getInterceptor(Advisor advisor);
 
 }

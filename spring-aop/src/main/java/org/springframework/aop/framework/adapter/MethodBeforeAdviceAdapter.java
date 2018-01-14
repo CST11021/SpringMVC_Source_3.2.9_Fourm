@@ -34,10 +34,12 @@ import org.springframework.aop.MethodBeforeAdvice;
 @SuppressWarnings("serial")
 class MethodBeforeAdviceAdapter implements AdvisorAdapter, Serializable {
 
+	// 判断Advice这个增强是否为“方法的前置增强”
 	public boolean supportsAdvice(Advice advice) {
 		return (advice instanceof MethodBeforeAdvice);
 	}
 
+	// 从advisor中获取“方法的前置增强”，并封装为拦截器器返回
 	public MethodInterceptor getInterceptor(Advisor advisor) {
 		MethodBeforeAdvice advice = (MethodBeforeAdvice) advisor.getAdvice();
 		return new MethodBeforeAdviceInterceptor(advice);

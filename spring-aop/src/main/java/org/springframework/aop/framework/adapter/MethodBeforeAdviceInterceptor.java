@@ -46,7 +46,9 @@ public class MethodBeforeAdviceInterceptor implements MethodInterceptor, Seriali
 		this.advice = advice;
 	}
 
+	// 执行织入的增强代码后在执行代理方法的代码
 	public Object invoke(MethodInvocation mi) throws Throwable {
+		// 这里就是执行织入的增强代码
 		this.advice.before(mi.getMethod(), mi.getArguments(), mi.getThis() );
 		return mi.proceed();
 	}

@@ -51,6 +51,7 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 		List<Object> interceptorList = new ArrayList<Object>(config.getAdvisors().length);
 		// 判断目标类是否有配置引介增强
 		boolean hasIntroductions = hasMatchingIntroductions(config, targetClass);
+		// 每种类型的增强都对应不同的方法拦截器，这里GlobalAdvisorAdapterRegistry中注册了不同类型的增强和对应的拦截器
 		AdvisorAdapterRegistry registry = GlobalAdvisorAdapterRegistry.getInstance();
 		for (Advisor advisor : config.getAdvisors()) {
 			// 如果是非引介类型的增强
