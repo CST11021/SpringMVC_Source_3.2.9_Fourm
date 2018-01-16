@@ -67,13 +67,7 @@ public abstract class AopContext {
 		return proxy;
 	}
 
-	/**
-	 * Make the given proxy available via the {@code currentProxy()} method.
-	 * <p>Note that the caller should be careful to keep the old value as appropriate.
-	 * @param proxy the proxy to expose (or {@code null} to reset it)
-	 * @return the old proxy, which may be {@code null} if none was bound
-	 * @see #currentProxy()
-	 */
+	// 设置新的代理对象，并返回旧的代理对象
 	static Object setCurrentProxy(Object proxy) {
 		Object old = currentProxy.get();
 		if (proxy != null) {

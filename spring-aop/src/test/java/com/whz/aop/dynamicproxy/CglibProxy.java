@@ -15,6 +15,7 @@ public class CglibProxy implements MethodInterceptor {
 		//通过字节码技术动态创建子类实例
 		return enhancer.create();
 	}
+	// 这里CGLIB实际上是采用了装饰器的设计模式：在子类中添加或改变原目标类的行为
 	public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {//拦截父类所有方法的调用
 		System.out.println("do before");
 		Object result = proxy.invokeSuper(obj, args);//通过代理类调用父类中的方法

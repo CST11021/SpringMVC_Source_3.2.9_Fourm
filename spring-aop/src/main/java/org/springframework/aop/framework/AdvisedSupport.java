@@ -73,7 +73,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	//** Whether the Advisors are already filtered for the specific target class */
 	private boolean preFiltered = false;
 	AdvisorChainFactory advisorChainFactory = new DefaultAdvisorChainFactory();
-	// 增强不一定可以作用在所有的方法中，这里用户缓存每个方法对应的方法拦截器
+	// 增强不一定可以作用在所有的方法中，这里用于缓存每个方法对应的方法拦截器
 	private transient Map<MethodCacheKey, List<Object>> methodCache;
 	// 保存代理类将要实现的接口。保存在列表中以保持注册顺序，用指定的接口顺序创建JDK代理
 	private List<Class> interfaces = new ArrayList<Class>();

@@ -89,7 +89,7 @@ public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 		}
 	}
 
-	// Determine whether the supplied AdvisedSupport has only the SpringProxy interface specified (or no proxy interfaces specified at all).
+	// 如果代理的不是接口，或者代理的接口是SpringProxy接口，则返回true
 	private boolean hasNoUserSuppliedProxyInterfaces(AdvisedSupport config) {
 		Class[] interfaces = config.getProxiedInterfaces();
 		return (interfaces.length == 0 || (interfaces.length == 1 && SpringProxy.class.equals(interfaces[0])));

@@ -45,14 +45,8 @@ public interface TargetSource extends TargetClassAware {
 	// 返回被代理的目标类类型
 	Class<?> getTargetClass();
 
-	/**
-	 * Will all calls to {@link #getTarget()} return the same object?
-	 * <p>In that case, there will be no need to invoke
-	 * {@link #releaseTarget(Object)}, and the AOP framework can cache
-	 * the return value of {@link #getTarget()}.
-	 * @return {@code true} if the target is immutable
-	 * @see #getTarget
-	 */
+	// 用于表明调用getTarget()接口是否要返回同一个目标对象实例，SingletonTargetSource的这个方法肯定是返回true，其他的实
+	// 现根据情况，通常返回false
 	boolean isStatic();
 
 	// 获取包含连接点的目标对象

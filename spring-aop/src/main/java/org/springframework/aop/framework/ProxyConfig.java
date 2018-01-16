@@ -42,7 +42,7 @@ public class ProxyConfig implements Serializable {
 	// 我们可以通过Advised查询代理对象的一些状态。
 	boolean opaque = false;
 	// 设置exposeProxy，可以让Spring AOP框架在生成代理对象时，将当前代理对象绑定到ThreadLocal。
-	// 如果目标对象需要访问当前代理对象，可以通过AOPContext.currentProxy(）取得。处于性能方面的考虑，该属性默认为false
+	// 如果目标对象需要访问当前代理对象，可以通过AOPContext.currentProxy()取得。处于性能方面的考虑，该属性默认为false
 	boolean exposeProxy = false;
 	// 如果frozen设置为true，那么一旦针对代理对象生成的各项信息配置完成，则不容许更改。
 	// 比如，如果ProxyFactory的设置完毕，并且fronzen为true，则不能对Advice进行任何变动，这样可以优化代理对象生成的性能。

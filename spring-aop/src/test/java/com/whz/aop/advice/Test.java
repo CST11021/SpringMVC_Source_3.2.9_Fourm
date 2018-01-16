@@ -21,6 +21,7 @@ public class Test {
         proxyFactory.setInterfaces(target.getClass().getInterfaces());
         proxyFactory.setTarget(target);
         proxyFactory.addAdvice(advice);
+        proxyFactory.setOptimize(true);
 
         //生成代理实例
         Waiter proxy = (Waiter) proxyFactory.getProxy();
