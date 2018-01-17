@@ -56,7 +56,7 @@ public class InjectionMetadata {
 		this.injectedElements = elements;
 	}
 
-
+	// 将所有配置属性（比如通过@Autowire注入的属性）保存到RootBeanDefinition#externallyManagedConfigMembers
 	public void checkConfigMembers(RootBeanDefinition beanDefinition) {
 		Set<InjectedElement> checkedElements = new LinkedHashSet<InjectedElement>(this.injectedElements.size());
 		for (InjectedElement element : this.injectedElements) {
@@ -85,7 +85,7 @@ public class InjectionMetadata {
 		}
 	}
 
-
+	//
 	public static boolean needsRefresh(InjectionMetadata metadata, Class<?> clazz) {
 		return (metadata == null || !metadata.targetClass.equals(clazz));
 	}

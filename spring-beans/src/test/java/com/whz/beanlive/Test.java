@@ -19,10 +19,15 @@ public class Test {
     @org.junit.Test
     public void test1() throws IOException {
         Resource[] configResources = new PathMatchingResourcePatternResolver().getResources(
-            "classpath*:com/whz/autowire/spring-autowire.xml");
+            "classpath*:com/whz/beanlive/spring-autowire.xml");
         XmlBeanFactory xmlBeanFactory = new XmlBeanFactory(configResources[0]);
 
+        AutowiredAnnotationBeanPostProcessor postProcessor = new AutowiredAnnotationBeanPostProcessor();
+        postProcessor.setBeanFactory(xmlBeanFactory);
+        xmlBeanFactory.addBeanPostProcessor(postProcessor);
 
+        Person person = (Person)xmlBeanFactory.getBean("person");
+        System.out.println(person);
     }
 
     @org.junit.Test

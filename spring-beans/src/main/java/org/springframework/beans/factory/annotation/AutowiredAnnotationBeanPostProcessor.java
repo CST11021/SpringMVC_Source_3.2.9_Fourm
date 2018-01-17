@@ -144,7 +144,9 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 	// 将类型为beanType和beanName对应的bean注入到beanDefinition
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
 		if (beanType != null) {
+			// 找出所有@Autowirez注解的属性，并封装在为一个InjectionMetadata
 			InjectionMetadata metadata = findAutowiringMetadata(beanName, beanType);
+			// 将所有配置属性（比如通过@Autowire注入的属性）保存到RootBeanDefinition#externallyManagedConfigMembers
 			metadata.checkConfigMembers(beanDefinition);
 		}
 	}
@@ -238,6 +240,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 	private InjectionMetadata findAutowiringMetadata(String beanName, Class<?> clazz) {
 		// Quick check on the concurrent map first, with minimal locking.
 		// Fall back to class name as cache key, for backwards compatibility with custom callers.
+		// 如果beanName为空，则使用全限定类名
 		String cacheKey = (StringUtils.hasLength(beanName) ? beanName : clazz.getName());
 		InjectionMetadata metadata = this.injectionMetadataCache.get(cacheKey);
 		if (InjectionMetadata.needsRefresh(metadata, clazz)) {
@@ -245,6 +248,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 				metadata = this.injectionMetadataCache.get(cacheKey);
 				if (InjectionMetadata.needsRefresh(metadata, clazz)) {
 					metadata = buildAutowiringMetadata(clazz);
+					// 将所有@Autowire注解的属性封装为一个InjectionMetadata对象，并保存到 this.injectionMetadataCache
 					this.injectionMetadataCache.put(cacheKey, metadata);
 				}
 			}

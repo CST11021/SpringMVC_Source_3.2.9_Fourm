@@ -193,6 +193,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 		}
 	}
 
+	// 将配置的属性（比如通过@Autowire注入的属性）添加到 this.externallyManagedConfigMembers
 	public void registerExternallyManagedConfigMember(Member configMember) {
 		synchronized (this.postProcessingLock) {
 			if (this.externallyManagedConfigMembers == null) {
@@ -201,7 +202,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 			this.externallyManagedConfigMembers.add(configMember);
 		}
 	}
-
+	// 判断 this.externallyManagedConfigMembers 是否包含指定的配置属性
 	public boolean isExternallyManagedConfigMember(Member configMember) {
 		synchronized (this.postProcessingLock) {
 			return (this.externallyManagedConfigMembers != null &&
