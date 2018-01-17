@@ -12,7 +12,7 @@
     <!--proxyInterfaces:指定代理的接口，如果是多个接口，请使用<list>元素-->
     <!--interceptorNames:指定使用的增强-->
     <!--target:指定对哪个bean进行代理-->
-    <bean id="waiter" class="org.springframework.aop.framework.ProxyFactoryBean"
+    <bean id="waiterProxy" class="org.springframework.aop.framework.ProxyFactoryBean"
         p:proxyInterfaces="com.whz.aop.advice.Waiter"
         p:interceptorNames="greetingBefore,greetingAfter,greetAround"
         p:target-ref="target"/>

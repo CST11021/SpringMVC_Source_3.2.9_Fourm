@@ -155,8 +155,10 @@ final class CglibAopProxy implements AopProxy, Serializable {
 			// 验证目标类是否有final方法，CGLIB无法代理final方法，这里会打日志进行提示
 			validateClassIfNecessary(proxySuperClass);
 
-			// 创建及配置CGLIB Enhancer
+			// 创建及配置CGLIB Enhancer，注意：这里 Enhancer 是spring-core包中的类
+			// 在内存中创建一个动态类的字节码，此时并没有做继承
 			Enhancer enhancer = createEnhancer();
+			// 1、设置类加载器
 			if (classLoader != null) {
 				enhancer.setClassLoader(classLoader);
 				if (classLoader instanceof SmartClassLoader &&
@@ -164,11 +166,13 @@ final class CglibAopProxy implements AopProxy, Serializable {
 					enhancer.setUseCache(false);
 				}
 			}
-			// 设置要被代理的目标类类型
+			// 2、为其指定父类，除了完成继承关系外，还将父类所有的方法名反射过来，并在自己的类中创建了这些方法
 			enhancer.setSuperclass(proxySuperClass);
+			// 3、设置代理的接口
 			enhancer.setInterfaces(AopProxyUtils.completeProxiedInterfaces(this.advised));
-			// 设置生成代理对象类名的方式，这里采用“BySpringCGLIB”的方式生成类名
+			// 4、设置生成代理对象类名的方式，这里采用“BySpringCGLIB”的方式生成类名
 			enhancer.setNamingPolicy(SpringNamingPolicy.INSTANCE);
+			// 5、TODO 具体作用不清楚
 			enhancer.setStrategy(new MemorySafeUndeclaredThrowableStrategy(UndeclaredThrowableException.class));
 			enhancer.setInterceptDuringConstruction(false);
 
@@ -184,7 +188,8 @@ final class CglibAopProxy implements AopProxy, Serializable {
             // 指定切入器，定义代理类逻辑
 			enhancer.setCallbacks(callbacks);
 
-			// 生成代理以及创建代理对象（如果有设置生成使用的构造器，则使用指定构造器实例化代理对象）
+			// 通过字节码技术动态创建代理对象，即目标对象的子类实例，如果有设置生成使用的构造器，则使用指定构造器实例化
+			// 代理对象
 			Object proxy;
 			if (this.constructorArgs != null) {
 				proxy = enhancer.create(this.constructorArgTypes, this.constructorArgs);

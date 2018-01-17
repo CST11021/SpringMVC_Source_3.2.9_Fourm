@@ -36,11 +36,11 @@ public class Test {
     public void TestAdvice1() {
         String configPath = "com/whz/aop/advice/spring-aop.xml";
         ApplicationContext ctx = new ClassPathXmlApplicationContext(configPath);
-        Waiter waiter = (Waiter)ctx.getBean("waiter");
+        Waiter waiterProxy = (Waiter)ctx.getBean("waiterProxy");
 
-        waiter.greetTo("John");
+        waiterProxy.greetTo("John");
         System.out.println();
-        waiter.serveTo("John");
+        waiterProxy.serveTo("John");
     }
 
 /*
