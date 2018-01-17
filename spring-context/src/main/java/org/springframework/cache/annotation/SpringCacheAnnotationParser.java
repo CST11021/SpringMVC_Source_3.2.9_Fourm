@@ -74,11 +74,10 @@ public class SpringCacheAnnotationParser implements CacheAnnotationParser, Seria
 		}
 		return ops;
 	}
-
 	private <T extends Annotation> Collection<CacheOperation> lazyInit(Collection<CacheOperation> ops) {
 		return (ops != null ? ops : new ArrayList<CacheOperation>(1));
 	}
-
+	// 解析 @Cacheable 注解
 	CacheableOperation parseCacheableAnnotation(AnnotatedElement ae, Cacheable caching) {
 		CacheableOperation cuo = new CacheableOperation();
 		cuo.setCacheNames(caching.value());
@@ -88,7 +87,7 @@ public class SpringCacheAnnotationParser implements CacheAnnotationParser, Seria
 		cuo.setName(ae.toString());
 		return cuo;
 	}
-
+	// 解析 @CacheEvict 注解
 	CacheEvictOperation parseEvictAnnotation(AnnotatedElement ae, CacheEvict caching) {
 		CacheEvictOperation ceo = new CacheEvictOperation();
 		ceo.setCacheNames(caching.value());
@@ -99,7 +98,7 @@ public class SpringCacheAnnotationParser implements CacheAnnotationParser, Seria
 		ceo.setName(ae.toString());
 		return ceo;
 	}
-
+	// 解析 @CachePut 注解
 	CacheOperation parseUpdateAnnotation(AnnotatedElement ae, CachePut caching) {
 		CachePutOperation cuo = new CachePutOperation();
 		cuo.setCacheNames(caching.value());
@@ -109,7 +108,7 @@ public class SpringCacheAnnotationParser implements CacheAnnotationParser, Seria
 		cuo.setName(ae.toString());
 		return cuo;
 	}
-
+	// 解析 @Caching 注解
 	Collection<CacheOperation> parseCachingAnnotation(AnnotatedElement ae, Caching caching) {
 		Collection<CacheOperation> ops = null;
 
@@ -137,7 +136,6 @@ public class SpringCacheAnnotationParser implements CacheAnnotationParser, Seria
 
 		return ops;
 	}
-
 	private <T extends Annotation> Collection<T> getAnnotations(AnnotatedElement ae, Class<T> annotationType) {
 		Collection<T> anns = new ArrayList<T>(2);
 
@@ -162,7 +160,6 @@ public class SpringCacheAnnotationParser implements CacheAnnotationParser, Seria
 	public boolean equals(Object other) {
 		return (this == other || other instanceof SpringCacheAnnotationParser);
 	}
-
 	@Override
 	public int hashCode() {
 		return SpringCacheAnnotationParser.class.hashCode();

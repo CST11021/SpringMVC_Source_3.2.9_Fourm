@@ -54,11 +54,11 @@ class AnnotationDrivenCacheBeanDefinitionParser implements BeanDefinitionParser 
 		// 的切面拦截
 		String mode = element.getAttribute("mode");
 		if ("aspectj".equals(mode)) {
-			// mode="aspectj"
+			// mode="aspectj" 判断是否使用aspectj代理技术来实现缓存注解的拦截
 			registerCacheAspect(element, parserContext);
 		}
 		else {
-			// mode="proxy"
+			// mode="proxy" 使用Spring动态代理方式来拦截，默认实现
 			AopAutoProxyConfigurer.configureAutoProxyCreator(element, parserContext);
 		}
 
@@ -110,6 +110,7 @@ class AnnotationDrivenCacheBeanDefinitionParser implements BeanDefinitionParser 
 				Object eleSource = parserContext.extractSource(element);
 
 				// 1、创建一个 CacheOperationSource 的 BeanDefinition 并注册到IOC容器中
+				// AnnotationCacheOperationSource中创建了一个SpringCacheAnnotationParser，它是用于解析缓存注解的解析器
 				RootBeanDefinition sourceDef = new RootBeanDefinition(AnnotationCacheOperationSource.class);
 				sourceDef.setSource(eleSource);
 				// BeanDefinition.ROLE_INFRASTRUCTURE表示该bean是Spring内部使用的bean

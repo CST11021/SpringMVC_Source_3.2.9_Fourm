@@ -46,6 +46,7 @@ import org.springframework.util.Assert;
 public class AnnotationCacheOperationSource extends AbstractFallbackCacheOperationSource implements Serializable {
 
 	private final boolean publicMethodsOnly;
+	// 表示一系列缓存注解解析器
 	private final Set<CacheAnnotationParser> annotationParsers;
 
 	// 构造器
