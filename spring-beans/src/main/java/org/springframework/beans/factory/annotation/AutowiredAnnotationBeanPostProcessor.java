@@ -139,12 +139,11 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 		}
 		this.beanFactory = (ConfigurableListableBeanFactory) beanFactory;
 	}
-	// BeanDefinition 被包装为 BeanWrapper 后，会调用该方法，将执行
-	// MergedBeanDefinitionPostProcessor#postProcessMergedBeanDefinition 方法
-	// 将类型为beanType和beanName对应的bean注入到beanDefinition
+	// BeanDefinition 被包装为 BeanWrapper 后，会调用该方法，将执行MergedBeanDefinitionPostProcessor#postProcessMergedBeanDefinition
+	// 方法，将类型为beanType和beanName对应的bean注入到beanDefinition，并缓存
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
 		if (beanType != null) {
-			// 找出所有@Autowirez注解的属性，并封装在为一个InjectionMetadata
+			// 找出所有@Autowirez注解的属性，并封装在为一个InjectionMetadata，并放入this.injectionMetadataCache缓存起来
 			InjectionMetadata metadata = findAutowiringMetadata(beanName, beanType);
 			// 将所有配置属性（比如通过@Autowire注入的属性）保存到RootBeanDefinition#externallyManagedConfigMembers
 			metadata.checkConfigMembers(beanDefinition);
@@ -210,9 +209,10 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 
 	@Override
 	public PropertyValues postProcessPropertyValues(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) throws BeansException {
-
+		// 找出这个Bean中所有@Autowire注解修饰的属性，并封装为一个InjectionMetadata，以便于后续将这些属性注入到Bean
 		InjectionMetadata metadata = findAutowiringMetadata(beanName, bean.getClass());
 		try {
+			// 将所有@Autowire注解修饰的属性注入到Bean
 			metadata.inject(bean, beanName, pvs);
 		}
 		catch (Throwable ex) {
@@ -237,12 +237,12 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 			throw new BeanCreationException("Injection of autowired dependencies failed for class [" + clazz + "]", ex);
 		}
 	}
+	// 找出这个Bean中所有@Autowire注解修饰的属性，并封装为一个InjectionMetadata，以便于后续将这些属性注入到Bean
 	private InjectionMetadata findAutowiringMetadata(String beanName, Class<?> clazz) {
-		// Quick check on the concurrent map first, with minimal locking.
-		// Fall back to class name as cache key, for backwards compatibility with custom callers.
 		// 如果beanName为空，则使用全限定类名
 		String cacheKey = (StringUtils.hasLength(beanName) ? beanName : clazz.getName());
 		InjectionMetadata metadata = this.injectionMetadataCache.get(cacheKey);
+		// 判断 metadata 是否放进缓存
 		if (InjectionMetadata.needsRefresh(metadata, clazz)) {
 			synchronized (this.injectionMetadataCache) {
 				metadata = this.injectionMetadataCache.get(cacheKey);
@@ -381,13 +381,10 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 		}
 	}
 
-
+	// 该内部类用于将@Autowire修饰的属性注入到Bean中
 	private class AutowiredFieldElement extends InjectionMetadata.InjectedElement {
-
 		private final boolean required;
-
 		private volatile boolean cached = false;
-
 		private volatile Object cachedFieldValue;
 
 		public AutowiredFieldElement(Field field, boolean required) {
@@ -439,12 +436,10 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 			}
 		}
 	}
+	// 该内部类用于将@Autowire修饰的方法对应的属性注入到Bean中
 	private class AutowiredMethodElement extends InjectionMetadata.InjectedElement {
-
 		private final boolean required;
-
 		private volatile boolean cached = false;
-
 		private volatile Object[] cachedMethodArguments;
 
 		public AutowiredMethodElement(Method method, boolean required, PropertyDescriptor pd) {
@@ -520,7 +515,6 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 				throw new BeanCreationException("Could not autowire method: " + method, ex);
 			}
 		}
-
 		private Object[] resolveCachedArguments(String beanName) {
 			if (this.cachedMethodArguments == null) {
 				return null;

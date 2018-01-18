@@ -71,6 +71,7 @@ public class InjectionMetadata {
 		}
 		this.checkedElements = checkedElements;
 	}
+	// 将所有@Autowire注解修饰的属性注入到Bean
 	public void inject(Object target, String beanName, PropertyValues pvs) throws Throwable {
 		Collection<InjectedElement> elementsToIterate =
 				(this.checkedElements != null ? this.checkedElements : this.injectedElements);

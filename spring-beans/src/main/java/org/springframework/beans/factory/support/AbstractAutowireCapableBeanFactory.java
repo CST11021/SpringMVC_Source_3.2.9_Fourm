@@ -976,7 +976,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			pvs = newPvs;
 		}
 
-		//第三步：执行InstantiationAwareBeanPostProcessor处理器的postProcessPropertyValues方法
+		//第三步：执行InstantiationAwareBeanPostProcessor处理器的postProcessPropertyValues方法，将@Autowire注解的属性注入
 		boolean hasInstAwareBpps = hasInstantiationAwareBeanPostProcessors();
 		//需要依赖检查
 		boolean needsDepCheck = (mbd.getDependencyCheck() != RootBeanDefinition.DEPENDENCY_CHECK_NONE);
