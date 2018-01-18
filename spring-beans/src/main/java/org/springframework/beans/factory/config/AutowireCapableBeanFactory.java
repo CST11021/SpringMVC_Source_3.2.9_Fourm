@@ -50,7 +50,9 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName) throws BeansException;
 	// 初始化之后执行BeanPostProcessors
 	Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName) throws BeansException;
-	// 根据工厂中定义的bean来解决指定的依赖项
+	// 根据工厂中定义的bean来解决指定的依赖项，descriptor用来描述被依赖的Bean对象，比如：Bean A中通过xml配置或通过@Autowire
+	// 注解配置依赖对象B，Spring会先实例化B，初始化B时会通过这个方法来进行实例化，descriptor用来描述B，beanName表示A的beanName
+	// autowiredBeanNames 表示被注入的Bean B
 	Object resolveDependency(DependencyDescriptor descriptor, String beanName, Set<String> autowiredBeanNames, TypeConverter typeConverter) throws BeansException;
 
 }

@@ -43,6 +43,7 @@ public abstract class InstantiationAwareBeanPostProcessorAdapter implements Smar
 	public Class<?> predictBeanType(Class<?> beanClass, String beanName) {
 		return null;
 	}
+	// 解析这个bean实例化时要使用的构造器
 	public Constructor<?>[] determineCandidateConstructors(Class<?> beanClass, String beanName) throws BeansException {
 		return null;
 	}

@@ -43,10 +43,13 @@ import org.springframework.util.ReflectionUtils;
  * @author Juergen Hoeller
  * @since 2.5
  */
+// 封装一个bean对象和一系列被自动装配注解修饰的对象，该类主要用于将类似@Autowire修饰的对象注入到Bean中
 public class InjectionMetadata {
 
 	private final Log logger = LogFactory.getLog(InjectionMetadata.class);
+	// 表示一个Bean对象类型
 	private final Class<?> targetClass;
+	// 表示一系列要被注入的属性
 	private final Collection<InjectedElement> injectedElements;
 	private volatile Set<InjectedElement> checkedElements;
 
@@ -86,14 +89,18 @@ public class InjectionMetadata {
 		}
 	}
 
-	//
+	// 判断指定的metadata是否为空，如果是空的，或者和当前对象的类型不一样返回true
 	public static boolean needsRefresh(InjectionMetadata metadata, Class<?> clazz) {
 		return (metadata == null || !metadata.targetClass.equals(clazz));
 	}
-	public static abstract class InjectedElement {
 
+	// 封装一个成员对象，这个成员对象（可能是属性也可能是方法）是用自动装配的注解修饰的，比如：@Autowire、@Inject
+	public static abstract class InjectedElement {
+		// 被自动装配注解修饰的对象
 		protected final Member member;
+		// 判断该对象是否是一个属性
 		protected final boolean isField;
+		// java.beans.PropertyDescriptor
 		protected final PropertyDescriptor pd;
 		protected volatile Boolean skip;
 
@@ -133,9 +140,7 @@ public class InjectionMetadata {
 				}
 			}
 		}
-		/**
-		 * Either this or {@link #getResourceToInject} needs to be overridden.
-		 */
+		/** Either this or {@link #getResourceToInject} needs to be overridden. */
 		protected void inject(Object target, String requestingBeanName, PropertyValues pvs) throws Throwable {
 			if (this.isField) {
 				Field field = (Field) this.member;
@@ -155,6 +160,10 @@ public class InjectionMetadata {
 					throw ex.getTargetException();
 				}
 			}
+		}
+		/** Either this or {@link #inject} needs to be overridden. */
+		protected Object getResourceToInject(Object target, String requestingBeanName) {
+			return null;
 		}
 		/**
 		 * Checks whether this injector's property needs to be skipped due to
@@ -186,12 +195,6 @@ public class InjectionMetadata {
 				this.skip = false;
 				return false;
 			}
-		}
-		/**
-		 * Either this or {@link #inject} needs to be overridden.
-		 */
-		protected Object getResourceToInject(Object target, String requestingBeanName) {
-			return null;
 		}
 
 		@Override
