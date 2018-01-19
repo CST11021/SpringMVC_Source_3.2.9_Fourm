@@ -39,6 +39,7 @@ import org.springframework.beans.factory.BeanNameAware;
  Spring利用BeanPostProcessor可干涉Bean生命周期的机制，提供了一些自动创建代理，织入切面的自动代理创建器，
  其中DefaultAdvisorAutoProxyCreator是功能强大的自动代理创建器，它可以将容器中所有Advisor自动织入到目标Bean中。
  */
+// DefaultAdvisorAutoProxyCreator :  将对应匹配的advisor，自动添加到spring的bean。它控制的是advisor的匹配，所有的bean都会被自动代理
 @SuppressWarnings("serial")
 public class DefaultAdvisorAutoProxyCreator extends AbstractAdvisorAutoProxyCreator implements BeanNameAware {
 
