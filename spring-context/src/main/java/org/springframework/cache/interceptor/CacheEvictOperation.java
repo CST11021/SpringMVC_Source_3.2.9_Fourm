@@ -27,19 +27,15 @@ public class CacheEvictOperation extends CacheOperation {
 	private boolean cacheWide = false;
 	private boolean beforeInvocation = false;
 
-
 	public void setCacheWide(boolean cacheWide) {
 		this.cacheWide = cacheWide;
 	}
-
 	public boolean isCacheWide() {
 		return this.cacheWide;
 	}
-
 	public void setBeforeInvocation(boolean beforeInvocation) {
 		this.beforeInvocation = beforeInvocation;
 	}
-
 	public boolean isBeforeInvocation() {
 		return this.beforeInvocation;
 	}

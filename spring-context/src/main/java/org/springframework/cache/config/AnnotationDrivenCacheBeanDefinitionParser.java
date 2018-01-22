@@ -58,7 +58,7 @@ class AnnotationDrivenCacheBeanDefinitionParser implements BeanDefinitionParser 
 			registerCacheAspect(element, parserContext);
 		}
 		else {
-			// mode="proxy" 使用Spring动态代理方式来拦截，默认实现
+			// mode="proxy" 使用Spring自动代理方式来拦截被缓存注解修饰的方法，默认实现
 			AopAutoProxyConfigurer.configureAutoProxyCreator(element, parserContext);
 		}
 
@@ -119,7 +119,8 @@ class AnnotationDrivenCacheBeanDefinitionParser implements BeanDefinitionParser 
 				// 这里返回的sourceName是“org.springframework.cache.annotation.AnnotationCacheOperationSource#0”
 				String sourceName = parserContext.getReaderContext().registerWithGeneratedName(sourceDef);
 
-				// 2、创建一个 CacheInterceptor 的 BeanDefinition 并注册到IOC容器中
+				// 2、创建一个 CacheInterceptor 的 BeanDefinition 并注册到IOC容器中，拦截器interceptorDef#cacheOperationSources
+				// 指向上面的AnnotationCacheOperationSource
 				RootBeanDefinition interceptorDef = new RootBeanDefinition(CacheInterceptor.class);
 				interceptorDef.setSource(eleSource);
 				interceptorDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
@@ -128,7 +129,8 @@ class AnnotationDrivenCacheBeanDefinitionParser implements BeanDefinitionParser 
 				interceptorDef.getPropertyValues().add("cacheOperationSources", new RuntimeBeanReference(sourceName));
 				String interceptorName = parserContext.getReaderContext().registerWithGeneratedName(interceptorDef);
 
-				// 3、创建一个 CacheAdvisor 的 BeanDefinition 并注册到IOC容器中
+				// 3、创建一个 CacheAdvisor 的 BeanDefinition 并注册到IOC容器中，增强advisorDef#cacheOperationSource
+				// 指向上面的AnnotationCacheOperationSource，advisorDef#adviceBeanName指向上面的拦截器
 				RootBeanDefinition advisorDef = new RootBeanDefinition(BeanFactoryCacheOperationSourceAdvisor.class);
 				advisorDef.setSource(eleSource);
 				advisorDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);

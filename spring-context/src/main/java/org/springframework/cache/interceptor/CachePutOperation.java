@@ -27,11 +27,9 @@ public class CachePutOperation extends CacheOperation {
 
 	private String unless;
 
-
 	public String getUnless() {
 		return unless;
 	}
-
 	public void setUnless(String unless) {
 		this.unless = unless;
 	}

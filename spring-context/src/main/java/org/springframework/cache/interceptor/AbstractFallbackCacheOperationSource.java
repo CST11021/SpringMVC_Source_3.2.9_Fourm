@@ -69,7 +69,6 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 	 */
 	final Map<Object, Collection<CacheOperation>> attributeCache = new ConcurrentHashMap<Object, Collection<CacheOperation>>(1024);
 
-
 	/**
 	 * Determine the caching attribute for this method invocation.
 	 * <p>Defaults to the class's caching attribute if no method attribute is found.
@@ -106,7 +105,6 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 			return cacheOps;
 		}
 	}
-
 	/**
 	 * Determine a cache key for the given method and target class.
 	 * <p>Must not produce same key for overloaded methods.
@@ -118,7 +116,6 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 	protected Object getCacheKey(Method method, Class<?> targetClass) {
 		return new DefaultCacheKey(method, targetClass);
 	}
-
 	private Collection<CacheOperation> computeCacheOperations(Method method, Class<?> targetClass) {
 		// Don't allow no-public methods as required.
 		if (allowPublicMethodsOnly() && !Modifier.isPublic(method.getModifiers())) {
@@ -154,8 +151,6 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 		}
 		return null;
 	}
-
-
 	/**
 	 * Subclasses need to implement this to return the caching attribute
 	 * for the given method, if any.
@@ -164,7 +159,6 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 	 * (or {@code null} if none)
 	 */
 	protected abstract Collection<CacheOperation> findCacheOperations(Method method);
-
 	/**
 	 * Subclasses need to implement this to return the caching attribute
 	 * for the given class, if any.
@@ -173,7 +167,6 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 	 * (or {@code null} if none)
 	 */
 	protected abstract Collection<CacheOperation> findCacheOperations(Class<?> clazz);
-
 	/**
 	 * Should only public methods be allowed to have caching semantics?
 	 * <p>The default implementation returns {@code false}.

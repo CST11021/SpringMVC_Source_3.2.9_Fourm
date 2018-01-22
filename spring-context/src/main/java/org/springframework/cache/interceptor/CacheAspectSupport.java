@@ -66,61 +66,39 @@ public abstract class CacheAspectSupport implements InitializingBean {
 	private static final String CACHEABLE = "cacheable";
 	private static final String UPDATE = "cacheupdate";
 	private static final String EVICT = "cacheevict";
+
 	private final ExpressionEvaluator evaluator = new ExpressionEvaluator();
 	private CacheManager cacheManager;
 	private CacheOperationSource cacheOperationSource;
 	private KeyGenerator keyGenerator = new DefaultKeyGenerator();
+	// 用于标记this.cacheManager和this.cacheOperationSource是否已经被初始化
 	private boolean initialized = false;
 
 
-	/**
-	 * Set the CacheManager that this cache aspect should delegate to.
-	 */
 	public void setCacheManager(CacheManager cacheManager) {
 		this.cacheManager = cacheManager;
 	}
-
-	/**
-	 * Return the CacheManager that this cache aspect delegates to.
-	 */
 	public CacheManager getCacheManager() {
 		return this.cacheManager;
 	}
 
-	/**
-	 * Set one or more cache operation sources which are used to find the cache
-	 * attributes. If more than one source is provided, they will be aggregated using a
-	 * {@link CompositeCacheOperationSource}.
-	 * @param cacheOperationSources must not be {@code null}
-	 */
 	public void setCacheOperationSources(CacheOperationSource... cacheOperationSources) {
 		Assert.notEmpty(cacheOperationSources, "At least 1 CacheOperationSource needs to be specified");
 		this.cacheOperationSource = (cacheOperationSources.length > 1 ?
 				new CompositeCacheOperationSource(cacheOperationSources) : cacheOperationSources[0]);
 	}
-
-	/**
-	 * Return the CacheOperationSource for this cache aspect.
-	 */
 	public CacheOperationSource getCacheOperationSource() {
 		return this.cacheOperationSource;
 	}
 
-	/**
-	 * Set the KeyGenerator for this cache aspect.
-	 * Default is {@link DefaultKeyGenerator}.
-	 */
 	public void setKeyGenerator(KeyGenerator keyGenerator) {
 		this.keyGenerator = keyGenerator;
 	}
-
-	/**
-	 * Return the KeyGenerator for this cache aspect,
-	 */
 	public KeyGenerator getKeyGenerator() {
 		return this.keyGenerator;
 	}
 
+	// 校验this.cacheManager和this.cacheOperationSource，这两个对象不允许为空，并标记initialized为true
 	public void afterPropertiesSet() {
 		if (this.cacheManager == null) {
 			throw new IllegalStateException("Property 'cacheManager' is required");
@@ -147,7 +125,6 @@ public abstract class CacheAspectSupport implements InitializingBean {
 		Method specificMethod = ClassUtils.getMostSpecificMethod(method, targetClass);
 		return ClassUtils.getQualifiedMethodName(specificMethod);
 	}
-
 	protected Collection<Cache> getCaches(CacheOperation operation) {
 		Set<String> cacheNames = operation.getCacheNames();
 		Collection<Cache> caches = new ArrayList<Cache>(cacheNames.size());
@@ -160,13 +137,11 @@ public abstract class CacheAspectSupport implements InitializingBean {
 		}
 		return caches;
 	}
-
 	protected CacheOperationContext getOperationContext(CacheOperation operation, Method method, Object[] args,
 			Object target, Class<?> targetClass) {
 
 		return new CacheOperationContext(operation, method, args, target, targetClass);
 	}
-
 	protected Object execute(Invoker invoker, Object target, Method method, Object[] args) {
 		// check whether aspect is enabled
 		// to cope with cases where the AJ is pulled in automatically
@@ -213,11 +188,9 @@ public abstract class CacheAspectSupport implements InitializingBean {
 	private void inspectBeforeCacheEvicts(Collection<CacheOperationContext> evictions) {
 		inspectCacheEvicts(evictions, true, ExpressionEvaluator.NO_RESULT);
 	}
-
 	private void inspectAfterCacheEvicts(Collection<CacheOperationContext> evictions, Object result) {
 		inspectCacheEvicts(evictions, false, result);
 	}
-
 	private void inspectCacheEvicts(Collection<CacheOperationContext> evictions, boolean beforeInvocation, Object result) {
 		if (!evictions.isEmpty()) {
 			boolean log = logger.isTraceEnabled();
@@ -257,7 +230,6 @@ public abstract class CacheAspectSupport implements InitializingBean {
 			}
 		}
 	}
-
 	private CacheStatus inspectCacheables(Collection<CacheOperationContext> cacheables) {
 		Map<CacheOperationContext, Object> cacheUpdates = new LinkedHashMap<CacheOperationContext, Object>(cacheables.size());
 		boolean cacheHit = false;
@@ -306,7 +278,6 @@ public abstract class CacheAspectSupport implements InitializingBean {
 
 		return null;
 	}
-
 	private Map<CacheOperationContext, Object> inspectCacheUpdates(Collection<CacheOperationContext> updates) {
 		Map<CacheOperationContext, Object> cacheUpdates = new LinkedHashMap<CacheOperationContext, Object>(updates.size());
 		if (!updates.isEmpty()) {
@@ -333,7 +304,6 @@ public abstract class CacheAspectSupport implements InitializingBean {
 		}
 		return cacheUpdates;
 	}
-
 	private void update(Map<CacheOperationContext, Object> updates, Object retVal) {
 		for (Map.Entry<CacheOperationContext, Object> entry : updates.entrySet()) {
 			CacheOperationContext operationContext = entry.getKey();
@@ -344,7 +314,6 @@ public abstract class CacheAspectSupport implements InitializingBean {
 			}
 		}
 	}
-
 	private Map<String, Collection<CacheOperationContext>> createOperationContext(
 			Collection<CacheOperation> cacheOperations, Method method, Object[] args, Object target, Class<?> targetClass) {
 
@@ -374,23 +343,15 @@ public abstract class CacheAspectSupport implements InitializingBean {
 
 
 	public interface Invoker {
-
 		Object invoke();
 	}
-
-
 	protected class CacheOperationContext {
 
 		private final CacheOperation operation;
-
 		private final Method method;
-
 		private final Object[] args;
-
 		private final Object target;
-
 		private final Class<?> targetClass;
-
 		private final Collection<Cache> caches;
 
 		public CacheOperationContext(CacheOperation operation, Method method, Object[] args, Object target, Class<?> targetClass) {
@@ -405,7 +366,6 @@ public abstract class CacheAspectSupport implements InitializingBean {
 		protected boolean isConditionPassing() {
 			return isConditionPassing(ExpressionEvaluator.NO_RESULT);
 		}
-
 		protected boolean isConditionPassing(Object result) {
 			if (StringUtils.hasText(this.operation.getCondition())) {
 				EvaluationContext evaluationContext = createEvaluationContext(result);
@@ -413,7 +373,6 @@ public abstract class CacheAspectSupport implements InitializingBean {
 			}
 			return true;
 		}
-
 		protected boolean canPutToCache(Object value) {
 			String unless = "";
 			if (this.operation instanceof CacheableOperation) {
@@ -428,7 +387,6 @@ public abstract class CacheAspectSupport implements InitializingBean {
 			}
 			return true;
 		}
-
 		/**
 		 * Computes the key for the given caching operation.
 		 * @return generated key (null if none can be generated)
@@ -440,24 +398,17 @@ public abstract class CacheAspectSupport implements InitializingBean {
 			}
 			return keyGenerator.generate(this.target, this.method, this.args);
 		}
-
 		private EvaluationContext createEvaluationContext(Object result) {
 			return evaluator.createEvaluationContext(this.caches, this.method, this.args, this.target, this.targetClass, result);
 		}
-
 		protected Collection<Cache> getCaches() {
 			return this.caches;
 		}
 	}
-
-
 	private static class CacheStatus {
-
 		// caches/key
 		final Map<CacheOperationContext, Object> cacheUpdates;
-
 		final boolean updateRequired;
-
 		final Object retVal;
 
 		CacheStatus(Map<CacheOperationContext, Object> cacheUpdates, boolean updateRequired, Object retVal) {
