@@ -45,77 +45,36 @@ import org.springframework.util.ObjectUtils;
 public class RegexpMethodPointcutAdvisor extends AbstractGenericPointcutAdvisor {
 
 	private String[] patterns;
-
 	private AbstractRegexpMethodPointcut pointcut;
-
 	private final Object pointcutMonitor = new SerializableMonitor();
 
 
-	/**
-	 * Create an empty RegexpMethodPointcutAdvisor.
-	 * @see #setPattern
-	 * @see #setPatterns
-	 * @see #setAdvice
-	 */
 	public RegexpMethodPointcutAdvisor() {
 	}
-
-	/**
-	 * Create a RegexpMethodPointcutAdvisor for the given advice.
-	 * The pattern still needs to be specified afterwards.
-	 * @param advice the advice to use
-	 * @see #setPattern
-	 * @see #setPatterns
-	 */
 	public RegexpMethodPointcutAdvisor(Advice advice) {
 		setAdvice(advice);
 	}
-
-	/**
-	 * Create a RegexpMethodPointcutAdvisor for the given advice.
-	 * @param pattern the pattern to use
-	 * @param advice the advice to use
-	 */
 	public RegexpMethodPointcutAdvisor(String pattern, Advice advice) {
 		setPattern(pattern);
 		setAdvice(advice);
 	}
-
-	/**
-	 * Create a RegexpMethodPointcutAdvisor for the given advice.
-	 * @param patterns the patterns to use
-	 * @param advice the advice to use
-	 */
 	public RegexpMethodPointcutAdvisor(String[] patterns, Advice advice) {
 		setPatterns(patterns);
 		setAdvice(advice);
 	}
 
 
-	/**
-	 * Set the regular expression defining methods to match.
-	 * <p>Use either this method or {@link #setPatterns}, not both.
-	 * @see #setPatterns
-	 */
+
+	// 设置匹配方法的规则表达式
 	public void setPattern(String pattern) {
 		setPatterns(new String[] {pattern});
 	}
-
-	/**
-	 * Set the regular expressions defining methods to match.
-	 * To be passed through to the pointcut implementation.
-	 * <p>Matching will be the union of all these; if any of the
-	 * patterns matches, the pointcut matches.
-	 * @see AbstractRegexpMethodPointcut#setPatterns
-	 */
 	public void setPatterns(String[] patterns) {
 		this.patterns = patterns;
 	}
 
 
-	/**
-	 * Initialize the singleton Pointcut held within this Advisor.
-	 */
+	// 获取这个Advisor里的切点信息
 	public Pointcut getPointcut() {
 		synchronized (this.pointcutMonitor) {
 			if (this.pointcut == null) {
@@ -142,9 +101,7 @@ public class RegexpMethodPointcutAdvisor extends AbstractGenericPointcutAdvisor 
 	}
 
 
-	/**
-	 * Empty class used for a serializable monitor object.
-	 */
+	// Empty class used for a serializable monitor object.
 	private static class SerializableMonitor implements Serializable {
 	}
 

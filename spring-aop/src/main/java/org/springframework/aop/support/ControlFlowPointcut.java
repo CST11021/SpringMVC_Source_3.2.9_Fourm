@@ -40,71 +40,40 @@ import org.springframework.util.ObjectUtils;
 public class ControlFlowPointcut implements Pointcut, ClassFilter, MethodMatcher, Serializable {
 
 	private Class clazz;
-
 	private String methodName;
-
+	// 用于记录拦截了多少次，该属性主要用于优化
 	private int evaluations;
 
-
-	/**
-	 * Construct a new pointcut that matches all control flows below that class.
-	 * @param clazz the clazz
-	 */
+	// 构造器
 	public ControlFlowPointcut(Class clazz) {
 		this(clazz, null);
 	}
-
-	/**
-	 * Construct a new pointcut that matches all calls below the
-	 * given method in the given class. If the method name is null,
-	 * matches all control flows below that class.
-	 * @param clazz the clazz
-	 * @param methodName the name of the method
-	 */
 	public ControlFlowPointcut(Class clazz, String methodName) {
 		Assert.notNull(clazz, "Class must not be null");
 		this.clazz = clazz;
 		this.methodName = methodName;
 	}
 
-
-	/**
-	 * Subclasses can override this for greater filtering (and performance).
-	 */
 	public boolean matches(Class clazz) {
 		return true;
 	}
-
-	/**
-	 * Subclasses can override this if it's possible to filter out
-	 * some candidate classes.
-	 */
 	public boolean matches(Method method, Class targetClass) {
 		return true;
 	}
-
 	public boolean isRuntime() {
 		return true;
 	}
-
 	public boolean matches(Method method, Class targetClass, Object[] args) {
 		++this.evaluations;
 		ControlFlow cflow = ControlFlowFactory.createControlFlow();
 		return (this.methodName != null) ? cflow.under(this.clazz, this.methodName) : cflow.under(this.clazz);
 	}
-
-	/**
-	 * It's useful to know how many times we've fired, for optimization.
-	 */
 	public int getEvaluations() {
 		return evaluations;
 	}
-
-
 	public ClassFilter getClassFilter() {
 		return this;
 	}
-
 	public MethodMatcher getMethodMatcher() {
 		return this;
 	}
@@ -120,7 +89,6 @@ public class ControlFlowPointcut implements Pointcut, ClassFilter, MethodMatcher
 		ControlFlowPointcut that = (ControlFlowPointcut) other;
 		return (this.clazz.equals(that.clazz)) && ObjectUtils.nullSafeEquals(that.methodName, this.methodName);
 	}
-
 	@Override
 	public int hashCode() {
 		int code = 17;

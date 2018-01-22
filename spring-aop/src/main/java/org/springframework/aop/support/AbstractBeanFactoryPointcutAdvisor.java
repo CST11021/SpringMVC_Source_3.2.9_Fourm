@@ -42,43 +42,19 @@ import org.springframework.util.Assert;
 public abstract class AbstractBeanFactoryPointcutAdvisor extends AbstractPointcutAdvisor implements BeanFactoryAware {
 
 	private String adviceBeanName;
-
 	private BeanFactory beanFactory;
-
 	private transient Advice advice;
-
 	private transient volatile Object adviceMonitor = new Object();
 
-
-	/**
-	 * Specify the name of the advice bean that this advisor should refer to.
-	 * <p>An instance of the specified bean will be obtained on first access
-	 * of this advisor's advice. This advisor will only ever obtain at most one
-	 * single instance of the advice bean, caching the instance for the lifetime
-	 * of the advisor.
-	 * @see #getAdvice()
-	 */
-	public void setAdviceBeanName(String adviceBeanName) {
-		this.adviceBeanName = adviceBeanName;
-	}
-
-	/**
-	 * Return the name of the advice bean that this advisor refers to, if any.
-	 */
-	public String getAdviceBeanName() {
-		return this.adviceBeanName;
-	}
 
 	public void setBeanFactory(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 	}
-
 	public void setAdvice(Advice advice) {
 		synchronized (this.adviceMonitor) {
 			this.advice = advice;
 		}
 	}
-
 	public Advice getAdvice() {
 		synchronized (this.adviceMonitor) {
 			if (this.advice == null && this.adviceBeanName != null) {
@@ -89,16 +65,16 @@ public abstract class AbstractBeanFactoryPointcutAdvisor extends AbstractPointcu
 		}
 	}
 
-	@Override
-	public String toString() {
-		return getClass().getName() + ": advice bean '" + getAdviceBeanName() + "'";
+	// getter and setter ...
+	public void setAdviceBeanName(String adviceBeanName) {
+		this.adviceBeanName = adviceBeanName;
+	}
+	public String getAdviceBeanName() {
+		return this.adviceBeanName;
 	}
 
 
-	//---------------------------------------------------------------------
 	// Serialization support
-	//---------------------------------------------------------------------
-
 	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
 		// Rely on default serialization, just initialize state after deserialization.
 		ois.defaultReadObject();
@@ -106,5 +82,8 @@ public abstract class AbstractBeanFactoryPointcutAdvisor extends AbstractPointcu
 		// Initialize transient fields.
 		this.adviceMonitor = new Object();
 	}
-
+	@Override
+	public String toString() {
+		return getClass().getName() + ": advice bean '" + getAdviceBeanName() + "'";
+	}
 }

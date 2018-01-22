@@ -34,58 +34,30 @@ import org.springframework.util.ObjectUtils;
  */
 public abstract class ClassFilters {
 
-	/**
-	 * Match all classes that <i>either</i> (or both) of the given ClassFilters matches.
-	 * @param cf1 the first ClassFilter
-	 * @param cf2 the second ClassFilter
-	 * @return a distinct ClassFilter that matches all classes that either
-	 * of the given ClassFilter matches
-	 */
+	// 根据多个classFilters返回一个UnionClassFilter实例
 	public static ClassFilter union(ClassFilter cf1, ClassFilter cf2) {
 		Assert.notNull(cf1, "First ClassFilter must not be null");
 		Assert.notNull(cf2, "Second ClassFilter must not be null");
 		return new UnionClassFilter(new ClassFilter[] {cf1, cf2});
 	}
-
-	/**
-	 * Match all classes that <i>either</i> (or all) of the given ClassFilters matches.
-	 * @param classFilters the ClassFilters to match
-	 * @return a distinct ClassFilter that matches all classes that either
-	 * of the given ClassFilter matches
-	 */
 	public static ClassFilter union(ClassFilter[] classFilters) {
 		Assert.notEmpty(classFilters, "ClassFilter array must not be empty");
 		return new UnionClassFilter(classFilters);
 	}
 
-	/**
-	 * Match all classes that <i>both</i> of the given ClassFilters match.
-	 * @param cf1 the first ClassFilter
-	 * @param cf2 the second ClassFilter
-	 * @return a distinct ClassFilter that matches all classes that both
-	 * of the given ClassFilter match
-	 */
+	// 根据多个classFilters返回一个IntersectionClassFilter实例
 	public static ClassFilter intersection(ClassFilter cf1, ClassFilter cf2) {
 		Assert.notNull(cf1, "First ClassFilter must not be null");
 		Assert.notNull(cf2, "Second ClassFilter must not be null");
 		return new IntersectionClassFilter(new ClassFilter[] {cf1, cf2});
 	}
-
-	/**
-	 * Match all classes that <i>all</i> of the given ClassFilters match.
-	 * @param classFilters the ClassFilters to match
-	 * @return a distinct ClassFilter that matches all classes that both
-	 * of the given ClassFilter match
-	 */
 	public static ClassFilter intersection(ClassFilter[] classFilters) {
 		Assert.notEmpty(classFilters, "ClassFilter array must not be empty");
 		return new IntersectionClassFilter(classFilters);
 	}
 
 
-	/**
-	 * ClassFilter implementation for a union of the given ClassFilters.
-	 */
+	// 封装的多个ClassFilter对象实例，并实现ClassFilter接口
 	@SuppressWarnings("serial")
 	private static class UnionClassFilter implements ClassFilter, Serializable {
 
@@ -109,17 +81,12 @@ public abstract class ClassFilters {
 			return (this == other || (other instanceof UnionClassFilter &&
 					ObjectUtils.nullSafeEquals(this.filters, ((UnionClassFilter) other).filters)));
 		}
-
 		@Override
 		public int hashCode() {
 			return ObjectUtils.nullSafeHashCode(this.filters);
 		}
 	}
-
-
-	/**
-	 * ClassFilter implementation for an intersection of the given ClassFilters.
-	 */
+	// 同 UnionClassFilter ，唯一的区别就是只要有一个ClassFilter不匹配指定的 clazz 就返回false
 	@SuppressWarnings("serial")
 	private static class IntersectionClassFilter implements ClassFilter, Serializable {
 
@@ -143,7 +110,6 @@ public abstract class ClassFilters {
 			return (this == other || (other instanceof IntersectionClassFilter &&
 					ObjectUtils.nullSafeEquals(this.filters, ((IntersectionClassFilter) other).filters)));
 		}
-
 		@Override
 		public int hashCode() {
 			return ObjectUtils.nullSafeHashCode(this.filters);

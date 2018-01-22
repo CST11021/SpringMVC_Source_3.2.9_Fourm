@@ -39,7 +39,7 @@ import org.springframework.beans.factory.BeanNameAware;
  Spring利用BeanPostProcessor可干涉Bean生命周期的机制，提供了一些自动创建代理，织入切面的自动代理创建器，
  其中DefaultAdvisorAutoProxyCreator是功能强大的自动代理创建器，它可以将容器中所有Advisor自动织入到目标Bean中。
  */
-// DefaultAdvisorAutoProxyCreator :  将对应匹配的advisor，自动添加到spring的bean。它控制的是advisor的匹配，所有的bean都会被自动代理
+// DefaultAdvisorAutoProxyCreator:将对应匹配的advisor，自动添加到spring的bean。它控制的是advisor的匹配，所有的bean都会被自动代理
 @SuppressWarnings("serial")
 public class DefaultAdvisorAutoProxyCreator extends AbstractAdvisorAutoProxyCreator implements BeanNameAware {
 
@@ -50,36 +50,15 @@ public class DefaultAdvisorAutoProxyCreator extends AbstractAdvisorAutoProxyCrea
 	private String advisorBeanNamePrefix;
 
 
-	/**
-	 * Set whether to exclude advisors with a certain prefix
-	 * in the bean name.
-	 */
 	public void setUsePrefix(boolean usePrefix) {
 		this.usePrefix = usePrefix;
 	}
-
-	/**
-	 * Return whether to exclude advisors with a certain prefix
-	 * in the bean name.
-	 */
 	public boolean isUsePrefix() {
 		return this.usePrefix;
 	}
-
-	/**
-	 * Set the prefix for bean names that will cause them to be included for
-	 * auto-proxying by this object. This prefix should be set to avoid circular
-	 * references. Default value is the bean name of this object + a dot.
-	 * @param advisorBeanNamePrefix the exclusion prefix
-	 */
 	public void setAdvisorBeanNamePrefix(String advisorBeanNamePrefix) {
 		this.advisorBeanNamePrefix = advisorBeanNamePrefix;
 	}
-
-	/**
-	 * Return the prefix for bean names that will cause them to be included
-	 * for auto-proxying by this object.
-	 */
 	public String getAdvisorBeanNamePrefix() {
 		return this.advisorBeanNamePrefix;
 	}
@@ -92,11 +71,7 @@ public class DefaultAdvisorAutoProxyCreator extends AbstractAdvisorAutoProxyCrea
 	}
 
 
-	/**
-	 * Consider Advisor beans with the specified prefix as eligible, if activated.
-	 * @see #setUsePrefix
-	 * @see #setAdvisorBeanNamePrefix
-	 */
+	// 判断指定bean是否为符合要求的增强bean
 	@Override
 	protected boolean isEligibleAdvisorBean(String beanName) {
 		return (!isUsePrefix() || beanName.startsWith(getAdvisorBeanNamePrefix()));

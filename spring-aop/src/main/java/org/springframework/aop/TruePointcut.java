@@ -28,9 +28,6 @@ class TruePointcut implements Pointcut, Serializable {
 
 	public static final TruePointcut INSTANCE = new TruePointcut();
 
-	/**
-	 * Enforce Singleton pattern.
-	 */
 	private TruePointcut() {
 	}
 
@@ -42,11 +39,6 @@ class TruePointcut implements Pointcut, Serializable {
 		return MethodMatcher.TRUE;
 	}
 
-	/**
-	 * Required to support serialization. Replaces with canonical
-	 * instance on deserialization, protecting Singleton pattern.
-	 * Alternative to overriding {@code equals()}.
-	 */
 	private Object readResolve() {
 		return INSTANCE;
 	}

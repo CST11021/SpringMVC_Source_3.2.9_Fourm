@@ -58,11 +58,9 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 		}
 		initBeanFactory((ConfigurableListableBeanFactory) beanFactory);
 	}
-
 	protected void initBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		this.advisorRetrievalHelper = new BeanFactoryAdvisorRetrievalHelperAdapter(beanFactory);
 	}
-
 
 	@Override
 	protected Object[] getAdvicesAndAdvisorsForBean(Class beanClass, String beanName, TargetSource targetSource) {
@@ -83,8 +81,9 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 * @see #sortAdvisors
 	 * @see #extendAdvisors
 	 */
-	// 对于指定bean的增强方法的获取一定是包含两个步骤，获取所有的增强以及寻找所有增强中适用于bean的增强并应用，那么findCandidateAdvisors与findAdvisorsThatCanApply
-	// 便是做了这两件事情。当然，如果无法找到对应的增强器便返回DO_NOT_PROXY，其中DO_NOT_PROXY=null。
+	// 对于指定bean的增强方法的获取一定是包含两个步骤，获取所有的增强以及寻找所有增强中适用于bean的增强并应用，那么
+	// findCandidateAdvisors与findAdvisorsThatCanApply 便是做了这两件事情。当然，如果无法找到对应的增强器便返回DO_NOT_PROXY，
+	// 其中DO_NOT_PROXY=null。
 	protected List<Advisor> findEligibleAdvisors(Class beanClass, String beanName) {
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
 		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
@@ -94,7 +93,6 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 		}
 		return eligibleAdvisors;
 	}
-
 	/**
 	 * Find all candidate Advisors to use in auto-proxying.
 	 * @return the List of candidate Advisors
@@ -102,7 +100,6 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	protected List<Advisor> findCandidateAdvisors() {
 		return this.advisorRetrievalHelper.findAdvisorBeans();
 	}
-
 	/**
 	 * Search the given candidate Advisors to find all Advisors that
 	 * can apply to the specified bean.
@@ -123,24 +120,12 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 		}
 	}
 
-	/**
-	 * Return whether the Advisor bean with the given name is eligible
-	 * for proxying in the first place.
-	 * @param beanName the name of the Advisor bean
-	 * @return whether the bean is eligible
-	 */
+	// 判断指定的Advisor bean是否有资格进行代理
 	protected boolean isEligibleAdvisorBean(String beanName) {
 		return true;
 	}
 
-	/**
-	 * Sort advisors based on ordering. Subclasses may choose to override this
-	 * method to customize the sorting strategy.
-	 * @param advisors the source List of Advisors
-	 * @return the sorted List of Advisors
-	 * @see org.springframework.core.Ordered
-	 * @see org.springframework.core.OrderComparator
-	 */
+	// 给这些advisors进行排序
 	protected List<Advisor> sortAdvisors(List<Advisor> advisors) {
 		OrderComparator.sort(advisors);
 		return advisors;

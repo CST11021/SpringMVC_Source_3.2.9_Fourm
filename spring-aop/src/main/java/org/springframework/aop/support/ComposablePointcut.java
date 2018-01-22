@@ -40,60 +40,32 @@ import org.springframework.util.ObjectUtils;
  */
 public class ComposablePointcut implements Pointcut, Serializable {
 
-	/** use serialVersionUID from Spring 1.2 for interoperability */
 	private static final long serialVersionUID = -2743223737633663832L;
 
 	private ClassFilter classFilter;
-
 	private MethodMatcher methodMatcher;
 
 
-	/**
-	 * Create a default ComposablePointcut, with {@code ClassFilter.TRUE}
-	 * and {@code MethodMatcher.TRUE}.
-	 */
+
 	public ComposablePointcut() {
 		this.classFilter = ClassFilter.TRUE;
 		this.methodMatcher = MethodMatcher.TRUE;
 	}
-
-	/**
-	 * Create a ComposablePointcut based on the given Pointcut.
-	 * @param pointcut the original Pointcut
-	 */
 	public ComposablePointcut(Pointcut pointcut) {
 		Assert.notNull(pointcut, "Pointcut must not be null");
 		this.classFilter = pointcut.getClassFilter();
 		this.methodMatcher = pointcut.getMethodMatcher();
 	}
-
-	/**
-	 * Create a ComposablePointcut for the given ClassFilter,
-	 * with {@code MethodMatcher.TRUE}.
-	 * @param classFilter the ClassFilter to use
-	 */
 	public ComposablePointcut(ClassFilter classFilter) {
 		Assert.notNull(classFilter, "ClassFilter must not be null");
 		this.classFilter = classFilter;
 		this.methodMatcher = MethodMatcher.TRUE;
 	}
-
-	/**
-	 * Create a ComposablePointcut for the given MethodMatcher,
-	 * with {@code ClassFilter.TRUE}.
-	 * @param methodMatcher the MethodMatcher to use
-	 */
 	public ComposablePointcut(MethodMatcher methodMatcher) {
 		Assert.notNull(methodMatcher, "MethodMatcher must not be null");
 		this.classFilter = ClassFilter.TRUE;
 		this.methodMatcher = methodMatcher;
 	}
-
-	/**
-	 * Create a ComposablePointcut for the given ClassFilter and MethodMatcher.
-	 * @param classFilter the ClassFilter to use
-	 * @param methodMatcher the MethodMatcher to use
-	 */
 	public ComposablePointcut(ClassFilter classFilter, MethodMatcher methodMatcher) {
 		Assert.notNull(classFilter, "ClassFilter must not be null");
 		Assert.notNull(methodMatcher, "MethodMatcher must not be null");
@@ -111,7 +83,6 @@ public class ComposablePointcut implements Pointcut, Serializable {
 		this.classFilter = ClassFilters.union(this.classFilter, other);
 		return this;
 	}
-
 	/**
 	 * Apply an intersection with the given ClassFilter.
 	 * @param other the ClassFilter to apply an intersection with
@@ -131,7 +102,6 @@ public class ComposablePointcut implements Pointcut, Serializable {
 		this.methodMatcher = MethodMatchers.union(this.methodMatcher, other);
 		return this;
 	}
-
 	/**
 	 * Apply an intersection with the given MethodMatcher.
 	 * @param other the MethodMatcher to apply an intersection with
@@ -157,7 +127,6 @@ public class ComposablePointcut implements Pointcut, Serializable {
 		this.classFilter = ClassFilters.union(this.classFilter, other.getClassFilter());
 		return this;
 	}
-
 	/**
 	 * Apply an intersection with the given Pointcut.
 	 * @param other the Pointcut to apply an intersection with
@@ -173,7 +142,6 @@ public class ComposablePointcut implements Pointcut, Serializable {
 	public ClassFilter getClassFilter() {
 		return this.classFilter;
 	}
-
 	public MethodMatcher getMethodMatcher() {
 		return this.methodMatcher;
 	}
@@ -190,7 +158,6 @@ public class ComposablePointcut implements Pointcut, Serializable {
 		return ObjectUtils.nullSafeEquals(that.classFilter, this.classFilter) &&
 				ObjectUtils.nullSafeEquals(that.methodMatcher, this.methodMatcher);
 	}
-
 	@Override
 	public int hashCode() {
 		int code = 17;
@@ -202,7 +169,6 @@ public class ComposablePointcut implements Pointcut, Serializable {
 		}
 		return code;
 	}
-
 	@Override
 	public String toString() {
 		return "ComposablePointcut: " + this.classFilter + ", " +this.methodMatcher;

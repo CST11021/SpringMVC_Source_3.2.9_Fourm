@@ -88,7 +88,8 @@ import org.springframework.util.ClassUtils;
  * @see DefaultAdvisorAutoProxyCreator
  */
 @SuppressWarnings("serial")
-public abstract class AbstractAutoProxyCreator extends ProxyConfig implements SmartInstantiationAwareBeanPostProcessor, BeanClassLoaderAware, BeanFactoryAware, Ordered, AopInfrastructureBean {
+public abstract class AbstractAutoProxyCreator extends ProxyConfig implements SmartInstantiationAwareBeanPostProcessor,
+		BeanClassLoaderAware, BeanFactoryAware, Ordered, AopInfrastructureBean {
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	/**
@@ -234,6 +235,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig implements Sm
 		return wrapIfNecessary(bean, beanName, cacheKey);
 	}
 
+	// bean实例化前被调用
 	public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
 		Object cacheKey = getCacheKey(beanClass, beanName);
 
@@ -263,21 +265,20 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig implements Sm
 
 		return null;
 	}
-
+	// bean实例化后被调用
 	public boolean postProcessAfterInstantiation(Object bean, String beanName) {
 		return true;
 	}
-
+	// 在bean包装器将给定的属性值应用到给定的bean之前调用
 	public PropertyValues postProcessPropertyValues(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) {
 
 		return pvs;
 	}
-
+	// Bean 调用构造函数，实例化之前执行该方法
 	public Object postProcessBeforeInitialization(Object bean, String beanName) {
 		return bean;
 	}
-
-	// Create a proxy with the configured interceptors if the bean is identified as one to proxy by the subclass.
+	// Bean 调用构造函数，实例化之后执行该方法
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		if (bean != null) {
 			// 根据给定的bean的class和name构建出个key，格式：beanClassName_beanName
@@ -290,16 +291,10 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig implements Sm
 		return bean;
 	}
 
-	/**
-	 * Build a cache key for the given bean class and bean name.
-	 * @param beanClass the bean class
-	 * @param beanName the bean name
-	 * @return the cache key for the given class and name
-	 */
+	// 返回beanClass的全限定类名 + beanName
 	protected Object getCacheKey(Class<?> beanClass, String beanName) {
 		return beanClass.getName() + "_" + beanName;
 	}
-
 	/**
 	 * Wrap the given bean if necessary, i.e. if it is eligible for being proxied.
 	 * @param bean the raw bean instance
@@ -336,20 +331,10 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig implements Sm
 		this.advisedBeans.put(cacheKey, Boolean.FALSE);
 		return bean;
 	}
-
-	/**
-	 * Return whether the given bean class represents an infrastructure class
-	 * that should never be proxied.
-	 * <p>The default implementation considers Advices, Advisors and
-	 * AopInfrastructureBeans as infrastructure classes.
-	 * @param beanClass the class of the bean
-	 * @return whether the bean represents an infrastructure class
-	 * @see org.aopalliance.aop.Advice
-	 * @see org.springframework.aop.Advisor
-	 * @see org.springframework.aop.framework.AopInfrastructureBean
-	 * @see #shouldSkip
-	 */
+	// Return whether the given bean class represents an infrastructure class that should never be proxied.
+	// 判断指定的class是否为一个基础设施类，基础设施类不可以被代理
 	protected boolean isInfrastructureClass(Class<?> beanClass) {
+		// 判断指定的beanClass是否为Advice（Advisor、AopInfrastructureBean），获取Advice（Advisor、AopInfrastructureBean）的子类
 		boolean retVal = Advice.class.isAssignableFrom(beanClass) ||
 				Advisor.class.isAssignableFrom(beanClass) ||
 				AopInfrastructureBean.class.isAssignableFrom(beanClass);
@@ -358,7 +343,6 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig implements Sm
 		}
 		return retVal;
 	}
-
 	/**
 	 * Subclasses should override this method to return {@code true} if the
 	 * given bean should not be considered for auto-proxying by this post-processor.
@@ -371,7 +355,6 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig implements Sm
 	protected boolean shouldSkip(Class<?> beanClass, String beanName) {
 		return false;
 	}
-
 	/**
 	 * Create a target source for bean instances. Uses any TargetSourceCreators if set.
 	 * Returns {@code null} if no custom TargetSource should be used.
@@ -402,7 +385,6 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig implements Sm
 		// No custom TargetSource found.
 		return null;
 	}
-
 	/**
 	 * Create an AOP proxy for the given bean.
 	 * @param beanClass the class of the bean
@@ -451,7 +433,6 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig implements Sm
 
 		return proxyFactory.getProxy(this.proxyClassLoader);
 	}
-
 	/**
 	 * Determine whether the given bean should be proxied with its target
 	 * class rather than its interfaces. Checks the
@@ -468,7 +449,6 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig implements Sm
 				(this.beanFactory instanceof ConfigurableListableBeanFactory &&
 						AutoProxyUtils.shouldProxyTargetClass((ConfigurableListableBeanFactory) this.beanFactory, beanName)));
 	}
-
 	/**
 	 * Return whether the Advisors returned by the subclass are pre-filtered
 	 * to match the bean's target class already, allowing the ClassFilter check
@@ -482,7 +462,6 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig implements Sm
 	protected boolean advisorsPreFiltered() {
 		return false;
 	}
-
 	/**
 	 * Determine the advisors for the given bean, including the specific interceptors
 	 * as well as the common interceptor, all adapted to the Advisor interface.
@@ -523,7 +502,6 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig implements Sm
 		}
 		return advisors;
 	}
-
 	/**
 	 * Resolves the specified interceptor names to Advisor objects.
 	 * @see #setInterceptorNames
@@ -540,7 +518,6 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig implements Sm
 		}
 		return advisors.toArray(new Advisor[advisors.size()]);
 	}
-
 	/**
 	 * Subclasses may choose to implement this: for example,
 	 * to change the interfaces exposed.
@@ -550,11 +527,8 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig implements Sm
 	 * immediably after this method returns
 	 */
 	protected void customizeProxyFactory(ProxyFactory proxyFactory) {}
-
-
 	/**
-	 * Return whether the given bean is to be proxied, what additional
-	 * advices (e.g. AOP Alliance interceptors) and advisors to apply.
+	 * Return whether the given bean is to be proxied, what additional advices (e.g. AOP Alliance interceptors) and advisors to apply.
 	 * @param beanClass the class of the bean to advise
 	 * @param beanName the name of the bean
 	 * @param customTargetSource the TargetSource returned by the
