@@ -119,16 +119,22 @@ public class ProxyFactoryBean extends ProxyCreatorSupport implements FactoryBean
 	// 拦截器列表中的这个后缀表示要扩展全局
 	public static final String GLOBAL_SUFFIX = "*";
 	// 表示被织入的增强名，比如一个目标类可以被织入多个增强，这些增强需事先一些增强接口，
-	// 如：MethodBeforeAdvice、AfterReturningAdvice和MethodInterceptor等，而这个interceptorNames表示的是实现这些增强接口的bean的BeanName，该属性也称为拦截器链
+	// 如：MethodBeforeAdvice、AfterReturningAdvice和MethodInterceptor等，而这个interceptorNames表示的是实现这些增强接口
+	// 的bean的BeanName，该属性也称为拦截器链
 	private String[] interceptorNames;
+	// 表示目标bean的beanName
 	private String targetName;
 	// 设置是否在没有指定的情况下自动检测代理接口，置为false后，如果没有指定代理接口，将为目标类创建一个CGLIB代理
 	private boolean autodetectInterfaces = true;
 	// 标识这个代理工厂返回的代理bean是否总是单例bean
 	private boolean singleton = true;
+	// AdvisorAdapter用于将advice包装为advisor对象，和从advisor中获取方法拦截器
 	private AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
+	// 表示是否冻结代理的相关配置
 	private boolean freezeProxy = false;
+	// 表示创建代理时使用的类加载器
 	private transient ClassLoader proxyClassLoader = ClassUtils.getDefaultClassLoader();
+	// 判断是否已配置proxyClassLoader（代理类的类加载器）
 	private transient boolean classLoaderConfigured = false;
 	private transient BeanFactory beanFactory;
 	// 标识该增强链是否已经被初始化
@@ -138,7 +144,8 @@ public class ProxyFactoryBean extends ProxyCreatorSupport implements FactoryBean
 
 
 
-	// ProxyFactoryBean 将调用该方法生成一个代理对象返回给用户（因为返回的Object对象是由JDK 动态代理生成的，所以在代码调试的时候无法查看器对象信息）
+	// ProxyFactoryBean 将调用该方法生成一个代理对象返回给用户（因为返回的Object对象是由JDK 动态代理生成的，所以在代码调
+	// 试的时候无法查看其对象信息）
 	public Object getObject() throws BeansException {
 		initializeAdvisorChain();
 		if (isSingleton()) {
@@ -177,7 +184,6 @@ public class ProxyFactoryBean extends ProxyCreatorSupport implements FactoryBean
 				if (logger.isTraceEnabled()) {
 					logger.trace("Configuring advisor or advice '" + name + "'");
 				}
-
 
 				if (name.endsWith(GLOBAL_SUFFIX)) {
 					// 判断是否以“*”结尾
@@ -224,53 +230,29 @@ public class ProxyFactoryBean extends ProxyCreatorSupport implements FactoryBean
 		return this.singletonInstance;
 	}
 
-
-
-	/**
-	 * Set the names of the interfaces we're proxying. If no interface is given, a CGLIB for the actual class will be created.
-	 * <p>This is essentially equivalent to the "setInterfaces" method,
-	 * but mirrors TransactionProxyFactoryBean's "setProxyInterfaces".
-	 * @see #setInterfaces
-	 * @see AbstractSingletonProxyFactoryBean#setProxyInterfaces
-	 */
+	// 设置代理类要实现的接口
 	public void setProxyInterfaces(Class[] proxyInterfaces) throws ClassNotFoundException {
 		setInterfaces(proxyInterfaces);
 	}
 
-	/**
-	 * Create a composite interface Class for the given interfaces,
-	 * implementing the given interfaces in one single Class.
-	 * <p>The default implementation builds a JDK proxy class for the
-	 * given interfaces.
-	 * @param interfaces the interfaces to merge
-	 * @return the merged interface as Class
-	 * @see java.lang.reflect.Proxy#getProxyClass
-	 */
+	// 使用JDK代理这些指定的接口
 	protected Class createCompositeInterface(Class[] interfaces) {
 		return ClassUtils.createCompositeInterface(interfaces, this.proxyClassLoader);
 	}
 
-
-	/**
-	 * Create a new prototype instance of this class's created proxy object,
-	 * backed by an independent AdvisedSupport configuration.
-	 * @return a totally independent proxy, whose advice we may manipulate in isolation
-	 */
+	// 创建一个原型的代理bean
 	private synchronized Object newPrototypeInstance() {
-		// In the case of a prototype, we need to give the proxy
-		// an independent instance of the configuration.
-		// In this case, no proxy will have an instance of this object's configuration,
-		// but will have an independent copy.
 		if (logger.isTraceEnabled()) {
 			logger.trace("Creating copy of prototype ProxyFactoryBean config: " + this);
 		}
 
+		// 1、复制代理配置对象
 		ProxyCreatorSupport copy = new ProxyCreatorSupport(getAopProxyFactory());
-		// The copy needs a fresh advisor chain, and a fresh TargetSource.
+		// 从beanFactory中获取目标类对应的Bean，并包装为一个TargetSource对象
 		TargetSource targetSource = freshTargetSource();
 		copy.copyConfigurationFrom(this, targetSource, freshAdvisorChain());
 		if (this.autodetectInterfaces && getProxiedInterfaces().length == 0 && !isProxyTargetClass()) {
-			// Rely on AOP infrastructure to tell us what interfaces to proxy.
+			// 返回目标类实现的所有接口
 			copy.setInterfaces(
 					ClassUtils.getAllInterfacesForClass(targetSource.getTargetClass(), this.proxyClassLoader));
 		}
@@ -279,6 +261,7 @@ public class ProxyFactoryBean extends ProxyCreatorSupport implements FactoryBean
 		if (logger.isTraceEnabled()) {
 			logger.trace("Using ProxyCreatorSupport copy: " + copy);
 		}
+		// 2、根据代理配置创建代理对象
 		return getProxy(copy.createAopProxy());
 	}
 
@@ -287,10 +270,7 @@ public class ProxyFactoryBean extends ProxyCreatorSupport implements FactoryBean
 		return aopProxy.getProxy(this.proxyClassLoader);
 	}
 
-	/**
-	 * Check the interceptorNames list whether it contains a target name as final element.
-	 * If found, remove the final name from the list and set it as targetName.
-	 */
+	// 检查interceptorNames列表的最后一个元素可能是目标类Bean，如果是，则从列表移除
 	private void checkInterceptorNames() {
 		if (!ObjectUtils.isEmpty(this.interceptorNames)) {
 			String finalName = this.interceptorNames[this.interceptorNames.length - 1];
@@ -305,6 +285,7 @@ public class ProxyFactoryBean extends ProxyCreatorSupport implements FactoryBean
 								"is not an advisor class: treating it as a target or TargetSource");
 					}
 					String[] newNames = new String[this.interceptorNames.length - 1];
+					// 将 interceptorNames 复制到 newNames
 					System.arraycopy(this.interceptorNames, 0, newNames, 0, newNames.length);
 					this.interceptorNames = newNames;
 				}
@@ -312,13 +293,7 @@ public class ProxyFactoryBean extends ProxyCreatorSupport implements FactoryBean
 		}
 	}
 
-	/**
-	 * Look at bean factory metadata to work out whether this bean name,
-	 * which concludes the interceptorNames list, is an Advisor or Advice,
-	 * or may be a target.
-	 * @param beanName bean name to check
-	 * @return {@code true} if it's an Advisor or Advice
-	 */
+	// 判断指定beanName对应的bean是否是Advice或Advisor对象
 	private boolean isNamedBeanAnAdvisorOrAdvice(String beanName) {
 		Class namedBeanClass = this.beanFactory.getType(beanName);
 		if (namedBeanClass != null) {
@@ -332,30 +307,30 @@ public class ProxyFactoryBean extends ProxyCreatorSupport implements FactoryBean
 		return false;
 	}
 
-
-
-	/**
-	 * Return an independent advisor chain.
-	 * We need to do this every time a new prototype instance is returned,
-	 * to return distinct instances of prototype Advisors and Advices.
-	 */
+	// 将所有的增强转为可被织入的Advisor对象，配置的原型bean
 	private List<Advisor> freshAdvisorChain() {
+		// 获取增强链，所有配置的增强Advice都会被包装成 Advisor
 		Advisor[] advisors = getAdvisors();
 		List<Advisor> freshAdvisors = new ArrayList<Advisor>(advisors.length);
+
+		// 遍历所有的增强，则将所有增强转为一个可被织入的Advisor对象（配置的Advice如果是原型bean，一开始会被封装为一个
+		// PrototypePlaceholderAdvisor对象）
 		for (Advisor advisor : advisors) {
 			if (advisor instanceof PrototypePlaceholderAdvisor) {
 				PrototypePlaceholderAdvisor pa = (PrototypePlaceholderAdvisor) advisor;
 				if (logger.isDebugEnabled()) {
 					logger.debug("Refreshing bean named '" + pa.getBeanName() + "'");
 				}
-				// Replace the placeholder with a fresh prototype instance resulting
-				// from a getBean() lookup
+				// Replace the placeholder with a fresh prototype instance resulting from a getBean() lookup
 				if (this.beanFactory == null) {
 					throw new IllegalStateException("No BeanFactory available anymore (probably due to serialization) " +
 							"- cannot resolve prototype advisor '" + pa.getBeanName() + "'");
 				}
+				// 从beanFactory中获取增强bean
 				Object bean = this.beanFactory.getBean(pa.getBeanName());
+				// 将Advice包装为一个Advisor
 				Advisor refreshedAdvisor = namedBeanToAdvisor(bean);
+
 				freshAdvisors.add(refreshedAdvisor);
 			}
 			else {
@@ -366,14 +341,12 @@ public class ProxyFactoryBean extends ProxyCreatorSupport implements FactoryBean
 		return freshAdvisors;
 	}
 
-	/**
-	 * Add all global interceptors and pointcuts.
-	 */
+	// Add all global interceptors and pointcuts.
 	private void addGlobalAdvisor(ListableBeanFactory beanFactory, String prefix) {
-		String[] globalAdvisorNames =
-				BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory, Advisor.class);
-		String[] globalInterceptorNames =
-				BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory, Interceptor.class);
+		// 返回这个beanFactory中，所有增强bean
+		String[] globalAdvisorNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory, Advisor.class);
+		String[] globalInterceptorNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory, Interceptor.class);
+
 		List<Object> beans = new ArrayList<Object>(globalAdvisorNames.length + globalInterceptorNames.length);
 		Map<Object, String> names = new HashMap<Object, String>(beans.size());
 		for (String name : globalAdvisorNames) {
@@ -386,7 +359,9 @@ public class ProxyFactoryBean extends ProxyCreatorSupport implements FactoryBean
 			beans.add(bean);
 			names.put(bean, name);
 		}
+
 		OrderComparator.sort(beans);
+
 		for (Object bean : beans) {
 			String name = names.get(bean);
 			if (name.startsWith(prefix)) {
@@ -398,6 +373,7 @@ public class ProxyFactoryBean extends ProxyCreatorSupport implements FactoryBean
 	// 添加 next 对应的增强到增强链中
 	private void addAdvisorOnChainCreation(Object next, String name) {
 		// We need to convert to an Advisor if necessary so that our source reference matches what we find from superclass interceptors.
+		// 将Advice包装为一个Advisor
 		Advisor advisor = namedBeanToAdvisor(next);
 		if (logger.isTraceEnabled()) {
 			logger.trace("Adding advisor with name '" + name + "'");
@@ -405,12 +381,7 @@ public class ProxyFactoryBean extends ProxyCreatorSupport implements FactoryBean
 		addAdvisor(advisor);
 	}
 
-	/**
-	 * Return a TargetSource to use when creating a proxy. If the target was not
-	 * specified at the end of the interceptorNames list, the TargetSource will be
-	 * this class's TargetSource member. Otherwise, we get the target bean and wrap
-	 * it in a TargetSource if necessary.
-	 */
+	// 从beanFactory中获取目标类对应的Bean，并包装为一个TargetSource对象
 	private TargetSource freshTargetSource() {
 		if (this.targetName == null) {
 			if (logger.isTraceEnabled()) {
@@ -431,7 +402,7 @@ public class ProxyFactoryBean extends ProxyCreatorSupport implements FactoryBean
 		}
 	}
 
-	// Convert the following object sourced from calling getBean() on a name in the interceptorNames array to an Advisor or TargetSource.
+	// 将Advice包装为一个Advisor
 	private Advisor namedBeanToAdvisor(Object next) {
 		try {
 			return this.advisorAdapterRegistry.wrap(next);
@@ -444,9 +415,7 @@ public class ProxyFactoryBean extends ProxyCreatorSupport implements FactoryBean
 		}
 	}
 
-	/**
-	 * Blow away and recache singleton on an advice change.
-	 */
+	// Blow away and recache singleton on an advice change.
 	@Override
 	protected void adviceChanged() {
 		super.adviceChanged();
@@ -458,7 +427,6 @@ public class ProxyFactoryBean extends ProxyCreatorSupport implements FactoryBean
 		}
 	}
 
-
 	// Serialization support
 	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
 		// Rely on default serialization; just initialize state after deserialization.
@@ -468,8 +436,7 @@ public class ProxyFactoryBean extends ProxyCreatorSupport implements FactoryBean
 		this.proxyClassLoader = ClassUtils.getDefaultClassLoader();
 	}
 
-
-	// 在拦截器链中使用，我们需要在创建代理时用原型替换一个bean
+	// 如果配置的增强bean是一个原型bean，则会将这个增强包装为一个PrototypePlaceholderAdvisor，并放到增强链中
 	private static class PrototypePlaceholderAdvisor implements Advisor, Serializable {
 
 		private final String beanName;
