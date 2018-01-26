@@ -120,11 +120,13 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig implements Sm
 	private ClassLoader proxyClassLoader = ClassUtils.getDefaultClassLoader();
 	private boolean classLoaderConfigured = false;
 	private BeanFactory beanFactory;
+	// 用于保存目标bean是否要进行代理，自动代理会找出目标bean的所有增强对象，如果一个增强都没有，说明该目标bean不用被代理
 	private final Map<Object, Boolean> advisedBeans = new ConcurrentHashMap<Object, Boolean>(64);
 	// using a ConcurrentHashMap as a Set
 	private final Map<String, Boolean> targetSourcedBeans = new ConcurrentHashMap<String, Boolean>(16);
 	// using a ConcurrentHashMap as a Set
 	private final Map<Object, Boolean> earlyProxyReferences = new ConcurrentHashMap<Object, Boolean>(16);
+	// 用于保存目标bean被代理后的bean类型
 	private final Map<Object, Class<?>> proxyTypes = new ConcurrentHashMap<Object, Class<?>>(16);
 
 
@@ -220,15 +222,14 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig implements Sm
 		return this.beanFactory;
 	}
 
+	// SmartInstantiationAwareBeanPostProcessor 接口
 	public Class<?> predictBeanType(Class<?> beanClass, String beanName) {
 		Object cacheKey = getCacheKey(beanClass, beanName);
 		return this.proxyTypes.get(cacheKey);
 	}
-
 	public Constructor<?>[] determineCandidateConstructors(Class<?> beanClass, String beanName) throws BeansException {
 		return null;
 	}
-
 	public Object getEarlyBeanReference(Object bean, String beanName) throws BeansException {
 		Object cacheKey = getCacheKey(bean.getClass(), beanName);
 		this.earlyProxyReferences.put(cacheKey, Boolean.TRUE);
@@ -278,13 +279,13 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig implements Sm
 	public Object postProcessBeforeInitialization(Object bean, String beanName) {
 		return bean;
 	}
-	// Bean 调用构造函数，实例化之后执行该方法
+	// Bean 调用构造函数，实例化之后执行该方法：如果这个bean有匹配到对应的增强，说明这个bean可以被代理，则该方法会返回被代理对象
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		if (bean != null) {
 			// 根据给定的bean的class和name构建出个key，格式：beanClassName_beanName
 			Object cacheKey = getCacheKey(bean.getClass(), beanName);
 			if (!this.earlyProxyReferences.containsKey(cacheKey)) {
-				// 如果他适合被代理，则需要封装指定bean
+				// 如果这个bean可以被代理，则返回代理的bean对象
 				return wrapIfNecessary(bean, beanName, cacheKey);
 			}
 		}
@@ -316,8 +317,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig implements Sm
 			return bean;
 		}
 
-		// Create proxy if we have advice.
-		// 如果存在增强方法则创建代理
+		// 返回所有适用于目标类bean的增强，如果返回的是null，说明没有可以织入到目标类bean的增强，则不用代理这个目标类bean
 		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
 		// 如果获取到了增强则需要针对增强创建代理
 		if (specificInterceptors != DO_NOT_PROXY) {
@@ -385,17 +385,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig implements Sm
 		// No custom TargetSource found.
 		return null;
 	}
-	/**
-	 * Create an AOP proxy for the given bean.
-	 * @param beanClass the class of the bean
-	 * @param beanName the name of the bean
-	 * @param specificInterceptors the set of interceptors that is
-	 * specific to this bean (may be empty, but not null)
-	 * @param targetSource the TargetSource for the proxy,
-	 * already pre-configured to access the bean
-	 * @return the AOP proxy for the bean
-	 * @see #buildAdvisors
-	 */
+	// 给目标bean织入增强，返回并代理对象
 	protected Object createProxy(Class<?> beanClass, String beanName, Object[] specificInterceptors, TargetSource targetSource) {
 
 		ProxyFactory proxyFactory = new ProxyFactory();
@@ -527,21 +517,8 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig implements Sm
 	 * immediably after this method returns
 	 */
 	protected void customizeProxyFactory(ProxyFactory proxyFactory) {}
-	/**
-	 * Return whether the given bean is to be proxied, what additional advices (e.g. AOP Alliance interceptors) and advisors to apply.
-	 * @param beanClass the class of the bean to advise
-	 * @param beanName the name of the bean
-	 * @param customTargetSource the TargetSource returned by the
-	 * {@link #getCustomTargetSource} method: may be ignored.
-	 * Will be {@code null} if no custom target source is in use.
-	 * @return an array of additional interceptors for the particular bean;
-	 * or an empty array if no additional interceptors but just the common ones;
-	 * or {@code null} if no proxy at all, not even with the common interceptors.
-	 * See constants DO_NOT_PROXY and PROXY_WITHOUT_ADDITIONAL_INTERCEPTORS.
-	 * @throws BeansException in case of errors
-	 * @see #DO_NOT_PROXY
-	 * @see #PROXY_WITHOUT_ADDITIONAL_INTERCEPTORS
-	 */
+
+	// 判断这个bean是否可以被代理，如果可以返回要织入到目标类的Advisor，如果返回是null，说明这个目标类Bean不可以被代理
 	protected abstract Object[] getAdvicesAndAdvisorsForBean(Class<?> beanClass, String beanName, TargetSource customTargetSource) throws BeansException;
 
 }

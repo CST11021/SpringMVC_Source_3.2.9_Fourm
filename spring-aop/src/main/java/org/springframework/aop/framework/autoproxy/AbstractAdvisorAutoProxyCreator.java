@@ -62,6 +62,7 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 		this.advisorRetrievalHelper = new BeanFactoryAdvisorRetrievalHelperAdapter(beanFactory);
 	}
 
+	// 返回所有适用于目标bean的增强，如果没有返回 DO_NOT_PROXY（其中DO_NOT_PROXY = null）。
 	@Override
 	protected Object[] getAdvicesAndAdvisorsForBean(Class beanClass, String beanName, TargetSource targetSource) {
 		List advisors = findEligibleAdvisors(beanClass, beanName);
@@ -71,21 +72,11 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 		return advisors.toArray();
 	}
 
-	/**
-	 * Find all eligible Advisors for auto-proxying this class.
-	 * @param beanClass the clazz to find advisors for
-	 * @param beanName the name of the currently proxied bean
-	 * @return the empty List, not {@code null},
-	 * if there are no pointcuts or interceptors
-	 * @see #findCandidateAdvisors
-	 * @see #sortAdvisors
-	 * @see #extendAdvisors
-	 */
-	// 对于指定bean的增强方法的获取一定是包含两个步骤，获取所有的增强以及寻找所有增强中适用于bean的增强并应用，那么
-	// findCandidateAdvisors与findAdvisorsThatCanApply 便是做了这两件事情。当然，如果无法找到对应的增强器便返回DO_NOT_PROXY，
-	// 其中DO_NOT_PROXY=null。
+	// 对于指定bean的增强方法的获取一定是包含两个步骤：1、获取所有的增强 2、寻找所有增强中适用于目标bean的增强
 	protected List<Advisor> findEligibleAdvisors(Class beanClass, String beanName) {
+		// 1、获取所有的增强
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
+		// 2、寻找所有增强中适用于目标bean的增强
 		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
 		extendAdvisors(eligibleAdvisors);
 		if (!eligibleAdvisors.isEmpty()) {
@@ -93,24 +84,13 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 		}
 		return eligibleAdvisors;
 	}
-	/**
-	 * Find all candidate Advisors to use in auto-proxying.
-	 * @return the List of candidate Advisors
-	 */
+	// 查找所有适合织入的advisor，以便于自动代理
 	protected List<Advisor> findCandidateAdvisors() {
 		return this.advisorRetrievalHelper.findAdvisorBeans();
 	}
-	/**
-	 * Search the given candidate Advisors to find all Advisors that
-	 * can apply to the specified bean.
-	 * @param candidateAdvisors the candidate Advisors
-	 * @param beanClass the target's bean class
-	 * @param beanName the target's bean name
-	 * @return the List of applicable Advisors
-	 * @see ProxyCreationContext#getCurrentProxiedBeanName()
-	 */
+	// 返回可以织入到目标bean的Advisor
 	protected List<Advisor> findAdvisorsThatCanApply(List<Advisor> candidateAdvisors, Class beanClass, String beanName) {
-
+		// 记录当前要被代理Bean的beanName
 		ProxyCreationContext.setCurrentProxiedBeanName(beanName);
 		try {
 			return AopUtils.findAdvisorsThatCanApply(candidateAdvisors, beanClass);

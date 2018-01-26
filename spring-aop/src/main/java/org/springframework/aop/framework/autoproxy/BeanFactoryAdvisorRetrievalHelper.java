@@ -42,26 +42,18 @@ public class BeanFactoryAdvisorRetrievalHelper {
 	private static final Log logger = LogFactory.getLog(BeanFactoryAdvisorRetrievalHelper.class);
 
 	private final ConfigurableListableBeanFactory beanFactory;
-
+	// 保存beanFactory中所有Advisor Bean对象的beanName
 	private String[] cachedAdvisorBeanNames;
 
 
-	/**
-	 * Create a new BeanFactoryAdvisorRetrievalHelper for the given BeanFactory.
-	 * @param beanFactory the ListableBeanFactory to scan
-	 */
+
 	public BeanFactoryAdvisorRetrievalHelper(ConfigurableListableBeanFactory beanFactory) {
 		Assert.notNull(beanFactory, "ListableBeanFactory must not be null");
 		this.beanFactory = beanFactory;
 	}
 
 
-	/**
-	 * Find all eligible Advisor beans in the current bean factory,
-	 * ignoring FactoryBeans and excluding beans that are currently in creation.
-	 * @return the list of {@link org.springframework.aop.Advisor} beans
-	 * @see #isEligibleBean
-	 */
+	// 查找所有适合织入的advisor bean
 	public List<Advisor> findAdvisorBeans() {
 		// Determine list of advisor bean names, if not cached already.
 		String[] advisorNames = null;
@@ -70,6 +62,7 @@ public class BeanFactoryAdvisorRetrievalHelper {
 			if (advisorNames == null) {
 				// Do not initialize FactoryBeans here: We need to leave all regular beans
 				// uninitialized to let the auto-proxy creator apply to them!
+				// 获取所有Advisor对象
 				advisorNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(
 						this.beanFactory, Advisor.class, true, false);
 				this.cachedAdvisorBeanNames = advisorNames;
@@ -79,8 +72,10 @@ public class BeanFactoryAdvisorRetrievalHelper {
 			return new LinkedList<Advisor>();
 		}
 
+		// 从BeanFactory中获取所有Advisor的Bean对象，并保存到advisors
 		List<Advisor> advisors = new LinkedList<Advisor>();
 		for (String name : advisorNames) {
+			// 判断这个增强是否适合织入
 			if (isEligibleBean(name)) {
 				if (this.beanFactory.isCurrentlyInCreation(name)) {
 					if (logger.isDebugEnabled()) {
@@ -113,12 +108,7 @@ public class BeanFactoryAdvisorRetrievalHelper {
 		return advisors;
 	}
 
-	/**
-	 * Determine whether the aspect bean with the given name is eligible.
-	 * <p>The default implementation always returns {@code true}.
-	 * @param beanName the name of the aspect bean
-	 * @return whether the bean is eligible
-	 */
+	// 判断给定的BeanName是否是一个适合织入的增强bean
 	protected boolean isEligibleBean(String beanName) {
 		return true;
 	}

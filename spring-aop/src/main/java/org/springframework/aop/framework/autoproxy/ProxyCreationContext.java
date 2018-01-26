@@ -28,23 +28,14 @@ import org.springframework.core.NamedThreadLocal;
  */
 public class ProxyCreationContext {
 
-	/** ThreadLocal holding the current proxied bean name during Advisor matching */
+	// ThreadLocal holding the current proxied bean name during Advisor matching 记录当前要被代理Bean的beanName
 	private static final ThreadLocal<String> currentProxiedBeanName =
 			new NamedThreadLocal<String>("Name of currently proxied bean");
 
 
-	/**
-	 * Return the name of the currently proxied bean instance.
-	 * @return the name of the bean, or {@code null} if none available
-	 */
 	public static String getCurrentProxiedBeanName() {
 		return currentProxiedBeanName.get();
 	}
-
-	/**
-	 * Set the name of the currently proxied bean instance.
-	 * @param beanName the name of the bean, or {@code null} to reset it
-	 */
 	static void setCurrentProxiedBeanName(String beanName) {
 		if (beanName != null) {
 			currentProxiedBeanName.set(beanName);
