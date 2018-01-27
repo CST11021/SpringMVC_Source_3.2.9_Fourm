@@ -367,7 +367,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			if (logger.isDebugEnabled()) {
 				logger.debug("Eagerly caching bean '" + beanName + "' to allow for resolving potential circular references");
 			}
-			// 为避免后期循环依赖，可以在bean初始化完成前将创建实例的ObjectFactory加入工厂
+			// 为避免后期循环依赖，可以在bean初始化完成前将创建实例的ObjectFactory加入缓存：
+			// 这就是 AbstractBeanFactory#doGetBean 方法中创建单例Bean时，为什么要用 ObjectFactory接口 的形式来创建的原因
 			addSingletonFactory(beanName, new ObjectFactory<Object>() {
 				public Object getObject() throws BeansException {
 					// 对bean再一次依赖引用，主要应用SmartInstantiationAware BeanPostProcessor，其中我们熟知的AOP就是在这里将advice动态织入bean中，
@@ -736,6 +737,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 （4） 最后在依赖注入“circularityB”和“circularityA”也是从catch里面拿提前暴露的bean。 完毕setter注入。
 	 可是对于“prototype”作用域Bean。Spring容器无法完毕依赖注入，由于“prototype”作用域的Bean，Spring容器不进行缓存，因此无法提前暴露一个创建中的Bean。
 	 */
+	// 该方法中，如果入参bean是 circularityA 这个Bean，则在第一创建circularityA时会返回null，因为该bean还没有被实例化，而
+	// 经过一轮循环依赖后，第二次创建 circularityA 调用该方法时，就会返回第一次实例化好并暴露出来的 circularityA 对象
 	protected Object getEarlyBeanReference(String beanName, RootBeanDefinition mbd, Object bean) {
 		Object exposedObject = bean;
 		if (bean != null && !mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {

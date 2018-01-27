@@ -21,27 +21,62 @@ import java.beans.PropertyDescriptor;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;
 
-// 该接口可以在Bean生命周期的另外两个时期提供扩展的回调接口，
-// 即实例化Bean之前（调用postProcessBeforeInstantiation方法）和实例化Bean之后（调用postProcessAfterInstantiation方法）
+
 public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 
-	// Bean 调用构造函数实例化之前执行该方法，如果该方法一个非空的实例，则BeanFactory直接返回该Bean实例对象，后续的属性
-	// 注入也就不再执行了
+	/**
+	 说明：
+	 	在调用bean构造函数实例化前被调用，IOC层在调用Bean构造器实例化之前会先执行该处理器方法，如果该处理器方法返回一个非
+	 	空对象，则IOC容器会中断后续初始化流程，即后续的属性注入也就不再执行了，直接返回该非空对象作为Bean的实例。
+
+	 相关的应用：
+	 	1、AbstractAutoProxyCreator
+	 	Spring中的自动代理机制中就是通过该处理器方法来实现的，它通过扩展该处理器方法，在IOC层调用Bean构造器实例化之前会先
+	 	执行该处理器方法，并遍历所有的Bean判断这个Bean是否可以被代理（该实现机制是通过配置一个目标Bean与增强匹配的表达式
+	 	来现实的，如RegexpMethodPointcutAdvisor，并通过该表达式判断每个Bean是否存有对应的增强器，如果存在说明该bean可以被
+	 	自动代理），然后在 InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation 处理器方法中织入增强，并返
+	 	回代理后的代理类，返回代理类后IOC就直接返回该Bean实例了，后续的属性注入则无法再执行了。
+	 */
 	Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException;
 	// Spring调用构造器实例化Bean，然后将Bean包装为一个BeanWrapper后，并在所有的配置属性注入到Bean前该处理器方法被调用，
 	// 该处理器方法的返回值是一个Boolean值，它可以用来控制是否继续注入Bean属性
+
+	/**
+	 说明：
+		 Spring调用构造器实例化Bean，然后将Bean包装为一个BeanWrapper后，并在所有的配置属性注入到Bean前该处理器方法被调用，
+	 	该处理器方法的返回值是一个Boolean值，它可以用来控制是否继续注入Bean属性，在Spring源码中属性注入方法populateBean()
+	 	的执行步骤如下：
+		 1、执行InstantiationAwareBeanPostProcessor处理器的postProcessAfterInstantiation方法，该函数可以控制程序是否继续
+	 		进行属性填充；
+		 2、根据注入类型(byName/byType)，提取依赖的bean，并统一存入PropertyValues中；
+		 3、执行InstantiationAwareBeanPostProcessor#postProcessPropertyValues方法，属性获取完毕后，并在将PropertyValues注
+	 		入到Bean前对属性的再次处理，典型应用是requiredAnnotationBeanPostProcessor 类中对属性的验证；
+		 4、将所有PropertyValues中的属性填充至BeanWrapper中。
+
+	 相关的应用：
+	 	。。。
+	 */
 	boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException;
 
+	/**
+	 说明：
+	 	该处理器方法是在BeanWrapper给Bean注入属性之前被调用的
 
-	// 在工厂将给定的属性值应用到给定的bean之前。允许检查是否已满足所有依赖项，例如基于bean属性设置器上的“Required”注解。
-	// 还允许替换属性值，通常通过创建一个基于原始属性值的MutablePropertyValues实例，添加或删除特定的值
-	// 该方法完成其他定制的一些依赖注入，如：
-	// AutowiredAnnotationBeanPostProcessor执行@Autowired注解注入
-	// CommonAnnotationBeanPostProcessor执行@Resource等注解的注入
-	// PersistenceAnnotationBeanPostProcessor执行@ PersistenceContext等JPA注解的注入
-	// RequiredAnnotationBeanPostProcessor执行@Required注解的检查等等
-	// checkDependencies：依赖检查
-	// applyPropertyValues：应用明确的setter属性注入
+	 相关的应用：
+		 1、AutowiredAnnotationBeanPostProcessor
+		 BeanWrapper在将给定的属性值注入到目标Bean之前，Spring会调用AutowiredAnnotationBeanPostProcessor#postProcessPropertyValues
+	 	 处理器方法，将所有@Autowired注解修饰的依赖Bean注入到目标Bean，也就说由@Autowired注解修饰的Bean属性最先被注入到Bean中
+
+		 2、RequiredAnnotationBeanPostProcessor
+		 如果一个bean某些字段必须含有，则可以使用@Required注释，RequiredAnnotationBeanPostProcessor#postProcessPropertyValues
+	 	 在所有属性注入到Bean前，回去检查所有被@Required注解修饰的方法（@Required只能修饰方法），判断是否有对应的属性注入。
+	 	 如果任何带有@Required的属性未设置的话 将会抛出BeanInitializationException异常。
+
+		 3、CommonAnnotationBeanPostProcessor
+		 CommonAnnotationBeanPostProcessor通过扩展该处理器方法，将那些被@Resource注解修饰的属性注入到Bean
+
+		 4、PersistenceAnnotationBeanPostProcessor执行@ PersistenceContext等JPA注解的注入
+	 */
 	PropertyValues postProcessPropertyValues(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) throws BeansException;
 
 }

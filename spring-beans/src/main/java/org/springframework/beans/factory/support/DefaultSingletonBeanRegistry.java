@@ -441,7 +441,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		return this.singletonObjects;
 	}
 
-	// 添加名称为beanName的singletonFactory对象，代码理解详见《Spring源码深度解析》113页
+	// 添加单例实例，解决循环引用的问题；添加名称为beanName的singletonFactory对象，代码理解详见《Spring源码深度解析》113页
 	protected void addSingletonFactory(String beanName, ObjectFactory singletonFactory) {
 		Assert.notNull(singletonFactory, "Singleton factory must not be null");
 		synchronized (this.singletonObjects) {

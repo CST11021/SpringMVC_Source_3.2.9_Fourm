@@ -54,7 +54,7 @@ import org.springframework.util.StringUtils;
  */
 
 /**
- 通过FieldRetrievingFactoryBean类，可以将其他Bean的Field值注入给其他Bean，或者直接定义新的Bean。下面是配置片段：
+ 通过FieldRetrievingFactoryBean类，可以将其他Bean的Field值注入给指定的Bean，或者直接定义新的Bean。下面是配置片段：
  <bean id="son" class="com.abc.service.Son">
 	 <property name="age">
 	 	<bean id="java.sql.connection.TRANSACTION_SERIALIZABLE" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
@@ -62,10 +62,11 @@ import org.springframework.util.StringUtils;
  </bean>
 
  在这个配置中，son对象的age的值，等于java.sql.Connection.TRANSACTION_SERIALIZABLE的值。在上面的定义中，定义FieldRetrievingFactoryBean
- 工厂Bean时，指定的id并不是该Bean实例的唯一标识，而是指定Field的表达式（即将要被取出来的值）。
- 注意：Field既可以是静态的，也可以是非晶态的。上面的配置片段指定的Field表达式是静态Field值，因此可以通过类名直接访问。
- 如果Field值是非静态的，则应该通过容器中已经存在的Bean来访问——即Field表达式的第一个短语应该是容器中已经存在的Bean。
- Field值也可以定义成Bean实例，例如，在配置文件中增加下面一段：
+ 这个FactoryBean时，指定的id并不是该Bean实例的唯一标识，而是指定Field的表达式（即将要被取出来的值）。
+
+ 注意：Field既可以是静态的，也可以是非静态的。上面的配置片段指定的Field表达式是静态的，因此可以通过类名直接访问。
+ 如果Field值是非静态的，则应该通过容器中已经存在的Bean来访问，即Field表达式的第一个短语应该是容器中已经存在的Bean，Field
+ 值也可以定义成Bean实例，例如，在配置文件中增加下面一段：
  <bean id="age" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
 	 <!-- targetClass指定Field所在的目标类 -->
 	 <property name="targetClass" value="java.sql.Connection" />
@@ -74,9 +75,9 @@ import org.springframework.util.StringUtils;
  </bean>
 
  使用FieldRetrievingFactoryBean获取Field值时，必须指定如下两个属性：
- targetClass或targetObject：分别用于指定Field值所在的目标累或目标对象。如果需要获得的Field是静态的，则使用targetClass指
- 定目标累；如果Field是非静态的，则使用targetObject指定目标对象
- targetField：指定目标类或目标对象的Field名
+ 1、targetClass或targetObject：分别用于指定Field值所在的目标累或目标对象。如果需要获得的Field是静态的，则使用targetClass
+ 	指定目标累；如果Field是非静态的，则使用targetObject指定目标对象
+ 2、targetField：指定目标类或目标对象的Field名
  */
 public class FieldRetrievingFactoryBean
 		implements FactoryBean<Object>, BeanNameAware, BeanClassLoaderAware, InitializingBean {

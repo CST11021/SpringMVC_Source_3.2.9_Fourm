@@ -22,11 +22,21 @@ import org.springframework.beans.BeansException;
 // 或者多个BeanPostProcessor接口的实现
 public interface BeanPostProcessor {
 
-
-	// Bean执行初始化方法（比如配置的init属性等）前被调用
+	/**
+	 1、@PostConstruct修饰的方法
+	 2、BeanPostProcessor#postProcessBeforeInitialization
+	 3、InitializingBean#afterPropertiesSet：设置完Bean的所有属性之后被调用
+	 4、调用<bean>配置中的init-method方法
+	 */
 	Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException;
 
-	// Bean执行初始化方法（比如配置的init属性等）后被调用
+	/**
+	 1、调用<bean>配置中的init-method方法
+	 2、BeanPostProcessor#postProcessAfterInitialization：Bean执行初始化方法后被调用
+	 3、@PreDestroy修饰的方法
+	 4、DisposableBean#destroy：在bean被销毁的时候调用
+	 5、调用<bean>配置中的destroy-method方法
+	 */
 	Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException;
 
 }
