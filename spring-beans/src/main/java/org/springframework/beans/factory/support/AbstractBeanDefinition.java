@@ -60,6 +60,11 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	private int dependencyCheck = DEPENDENCY_CHECK_NONE;
 	// 表示这个依赖的所有bean
 	private String[] dependsOn;
+	// 对应的配置：<bean autowire-candidate="true/false">
+	// Spring在实例化这个bean的时候会在容器中查找匹配的bean对autowire bean进行属性注入，这些被查找的bean我们称为候选bean。
+	// 作为候选bean，我凭什么就要被你用，老子不给你用。所以候选bean给自己增加了autowire-candidate="false"属性（默认是true），
+	// 那么容器就不会把这个bean当做候选bean了，即这个bean不会被当做自动装配对象。同样，<beans/>标签可以定义
+	// default-autowire-candidate="false"属性让它包含的所有bean都不做为候选bean。我的地盘我做主。
 	private boolean autowireCandidate = true;
 	// 自动装配时当出现多个Bean候选者时，被注解为@Primary的Bean将作为首选者，否则将抛出异常（@Primary对应bean配置的中primary属性配置）
 	private boolean primary = false;

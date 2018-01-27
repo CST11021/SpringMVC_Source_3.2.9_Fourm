@@ -54,9 +54,12 @@ import org.springframework.util.StringUtils;
  * @see Qualifier
  * @see Value
  */
+// Spring使用了QualifierAnnotationAutowireCandidateResolver这个解析器后，Spring就支持注解方式的注入了
 public class QualifierAnnotationAutowireCandidateResolver implements AutowireCandidateResolver, BeanFactoryAware {
 
+	// 表示一系列自动注入注解的集合（包括：@AutoWired、@Qualifier）
 	private final Set<Class<? extends Annotation>> qualifierTypes = new LinkedHashSet<Class<? extends Annotation>>();
+	// 表示@Value注解类型
 	private Class<? extends Annotation> valueAnnotationType = Value.class;
 	private BeanFactory beanFactory;
 
@@ -80,46 +83,19 @@ public class QualifierAnnotationAutowireCandidateResolver implements AutowireCan
 		this.qualifierTypes.addAll(qualifierTypes);
 	}
 
-	/**
-	 * Register the given type to be used as a qualifier when autowiring.
-	 * <p>This identifies qualifier annotations for direct use (on fields,
-	 * method parameters and constructor parameters) as well as meta
-	 * annotations that in turn identify actual qualifier annotations.
-	 * <p>This implementation only supports annotations as qualifier types.
-	 * The default is Spring's {@link Qualifier} annotation which serves
-	 * as a qualifier for direct use and also as a meta annotation.
-	 * @param qualifierType the annotation type to register
-	 */
+	// 添加一个自动注入注解类型
 	public void addQualifierType(Class<? extends Annotation> qualifierType) {
 		this.qualifierTypes.add(qualifierType);
 	}
-	/**
-	 * Set the 'value' annotation type, to be used on fields, method parameters
-	 * and constructor parameters.
-	 * <p>The default value annotation type is the Spring-provided
-	 * {@link Value} annotation.
-	 * <p>This setter property exists so that developers can provide their own
-	 * (non-Spring-specific) annotation type to indicate a default value
-	 * expression for a specific argument.
-	 */
 	public void setValueAnnotationType(Class<? extends Annotation> valueAnnotationType) {
 		this.valueAnnotationType = valueAnnotationType;
 	}
+
 	public void setBeanFactory(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 	}
-	/**
-	 * Determine whether the provided bean definition is an autowire candidate.
-	 * <p>To be considered a candidate the bean's <em>autowire-candidate</em>
-	 * attribute must not have been set to 'false'. Also, if an annotation on
-	 * the field or parameter to be autowired is recognized by this bean factory
-	 * as a <em>qualifier</em>, the bean must 'match' against the annotation as
-	 * well as any attributes it may contain. The bean definition must contain
-	 * the same qualifier or match by meta attributes. A "value" attribute will
-	 * fallback to match against the bean name or an alias if a qualifier or
-	 * attribute does not match.
-	 * @see Qualifier
-	 */
+
+	// 判断这个bean是否为一个候选Bean
 	public boolean isAutowireCandidate(BeanDefinitionHolder bdHolder, DependencyDescriptor descriptor) {
 		if (!bdHolder.getBeanDefinition().isAutowireCandidate()) {
 			// if explicitly false, do not proceed with qualifier check
@@ -182,9 +158,8 @@ public class QualifierAnnotationAutowireCandidateResolver implements AutowireCan
 		}
 		return true;
 	}
-	/**
-	 * Checks whether the given annotation type is a recognized qualifier type.
-	 */
+
+	// 判断这个注解类型是否为自动注入注解类型
 	protected boolean isQualifier(Class<? extends Annotation> annotationType) {
 		for (Class<? extends Annotation> qualifierType : this.qualifierTypes) {
 			if (annotationType.equals(qualifierType) || annotationType.isAnnotationPresent(qualifierType)) {

@@ -25,9 +25,10 @@ import org.springframework.beans.PropertyValues;
 // 即实例化Bean之前（调用postProcessBeforeInstantiation方法）和实例化Bean之后（调用postProcessAfterInstantiation方法）
 public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 
-	// bean实例化前被调用
+	// Bean 调用构造函数实例化之前执行该方法，如果该方法一个非空的实例，则BeanFactory直接返回该Bean实例对象，后续的属性
+	// 注入也就不再执行了
 	Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException;
-	// bean实例化后被调用
+	// Bean 调用构造函数，实例化之后执行该方法
 	boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException;
 
 

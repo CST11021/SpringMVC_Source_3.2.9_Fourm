@@ -48,22 +48,31 @@ import org.springframework.util.ClassUtils;
  */
 public class CustomAutowireConfigurer implements BeanFactoryPostProcessor, BeanClassLoaderAware, Ordered {
 
-	private int order = Ordered.LOWEST_PRECEDENCE;  // default: same as non-Ordered
+	// default: same as non-Ordered
+	private int order = Ordered.LOWEST_PRECEDENCE;
+	// 该集合保存的自定义类型必须是注解类型
 	private Set customQualifierTypes;
 	private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
+	// 实现BeanFactoryPostProcessor#postProcessBeanFactory接口：在解析完配置文件后，实例化Bean之前被调用
 	@SuppressWarnings("unchecked")
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		if (this.customQualifierTypes != null) {
+
+			// 1、如果beanFactory不是DefaultListableBeanFactory的对象则抛出异常
 			if (!(beanFactory instanceof DefaultListableBeanFactory)) {
 				throw new IllegalStateException("CustomAutowireConfigurer needs to operate on a DefaultListableBeanFactory");
 			}
+
+			// 2、判断BeanFactory#AutowireCandidateResolver 是否为 QualifierAnnotationAutowireCandidateResolver 的对象
+			// 如果不是设置一个QualifierAnnotationAutowireCandidateResolver实例
 			DefaultListableBeanFactory dlbf = (DefaultListableBeanFactory) beanFactory;
 			if (!(dlbf.getAutowireCandidateResolver() instanceof QualifierAnnotationAutowireCandidateResolver)) {
 				dlbf.setAutowireCandidateResolver(new QualifierAnnotationAutowireCandidateResolver());
 			}
 			QualifierAnnotationAutowireCandidateResolver resolver =
 					(QualifierAnnotationAutowireCandidateResolver) dlbf.getAutowireCandidateResolver();
+
 			for (Object value : this.customQualifierTypes) {
 				Class customType = null;
 				if (value instanceof Class) {
@@ -77,6 +86,8 @@ public class CustomAutowireConfigurer implements BeanFactoryPostProcessor, BeanC
 					throw new IllegalArgumentException(
 							"Invalid value [" + value + "] for custom qualifier type: needs to be Class or String.");
 				}
+
+				// 判断这个customType是否为一个注解类型，如果不是则抛出异常
 				if (!Annotation.class.isAssignableFrom(customType)) {
 					throw new IllegalArgumentException(
 							"Qualifier type [" + customType.getName() + "] needs to be annotation type");

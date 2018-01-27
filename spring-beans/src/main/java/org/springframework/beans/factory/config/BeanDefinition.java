@@ -73,7 +73,11 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	String[] getDependsOn();
 	void setDependsOn(String[] dependsOn);
 
-	//是否为被自动装配 <bean autowire-candidate="true/false">
+	// 是否为被自动装配 <bean autowire-candidate="true/false">
+	// Spring在实例化这个bean的时候会在容器中查找匹配的bean对autowire bean进行属性注入，这些被查找的bean我们称为候选bean。
+	// 作为候选bean，我凭什么就要被你用，老子不给你用。所以候选bean给自己增加了autowire-candidate="false"属性（默认是true），
+	// 那么容器就不会把这个bean当做候选bean了，即这个bean不会被当做自动装配对象。同样，<beans/>标签可以定义
+	// default-autowire-candidate="false"属性让它包含的所有bean都不做为候选bean。我的地盘我做主。
 	boolean isAutowireCandidate();
 	void setAutowireCandidate(boolean autowireCandidate);
 

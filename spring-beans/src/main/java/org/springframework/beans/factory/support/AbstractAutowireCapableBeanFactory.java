@@ -1293,18 +1293,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 	}
 
-	// 初始化这个bean实例，执行相应的工厂回调，初始化方法和后处理器：
-	// 详见
-	// * @see BeanNameAware
-	// * @see BeanClassLoaderAware
-	// * @see BeanFactoryAware
-	// * @see #applyBeanPostProcessorsBeforeInitialization
-	// * @see #invokeInitMethods
-	// * @see #applyBeanPostProcessorsAfterInitialization
+	// 初始化这个bean实例，如果Spring配置文件中Bean有配置init-method属性，则该方法会被调用，并在populateBean方法后被调用
+	// 执行相应的工厂回调，初始化方法和后处理器：
 	protected Object initializeBean(final String beanName, final Object bean, RootBeanDefinition mbd) {
 		if (System.getSecurityManager() != null) {
 			AccessController.doPrivileged(new PrivilegedAction<Object>() {
 				public Object run() {
+					// 如果Bean实现了Aware接口（包括：BeanNameAware、BeanClassLoaderAware和BeanFactoryAware）则会在这里
+					// 执行自动注入的方法
 					invokeAwareMethods(beanName, bean);
 					return null;
 				}

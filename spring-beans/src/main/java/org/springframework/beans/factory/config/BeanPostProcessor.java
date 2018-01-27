@@ -18,13 +18,15 @@ package org.springframework.beans.factory.config;
 
 import org.springframework.beans.BeansException;
 
-// 该接口作用是：如果我们需要在Spring容器完成Bean的实例化，配置和其他的初始化后添加一些自己的逻辑处理，我们就可以定义一个或者多个BeanPostProcessor接口的实现
+// 该接口作用是：如果我们需要在Spring容器完成Bean的实例化，配置和其他的初始化后添加一些自己的逻辑处理，我们就可以定义一个
+// 或者多个BeanPostProcessor接口的实现
 public interface BeanPostProcessor {
 
-	// Bean 调用构造函数，实例化之前执行该方法
+
+	// Bean执行初始化方法（比如配置的init属性等）前被调用
 	Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException;
 
-	// Bean 调用构造函数，实例化之后执行该方法
+	// Bean执行初始化方法（比如配置的init属性等）后被调用
 	Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException;
 
 }
