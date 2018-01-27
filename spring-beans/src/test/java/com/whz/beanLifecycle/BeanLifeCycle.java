@@ -5,7 +5,9 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessorAdapter;
+import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -18,7 +20,11 @@ public class BeanLifeCycle {
 
         // 注册 BeanDefinition 之后，在实例化 BeanDefinition之前调用
         BeanFactoryPostProcessor beanFactoryPostProcessor = new MyBeanFactoryPostProcessor();
-        beanFactoryPostProcessor.postProcessBeanFactory((XmlBeanFactory) bf);
+        beanFactoryPostProcessor.postProcessBeanFactory((ConfigurableListableBeanFactory) bf);
+
+        BeanDefinitionRegistryPostProcessor beanDefinitionRegistryPostProcessor =
+            new MyBeanDefinitionRegistryPostProcessor();
+        beanDefinitionRegistryPostProcessor.postProcessBeanFactory((ConfigurableListableBeanFactory) bf);
 
         InstantiationAwareBeanPostProcessorAdapter instantiationAwareBeanPostProcessor = new MyInstantiationAwareBeanPostProcessor();
         ((ConfigurableBeanFactory)bf).addBeanPostProcessor(instantiationAwareBeanPostProcessor);
