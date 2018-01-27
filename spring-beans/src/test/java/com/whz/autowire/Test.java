@@ -1,4 +1,4 @@
-package com.whz.beanlive;
+package com.whz.autowire;
 
 import java.io.IOException;
 import java.util.List;
@@ -9,7 +9,6 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.util.CollectionUtils;
@@ -19,7 +18,7 @@ public class Test {
     @org.junit.Test
     public void test1() throws IOException {
         Resource[] configResources = new PathMatchingResourcePatternResolver().getResources(
-            "classpath*:com/whz/beanlive/spring-autowire.xml");
+            "classpath*:com/whz/autowire/spring-autowire.xml");
         XmlBeanFactory xmlBeanFactory = new XmlBeanFactory(configResources[0]);
 
         AutowiredAnnotationBeanPostProcessor postProcessor = new AutowiredAnnotationBeanPostProcessor();
@@ -46,7 +45,7 @@ public class Test {
 
         ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
         Resource[] configResources = resourcePatternResolver.getResources(
-                "classpath*:com/whz/beanlive/spring-autowire.xml");
+                "classpath*:com/whz/autowire/spring-autowire.xml");
 
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(factory);
         reader.loadBeanDefinitions(configResources);
@@ -54,7 +53,7 @@ public class Test {
         List<String> beanNames = CollectionUtils.arrayToList(factory.getBeanDefinitionNames());
         System.out.println(beanNames);
 
-        com.whz.beanlive.Person person = (com.whz.beanlive.Person) factory.getBean("person");
+        com.whz.autowire.Person person = (com.whz.autowire.Person) factory.getBean("person");
         System.out.println(person);
     }
 

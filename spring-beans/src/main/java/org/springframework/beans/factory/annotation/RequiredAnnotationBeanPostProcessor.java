@@ -70,14 +70,15 @@ import org.springframework.util.Assert;
  * @see #setRequiredAnnotationType
  * @see Required
  */
+// 如果一个bean某些字段必须含有，则可以使用@Required注释，RequiredAnnotationBeanPostProcessor#postProcessPropertyValues
+// 在所有属性注入到Bean前，回去检查所有被@Required注解修饰的方法（@Required只能修饰方法），判断是否有对应的属性注入。
 public class RequiredAnnotationBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter
 		implements MergedBeanDefinitionPostProcessor, PriorityOrdered, BeanFactoryAware {
 
-	/**
-	 * Bean definition attribute that may indicate whether a given bean is supposed
-	 * to be skipped when performing this post-processor's required property check.
-	 * @see #shouldSkip
-	 */
+	// 如果一个bean不希望进行required检查,可以使用如下配置：
+	//<bean id="dummy" class="com.javarticles.spring.Employee">
+    //   <meta key="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor.skipRequiredCheck" value="true" />
+    //</bean>
 	public static final String SKIP_REQUIRED_CHECK_ATTRIBUTE =
 			Conventions.getQualifiedAttributeName(RequiredAnnotationBeanPostProcessor.class, "skipRequiredCheck");
 

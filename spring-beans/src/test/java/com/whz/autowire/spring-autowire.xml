@@ -4,10 +4,10 @@
        xmlns:p="http://www.springframework.org/schema/p"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
-    <bean class="com.whz.beanlive.Car"/>
-    <bean id="address" class="com.whz.beanlive.Address" p:city="厦门" p:street="思明区"/>
-    <bean id="car" class="com.whz.beanlive.Car" p:brand="奥迪" p:price="300000"/>
-    <bean id="person" class="com.whz.beanlive.Person">
+    <bean class="com.whz.autowire.Car"/>
+    <bean id="address" class="com.whz.autowire.Address" p:city="厦门" p:street="思明区"/>
+    <bean id="car" class="com.whz.autowire.Car" p:brand="奥迪" p:price="300000"/>
+    <bean id="person" class="com.whz.autowire.Person">
 
     </bean>
 
