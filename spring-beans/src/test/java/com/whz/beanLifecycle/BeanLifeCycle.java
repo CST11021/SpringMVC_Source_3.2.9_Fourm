@@ -42,6 +42,17 @@ public class BeanLifeCycle {
         ((XmlBeanFactory)bf).destroySingletons();
     }
 
+    @Test
+    public void LifeCycleInApplicationContext() {
+        // 注意：@PostConstruct 和 @PreDestroy 注解，在 ApplicationContext 级别时才能生效，并这两方法在配置的
+        // init-method="myInit" destroy-method="myDestory" 的方法前先执行。
+        //ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext("com/whz/beanLifecycle/bean.xml");
+        //Car car = (Car) ctx.getBean("car");
+        //System.out.println(car);
+        // close()方法在 ConfigurableApplicationContext 接口中定义
+        //ctx.close();
+    }
+
 
 }
 
