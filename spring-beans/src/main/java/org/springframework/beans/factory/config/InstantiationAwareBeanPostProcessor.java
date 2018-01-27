@@ -28,7 +28,8 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	// Bean 调用构造函数实例化之前执行该方法，如果该方法一个非空的实例，则BeanFactory直接返回该Bean实例对象，后续的属性
 	// 注入也就不再执行了
 	Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException;
-	// Bean 调用构造函数，实例化之后执行该方法
+	// Spring调用构造器实例化Bean，然后将Bean包装为一个BeanWrapper后，并在所有的配置属性注入到Bean前该处理器方法被调用，
+	// 该处理器方法的返回值是一个Boolean值，它可以用来控制是否继续注入Bean属性
 	boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException;
 
 
