@@ -8,6 +8,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessorAdapter;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
+import org.springframework.beans.factory.support.MergedBeanDefinitionPostProcessor;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -31,6 +32,9 @@ public class BeanLifeCycle {
 
         BeanPostProcessor beanPostProcessor = new MyBeanPostProcessor();
         ((ConfigurableBeanFactory)bf).addBeanPostProcessor(beanPostProcessor);
+
+        MergedBeanDefinitionPostProcessor mergedBeanDefinitionPostProcessor = new MyMergedBeanDefinitionPostProcessor();
+        ((ConfigurableBeanFactory)bf).addBeanPostProcessor(mergedBeanDefinitionPostProcessor);
 
         Car car1 = (Car)bf.getBean("car");
         car1.introduce();

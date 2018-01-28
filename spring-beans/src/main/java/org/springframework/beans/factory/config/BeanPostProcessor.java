@@ -23,8 +23,8 @@ import org.springframework.beans.BeansException;
 public interface BeanPostProcessor {
 
 	/**
-	 1、@PostConstruct修饰的方法
-	 2、BeanPostProcessor#postProcessBeforeInitialization
+	 1、BeanPostProcessor#postProcessBeforeInitialization
+	 2、@PostConstruct修饰的方法
 	 3、InitializingBean#afterPropertiesSet：设置完Bean的所有属性之后被调用
 	 4、调用<bean>配置中的init-method方法
 	 */
