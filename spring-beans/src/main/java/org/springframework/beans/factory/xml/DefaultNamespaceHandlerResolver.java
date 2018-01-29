@@ -52,12 +52,11 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 
 	// 映射文件的位置。可以存在于多个JAR文件中。
 	public static final String DEFAULT_HANDLER_MAPPINGS_LOCATION = "META-INF/spring.handlers";
-
-	//** ClassLoader to use for NamespaceHandler classes */
+	// META-INF/spring.handlers 文件中配置的命名空间及对应的处理器类，是使用类的全限定类名配置的，这个类加载器用来加载这个处理器类
 	private final ClassLoader classLoader;
-	//** Resource location to search for */
+	// 表示spring.handlers文件目录，默认值为“META-INF/spring.handlers”
 	private final String handlerMappingsLocation;
-	//** Stores the mappings from namespace URI to NamespaceHandler class name / instance */ 用来保存命名空间对应的处理器，如："http://www.springframework.org/schema/context"对应ContextNamespaceHandler.java
+	// 用来保存命名空间对应的处理器，如："http://www.springframework.org/schema/context"对应ContextNamespaceHandler.java
 	private volatile Map<String, Object> handlerMappings;
 
 
@@ -111,7 +110,9 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 	}
 
 	// 加载NamespaceHandler对象与命名空间URI的映射表
-	// DefaultNamespaceHandlerResolver的resolve方法通过调用getHandlerMappings()方法获得NamespaceHandler对象与命名空间URI的映射表，并从这个映射表中取到并返回对应的NamespaceHandler对象。resolve方法的重点就在于NamespaceHandler对象映射表的获取
+	// DefaultNamespaceHandlerResolver的resolve方法通过调用getHandlerMappings()方法获得NamespaceHandler对象与命名空间URI
+	// 的映射表，并从这个映射表中取到并返回对应的NamespaceHandler对象。resolve方法的重点就在于NamespaceHandler对象映射表
+	// 的获取
 	private Map<String, Object> getHandlerMappings() {
 		if (this.handlerMappings == null) {
 			synchronized (this) {
