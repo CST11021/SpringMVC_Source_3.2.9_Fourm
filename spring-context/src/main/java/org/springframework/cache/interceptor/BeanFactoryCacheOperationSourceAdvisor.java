@@ -32,6 +32,10 @@ public class BeanFactoryCacheOperationSourceAdvisor extends AbstractBeanFactoryP
 
 	private CacheOperationSource cacheOperationSource;
 
+	// 带有缓存注解的方法都是增强切入点，Spring缓存机制就是通过 CacheOperationSourcePointcut 来判断目标Bean是否需要被代理
+	// 的，Spring的自动代理通过 BeanPostProcessor#postProcessAfterInitialization 处理器方法，判断当前Bean是否需要被代理
+	// 而当前Bean是否需要被代理取决于 CacheOperationSourcePointcut#matches方法，该方法判断这个当前Bean的指定方法是否有被
+	// Spring的缓存注解修改，如果存在一个被缓存注解修改的方法，则说明该Bean需要被代理。
 	private final CacheOperationSourcePointcut pointcut = new CacheOperationSourcePointcut() {
 		@Override
 		protected CacheOperationSource getCacheOperationSource() {
