@@ -32,19 +32,21 @@ import org.w3c.dom.Element;
  * @author Costin Leau
  * @since 3.1
  */
+// 用于解析<cache:annotation-driven/>和<cache:advice>标签
 public class CacheNamespaceHandler extends NamespaceHandlerSupport {
 
 	static final String CACHE_MANAGER_ATTRIBUTE = "cache-manager";
 	static final String DEFAULT_CACHE_MANAGER_BEAN_NAME = "cacheManager";
 
-	// 从该标签中抽取cache-manager属性配置的值，如果没有配置，则返回cacheManager
+	// 提取<cache:annotation-driven cache-manager="cacheManager"/>中配置的cache-manager属性，如果没有配置默认使用“cacheManager”
 	static String extractCacheManager(Element element) {
 		return (element.hasAttribute(CacheNamespaceHandler.CACHE_MANAGER_ATTRIBUTE) ? element
 				.getAttribute(CacheNamespaceHandler.CACHE_MANAGER_ATTRIBUTE)
 				: CacheNamespaceHandler.DEFAULT_CACHE_MANAGER_BEAN_NAME);
 	}
 
-	// 解析“key-generator”属性，并设置到BeanDefinition中
+	// 解析<cache:annotation-driven key-generator=""/>中配置的key-generator属性，如果不为空则封装为一个
+	// RuntimeBeanReference对象，并添加到BeanDefinition#propertyValues中，方便后续的属性注入
 	static BeanDefinition parseKeyGenerator(Element element, BeanDefinition def) {
 		String name = element.getAttribute("key-generator");
 		if (StringUtils.hasText(name)) {
