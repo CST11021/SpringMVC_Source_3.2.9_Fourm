@@ -52,6 +52,8 @@ import org.springframework.util.ObjectUtils;
  * @author Juergen Hoeller
  * @since 3.1
  */
+// 该类是一个抽象类，可以通过继承该方法，判断目标类的指定方法，是否有被缓存注解修饰，如果有则返回缓存注解的CacheOperation
+// 对象，如果没有则返回null
 public abstract class AbstractFallbackCacheOperationSource implements CacheOperationSource {
 
 	protected final Log logger = LogFactory.getLog(getClass());
@@ -167,10 +169,8 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 	 * (or {@code null} if none)
 	 */
 	protected abstract Collection<CacheOperation> findCacheOperations(Class<?> clazz);
-	/**
-	 * Should only public methods be allowed to have caching semantics?
-	 * <p>The default implementation returns {@code false}.
-	 */
+
+	// 表示缓存注解方法是否只可以作用于public方法，默认返回false，子类可以覆盖该方法
 	protected boolean allowPublicMethodsOnly() {
 		return false;
 	}

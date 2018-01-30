@@ -124,7 +124,10 @@ class AnnotationDrivenCacheBeanDefinitionParser implements BeanDefinitionParser 
 				RootBeanDefinition interceptorDef = new RootBeanDefinition(CacheInterceptor.class);
 				interceptorDef.setSource(eleSource);
 				interceptorDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+				// 向指定的BeanDefinition添加一个cacheManager的属性
 				parseCacheManagerProperty(element, interceptorDef);
+				// 解析<cache:annotation-driven key-generator=""/>中配置的key-generator属性，如果不为空则封装为一个
+				// RuntimeBeanReference对象，并添加到BeanDefinition#propertyValues中，方便后续的属性注入
 				CacheNamespaceHandler.parseKeyGenerator(element, interceptorDef);
 				interceptorDef.getPropertyValues().add("cacheOperationSources", new RuntimeBeanReference(sourceName));
 				String interceptorName = parserContext.getReaderContext().registerWithGeneratedName(interceptorDef);

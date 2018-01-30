@@ -32,16 +32,7 @@ import org.springframework.cache.interceptor.CacheOperation;
  */
 public interface CacheAnnotationParser {
 
-	/**
-	 * Parses the cache definition for the given method or class,
-	 * based on a known annotation type.
-	 * <p>This essentially parses a known cache annotation into Spring's
-	 * metadata attribute class. Returns {@code null} if the method/class
-	 * is not cacheable.
-	 * @param ae the annotated method or class
-	 * @return CacheOperation the configured caching operation,
-	 * or {@code null} if none was found
-	 * @see AnnotationCacheOperationSource#determineCacheOperations(AnnotatedElement)
-	 */
+	// AnnotatedElement表示一个Method对象或Class对象，该方法用来解析指定方法或类配置的Spring缓存注解配合信息，缓存注解的
+	// 配置信息将被封装为一个CacheOperation对象
 	Collection<CacheOperation> parseCacheAnnotations(AnnotatedElement ae);
 }

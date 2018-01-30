@@ -38,9 +38,12 @@ import org.springframework.util.ObjectUtils;
  * @author Phillip Webb
  * @since 3.1
  */
+// 该类用来解析不同缓存注解的配置信息
 @SuppressWarnings("serial")
 public class SpringCacheAnnotationParser implements CacheAnnotationParser, Serializable {
 
+	// AnnotatedElement表示一个Method对象或Class对象，该方法用来解析指定方法或类配置的Spring缓存注解配合信息，缓存注解的
+	// 配置信息将被封装为一个CacheOperation对象
 	public Collection<CacheOperation> parseCacheAnnotations(AnnotatedElement ae) {
 		Collection<CacheOperation> ops = null;
 
@@ -74,9 +77,7 @@ public class SpringCacheAnnotationParser implements CacheAnnotationParser, Seria
 		}
 		return ops;
 	}
-	private <T extends Annotation> Collection<CacheOperation> lazyInit(Collection<CacheOperation> ops) {
-		return (ops != null ? ops : new ArrayList<CacheOperation>(1));
-	}
+
 	// 解析 @Cacheable 注解
 	CacheableOperation parseCacheableAnnotation(AnnotatedElement ae, Cacheable caching) {
 		CacheableOperation cuo = new CacheableOperation();
@@ -135,6 +136,10 @@ public class SpringCacheAnnotationParser implements CacheAnnotationParser, Seria
 		}
 
 		return ops;
+	}
+
+	private <T extends Annotation> Collection<CacheOperation> lazyInit(Collection<CacheOperation> ops) {
+		return (ops != null ? ops : new ArrayList<CacheOperation>(1));
 	}
 	private <T extends Annotation> Collection<T> getAnnotations(AnnotatedElement ae, Class<T> annotationType) {
 		Collection<T> anns = new ArrayList<T>(2);

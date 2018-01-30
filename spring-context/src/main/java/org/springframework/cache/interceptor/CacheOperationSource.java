@@ -37,6 +37,7 @@ public interface CacheOperationSource {
 	 * the declaring class of the method must be used)
 	 * @return all cache operations for this method, or {@code null} if none found
 	 */
+	// 判断目标类的指定方法，是否有被缓存注解修饰，如果有则返回缓存注解的CacheOperation对象，如果没有则返回null
 	Collection<CacheOperation> getCacheOperations(Method method, Class<?> targetClass);
 
 }
