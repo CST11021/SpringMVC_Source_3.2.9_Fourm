@@ -44,7 +44,6 @@ import org.springframework.util.StringUtils;
 public class DateFormatter implements Formatter<Date> {
 
 	private static final Map<ISO, String> ISO_PATTERNS;
-
 	static {
 		Map<ISO, String> formats = new HashMap<DateTimeFormat.ISO, String>(4);
 		formats.put(ISO.DATE, "yyyy-MM-dd");
@@ -52,104 +51,24 @@ public class DateFormatter implements Formatter<Date> {
 		formats.put(ISO.DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 		ISO_PATTERNS = Collections.unmodifiableMap(formats);
 	}
-
-
 	private String pattern;
-
 	private int style = DateFormat.DEFAULT;
-
 	private String stylePattern;
-
 	private ISO iso;
-
 	private TimeZone timeZone;
-
 	private boolean lenient = false;
 
 
-	/**
-	 * Create a new default DateFormatter.
-	 */
 	public DateFormatter() {
 	}
-
-	/**
-	 * Create a new DateFormatter for the given date pattern.
-	 */
 	public DateFormatter(String pattern) {
 		this.pattern = pattern;
-	}
-
-
-	/**
-	 * Set the pattern to use to format date values.
-	 * <p>If not specified, DateFormat's default style will be used.
-	 */
-	public void setPattern(String pattern) {
-		this.pattern = pattern;
-	}
-
-	/**
-	 * Set the ISO format used for this date.
-	 * @param iso the {@link ISO} format
-	 * @since 3.2
-	 */
-	public void setIso(ISO iso) {
-		this.iso = iso;
-	}
-
-	/**
-	 * Set the style to use to format date values.
-	 * <p>If not specified, DateFormat's default style will be used.
-	 * @see DateFormat#DEFAULT
-	 * @see DateFormat#SHORT
-	 * @see DateFormat#MEDIUM
-	 * @see DateFormat#LONG
-	 * @see DateFormat#FULL
-	 */
-	public void setStyle(int style) {
-		this.style = style;
-	}
-
-	/**
-	 * Set the two character to use to format date values. The first character used for
-	 * the date style, the second is for the time style. Supported characters are
-	 * <ul>
-	 * <li>'S' = Small</li>
-	 * <li>'M' = Medium</li>
-	 * <li>'L' = Long</li>
-	 * <li>'F' = Full</li>
-	 * <li>'-' = Omitted</li>
-	 * <ul>
-	 * This method mimics the styles supported by Joda-Time.
-	 * @param stylePattern two characters from the set {"S", "M", "L", "F", "-"}
-	 * @since 3.2
-	 */
-	public void setStylePattern(String stylePattern) {
-		this.stylePattern = stylePattern;
-	}
-
-	/**
-	 * Set the TimeZone to normalize the date values into, if any.
-	 */
-	public void setTimeZone(TimeZone timeZone) {
-		this.timeZone = timeZone;
-	}
-
-	/**
-	 * Specify whether or not parsing is to be lenient. Default is false.
-	 * <p>With lenient parsing, the parser may allow inputs that do not precisely match the format.
-	 * With strict parsing, inputs must match the format exactly.
-	 */
-	public void setLenient(boolean lenient) {
-		this.lenient = lenient;
 	}
 
 
 	public String print(Date date, Locale locale) {
 		return getDateFormat(locale).format(date);
 	}
-
 	public Date parse(String text, Locale locale) throws ParseException {
 		return getDateFormat(locale).parse(text);
 	}
@@ -163,7 +82,6 @@ public class DateFormatter implements Formatter<Date> {
 		dateFormat.setLenient(this.lenient);
 		return dateFormat;
 	}
-
 	private DateFormat createDateFormat(Locale locale) {
 		if (StringUtils.hasLength(this.pattern)) {
 			return new SimpleDateFormat(this.pattern, locale);
@@ -194,7 +112,6 @@ public class DateFormatter implements Formatter<Date> {
 		}
 		return DateFormat.getDateInstance(this.style, locale);
 	}
-
 	private int getStylePatternForChar(int index) {
 		if (this.stylePattern != null && this.stylePattern.length() > index) {
 			switch (this.stylePattern.charAt(index)) {
@@ -208,4 +125,23 @@ public class DateFormatter implements Formatter<Date> {
 		throw new IllegalStateException("Unsupported style pattern '" + this.stylePattern + "'");
 	}
 
+	// setter 方法
+	public void setPattern(String pattern) {
+		this.pattern = pattern;
+	}
+	public void setIso(ISO iso) {
+		this.iso = iso;
+	}
+	public void setStyle(int style) {
+		this.style = style;
+	}
+	public void setStylePattern(String stylePattern) {
+		this.stylePattern = stylePattern;
+	}
+	public void setTimeZone(TimeZone timeZone) {
+		this.timeZone = timeZone;
+	}
+	public void setLenient(boolean lenient) {
+		this.lenient = lenient;
+	}
 }

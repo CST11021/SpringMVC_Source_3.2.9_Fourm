@@ -30,6 +30,7 @@ import org.springframework.util.ObjectUtils;
  * @author Costin Leau
  * @since 3.1
  */
+//
 @SuppressWarnings("serial")
 abstract class CacheOperationSourcePointcut extends StaticMethodMatcherPointcut implements Serializable {
 
@@ -37,6 +38,12 @@ abstract class CacheOperationSourcePointcut extends StaticMethodMatcherPointcut 
 		CacheOperationSource cas = getCacheOperationSource();
 		return (cas != null && !CollectionUtils.isEmpty(cas.getCacheOperations(method, targetClass)));
 	}
+	/**
+	 * Obtain the underlying {@link CacheOperationSource} (may be {@code null}).
+	 * To be implemented by subclasses.
+	 */
+	protected abstract CacheOperationSource getCacheOperationSource();
+
 
 	@Override
 	public boolean equals(Object other) {
@@ -49,22 +56,16 @@ abstract class CacheOperationSourcePointcut extends StaticMethodMatcherPointcut 
 		CacheOperationSourcePointcut otherPc = (CacheOperationSourcePointcut) other;
 		return ObjectUtils.nullSafeEquals(getCacheOperationSource(), otherPc.getCacheOperationSource());
 	}
-
 	@Override
 	public int hashCode() {
 		return CacheOperationSourcePointcut.class.hashCode();
 	}
-
 	@Override
 	public String toString() {
 		return getClass().getName() + ": " + getCacheOperationSource();
 	}
 
 
-	/**
-	 * Obtain the underlying {@link CacheOperationSource} (may be {@code null}).
-	 * To be implemented by subclasses.
-	 */
-	protected abstract CacheOperationSource getCacheOperationSource();
+
 
 }

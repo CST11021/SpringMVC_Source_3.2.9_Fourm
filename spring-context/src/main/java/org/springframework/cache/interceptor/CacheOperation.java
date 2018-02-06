@@ -27,12 +27,15 @@ import org.springframework.util.Assert;
  *
  * @author Costin Leau
  */
-// CacheEvictOperation、CachePutOperation和CacheableOperation
+// 该抽象类是CacheEvictOperation、CachePutOperation和CacheableOperation的父类，用来封装Spring缓存注解的配置信息
 public abstract class CacheOperation {
-
+	// 表示缓存注解配置的value值，如：@Cacheable(value="accountCache")
 	private Set<String> cacheNames = Collections.emptySet();
+	// 表示缓存注解配置的condition值
 	private String condition = "";
+	// 表示缓存注解配置的key值
 	private String key = "";
+	// 表示缓存注解修饰的方法或类
 	private String name = "";
 
 

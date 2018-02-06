@@ -51,13 +51,10 @@ import org.springframework.util.Assert;
 public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactoryAware {
 
 	private final Log logger = LogFactory.getLog(getClass());
-
 	private volatile long timeoutPerShutdownPhase = 30000;
-
 	// 判断容器是否处于启动状态
 	private volatile boolean running;
 	private volatile ConfigurableListableBeanFactory beanFactory;
-
 
 
 	public void setTimeoutPerShutdownPhase(long timeoutPerShutdownPhase) {
@@ -85,7 +82,6 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 		startBeans(false);
 		this.running = true;
 	}
-
 	/**
 	 * Stop all registered beans that implement Lifecycle and <i>are</i>
 	 * currently running. Any bean that implements SmartLifecycle
@@ -100,17 +96,14 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 		stopBeans();
 		this.running = false;
 	}
-
 	public void onRefresh() {
 		startBeans(true);
 		this.running = true;
 	}
-
 	public void onClose() {
 		stopBeans();
 		this.running = false;
 	}
-
 	// 判断Spring容器是否处于运行状态
 	public boolean isRunning() {
 		return this.running;
@@ -144,7 +137,6 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 			}
 		}
 	}
-
 	/**
 	 * Start the specified bean as part of the given set of Lifecycle beans,
 	 * making sure that any beans that it depends on are started first.
@@ -175,7 +167,6 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 			}
 		}
 	}
-
 	private void stopBeans() {
 		Map<String, Lifecycle> lifecycleBeans = getLifecycleBeans();
 		Map<Integer, LifecycleGroup> phases = new HashMap<Integer, LifecycleGroup>();
@@ -197,7 +188,6 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 			}
 		}
 	}
-
 	/**
 	 * Stop the specified bean as part of the given set of Lifecycle beans,
 	 * making sure that any beans that depends on it are stopped first.
@@ -278,7 +268,6 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 		}
 		return beans;
 	}
-
 	/**
 	 * Determine the lifecycle phase of the given bean.
 	 * <p>The default implementation checks for the {@link Phased} interface.
@@ -291,8 +280,6 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 	protected int getPhase(Lifecycle bean) {
 		return (bean instanceof Phased ? ((Phased) bean).getPhase() : 0);
 	}
-
-
 	/**
 	 * Helper class for maintaining a group of Lifecycle beans that should be started
 	 * and stopped together based on their 'phase' value (or the default value of 0).
@@ -372,8 +359,6 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 			}
 		}
 	}
-
-
 	/**
 	 * Adapts the Comparable interface onto the lifecycle phase model.
 	 */

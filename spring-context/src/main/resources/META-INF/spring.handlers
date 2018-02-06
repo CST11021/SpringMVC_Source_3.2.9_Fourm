@@ -3,3 +3,5 @@ http\://www.springframework.org/schema/jee=org.springframework.ejb.config.JeeNam
 http\://www.springframework.org/schema/lang=org.springframework.scripting.config.LangNamespaceHandler
 http\://www.springframework.org/schema/task=org.springframework.scheduling.config.TaskNamespaceHandler
 http\://www.springframework.org/schema/cache=org.springframework.cache.config.CacheNamespaceHandler
+
+http\://blog.csdn.net/cutesource/schema/people=com.whz.spring.springhandlers.MyNamespaceHandler

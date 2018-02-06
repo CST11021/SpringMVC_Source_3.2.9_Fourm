@@ -22,3 +22,5 @@ http\://www.springframework.org/schema/task/spring-task.xsd=org/springframework/
 http\://www.springframework.org/schema/cache/spring-cache-3.1.xsd=org/springframework/cache/config/spring-cache-3.1.xsd
 http\://www.springframework.org/schema/cache/spring-cache-3.2.xsd=org/springframework/cache/config/spring-cache-3.2.xsd
 http\://www.springframework.org/schema/cache/spring-cache.xsd=org/springframework/cache/config/spring-cache-3.2.xsd
+
+http\://blog.csdn.net/cutesource/schema/people.xsd=META-INF/people.xsd
