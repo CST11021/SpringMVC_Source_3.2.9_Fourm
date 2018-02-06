@@ -55,6 +55,7 @@ import org.springframework.util.StringUtils;
  * @see Value
  */
 // Spring使用了QualifierAnnotationAutowireCandidateResolver这个解析器后，Spring就支持注解方式的注入了
+// 该实现类用于ApplicationContext容器扩展对自动注入注解的支持，BeanFactory默认使用 SimpleAutowireCandidateResolver 实现
 public class QualifierAnnotationAutowireCandidateResolver implements AutowireCandidateResolver, BeanFactoryAware {
 
 	// 表示一系列自动注入注解的集合
