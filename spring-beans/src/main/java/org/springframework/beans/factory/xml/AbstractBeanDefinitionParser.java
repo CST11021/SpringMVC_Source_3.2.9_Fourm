@@ -56,22 +56,29 @@ public abstract class AbstractBeanDefinitionParser implements BeanDefinitionPars
 	public static final String NAME_ATTRIBUTE = "name";
 
 	public final BeanDefinition parse(Element element, ParserContext parserContext) {
+		// 解析标签，并返回一个 AbstractBeanDefinition 对象
 		AbstractBeanDefinition definition = parseInternal(element, parserContext);
+
 		if (definition != null && !parserContext.isNested()) {
 			try {
+				// 生成一个beanId
 				String id = resolveId(element, definition, parserContext);
 				if (!StringUtils.hasText(id)) {
 					parserContext.getReaderContext().error(
 							"Id is required for element '" + parserContext.getDelegate().getLocalName(element)
 									+ "' when used as a top-level tag", element);
 				}
+
+				// 解析name属性，作为bean的别名
 				String[] aliases = new String[0];
 				String name = element.getAttribute(NAME_ATTRIBUTE);
 				if (StringUtils.hasLength(name)) {
 					aliases = StringUtils.trimArrayElements(StringUtils.commaDelimitedListToStringArray(name));
 				}
+
 				BeanDefinitionHolder holder = new BeanDefinitionHolder(definition, id, aliases);
 				registerBeanDefinition(holder, parserContext.getRegistry());
+
 				if (shouldFireEvents()) {
 					BeanComponentDefinition componentDefinition = new BeanComponentDefinition(holder);
 					postProcessComponentDefinition(componentDefinition);
@@ -133,37 +140,15 @@ public abstract class AbstractBeanDefinitionParser implements BeanDefinitionPars
 	}
 
 
-	/**
-	 * Central template method to actually parse the supplied {@link Element}
-	 * into one or more {@link BeanDefinition BeanDefinitions}.
-	 * @param element	the element that is to be parsed into one or more {@link BeanDefinition BeanDefinitions}
-	 * @param parserContext the object encapsulating the current state of the parsing process;
-	 * provides access to a {@link org.springframework.beans.factory.support.BeanDefinitionRegistry}
-	 * @return the primary {@link BeanDefinition} resulting from the parsing of the supplied {@link Element}
-	 * @see #parse(org.w3c.dom.Element, ParserContext)
-	 * @see #postProcessComponentDefinition(org.springframework.beans.factory.parsing.BeanComponentDefinition)
-	 */
+	// 该解析操作交由子类 AbstractSingleBeanDefinitionParser 扩展实现
 	protected abstract AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext);
 
-	/**
-	 * Should an ID be generated instead of read from the passed in {@link Element}?
-	 * <p>Disabled by default; subclasses can override this to enable ID generation.
-	 * Note that this flag is about <i>always</i> generating an ID; the parser
-	 * won't even check for an "id" attribute in this case.
-	 * @return whether the parser should always generate an id
-	 */
+	// beanId是否交由Spring来生成，子类修改该方法，
 	protected boolean shouldGenerateId() {
 		return false;
 	}
 
-	/**
-	 * Should an ID be generated instead if the passed in {@link Element} does not
-	 * specify an "id" attribute explicitly?
-	 * <p>Disabled by default; subclasses can override this to enable ID generation
-	 * as fallback: The parser will first check for an "id" attribute in this case,
-	 * only falling back to a generated ID if no value was specified.
-	 * @return whether the parser should generate an id if no id was specified
-	 */
+	// 如果自定义标签没有id属性的话，重载该方法，让Spring帮忙生成一个beanName作为id
 	protected boolean shouldGenerateIdAsFallback() {
 		return false;
 	}
