@@ -33,7 +33,7 @@
 	<!--方式二：-->
 	<!--使用tx命名空间式的配置-->
 	<aop:config>
-		<aop:pointcut id="serviceMethod" expression="execution(* com.whz.transactional.*Service.*(..))" />
+		<aop:pointcut id="serviceMethod" expression="execution(* com.whz.spring.transactional.*Service.*(..))" />
 		<aop:advisor pointcut-ref="serviceMethod" advice-ref="txAdvice" />
 	</aop:config>
 	<tx:advice id="txAdvice" >
