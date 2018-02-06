@@ -26,12 +26,13 @@ import org.springframework.beans.factory.config.DependencyDescriptor;
  * @author Juergen Hoeller
  * @since 2.5
  */
-// AutowireCandidateResolver是一个策略接口，由它来决定特定的bean definition对特定的依赖是否可以作为一个自动绑定的候选项
-// QualifierAnnotationAutowireCandidateResolver间接实现了AutowireCandidateResolver，对要自动绑定的field或者参数和bean definition
+// AutowireCandidateResolver是一个策略接口，由它来决定指定的Bean是否可以作为一个被自动绑定的候选项Bean
+// QualifierAnnotationAutowireCandidateResolver实现了AutowireCandidateResolver，对要自动绑定的字段、参数和Bean
 // 根据@qualifier注解进行匹配。同时也支持通过@value注解来绑定表达式的值。
 public interface AutowireCandidateResolver {
 
-	// 判断bdHodler对应的bean是否可自动注入
+	// 判断bdHodler对应的Bean是否可自动注入到其他的Bean（比如：BeanA通过@Autowired修饰变量b，则该方法判断b对应的Bean是否
+	// 可以被自动注入a）
 	boolean isAutowireCandidate(BeanDefinitionHolder bdHolder, DependencyDescriptor descriptor);
 
 	// 为给定的依赖项提供一个默认值

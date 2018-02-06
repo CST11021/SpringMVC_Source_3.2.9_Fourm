@@ -32,15 +32,12 @@ import org.springframework.beans.factory.config.DependencyDescriptor;
  */
 public class SimpleAutowireCandidateResolver implements AutowireCandidateResolver {
 
-	/**
-	 * Determine if the provided bean definition is an autowire candidate.
-	 * <p>To be considered a candidate the bean's <em>autowire-candidate</em>
-	 * attribute must not have been set to 'false'.
-	 */
+	// 通过BeanDefinition配置来判断是否为候选Bean，对应xml配置：<bean autowire-candidate="true">，默认为true
 	public boolean isAutowireCandidate(BeanDefinitionHolder bdHolder, DependencyDescriptor descriptor) {
 		return bdHolder.getBeanDefinition().isAutowireCandidate();
 	}
 
+	// 返回自动装配的默认值
 	public Object getSuggestedValue(DependencyDescriptor descriptor) {
 		return null;
 	}

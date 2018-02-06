@@ -57,18 +57,22 @@ import org.springframework.util.StringUtils;
 // Spring使用了QualifierAnnotationAutowireCandidateResolver这个解析器后，Spring就支持注解方式的注入了
 public class QualifierAnnotationAutowireCandidateResolver implements AutowireCandidateResolver, BeanFactoryAware {
 
-	// 表示一系列自动注入注解的集合（包括：@AutoWired、@Qualifier）
+	// 表示一系列自动注入注解的集合
 	private final Set<Class<? extends Annotation>> qualifierTypes = new LinkedHashSet<Class<? extends Annotation>>();
 	// 表示@Value注解类型
 	private Class<? extends Annotation> valueAnnotationType = Value.class;
+	// Bean工厂，该字段通过自动注入机制注入
 	private BeanFactory beanFactory;
 
+
+	// 构造器
 	@SuppressWarnings("unchecked")
 	public QualifierAnnotationAutowireCandidateResolver() {
 		this.qualifierTypes.add(Qualifier.class);
 		try {
 			this.qualifierTypes.add((Class<? extends Annotation>)
-					ClassUtils.forName("javax.inject.Qualifier", QualifierAnnotationAutowireCandidateResolver.class.getClassLoader()));
+					ClassUtils.forName("javax.inject.Qualifier",
+					QualifierAnnotationAutowireCandidateResolver.class.getClassLoader()));
 		}
 		catch (ClassNotFoundException ex) {
 			// JSR-330 API not available - simply skip.
@@ -83,17 +87,8 @@ public class QualifierAnnotationAutowireCandidateResolver implements AutowireCan
 		this.qualifierTypes.addAll(qualifierTypes);
 	}
 
-	// 添加一个自动注入注解类型
-	public void addQualifierType(Class<? extends Annotation> qualifierType) {
-		this.qualifierTypes.add(qualifierType);
-	}
-	public void setValueAnnotationType(Class<? extends Annotation> valueAnnotationType) {
-		this.valueAnnotationType = valueAnnotationType;
-	}
 
-	public void setBeanFactory(BeanFactory beanFactory) {
-		this.beanFactory = beanFactory;
-	}
+
 
 	// 判断这个bean是否为一个候选Bean
 	public boolean isAutowireCandidate(BeanDefinitionHolder bdHolder, DependencyDescriptor descriptor) {
@@ -105,6 +100,7 @@ public class QualifierAnnotationAutowireCandidateResolver implements AutowireCan
 			// no qualification necessary
 			return true;
 		}
+
 		boolean match = checkQualifiers(bdHolder, descriptor.getAnnotations());
 		if (match) {
 			MethodParameter methodParam = descriptor.getMethodParameter();
@@ -117,9 +113,33 @@ public class QualifierAnnotationAutowireCandidateResolver implements AutowireCan
 		}
 		return match;
 	}
-	/**
-	 * Match the given qualifier annotations against the candidate bean definition.
-	 */
+	// 判断这个依赖项是否有被@Value注解修饰，如果有，则返回配置的value值
+	public Object getSuggestedValue(DependencyDescriptor descriptor) {
+		// 判断 Annotation[] 中是否包含@Value注解，如果有则返回该注解配置的value值
+		Object value = findValue(descriptor.getAnnotations());
+
+		// @Value注解可能修饰方法
+		if (value == null) {
+			MethodParameter methodParam = descriptor.getMethodParameter();
+			if (methodParam != null) {
+				value = findValue(methodParam.getMethodAnnotations());
+			}
+		}
+		return value;
+	}
+	public void setBeanFactory(BeanFactory beanFactory) {
+		this.beanFactory = beanFactory;
+	}
+
+	// 添加一个自动注入注解类型
+	public void addQualifierType(Class<? extends Annotation> qualifierType) {
+		this.qualifierTypes.add(qualifierType);
+	}
+	public void setValueAnnotationType(Class<? extends Annotation> valueAnnotationType) {
+		this.valueAnnotationType = valueAnnotationType;
+	}
+
+	// Match the given qualifier annotations against the candidate bean definition.
 	protected boolean checkQualifiers(BeanDefinitionHolder bdHolder, Annotation[] annotationsToSearch) {
 		if (ObjectUtils.isEmpty(annotationsToSearch)) {
 			return true;
@@ -129,6 +149,7 @@ public class QualifierAnnotationAutowireCandidateResolver implements AutowireCan
 			Class<? extends Annotation> type = annotation.annotationType();
 			boolean checkMeta = true;
 			boolean fallbackToMeta = false;
+
 			if (isQualifier(type)) {
 				if (!checkQualifier(bdHolder, annotation, typeConverter)) {
 					fallbackToMeta = true;
@@ -158,7 +179,6 @@ public class QualifierAnnotationAutowireCandidateResolver implements AutowireCan
 		}
 		return true;
 	}
-
 	// 判断这个注解类型是否为自动注入注解类型
 	protected boolean isQualifier(Class<? extends Annotation> annotationType) {
 		for (Class<? extends Annotation> qualifierType : this.qualifierTypes) {
@@ -168,9 +188,7 @@ public class QualifierAnnotationAutowireCandidateResolver implements AutowireCan
 		}
 		return false;
 	}
-	/**
-	 * Match the given qualifier annotation against the candidate bean definition.
-	 */
+	// Match the given qualifier annotation against the candidate bean definition.
 	protected boolean checkQualifier(BeanDefinitionHolder bdHolder, Annotation annotation, TypeConverter typeConverter) {
 
 		Class<? extends Annotation> type = annotation.annotationType();
@@ -258,23 +276,7 @@ public class QualifierAnnotationAutowireCandidateResolver implements AutowireCan
 		Method resolvedFactoryMethod = bd.getResolvedFactoryMethod();
 		return (resolvedFactoryMethod != null ? AnnotationUtils.getAnnotation(resolvedFactoryMethod, type) : null);
 	}
-	/**
-	 * Determine whether the given dependency carries a value annotation.
-	 * @see Value
-	 */
-	public Object getSuggestedValue(DependencyDescriptor descriptor) {
-		Object value = findValue(descriptor.getAnnotations());
-		if (value == null) {
-			MethodParameter methodParam = descriptor.getMethodParameter();
-			if (methodParam != null) {
-				value = findValue(methodParam.getMethodAnnotations());
-			}
-		}
-		return value;
-	}
-	/**
-	 * Determine a suggested value from any of the given candidate annotations.
-	 */
+	// 判断 annotationsToSearch 中是否包含@Value注解，如果有则返回该注解配置的value值
 	protected Object findValue(Annotation[] annotationsToSearch) {
 		for (Annotation annotation : annotationsToSearch) {
 			if (this.valueAnnotationType.isInstance(annotation)) {

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- 如果不配置autowire="byName"则person这个bean，默认是不使用自动装配的 -->
+    <!--自动装配时，Spring会去查找所有可被自动注入的Bean，我们称为候选Bean，候选Bean取决于<bean autowire-candidate="true">-->
+    <!--配置，autowire-candidate属性不配置的时候默认为true，因此，通常我们配置的Bean都为候选Bean，自动注入时，会从-->
+    <!--候选Bean中选取一个符合条件的Bean，判断依据有两种：-->
+    <!--1、根据类型匹配：例如，会从所有Bean中找出类型为Address的Bean，如果有多个，则抛出异常-->
+    <!--2、根据名称匹配：例如，会从所有Bean中找出beanName为address的bean，这里的beanName取决于setter方法名 -->
+    <bean id="person" class="com.whz.autowire.byname.Person" p:name="张三" autowire="byName"/>
+
+    <!-- autowire-candidate="true"配置表示：是否可以被注入到目标bean（比如person依赖address，则person就是目标bean）-->
+    <bean id="address" class="com.whz.autowire.byname.Address" p:city="北京" autowire-candidate="true" autowire="byName"/>
+
+    <bean id="car" class="com.whz.autowire.byname.Car"/>
+
+</beans>

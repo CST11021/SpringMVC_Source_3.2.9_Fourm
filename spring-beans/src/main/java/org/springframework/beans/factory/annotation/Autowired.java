@@ -69,10 +69,7 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Autowired {
 
-	/**
-	 * Declares whether the annotated dependency is required.
-	 * <p>Defaults to {@code true}.
-	 */
+	// 如果配置为true，则当自动注入时找不到对应的Bean，则会报错
 	boolean required() default true;
 
 }
