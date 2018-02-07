@@ -130,7 +130,7 @@ public class Test {
     @org.junit.Test
     public void testSaveBySpringTransaction() throws Exception {
         // 将事务的模板类代码抽到出来交由Spring配置实现
-        ApplicationContext app = new ClassPathXmlApplicationContext("/com/whz/transactional/spring-annoTransaction.xml");
+        ApplicationContext app = new ClassPathXmlApplicationContext("/com/whz/spring/transactional/spring-annoTransaction.xml");
         UserService userService = (UserService) app.getBean("userService");
         userService.saveByAnno(zhangsanUser);
     }
@@ -138,14 +138,15 @@ public class Test {
     @org.junit.Test
     public void testSaveBySpringTransaction1() throws Exception {
         // 将事务的模板类代码抽到出来交由Spring配置实现
-        ApplicationContext app = new ClassPathXmlApplicationContext("/com/whz/transactional/spring-xmlTransaction.xml");
+        ApplicationContext app = new ClassPathXmlApplicationContext("/com/whz/spring/transactional/spring-xmlTransaction.xml");
         UserService userService = (UserService) app.getBean("userServiceTarget");
         userService.saveByConfg1(zhangsanUser);
     }
+    // 使用tx命名空间配置的方式
     @org.junit.Test
     public void testSaveBySpringTransaction2() throws Exception {
         // 将事务的模板类代码抽到出来交由Spring配置实现
-        ApplicationContext app = new ClassPathXmlApplicationContext("/com/whz/transactional/spring-xmlTransaction.xml");
+        ApplicationContext app = new ClassPathXmlApplicationContext("/com/whz/spring/transactional/spring-xmlTransaction.xml");
         UserService userService = (UserService) app.getBean("userServiceTarget");
         userService.saveByConfg2(zhangsanUser);
     }

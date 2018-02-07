@@ -22,9 +22,7 @@
 		  p:target-ref="userService">
 		<property name="transactionAttributes">
 			<props>
-				<prop key="saveByConfg1">
-					PROPAGATION_REQUIRED
-				</prop>
+				<prop key="saveByConfg1">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>

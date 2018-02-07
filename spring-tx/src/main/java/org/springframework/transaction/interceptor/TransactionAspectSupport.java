@@ -66,16 +66,15 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 	// NOTE: This class must not implement Serializable because it serves as base
 	// class for AspectJ aspects (which are not allowed to implement Serializable)!
 
+	protected final Log logger = LogFactory.getLog(getClass());
+
 	/**
 	 * Holder to support the {@code currentTransactionStatus()} method,
 	 * and to support communication between different cooperating advices
 	 * (e.g. before and after advice) if the aspect involves more than a
 	 * single method (as will be the case for around advice).
 	 */
-	private static final ThreadLocal<TransactionInfo> transactionInfoHolder =
-			new NamedThreadLocal<TransactionInfo>("Current aspect-driven transaction");
-
-
+	private static final ThreadLocal<TransactionInfo> transactionInfoHolder = new NamedThreadLocal<TransactionInfo>("Current aspect-driven transaction");
 	/**
 	 * Subclasses can use this to return the current TransactionInfo.
 	 * Only subclasses that cannot handle all operations in one method,
@@ -96,7 +95,6 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 	protected static TransactionInfo currentTransactionInfo() throws NoTransactionException {
 		return transactionInfoHolder.get();
 	}
-
 	/**
 	 * Return the transaction status of the current method invocation.
 	 * Mainly intended for code that wants to set the current transaction
@@ -111,125 +109,66 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 		}
 		return currentTransactionInfo().transactionStatus;
 	}
-
-
-	protected final Log logger = LogFactory.getLog(getClass());
-
 	private String transactionManagerBeanName;
-
 	private PlatformTransactionManager transactionManager;
-
 	private TransactionAttributeSource transactionAttributeSource;
-
 	private BeanFactory beanFactory;
 
 
-	/**
-	 * Specify the name of the default transaction manager bean.
-	 */
+
+	// 检查需要的属性是否已经设置
+	public void afterPropertiesSet() {
+		if (this.transactionManager == null && this.beanFactory == null) {
+			throw new IllegalStateException(
+				"Setting the property 'transactionManager' or running in a ListableBeanFactory is required");
+		}
+		if (this.transactionAttributeSource == null) {
+			throw new IllegalStateException(
+				"Either 'transactionAttributeSource' or 'transactionAttributes' is required: " +
+					"If there are no transactional methods, then don't use a transaction aspect.");
+		}
+	}
+
+
+
 	public void setTransactionManagerBeanName(String transactionManagerBeanName) {
 		this.transactionManagerBeanName = transactionManagerBeanName;
 	}
-
-	/**
-	 * Return the name of the default transaction manager bean.
-	 */
 	protected final String getTransactionManagerBeanName() {
 		return this.transactionManagerBeanName;
 	}
 
-	/**
-	 * Specify the target transaction manager.
-	 */
 	public void setTransactionManager(PlatformTransactionManager transactionManager) {
 		this.transactionManager = transactionManager;
 	}
-
-	/**
-	 * Return the transaction manager, if specified.
-	 */
 	public PlatformTransactionManager getTransactionManager() {
 		return this.transactionManager;
 	}
 
-	/**
-	 * Set properties with method names as keys and transaction attribute
-	 * descriptors (parsed via TransactionAttributeEditor) as values:
-	 * e.g. key = "myMethod", value = "PROPAGATION_REQUIRED,readOnly".
-	 * <p>Note: Method names are always applied to the target class,
-	 * no matter if defined in an interface or the class itself.
-	 * <p>Internally, a NameMatchTransactionAttributeSource will be
-	 * created from the given properties.
-	 * @see #setTransactionAttributeSource
-	 * @see TransactionAttributeEditor
-	 * @see NameMatchTransactionAttributeSource
-	 */
 	public void setTransactionAttributes(Properties transactionAttributes) {
 		NameMatchTransactionAttributeSource tas = new NameMatchTransactionAttributeSource();
 		tas.setProperties(transactionAttributes);
 		this.transactionAttributeSource = tas;
 	}
-
-	/**
-	 * Set multiple transaction attribute sources which are used to find transaction
-	 * attributes. Will build a CompositeTransactionAttributeSource for the given sources.
-	 * @see CompositeTransactionAttributeSource
-	 * @see MethodMapTransactionAttributeSource
-	 * @see NameMatchTransactionAttributeSource
-	 * @see org.springframework.transaction.annotation.AnnotationTransactionAttributeSource
-	 */
 	public void setTransactionAttributeSources(TransactionAttributeSource[] transactionAttributeSources) {
 		this.transactionAttributeSource = new CompositeTransactionAttributeSource(transactionAttributeSources);
 	}
 
-	/**
-	 * Set the transaction attribute source which is used to find transaction
-	 * attributes. If specifying a String property value, a PropertyEditor
-	 * will create a MethodMapTransactionAttributeSource from the value.
-	 * @see TransactionAttributeSourceEditor
-	 * @see MethodMapTransactionAttributeSource
-	 * @see NameMatchTransactionAttributeSource
-	 * @see org.springframework.transaction.annotation.AnnotationTransactionAttributeSource
-	 */
 	public void setTransactionAttributeSource(TransactionAttributeSource transactionAttributeSource) {
 		this.transactionAttributeSource = transactionAttributeSource;
 	}
-
-	/**
-	 * Return the transaction attribute source.
-	 */
 	public TransactionAttributeSource getTransactionAttributeSource() {
 		return this.transactionAttributeSource;
 	}
 
-	/**
-	 * Set the BeanFactory to use for retrieving PlatformTransactionManager beans.
-	 */
 	public void setBeanFactory(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 	}
-
-	/**
-	 * Return the BeanFactory to use for retrieving PlatformTransactionManager beans.
-	 */
 	protected final BeanFactory getBeanFactory() {
 		return this.beanFactory;
 	}
 
-	/**
-	 * Check that required properties were set.
-	 */
-	public void afterPropertiesSet() {
-		if (this.transactionManager == null && this.beanFactory == null) {
-			throw new IllegalStateException(
-					"Setting the property 'transactionManager' or running in a ListableBeanFactory is required");
-		}
-		if (this.transactionAttributeSource == null) {
-			throw new IllegalStateException(
-					"Either 'transactionAttributeSource' or 'transactionAttributes' is required: " +
-					"If there are no transactional methods, then don't use a transaction aspect.");
-		}
-	}
+
 
 
 	/**
@@ -242,8 +181,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 	 * @return the return value of the method, if any
 	 * @throws Throwable propagated from the target invocation
 	 */
-	protected Object invokeWithinTransaction(Method method, Class targetClass, final InvocationCallback invocation)
-			throws Throwable {
+	protected Object invokeWithinTransaction(Method method, Class targetClass, final InvocationCallback invocation) throws Throwable {
 
 		// If the transaction attribute is null, the method is non-transactional.
 		final TransactionAttribute txAttr = getTransactionAttributeSource().getTransactionAttribute(method, targetClass);
@@ -615,7 +553,6 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 		}
 	}
 
-
 	/**
 	 * Simple callback interface for proceeding with the target invocation.
 	 * Concrete interceptors/aspects adapt this to their invocation mechanism.
@@ -624,7 +561,6 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 
 		Object proceedWithInvocation() throws Throwable;
 	}
-
 
 	/**
 	 * Internal holder class for a Throwable, used as a return value
@@ -642,7 +578,6 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 			return this.throwable;
 		}
 	}
-
 
 	/**
 	 * Internal holder class for a Throwable, used as a RuntimeException to be

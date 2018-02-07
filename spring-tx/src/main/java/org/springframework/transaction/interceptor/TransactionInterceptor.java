@@ -49,35 +49,13 @@ import java.util.Properties;
 @SuppressWarnings("serial")
 public class TransactionInterceptor extends TransactionAspectSupport implements MethodInterceptor, Serializable {
 
-	/**
-	 * Create a new TransactionInterceptor.
-	 * <p>Transaction manager and transaction attributes still need to be set.
-	 * @see #setTransactionManager
-	 * @see #setTransactionAttributes(java.util.Properties)
-	 * @see #setTransactionAttributeSource(TransactionAttributeSource)
-	 */
+
 	public TransactionInterceptor() {
 	}
-
-	/**
-	 * Create a new TransactionInterceptor.
-	 * @param ptm the transaction manager to perform the actual transaction management
-	 * @param attributes the transaction attributes in properties format
-	 * @see #setTransactionManager
-	 * @see #setTransactionAttributes(java.util.Properties)
-	 */
 	public TransactionInterceptor(PlatformTransactionManager ptm, Properties attributes) {
 		setTransactionManager(ptm);
 		setTransactionAttributes(attributes);
 	}
-
-	/**
-	 * Create a new TransactionInterceptor.
-	 * @param ptm the transaction manager to perform the actual transaction management
-	 * @param tas the attribute source to be used to find transaction attributes
-	 * @see #setTransactionManager
-	 * @see #setTransactionAttributeSource(TransactionAttributeSource)
-	 */
 	public TransactionInterceptor(PlatformTransactionManager ptm, TransactionAttributeSource tas) {
 		setTransactionManager(ptm);
 		setTransactionAttributeSource(tas);
@@ -85,9 +63,7 @@ public class TransactionInterceptor extends TransactionAspectSupport implements 
 
 
 	public Object invoke(final MethodInvocation invocation) throws Throwable {
-		// Work out the target class: may be {@code null}.
-		// The TransactionAttributeSource should be passed the target class
-		// as well as the method, which may be from an interface.
+		// 返回目标类类型
 		Class<?> targetClass = (invocation.getThis() != null ? AopUtils.getTargetClass(invocation.getThis()) : null);
 
 		// Adapt to TransactionAspectSupport's invokeWithinTransaction...
@@ -102,7 +78,6 @@ public class TransactionInterceptor extends TransactionAspectSupport implements 
 	//---------------------------------------------------------------------
 	// Serialization support
 	//---------------------------------------------------------------------
-
 	private void writeObject(ObjectOutputStream oos) throws IOException {
 		// Rely on default serialization, although this class itself doesn't carry state anyway...
 		oos.defaultWriteObject();
@@ -113,7 +88,6 @@ public class TransactionInterceptor extends TransactionAspectSupport implements 
 		oos.writeObject(getTransactionAttributeSource());
 		oos.writeObject(getBeanFactory());
 	}
-
 	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
 		// Rely on default serialization, although this class itself doesn't carry state anyway...
 		ois.defaultReadObject();

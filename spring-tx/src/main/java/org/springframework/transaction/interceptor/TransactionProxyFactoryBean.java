@@ -111,81 +111,17 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @see org.springframework.aop.framework.ProxyFactoryBean
  */
 @SuppressWarnings("serial")
-public class TransactionProxyFactoryBean extends AbstractSingletonProxyFactoryBean
-		implements BeanFactoryAware {
+public class TransactionProxyFactoryBean extends AbstractSingletonProxyFactoryBean implements BeanFactoryAware {
 
 	private final TransactionInterceptor transactionInterceptor = new TransactionInterceptor();
-
 	private Pointcut pointcut;
 
 
-	/**
-	 * Set the transaction manager. This will perform actual
-	 * transaction management: This class is just a way of invoking it.
-	 * @see TransactionInterceptor#setTransactionManager
-	 */
-	public void setTransactionManager(PlatformTransactionManager transactionManager) {
-		this.transactionInterceptor.setTransactionManager(transactionManager);
-	}
-
-	/**
-	 * Set properties with method names as keys and transaction attribute
-	 * descriptors (parsed via TransactionAttributeEditor) as values:
-	 * e.g. key = "myMethod", value = "PROPAGATION_REQUIRED,readOnly".
-	 * <p>Note: Method names are always applied to the target class,
-	 * no matter if defined in an interface or the class itself.
-	 * <p>Internally, a NameMatchTransactionAttributeSource will be
-	 * created from the given properties.
-	 * @see #setTransactionAttributeSource
-	 * @see TransactionInterceptor#setTransactionAttributes
-	 * @see TransactionAttributeEditor
-	 * @see NameMatchTransactionAttributeSource
-	 */
-	public void setTransactionAttributes(Properties transactionAttributes) {
-		this.transactionInterceptor.setTransactionAttributes(transactionAttributes);
-	}
-
-	/**
-	 * Set the transaction attribute source which is used to find transaction
-	 * attributes. If specifying a String property value, a PropertyEditor
-	 * will create a MethodMapTransactionAttributeSource from the value.
-	 * @see #setTransactionAttributes
-	 * @see TransactionInterceptor#setTransactionAttributeSource
-	 * @see TransactionAttributeSourceEditor
-	 * @see MethodMapTransactionAttributeSource
-	 * @see NameMatchTransactionAttributeSource
-	 * @see org.springframework.transaction.annotation.AnnotationTransactionAttributeSource
-	 */
-	public void setTransactionAttributeSource(TransactionAttributeSource transactionAttributeSource) {
-		this.transactionInterceptor.setTransactionAttributeSource(transactionAttributeSource);
-	}
-
-	/**
-	 * Set a pointcut, i.e a bean that can cause conditional invocation
-	 * of the TransactionInterceptor depending on method and attributes passed.
-	 * Note: Additional interceptors are always invoked.
-	 * @see #setPreInterceptors
-	 * @see #setPostInterceptors
-	 */
-	public void setPointcut(Pointcut pointcut) {
-		this.pointcut = pointcut;
-	}
-
-	/**
-	 * This callback is optional: If running in a BeanFactory and no transaction
-	 * manager has been set explicitly, a single matching bean of type
-	 * {@link PlatformTransactionManager} will be fetched from the BeanFactory.
-	 * @see org.springframework.beans.factory.BeanFactory#getBean(Class)
-	 * @see org.springframework.transaction.PlatformTransactionManager
-	 */
 	public void setBeanFactory(BeanFactory beanFactory) {
 		this.transactionInterceptor.setBeanFactory(beanFactory);
 	}
 
 
-	/**
-	 * Creates an advisor for this FactoryBean's TransactionInterceptor.
-	 */
 	@Override
 	protected Object createMainInterceptor() {
 		this.transactionInterceptor.afterPropertiesSet();
@@ -197,5 +133,23 @@ public class TransactionProxyFactoryBean extends AbstractSingletonProxyFactoryBe
 			return new TransactionAttributeSourceAdvisor(this.transactionInterceptor);
 		}
 	}
+
+
+	// setter ...
+	public void setTransactionManager(PlatformTransactionManager transactionManager) {
+		this.transactionInterceptor.setTransactionManager(transactionManager);
+	}
+	public void setTransactionAttributes(Properties transactionAttributes) {
+		this.transactionInterceptor.setTransactionAttributes(transactionAttributes);
+	}
+	public void setTransactionAttributeSource(TransactionAttributeSource transactionAttributeSource) {
+		this.transactionInterceptor.setTransactionAttributeSource(transactionAttributeSource);
+	}
+	public void setPointcut(Pointcut pointcut) {
+		this.pointcut = pointcut;
+	}
+
+
+
 
 }
