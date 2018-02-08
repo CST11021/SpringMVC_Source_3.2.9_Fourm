@@ -95,10 +95,8 @@ public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 		return (interfaces.length == 0 || (interfaces.length == 1 && SpringProxy.class.equals(interfaces[0])));
 	}
 
-
 	// 在实际创建CGLIB代理时，内部工厂类仅用于引入CGLIB依赖项
 	private static class CglibProxyFactory {
-
 		public static AopProxy createCglibProxy(AdvisedSupport advisedSupport) {
 			return new CglibAopProxy(advisedSupport);
 		}

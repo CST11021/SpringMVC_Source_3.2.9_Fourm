@@ -41,94 +41,24 @@ import org.springframework.util.ClassUtils;
 public abstract class AbstractSingletonProxyFactoryBean extends ProxyConfig
 		implements FactoryBean<Object>, BeanClassLoaderAware, InitializingBean {
 
+	// 要被代理的目标对象
 	private Object target;
-
+	// 要代理的接口
 	private Class<?>[] proxyInterfaces;
-
+	//
 	private Object[] preInterceptors;
 
 	private Object[] postInterceptors;
 
-	/** Default is global AdvisorAdapterRegistry */
+	// Default is global AdvisorAdapterRegistry
 	private AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
-
+	// 表示创建代理对象使用的类加载器
 	private transient ClassLoader proxyClassLoader;
-
+	// 表示代理后的对象
 	private Object proxy;
 
 
-	/**
-	 * Set the target object, that is, the bean to be wrapped with a transactional proxy.
-	 * <p>The target may be any object, in which case a SingletonTargetSource will
-	 * be created. If it is a TargetSource, no wrapper TargetSource is created:
-	 * This enables the use of a pooling or prototype TargetSource etc.
-	 * @see org.springframework.aop.TargetSource
-	 * @see org.springframework.aop.target.SingletonTargetSource
-	 * @see org.springframework.aop.target.LazyInitTargetSource
-	 * @see org.springframework.aop.target.PrototypeTargetSource
-	 * @see org.springframework.aop.target.CommonsPoolTargetSource
-	 */
-	public void setTarget(Object target) {
-		this.target = target;
-	}
-
-	/**
-	 * Specify the set of interfaces being proxied.
-	 * <p>If not specified (the default), the AOP infrastructure works
-	 * out which interfaces need proxying by analyzing the target,
-	 * proxying all the interfaces that the target object implements.
-	 */
-	public void setProxyInterfaces(Class<?>[] proxyInterfaces) {
-		this.proxyInterfaces = proxyInterfaces;
-	}
-
-	/**
-	 * Set additional interceptors (or advisors) to be applied before the
-	 * implicit transaction interceptor, e.g. a PerformanceMonitorInterceptor.
-	 * <p>You may specify any AOP Alliance MethodInterceptors or other
-	 * Spring AOP Advices, as well as Spring AOP Advisors.
-	 * @see org.springframework.aop.interceptor.PerformanceMonitorInterceptor
-	 */
-	public void setPreInterceptors(Object[] preInterceptors) {
-		this.preInterceptors = preInterceptors;
-	}
-
-	/**
-	 * Set additional interceptors (or advisors) to be applied after the
-	 * implicit transaction interceptor.
-	 * <p>You may specify any AOP Alliance MethodInterceptors or other
-	 * Spring AOP Advices, as well as Spring AOP Advisors.
-	 */
-	public void setPostInterceptors(Object[] postInterceptors) {
-		this.postInterceptors = postInterceptors;
-	}
-
-	/**
-	 * Specify the AdvisorAdapterRegistry to use.
-	 * Default is the global AdvisorAdapterRegistry.
-	 * @see org.springframework.aop.framework.adapter.GlobalAdvisorAdapterRegistry
-	 */
-	public void setAdvisorAdapterRegistry(AdvisorAdapterRegistry advisorAdapterRegistry) {
-		this.advisorAdapterRegistry = advisorAdapterRegistry;
-	}
-
-	/**
-	 * Set the ClassLoader to generate the proxy class in.
-	 * <p>Default is the bean ClassLoader, i.e. the ClassLoader used by the
-	 * containing BeanFactory for loading all bean classes. This can be
-	 * overridden here for specific proxies.
-	 */
-	public void setProxyClassLoader(ClassLoader classLoader) {
-		this.proxyClassLoader = classLoader;
-	}
-
-	public void setBeanClassLoader(ClassLoader classLoader) {
-		if (this.proxyClassLoader == null) {
-			this.proxyClassLoader = classLoader;
-		}
-	}
-
-
+	// 设置目标类、增强和代理接口等信息，生成的代理对象也是在该方法中创建的
 	public void afterPropertiesSet() {
 		if (this.target == null) {
 			throw new IllegalArgumentException("Property 'target' is required");
@@ -142,6 +72,7 @@ public abstract class AbstractSingletonProxyFactoryBean extends ProxyConfig
 
 		ProxyFactory proxyFactory = new ProxyFactory();
 
+		// 给代理工厂设置增强信息，将拦截器包装为Advisor
 		if (this.preInterceptors != null) {
 			for (Object interceptor : this.preInterceptors) {
 				proxyFactory.addAdvisor(this.advisorAdapterRegistry.wrap(interceptor));
@@ -173,30 +104,12 @@ public abstract class AbstractSingletonProxyFactoryBean extends ProxyConfig
 
 		this.proxy = proxyFactory.getProxy(this.proxyClassLoader);
 	}
-
-	/**
-	 * Determine a TargetSource for the given target (or TargetSource).
-	 * @param target target. If this is an implementation of TargetSource it is
-	 * used as our TargetSource; otherwise it is wrapped in a SingletonTargetSource.
-	 * @return a TargetSource for this object
-	 */
-	protected TargetSource createTargetSource(Object target) {
-		if (target instanceof TargetSource) {
-			return (TargetSource) target;
-		}
-		else {
-			return new SingletonTargetSource(target);
-		}
-	}
-
-
 	public Object getObject() {
 		if (this.proxy == null) {
 			throw new FactoryBeanNotInitializedException();
 		}
 		return this.proxy;
 	}
-
 	public Class<?> getObjectType() {
 		if (this.proxy != null) {
 			return this.proxy.getClass();
@@ -212,18 +125,49 @@ public abstract class AbstractSingletonProxyFactoryBean extends ProxyConfig
 		}
 		return null;
 	}
-
 	public final boolean isSingleton() {
 		return true;
 	}
 
 
-	/**
-	 * Create the "main" interceptor for this proxy factory bean.
-	 * Typically an Advisor, but can also be any type of Advice.
-	 * <p>Pre-interceptors will be applied before, post-interceptors
-	 * will be applied after this interceptor.
-	 */
+	// 将目标对象包装为一个 TargetSource 为后续代理做准备
+	protected TargetSource createTargetSource(Object target) {
+		if (target instanceof TargetSource) {
+			return (TargetSource) target;
+		}
+		else {
+			return new SingletonTargetSource(target);
+		}
+	}
+	// Create the "main" interceptor for this proxy factory bean.
+	// Typically an Advisor, but can also be any type of Advice.
+	// Pre-interceptors will be applied before, post-interceptors will be applied after this interceptor.
 	protected abstract Object createMainInterceptor();
+
+
+	// setter ...
+	public void setTarget(Object target) {
+		this.target = target;
+	}
+	public void setProxyInterfaces(Class<?>[] proxyInterfaces) {
+		this.proxyInterfaces = proxyInterfaces;
+	}
+	public void setPreInterceptors(Object[] preInterceptors) {
+		this.preInterceptors = preInterceptors;
+	}
+	public void setPostInterceptors(Object[] postInterceptors) {
+		this.postInterceptors = postInterceptors;
+	}
+	public void setAdvisorAdapterRegistry(AdvisorAdapterRegistry advisorAdapterRegistry) {
+		this.advisorAdapterRegistry = advisorAdapterRegistry;
+	}
+	public void setProxyClassLoader(ClassLoader classLoader) {
+		this.proxyClassLoader = classLoader;
+	}
+	public void setBeanClassLoader(ClassLoader classLoader) {
+		if (this.proxyClassLoader == null) {
+			this.proxyClassLoader = classLoader;
+		}
+	}
 
 }

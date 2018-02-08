@@ -30,6 +30,8 @@ import org.springframework.util.Assert;
  * Used internally by the AOP framework; application developers should not need
  * to use this class directly.
  *
+ * 方法的后置增强拦截器，该拦截器内部封装了一个后置强转对象，通过invoke()拦截相应的方法，然后织入增强逻辑实现AOP
+ *
  * @author Rod Johnson
  */
 @SuppressWarnings("serial")
@@ -37,18 +39,16 @@ public class AfterReturningAdviceInterceptor implements MethodInterceptor, After
 
 	private final AfterReturningAdvice advice;
 
-
-	/**
-	 * Create a new AfterReturningAdviceInterceptor for the given advice.
-	 * @param advice the AfterReturningAdvice to wrap
-	 */
 	public AfterReturningAdviceInterceptor(AfterReturningAdvice advice) {
 		Assert.notNull(advice, "Advice must not be null");
 		this.advice = advice;
 	}
 
+	// 执行方法前会调用该方法
 	public Object invoke(MethodInvocation mi) throws Throwable {
+		// 调用目标类方法
 		Object retVal = mi.proceed();
+		// 执行方法的后置增强逻辑
 		this.advice.afterReturning(retVal, mi.getMethod(), mi.getArguments(), mi.getThis());
 		return retVal;
 	}

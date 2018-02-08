@@ -80,6 +80,29 @@ import org.springframework.util.ObjectUtils;
  * do not have the same object identity. However, they do have the same interceptors
  * and target, and changing any reference will change all objects.
  *
+
+ 此类表示被织入增强后的代理类，在Spring中，我们进行要使用 ProxyFactoryBean 来配置一个，被织入增强后的代理类，如：
+
+ <!--要被织入的增强-->
+ <bean id="pmonitor" class="com.whz.aop.advice.ControllablePerformanceMonitor" />
+ <!--被织入的目标类-->
+ <bean id="forumServiceTarget" class="com.whz.aop.advice.ForumService" />
+ <!--被织入增强后的代理类-->
+ <bean id="forumService" class="org.springframework.aop.framework.ProxyFactoryBean"
+ p:interfaces="com.whz.aop.advice.Monitorable"
+ p:target-ref="forumServiceTarget"
+ p:interceptorNames="pmonitor"
+ p:proxyTargetClass="true" />
+
+
+ 此外，要注意，ProxyFactoryBean 是一个工厂Bean，它实现了 FactoryBean 接口，当我们使用如下代码：
+ String configPath = "com/whz/aop/advice/spring-aop.xml";
+ ApplicationContext ctx = new ClassPathXmlApplicationContext(configPath);
+ ForumService forumService = (ForumService)ctx.getBean("forumService");
+
+ 这里获取的 forumService 实例不是一个 ProxyFactoryBean 类型的实例，而是由 ProxyFactoryBean#getObject() 生成的对象实例
+
+
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @see #setInterceptorNames
@@ -88,29 +111,6 @@ import org.springframework.util.ObjectUtils;
  * @see org.springframework.aop.Advisor
  * @see Advised
  */
-/*
-  此类表示被织入增强后的代理类，在Spring中，我们进行要使用 ProxyFactoryBean 来配置一个，被织入增强后的代理类，如：
-
-	<!--要被织入的增强-->
-    <bean id="pmonitor" class="com.whz.aop.advice.ControllablePerformanceMonitor" />
-    <!--被织入的目标类-->
-    <bean id="forumServiceTarget" class="com.whz.aop.advice.ForumService" />
-    <!--被织入增强后的代理类-->
-    <bean id="forumService" class="org.springframework.aop.framework.ProxyFactoryBean"
-          p:interfaces="com.whz.aop.advice.Monitorable"
-          p:target-ref="forumServiceTarget"
-          p:interceptorNames="pmonitor"
-          p:proxyTargetClass="true" />
-
-
-   此外，要注意，ProxyFactoryBean 是一个工厂Bean，它实现了 FactoryBean 接口，当我们使用如下代码：
-   		String configPath = "com/whz/aop/advice/spring-aop.xml";
-        ApplicationContext ctx = new ClassPathXmlApplicationContext(configPath);
-        ForumService forumService = (ForumService)ctx.getBean("forumService");
-
-   这里获取的 forumService 实例不是一个 ProxyFactoryBean 类型的实例，而是由 ProxyFactoryBean#getObject() 生成的对象实例
-
-  */
 @SuppressWarnings("serial")
 public class ProxyFactoryBean extends ProxyCreatorSupport implements FactoryBean<Object>, BeanClassLoaderAware, BeanFactoryAware {
 

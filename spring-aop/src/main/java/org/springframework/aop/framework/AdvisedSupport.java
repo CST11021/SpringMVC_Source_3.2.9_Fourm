@@ -54,13 +54,15 @@ import org.springframework.util.CollectionUtils;
  * <p>This class is serializable; subclasses need not be.
  * This class is used to hold snapshots of proxies.
  *
+ *  AdvisedSupport继承了ProxyConfig并实现了Advised接口，所以AdvisedSupport所承载的信息可以划分为两类：
+ *  一个类是ProxyConfig，记载生成代理对象的控制信息；
+ *  一类是Advised，承载生成代理对象所需要的必要信息，如相关目标类、Advice、Advisor等。
+ *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @see org.springframework.aop.framework.AopProxy
  */
-// AdvisedSupport继承了ProxyConfig并实现了Advised接口，所以AdvisedSupport所承载的信息可以划分为两类：
-// 一个类是ProxyConfig，记载生成代理对象的控制信息；
-// 一类是Advised，承载生成代理对象所需要的必要信息，如相关目标类、Advice、Advisor等。
+
 @SuppressWarnings("unchecked")
 public class AdvisedSupport extends ProxyConfig implements Advised {
 

@@ -23,12 +23,15 @@ import org.springframework.util.Assert;
 /**
  * Convenience superclass for configuration used in creating proxies, to ensure that all proxy creators have consistent properties.
  *
+ * ProxyConfig其实就是一个普通的JavaBean，它定义了5个boolean类型的属性，分别控制在生成代理对象的时候，应该采取哪些行为措施
+ * 该类用于创建代理的配置的方便超类，以确保所有的代理创建者都具有一致的属性。
+ *
+ * 这是一个顶级的配置超类，AOP 的目标类、增强以及切入点配置在其子类 AdvisedSupport 中配置
+ *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @see AdvisedSupport
  */
-// 用于创建代理的配置的方便超类，以确保所有的代理创建者都具有一致的属性。
-// ProxyConfig其实就是一个普通的JavaBean，它定义了5个boolean类型的属性，分别控制在生成代理对象的时候，应该采取哪些行为措施
 public class ProxyConfig implements Serializable {
 	//** use serialVersionUID from Spring 1.2 for interoperability */
 	private static final long serialVersionUID = -8409359707199703185L;
