@@ -266,19 +266,6 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig implements Sm
 
 		return null;
 	}
-	// bean实例化后被调用
-	public boolean postProcessAfterInstantiation(Object bean, String beanName) {
-		return true;
-	}
-	// 在bean包装器将给定的属性值应用到给定的bean之前调用
-	public PropertyValues postProcessPropertyValues(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) {
-
-		return pvs;
-	}
-	// Bean 调用构造函数，实例化之前执行该方法
-	public Object postProcessBeforeInitialization(Object bean, String beanName) {
-		return bean;
-	}
 	// Bean 调用构造函数，实例化之后执行该方法：如果这个bean有匹配到对应的增强，说明这个bean可以被代理，则该方法会返回被代理对象
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		if (bean != null) {
@@ -291,6 +278,22 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig implements Sm
 		}
 		return bean;
 	}
+
+
+	// 不做任何处理：bean实例化后被调用
+	public boolean postProcessAfterInstantiation(Object bean, String beanName) {
+		return true;
+	}
+	// 不做任何处理：在bean包装器将给定的属性值应用到给定的bean之前调用
+	public PropertyValues postProcessPropertyValues(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) {
+
+		return pvs;
+	}
+	// 不做任何处理：Bean 调用构造函数，实例化之前执行该方法
+	public Object postProcessBeforeInitialization(Object bean, String beanName) {
+		return bean;
+	}
+
 
 	// 返回beanClass的全限定类名 + beanName
 	protected Object getCacheKey(Class<?> beanClass, String beanName) {
