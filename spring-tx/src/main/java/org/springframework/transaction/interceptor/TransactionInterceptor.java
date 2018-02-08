@@ -40,6 +40,8 @@ import java.util.Properties;
  *
  * <p>TransactionInterceptors are thread-safe.
  *
+ * 事务拦截器对象，如果目标方法配置了事务，则当目标方法被调用时，会调用invoke()方法织入事务增强代码
+ *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @see TransactionProxyFactoryBean
@@ -62,6 +64,7 @@ public class TransactionInterceptor extends TransactionAspectSupport implements 
 	}
 
 
+	//
 	public Object invoke(final MethodInvocation invocation) throws Throwable {
 		// 返回目标类类型
 		Class<?> targetClass = (invocation.getThis() != null ? AopUtils.getTargetClass(invocation.getThis()) : null);
@@ -69,6 +72,7 @@ public class TransactionInterceptor extends TransactionAspectSupport implements 
 		// Adapt to TransactionAspectSupport's invokeWithinTransaction...
 		return invokeWithinTransaction(invocation.getMethod(), targetClass, new InvocationCallback() {
 			public Object proceedWithInvocation() throws Throwable {
+				// 执行目标方法
 				return invocation.proceed();
 			}
 		});

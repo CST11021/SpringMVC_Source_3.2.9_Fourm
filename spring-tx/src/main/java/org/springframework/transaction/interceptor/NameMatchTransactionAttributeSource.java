@@ -33,6 +33,13 @@ import org.springframework.util.PatternMatchUtils;
  * Simple {@link TransactionAttributeSource} implementation that
  * allows attributes to be matched by registered name.
  *
+ * 该类封装了如下的配置信息：
+	<property name="transactionAttributes">
+		<props>
+			<prop key="saveByConfg1">PROPAGATION_REQUIRED</prop>
+		</props>
+	</property>
+ *
  * @author Juergen Hoeller
  * @since 21.08.2003
  * @see #isMatch
@@ -41,37 +48,33 @@ import org.springframework.util.PatternMatchUtils;
 @SuppressWarnings("serial")
 public class NameMatchTransactionAttributeSource implements TransactionAttributeSource, Serializable {
 
-	/**
-	 * Logger available to subclasses.
-	 * <p>Static for optimal serialization.
-	 */
 	protected static final Log logger = LogFactory.getLog(NameMatchTransactionAttributeSource.class);
 
-	/** Keys are method names; values are TransactionAttributes */
+	/**
+	 KEY：表示方法名；value表示TransactionAttributes对象，Spring配置如下：
+	 <bean id="userServiceTarget" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean"
+		 p:transactionManager-ref="transactionManager"
+		 p:target-ref="userService">
+		 <property name="transactionAttributes">
+			 <props>
+			 	<prop key="saveByConfg1">PROPAGATION_REQUIRED</prop>
+			 </props>
+		 </property>
+	 </bean>
+
+	 这里会将 PROPAGATION_REQUIRED 转为对应的 TransactionAttribute 对象
+	 */
 	private Map<String, TransactionAttribute> nameMap = new HashMap<String, TransactionAttribute>();
 
 
-	/**
-	 * Set a name/attribute map, consisting of method names
-	 * (e.g. "myMethod") and TransactionAttribute instances
-	 * (or Strings to be converted to TransactionAttribute instances).
-	 * @see TransactionAttribute
-	 * @see TransactionAttributeEditor
-	 */
 	public void setNameMap(Map<String, TransactionAttribute> nameMap) {
 		for (Map.Entry<String, TransactionAttribute> entry : nameMap.entrySet()) {
 			addTransactionalMethod(entry.getKey(), entry.getValue());
 		}
 	}
-
-	/**
-	 * Parses the given properties into a name/attribute map.
-	 * Expects method names as keys and String attributes definitions as values,
-	 * parsable into TransactionAttribute instances via TransactionAttributeEditor.
-	 * @see #setNameMap
-	 * @see TransactionAttributeEditor
-	 */
 	public void setProperties(Properties transactionAttributes) {
+		// 这里通过 TransactionAttributeEditor 属性编辑器将 <prop key="saveByConfg1">PROPAGATION_REQUIRED</prop> 配置中的
+		// PROPAGATION_REQUIRED 转为一个 TransactionAttribute 对象
 		TransactionAttributeEditor tae = new TransactionAttributeEditor();
 		Enumeration propNames = transactionAttributes.propertyNames();
 		while (propNames.hasMoreElements()) {
@@ -82,22 +85,12 @@ public class NameMatchTransactionAttributeSource implements TransactionAttribute
 			addTransactionalMethod(methodName, attr);
 		}
 	}
-
-	/**
-	 * Add an attribute for a transactional method.
-	 * <p>Method names can be exact matches, or of the pattern "xxx*",
-	 * "*xxx" or "*xxx*" for matching multiple methods.
-	 * @param methodName the name of the method
-	 * @param attr attribute associated with the method
-	 */
 	public void addTransactionalMethod(String methodName, TransactionAttribute attr) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Adding transactional method [" + methodName + "] with attribute [" + attr + "]");
 		}
 		this.nameMap.put(methodName, attr);
 	}
-
-
 	public TransactionAttribute getTransactionAttribute(Method method, Class<?> targetClass) {
 		// look for direct name match
 		String methodName = method.getName();
@@ -117,16 +110,6 @@ public class NameMatchTransactionAttributeSource implements TransactionAttribute
 
 		return attr;
 	}
-
-	/**
-	 * Return if the given method name matches the mapped name.
-	 * <p>The default implementation checks for "xxx*", "*xxx" and "*xxx*" matches,
-	 * as well as direct equality. Can be overridden in subclasses.
-	 * @param methodName the method name of the class
-	 * @param mappedName the name in the descriptor
-	 * @return if the names match
-	 * @see org.springframework.util.PatternMatchUtils#simpleMatch(String, String)
-	 */
 	protected boolean isMatch(String methodName, String mappedName) {
 		return PatternMatchUtils.simpleMatch(mappedName, methodName);
 	}
@@ -143,12 +126,10 @@ public class NameMatchTransactionAttributeSource implements TransactionAttribute
 		NameMatchTransactionAttributeSource otherTas = (NameMatchTransactionAttributeSource) other;
 		return ObjectUtils.nullSafeEquals(this.nameMap, otherTas.nameMap);
 	}
-
 	@Override
 	public int hashCode() {
 		return NameMatchTransactionAttributeSource.class.hashCode();
 	}
-
 	@Override
 	public String toString() {
 		return getClass().getName() + ": " + this.nameMap;
