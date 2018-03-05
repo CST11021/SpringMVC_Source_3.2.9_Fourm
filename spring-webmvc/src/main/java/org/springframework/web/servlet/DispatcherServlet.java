@@ -422,8 +422,10 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 	private void initMultipartResolver(ApplicationContext context) {
 		try {
-			// 这个bean是在 dispatcherServlet 初始化的时候，通过启动参数<init-param> 读取Spring相关的配置，例如这样的一段bean配置：
-			// <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" p:defaultEncoding="utf-8"/>
+			// 这个bean是在 dispatcherServlet 初始化的时候，通过启动参数<init-param> 读取Spring相关的配置，例如这样的一段
+			// bean配置：
+			// <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"
+			// p:defaultEncoding="utf-8"/>
 			this.multipartResolver = context.getBean(MULTIPART_RESOLVER_BEAN_NAME, MultipartResolver.class);
 			if (logger.isDebugEnabled()) {
 				logger.debug("Using MultipartResolver [" + this.multipartResolver + "]");
@@ -440,7 +442,8 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 	private void initLocaleResolver(ApplicationContext context) {
 		try {
-			// 尝试去获取"localeResolver"这个bean，如果没有这个bean（我们没有配置这个bean）,则会在异常如理中使用默认的 区域解析器
+			// 尝试去获取"localeResolver"这个bean，如果没有这个bean（我们没有配置这个bean）,则会在异常处理中使用默认的区
+			// 域解析器
 			this.localeResolver = context.getBean(LOCALE_RESOLVER_BEAN_NAME, LocaleResolver.class);
 			if (logger.isDebugEnabled()) {
 				logger.debug("Using LocaleResolver [" + this.localeResolver + "]");
@@ -782,7 +785,8 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 		}
 	}
-	// 所有请求最后都交由doDispatch()方法来处理，doDispatch()负责转发请求，将请求交给对应的处理器进行处理，调用getHandler来相应HTTP请求，然后通过执行Handler的处理方法来得到返回的 ModelAndView 结果，最后把这个ModelAndView对象交给相应的试图对象去呈现。
+	// 所有请求最后都交由doDispatch()方法来处理，doDispatch()负责转发请求，将请求交给对应的处理器进行处理，调用getHandler
+	// 来相应HTTP请求，然后通过执行Handler的处理方法来得到返回的 ModelAndView 结果，最后把这个ModelAndView对象交给相应的试图对象去呈现。
 	// 在这里，可以看到MVC模式核心的实现，同时，也是在这里完成了模型、试图和控制器的紧密结合
 	protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		HttpServletRequest processedRequest = request;
@@ -800,7 +804,8 @@ public class DispatcherServlet extends FrameworkServlet {
 
 			try {
 				// 优先判断一下是不是文件上传的 request
-				// 对于请求的处理，Spring首先考虑的是对于Multipart的处理，如果是MultipartContent类型的Request，则转换request为MultipartHttpServletRequest类型的request
+				// 对于请求的处理，Spring首先考虑的是对于Multipart的处理，如果是MultipartContent类型的Request，则转换
+				// request为MultipartHttpServletRequest类型的request
 				processedRequest = checkMultipart(request);
 				// 是否真的转换:multipartRequestParsed 为 true 的话，说明已经做了转换
 				multipartRequestParsed = processedRequest != request;
@@ -833,7 +838,8 @@ public class DispatcherServlet extends FrameworkServlet {
 					}
 				}
 
-				// 执行HandlerExecutionChain所有Interceptor中的preHandle方法，一旦有一个返回了false那么请求就不进行继续处理，这也是为什么 preHandle 返回了false就可以拦截用户继续执行了
+				// 执行HandlerExecutionChain所有Interceptor中的preHandle方法，一旦有一个返回了false那么请求就不进行继续
+				// 处理，这也是为什么 preHandle 返回了false就可以拦截用户继续执行了
 				if (!mappedHandler.applyPreHandle(processedRequest, response)) {
 					return;
 				}
@@ -852,7 +858,8 @@ public class DispatcherServlet extends FrameworkServlet {
 
 				// 校验是否添加了视图，如果没有视图就会添加一个默认的视图，通过url的规则来拼凑
 				applyDefaultViewName(request, mv);
-				// 当执行完Handler相对应的处理方法（即Controller中对应的方法）后，需要执行一些的拦截器，这块逻辑是执行HandlerExecutionChain所有Interceptor中的postHandle方法
+				// 当执行完Handler相对应的处理方法（即Controller中对应的方法）后，需要执行一些的拦截器，这块逻辑是执行
+				// HandlerExecutionChain所有Interceptor中的postHandle方法
 				mappedHandler.applyPostHandle(processedRequest, response, mv);
 			}
 			catch (Exception ex) {

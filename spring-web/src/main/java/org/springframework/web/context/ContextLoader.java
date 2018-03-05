@@ -98,9 +98,11 @@ public class ContextLoader {
 
 	/* --------------- 初始化一个 WebApplicationContext 容器 ------------------------------------------------------------------------------------------------ */
 
-	// 系统启动时调用该方法，并传入ServletContext,初始化完WebApplicationContext后，将WebApplicationContext实例存在servletContext中，以供全局访问
+	// 系统启动时调用该方法，并传入ServletContext,初始化完WebApplicationContext后，将WebApplicationContext实例存在
+	// servletContext中，以供全局访问
 	public WebApplicationContext initWebApplicationContext(ServletContext servletContext) {
-		// web.xml中存在多次ContextLoader定义时，则抛出异常（initWebApplicationContext方法是启动Spring容器的入口，我们不允许在还没有加载Spring容器就已经存在了Spring容器实例）
+		// web.xml中存在多次ContextLoader定义时，则抛出异常（initWebApplicationContext方法是启动Spring容器的入口，我们不
+		// 允许在还没有加载Spring容器就已经存在了Spring容器实例）
 		if (servletContext.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE) != null) {
 			throw new IllegalStateException("Cannot initialize context because there is already a root application context present - " + "check whether you have multiple ContextLoader* definitions in your web.xml!");
 		}
@@ -134,13 +136,14 @@ public class ContextLoader {
 				}
 			}
 
-			// 第二步：将context记录在servletContext中，以便于 DispatcherServlet 可以通过 getServletContext().getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE) 来获取实例
+			// 第二步：将context记录在servletContext中，以便于 DispatcherServlet 可以通过
+			// getServletContext().getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE) 来获取实例
 			servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, this.context);
 
 			// 第三步：将Spring容器记录到全局变量中
 			ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 			if (ccl == ContextLoader.class.getClassLoader()) {
-				// 情况下，程序会进入到这里
+				// 一般情况下，程序会进入到这里
 				// 这里涉及到 “Thread.currentThread().getContextClassLoader()”与“ContextLoader.class.getClassLoader()”的区别的一个知识点
 				currentContext = this.context;
 			}

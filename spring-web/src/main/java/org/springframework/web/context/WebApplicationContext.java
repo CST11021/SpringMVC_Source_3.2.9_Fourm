@@ -53,36 +53,34 @@ public interface WebApplicationContext extends ApplicationContext {
 	 */
 	String ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE = WebApplicationContext.class.getName() + ".ROOT";
 
+
 	/**
 	 * Scope identifier for request scope: "request".
 	 * Supported in addition to the standard scopes "singleton" and "prototype".
 	 */
 	String SCOPE_REQUEST = "request";
-
 	/**
 	 * Scope identifier for session scope: "session".
 	 * Supported in addition to the standard scopes "singleton" and "prototype".
 	 */
 	String SCOPE_SESSION = "session";
-
 	/**
 	 * Scope identifier for global session scope: "globalSession".
 	 * Supported in addition to the standard scopes "singleton" and "prototype".
 	 */
 	String SCOPE_GLOBAL_SESSION = "globalSession";
-
 	/**
 	 * Scope identifier for the global web application scope: "application".
 	 * Supported in addition to the standard scopes "singleton" and "prototype".
 	 */
 	String SCOPE_APPLICATION = "application";
 
+
 	/**
 	 * Name of the ServletContext environment bean in the factory.
 	 * @see javax.servlet.ServletContext
 	 */
 	String SERVLET_CONTEXT_BEAN_NAME = "servletContext";
-
 	/**
 	 * Name of the ServletContext/PortletContext init-params environment bean in the factory.
 	 * <p>Note: Possibly merged with ServletConfig/PortletConfig parameters.
@@ -93,7 +91,6 @@ public interface WebApplicationContext extends ApplicationContext {
 	 * @see javax.servlet.ServletConfig#getInitParameter(String)
 	 */
 	String CONTEXT_PARAMETERS_BEAN_NAME = "contextParameters";
-
 	/**
 	 * Name of the ServletContext/PortletContext attributes environment bean in the factory.
 	 * @see javax.servlet.ServletContext#getAttributeNames()

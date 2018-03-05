@@ -6,18 +6,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ThreadPoolService {
 
 	private static int capacity = 20;
+	// 表示线程池维护线程的最少数量
 	private static int minimumPoolSize = 100;
+	// 表示线程池维护线程的最大数量
 	private static int maximumPoolSize = 100;
 	private static String taskName = "Worker";
 
-//	minimumPoolSize： 线程池维护线程的最少数量
-//	maximumPoolSize：线程池维护线程的最大数量
-//	keepAliveTime： 线程池维护线程所允许的空闲时间
-//	unit： 线程池维护线程所允许的空闲时间的单位
-//	workQueue： 线程池所使用的缓冲队列
-//	handler： 线程池对拒绝任务的处理策略
-	private static ThreadPoolExecutor executor = new ThreadPoolExecutor(
-			minimumPoolSize, maximumPoolSize, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new DefaultThreadFactory());
+	//	minimumPoolSize： 线程池维护线程的最少数量
+	//	maximumPoolSize：线程池维护线程的最大数量
+	//	keepAliveTime： 线程池维护线程所允许的空闲时间
+	//	unit： 线程池维护线程所允许的空闲时间的单位
+	//	workQueue： 线程池所使用的缓冲队列
+	//	handler： 线程池对拒绝任务的处理策略
+	private static ThreadPoolExecutor executor = new ThreadPoolExecutor(minimumPoolSize, maximumPoolSize, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new DefaultThreadFactory());
 
 	private static ThreadPoolService instance = new ThreadPoolService(capacity, minimumPoolSize, maximumPoolSize, taskName, executor);
 

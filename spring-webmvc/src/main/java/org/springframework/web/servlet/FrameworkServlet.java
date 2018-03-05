@@ -101,7 +101,8 @@ public abstract class FrameworkServlet extends HttpServletBean {
 
 	/* -------------初始化 WebApplicationContext ----------------------------------------------------------------------------------------------------- */
 
-	// 覆盖 HttpServletBean 中的方法，该方法设计了计时器来统计初始化的执行时间，而且提供了一个扩展方法 initFrameworkServlet() 用于子类的覆盖操作，而作为关键的初始化逻辑实现委托给了 initWebApplicationContext()方法
+	// 覆盖 HttpServletBean 中的方法，该方法设计了计时器来统计初始化的执行时间，而且提供了一个扩展方法 initFrameworkServlet()
+	// 用于子类的覆盖操作，而作为关键的初始化逻辑实现委托给了 initWebApplicationContext()方法
 	@Override
 	protected final void initServletBean() throws ServletException {
 		getServletContext().log("Initializing Spring FrameworkServlet '" + getServletName() + "'");
@@ -345,7 +346,8 @@ public abstract class FrameworkServlet extends HttpServletBean {
 			processRequest(request, response);
 		}
 		else {
-			super.service(request, response);//交由父类根据请求类型进行处理，因为FrameworkServlet重写了doGet，doPost等方法，所以最后的处理实现还是在FrameworkServlet中实现
+			//交由父类根据请求类型进行处理，因为FrameworkServlet重写了doGet，doPost等方法，所以最后的处理实现还是在FrameworkServlet中实现
+			super.service(request, response);
 		}
 	}
 	@Override
