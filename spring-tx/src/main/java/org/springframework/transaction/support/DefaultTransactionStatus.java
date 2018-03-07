@@ -49,15 +49,10 @@ import org.springframework.transaction.SavepointManager;
 public class DefaultTransactionStatus extends AbstractTransactionStatus {
 
 	private final Object transaction;
-
 	private final boolean newTransaction;
-
 	private final boolean newSynchronization;
-
 	private final boolean readOnly;
-
 	private final boolean debug;
-
 	private final Object suspendedResources;
 
 

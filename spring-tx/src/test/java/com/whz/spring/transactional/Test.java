@@ -86,7 +86,6 @@ public class Test {
 
         PlatformTransactionManager tran = new DataSourceTransactionManager(datasource);// 事务管理器
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();// 事务定义类
-        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);// 设置事务传播级别
         TransactionStatus status = tran.getTransaction(def);// 返回事务对象
         try {
             userService.saveWithoutTransaction(zhangsanUser);

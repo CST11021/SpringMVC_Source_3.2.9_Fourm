@@ -38,11 +38,7 @@ public interface TransactionAttribute extends TransactionDefinition {
 	 */
 	String getQualifier();
 
-	/**
-	 * Should we roll back on the given exception?
-	 * @param ex the exception to evaluate
-	 * @return whether to perform a rollback or not
-	 */
+	// 指定的异常发生时，事务是否回滚
 	boolean rollbackOn(Throwable ex);
 
 }

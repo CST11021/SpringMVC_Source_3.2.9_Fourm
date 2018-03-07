@@ -240,7 +240,7 @@ public class CciLocalTransactionManager extends AbstractPlatformTransactionManag
 	protected void doCleanupAfterCompletion(Object transaction) {
 		CciLocalTransactionObject txObject = (CciLocalTransactionObject) transaction;
 
-		// Remove the connection holder from the thread.
+		// 将数据库连接从当前线程中解除绑定
 		TransactionSynchronizationManager.unbindResource(getConnectionFactory());
 		txObject.getConnectionHolder().clear();
 
@@ -248,6 +248,7 @@ public class CciLocalTransactionManager extends AbstractPlatformTransactionManag
 		if (logger.isDebugEnabled()) {
 			logger.debug("Releasing CCI Connection [" + con + "] after transaction");
 		}
+		// 释放连接
 		ConnectionFactoryUtils.releaseConnection(con, getConnectionFactory());
 	}
 

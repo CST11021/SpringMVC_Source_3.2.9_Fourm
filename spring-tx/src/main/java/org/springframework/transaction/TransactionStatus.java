@@ -36,24 +36,10 @@ package org.springframework.transaction;
  */
 public interface TransactionStatus extends SavepointManager {
 
-	/**
-	 * Return whether the present transaction is new (else participating
-	 * in an existing transaction, or potentially not running in an
-	 * actual transaction in the first place).
-	 */
+	// 是否是一个新的事务
 	boolean isNewTransaction();
 
-	/**
-	 * Return whether this transaction internally carries a savepoint,
-	 * that is, has been created as nested transaction based on a savepoint.
-	 * <p>This method is mainly here for diagnostic purposes, alongside
-	 * {@link #isNewTransaction()}. For programmatic handling of custom
-	 * savepoints, use SavepointManager's operations.
-	 * @see #isNewTransaction()
-	 * @see #createSavepoint
-	 * @see #rollbackToSavepoint(Object)
-	 * @see #releaseSavepoint(Object)
-	 */
+	// 是否有回滚的保存点
 	boolean hasSavepoint();
 
 	/**
@@ -81,12 +67,7 @@ public interface TransactionStatus extends SavepointManager {
 	 */
 	void flush();
 
-	/**
-	 * Return whether this transaction is completed, that is,
-	 * whether it has already been committed or rolled back.
-	 * @see PlatformTransactionManager#commit
-	 * @see PlatformTransactionManager#rollback
-	 */
+	// 判断事务是否已经完成，比如已提交或已经回滚
 	boolean isCompleted();
 
 }

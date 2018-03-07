@@ -31,66 +31,25 @@ public class DefaultTransactionAttribute extends DefaultTransactionDefinition im
 	private String qualifier;
 
 
-	/**
-	 * Create a new DefaultTransactionAttribute, with default settings.
-	 * Can be modified through bean property setters.
-	 * @see #setPropagationBehavior
-	 * @see #setIsolationLevel
-	 * @see #setTimeout
-	 * @see #setReadOnly
-	 * @see #setName
-	 */
 	public DefaultTransactionAttribute() {
 		super();
 	}
-
-	/**
-	 * Copy constructor. Definition can be modified through bean property setters.
-	 * @see #setPropagationBehavior
-	 * @see #setIsolationLevel
-	 * @see #setTimeout
-	 * @see #setReadOnly
-	 * @see #setName
-	 */
 	public DefaultTransactionAttribute(TransactionAttribute other) {
 		super(other);
 	}
-
-	/**
-	 * Create a new DefaultTransactionAttribute with the the given
-	 * propagation behavior. Can be modified through bean property setters.
-	 * @param propagationBehavior one of the propagation constants in the
-	 * TransactionDefinition interface
-	 * @see #setIsolationLevel
-	 * @see #setTimeout
-	 * @see #setReadOnly
-	 */
 	public DefaultTransactionAttribute(int propagationBehavior) {
 		super(propagationBehavior);
 	}
 
-
-	/**
-	 * Associate a qualifier value with this transaction attribute.
-	 * <p>This may be used for choosing a corresponding transaction manager
-	 * to process this specific transaction.
-	 */
+	
 	public void setQualifier(String qualifier) {
 		this.qualifier = qualifier;
 	}
-
-	/**
-	 * Return a qualifier value associated with this transaction attribute.
-	 */
 	public String getQualifier() {
 		return this.qualifier;
 	}
 
-	/**
-	 * The default behavior is as with EJB: rollback on unchecked exception.
-	 * Additionally attempt to rollback on Error.
-	 * <p>This is consistent with TransactionTemplate's default behavior.
-	 */
+	// 指定的异常发生时，事务是否回滚
 	public boolean rollbackOn(Throwable ex) {
 		return (ex instanceof RuntimeException || ex instanceof Error);
 	}

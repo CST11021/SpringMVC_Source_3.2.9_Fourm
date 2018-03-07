@@ -84,12 +84,7 @@ public abstract class TransactionSynchronizationUtils {
 		}
 	}
 
-	/**
-	 * Trigger {@code beforeCommit} callbacks on all currently registered synchronizations.
-	 * @param readOnly whether the transaction is defined as read-only transaction
-	 * @throws RuntimeException if thrown by a {@code beforeCommit} callback
-	 * @see TransactionSynchronization#beforeCommit(boolean)
-	 */
+	// 事务提交前被调用
 	public static void triggerBeforeCommit(boolean readOnly) {
 		for (TransactionSynchronization synchronization : TransactionSynchronizationManager.getSynchronizations()) {
 			synchronization.beforeCommit(readOnly);

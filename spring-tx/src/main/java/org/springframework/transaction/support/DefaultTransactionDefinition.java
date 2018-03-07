@@ -36,13 +36,28 @@ import org.springframework.transaction.TransactionDefinition;
 @SuppressWarnings("serial")
 public class DefaultTransactionDefinition implements TransactionDefinition, Serializable {
 
-	//** Prefix for the propagation constants defined in TransactionDefinition */
+	/** 定义事务隔离界别的前缀：
+	 Propagation_Required：如果上下文存在事务，那么就加入到事务中执行，否则新建事务执行（这个级别通常能满足处理大多数的业务场景，是默认的spring事务传播级别）。
+	 Propagation_Supports：如果上下文存在事务，则支持事务加入事务，否则使用非事务的方式执行（所以说，并非所有的包在transactionTemplate.execute中的代码都会有事务支持。这个通常是用来处理那些并非原子性的非核心业务逻辑操作。应用场景较少）。
+	 Propagation_Mandatory：该级别的事务要求上下文中必须要存在事务，否则就会抛出异常（配置该方式的传播级别是有效的控制上下文调用代码遗漏添加事务控制的保证手段。比如一段代码不能单独被调用执行，但是一旦被调用，就必须有事务包含的情况）。
+	 Propagation_Requires_New：每次都会新建一个事务，并且同时将上下文中的事务挂起，执行当前新建事务完成以后，上下文事务恢复再执行。
+	 Propagation_Not_Supported：以非事务方式执行操作，如果当前存在事务，就把当前事务挂起。
+	 Propagation_Never：以非事务方式执行，如果当前存在事务，则抛出异常。
+	 Propagation_Nested：如果上下文中存在事务，则嵌套事务执行，如果不存在事务，则新建事务。*/
 	public static final String PREFIX_PROPAGATION = "PROPAGATION_";
-	//** Prefix for the isolation constants defined in TransactionDefinition */
+
+	/** 定义事务传播级别的前缀：
+	 Isolation_Read_Uncommited读未提交数据
+	 Isolation_Read Commited读以提交数据
+	 Isolation_Repeatable Read可重复读
+	 Isolation_Serializable 串行化
+	 Isolation_Default使用底层数据库的默认隔离解蔽*/
 	public static final String PREFIX_ISOLATION = "ISOLATION_";
-	//** Prefix for transaction timeout values in description strings */
+
+	/** 描述事务超时时间的前缀 */
 	public static final String PREFIX_TIMEOUT = "timeout_";
-	//** Marker for read-only transactions in description strings */
+
+	/** 用于标记事务只读 */
 	public static final String READ_ONLY_MARKER = "readOnly";
 
 
@@ -153,7 +168,6 @@ public class DefaultTransactionDefinition implements TransactionDefinition, Seri
 		}
 		return result;
 	}
-
 	@Override
 	public boolean equals(Object other) {
 		return (other instanceof TransactionDefinition && toString().equals(other.toString()));

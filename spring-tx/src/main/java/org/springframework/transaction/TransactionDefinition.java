@@ -19,29 +19,6 @@ package org.springframework.transaction;
 import java.sql.Connection;
 
 /**
- * Interface that defines Spring-compliant transaction properties.
- * Based on the propagation behavior definitions analogous to EJB CMT attributes.
- *
- * <p>Note that isolation level and timeout settings will not get applied unless
- * an actual new transaction gets started. As only {@link #PROPAGATION_REQUIRED},
- * {@link #PROPAGATION_REQUIRES_NEW} and {@link #PROPAGATION_NESTED} can cause
- * that, it usually doesn't make sense to specify those settings in other cases.
- * Furthermore, be aware that not all transaction managers will support those
- * advanced features and thus might throw corresponding exceptions when given
- * non-default values.
- *
- * <p>The {@link #isReadOnly() read-only flag} applies to any transaction context,
- * whether backed by an actual resource transaction or operating non-transactionally
- * at the resource level. In the latter case, the flag will only apply to managed
- * resources within the application, such as a Hibernate {@code Session}.
- *
- * @author Juergen Hoeller
- * @since 08.05.2003
- * @see PlatformTransactionManager#getTransaction(TransactionDefinition)
- * @see org.springframework.transaction.support.DefaultTransactionDefinition
- * @see org.springframework.transaction.interceptor.TransactionAttribute
- */
-/*
 	一个数据库可能拥有多个客户端，这些客户端以并发的方式访问数据库。数据库中的相同数据可能同时被多个事务访问，如果没有采
 取必要的隔离措施，就会导致各种并发问题，这些并发问题归结为5类，包括3类数据读取问题和2类数据更新问题：
 
@@ -89,7 +66,7 @@ public interface TransactionDefinition {
 	int PROPAGATION_NOT_SUPPORTED = 4;
 	int PROPAGATION_NEVER = 5;
 	int PROPAGATION_NESTED = 6;
-	/* ---------------- Spring中的7种事务传播级别 ---------------- */
+
 
 	
 	
@@ -104,7 +81,7 @@ public interface TransactionDefinition {
 	int ISOLATION_REPEATABLE_READ = Connection.TRANSACTION_REPEATABLE_READ;
 	// 事务界别最高，5种并发事务问题都不会出现
 	int ISOLATION_SERIALIZABLE = Connection.TRANSACTION_SERIALIZABLE;
-	/* ---------------- Spring中5种事务隔离级别 ------------------------------------ */
+
 
 	// Use the default timeout of the underlying transaction system,or none if timeouts are not supported.
 	int TIMEOUT_DEFAULT = -1;
