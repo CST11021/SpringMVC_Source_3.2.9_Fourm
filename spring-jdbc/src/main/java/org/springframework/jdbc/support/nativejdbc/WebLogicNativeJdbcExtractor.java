@@ -29,7 +29,7 @@ import org.springframework.util.ReflectionUtils;
  * <p>Returns the underlying native Connection to application code instead
  * of WebLogic's wrapper implementation; unwraps the Connection for native
  * statements. The returned JDBC classes can then safely be cast, e.g. to
- * {@code oracle.jdbc.OracleConnection}.
+ * {@code oracle.com.whz.spring.jdbc.OracleConnection}.
  *
  * <p>This NativeJdbcExtractor can be set just to <i>allow</i> working
  * with a WebLogic DataSource: If a given object is not a WebLogic
@@ -43,7 +43,7 @@ import org.springframework.util.ReflectionUtils;
  */
 public class WebLogicNativeJdbcExtractor extends NativeJdbcExtractorAdapter {
 
-	private static final String JDBC_EXTENSION_NAME = "weblogic.jdbc.extensions.WLConnection";
+	private static final String JDBC_EXTENSION_NAME = "weblogic.com.whz.spring.jdbc.extensions.WLConnection";
 
 
 	private final Class jdbcExtensionClass;

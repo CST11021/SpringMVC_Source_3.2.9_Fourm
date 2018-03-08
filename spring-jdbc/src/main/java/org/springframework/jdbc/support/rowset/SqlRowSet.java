@@ -33,7 +33,7 @@ import org.springframework.jdbc.InvalidResultSetAccessException;
  * <p>The main difference to the standard JDBC RowSet is that an SQLException
  * is never thrown here. This allows a SqlRowSet to be used without having
  * to deal with checked exceptions. A SqlRowSet will throw Spring's
- * {@code org.springframework.jdbc.InvalidResultSetAccessException}
+ * {@code org.springframework.com.whz.spring.jdbc.InvalidResultSetAccessException}
  * instead (when appropriate).
  *
  * <p>Note: This interface extends the {@code java.io.Serializable}

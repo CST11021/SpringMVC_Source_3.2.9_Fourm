@@ -54,7 +54,7 @@ final class H2EmbeddedDatabaseConfigurer extends AbstractEmbeddedDatabaseConfigu
 
 	public void configureConnectionProperties(ConnectionProperties properties, String databaseName) {
 		properties.setDriverClass(this.driverClass);
-		properties.setUrl(String.format("jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1", databaseName));
+		properties.setUrl(String.format("com.whz.spring.jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1", databaseName));
 		properties.setUsername("sa");
 		properties.setPassword("");
 	}

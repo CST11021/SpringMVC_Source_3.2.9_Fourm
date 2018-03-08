@@ -34,7 +34,7 @@ import java.sql.SQLException;
  *
  * <p>Alternatively, consider subclassing
  * {@link org.springframework.jdbc.object.MappingSqlQuery} from the
- * {@code jdbc.object} package: Instead of working with separate
+ * {@code com.whz.spring.jdbc.object} package: Instead of working with separate
  * JdbcTemplate and RowMapper objects, you can build executable query
  * objects (containing row-mapping logic) in that style.
  *

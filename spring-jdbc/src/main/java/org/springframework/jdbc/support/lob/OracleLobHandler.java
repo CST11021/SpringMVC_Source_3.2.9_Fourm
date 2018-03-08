@@ -64,7 +64,7 @@ import org.springframework.util.FileCopyUtils;
  * See the {@link LobHandler} interface javadoc for a summary of recommendations.
  *
  * <p>Needs to work on a native JDBC Connection, to be able to cast it to
- * {@code oracle.jdbc.OracleConnection}. If you pass in Connections from a
+ * {@code oracle.com.whz.spring.jdbc.OracleConnection}. If you pass in Connections from a
  * connection pool (the usual case in a Java EE environment), you need to set an
  * appropriate {@link org.springframework.jdbc.support.nativejdbc.NativeJdbcExtractor}
  * to allow for automatic retrieval of the underlying native JDBC Connection.
@@ -124,7 +124,7 @@ public class OracleLobHandler extends AbstractLobHandler {
 
 	/**
 	 * Set an appropriate NativeJdbcExtractor to be able to retrieve the underlying
-	 * native {@code oracle.jdbc.OracleConnection}. This is necessary for
+	 * native {@code oracle.com.whz.spring.jdbc.OracleConnection}. This is necessary for
 	 * DataSource-based connection pools, as those need to return wrapped JDBC
 	 * Connection handles that cannot be cast to a native Connection implementation.
 	 * <p>Effectively, this LobHandler just invokes a single NativeJdbcExtractor
@@ -135,7 +135,7 @@ public class OracleLobHandler extends AbstractLobHandler {
 	 * (which is what OracleLobHandler needs) will work with many connection pools.
 	 * See {@code SimpleNativeJdbcExtractor} and
 	 * <a href="http://download.oracle.com/otn_hosted_doc/jdeveloper/905/jdbc-javadoc/oracle/jdbc/OracleConnection.html">
-	 * oracle.jdbc.OracleConnection</a> javadoc for details.
+	 * oracle.com.whz.spring.jdbc.OracleConnection</a> javadoc for details.
 	 * @see org.springframework.jdbc.support.nativejdbc.NativeJdbcExtractor#getNativeConnectionFromStatement
 	 * @see org.springframework.jdbc.support.nativejdbc.SimpleNativeJdbcExtractor
 	 * @see org.springframework.jdbc.support.nativejdbc.OracleJdbc4NativeJdbcExtractor
@@ -526,7 +526,7 @@ public class OracleLobHandler extends AbstractLobHandler {
 				}
 				else if (con != null && ex.getTargetException() instanceof ClassCastException) {
 					throw new InvalidDataAccessApiUsageException(
-							"OracleLobCreator needs to work on [oracle.jdbc.OracleConnection], not on [" +
+							"OracleLobCreator needs to work on [oracle.com.whz.spring.jdbc.OracleConnection], not on [" +
 							con.getClass().getName() + "]: specify a corresponding NativeJdbcExtractor",
 							ex.getTargetException());
 				}

@@ -26,11 +26,11 @@ import java.sql.Statement;
  * A {@link Jdbc4NativeJdbcExtractor} which comes pre-configured for Oracle's JDBC driver,
  * specifying the following vendor-specific API types for unwrapping:
  * <ul>
- * <li>{@code oracle.jdbc.OracleConnection}
- * <li>{@code oracle.jdbc.OracleStatement}
- * <li>{@code oracle.jdbc.OraclePreparedStatement}
- * <li>{@code oracle.jdbc.OracleCallableStatement}
- * <li>{@code oracle.jdbc.OracleResultSet}
+ * <li>{@code oracle.com.whz.spring.jdbc.OracleConnection}
+ * <li>{@code oracle.com.whz.spring.jdbc.OracleStatement}
+ * <li>{@code oracle.com.whz.spring.jdbc.OraclePreparedStatement}
+ * <li>{@code oracle.com.whz.spring.jdbc.OracleCallableStatement}
+ * <li>{@code oracle.com.whz.spring.jdbc.OracleResultSet}
  * </ul>
  *
  * <p>Note: This will work with any JDBC 4.0 compliant connection pool, without a need for
@@ -45,11 +45,11 @@ public class OracleJdbc4NativeJdbcExtractor extends Jdbc4NativeJdbcExtractor {
 	@SuppressWarnings("unchecked")
 	public OracleJdbc4NativeJdbcExtractor() {
 		try {
-			setConnectionType((Class<Connection>) getClass().getClassLoader().loadClass("oracle.jdbc.OracleConnection"));
-			setStatementType((Class<Statement>) getClass().getClassLoader().loadClass("oracle.jdbc.OracleStatement"));
-			setPreparedStatementType((Class<PreparedStatement>) getClass().getClassLoader().loadClass("oracle.jdbc.OraclePreparedStatement"));
-			setCallableStatementType((Class<CallableStatement>) getClass().getClassLoader().loadClass("oracle.jdbc.OracleCallableStatement"));
-			setResultSetType((Class<ResultSet>) getClass().getClassLoader().loadClass("oracle.jdbc.OracleResultSet"));
+			setConnectionType((Class<Connection>) getClass().getClassLoader().loadClass("oracle.com.whz.spring.jdbc.OracleConnection"));
+			setStatementType((Class<Statement>) getClass().getClassLoader().loadClass("oracle.com.whz.spring.jdbc.OracleStatement"));
+			setPreparedStatementType((Class<PreparedStatement>) getClass().getClassLoader().loadClass("oracle.com.whz.spring.jdbc.OraclePreparedStatement"));
+			setCallableStatementType((Class<CallableStatement>) getClass().getClassLoader().loadClass("oracle.com.whz.spring.jdbc.OracleCallableStatement"));
+			setResultSetType((Class<ResultSet>) getClass().getClassLoader().loadClass("oracle.com.whz.spring.jdbc.OracleResultSet"));
 		}
 		catch (Exception ex) {
 			throw new IllegalStateException(

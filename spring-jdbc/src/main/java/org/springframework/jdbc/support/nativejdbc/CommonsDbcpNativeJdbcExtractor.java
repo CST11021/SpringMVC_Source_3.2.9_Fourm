@@ -33,7 +33,7 @@ import org.springframework.util.ReflectionUtils;
  *
  * <p>Returns the underlying native Connection, Statement, etc to application
  * code instead of DBCP's wrapper implementations. The returned JDBC classes
- * can then safely be cast, e.g. to {@code oracle.jdbc.OracleConnection}.
+ * can then safely be cast, e.g. to {@code oracle.com.whz.spring.jdbc.OracleConnection}.
  *
  * <p>This NativeJdbcExtractor can be set just to <i>allow</i> working with a
  * Commons DBCP DataSource: If a given object is not a Commons DBCP wrapper,

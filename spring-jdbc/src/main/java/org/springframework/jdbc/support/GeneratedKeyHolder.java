@@ -30,7 +30,7 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
  *
  * <p>Create an instance of this class for each insert operation, and pass
  * it to the corresponding {@link org.springframework.jdbc.core.JdbcTemplate}
- * or {org.springframework.jdbc.object.SqlUpdate} methods.
+ * or {org.springframework.com.whz.spring.jdbc.object.SqlUpdate} methods.
  *
  * @author Thomas Risberg
  * @author Juergen Hoeller

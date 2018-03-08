@@ -1,4 +1,4 @@
-http\://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd=org/springframework/jdbc/config/spring-jdbc-3.0.xsd
-http\://www.springframework.org/schema/jdbc/spring-jdbc-3.1.xsd=org/springframework/jdbc/config/spring-jdbc-3.1.xsd
-http\://www.springframework.org/schema/jdbc/spring-jdbc-3.2.xsd=org/springframework/jdbc/config/spring-jdbc-3.2.xsd
-http\://www.springframework.org/schema/jdbc/spring-jdbc.xsd=org/springframework/jdbc/config/spring-jdbc-3.2.xsd
+http\://www.springframework.org/schema/com.whz.spring.jdbc/spring-com.whz.spring.jdbc-3.0.xsd=org/springframework/com.whz.spring.jdbc/config/spring-com.whz.spring.jdbc-3.0.xsd
+http\://www.springframework.org/schema/com.whz.spring.jdbc/spring-com.whz.spring.jdbc-3.1.xsd=org/springframework/com.whz.spring.jdbc/config/spring-com.whz.spring.jdbc-3.1.xsd
+http\://www.springframework.org/schema/com.whz.spring.jdbc/spring-com.whz.spring.jdbc-3.2.xsd=org/springframework/com.whz.spring.jdbc/config/spring-com.whz.spring.jdbc-3.2.xsd
+http\://www.springframework.org/schema/com.whz.spring.jdbc/spring-com.whz.spring.jdbc.xsd=org/springframework/com.whz.spring.jdbc/config/spring-com.whz.spring.jdbc-3.2.xsd

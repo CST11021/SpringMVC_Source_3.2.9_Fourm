@@ -14,7 +14,7 @@
 	-->
 <beans>
 
-	<bean id="DB2" class="org.springframework.jdbc.support.SQLErrorCodes">
+	<bean id="DB2" class="org.springframework.com.whz.spring.jdbc.support.SQLErrorCodes">
 		<property name="databaseProductName">
 			<value>DB2*</value>
 		</property>
@@ -38,7 +38,7 @@
 		</property>
 	</bean>
 
-	<bean id="Derby" class="org.springframework.jdbc.support.SQLErrorCodes">
+	<bean id="Derby" class="org.springframework.com.whz.spring.jdbc.support.SQLErrorCodes">
 		<property name="databaseProductName">
 			<value>Apache Derby</value>
 		</property>
@@ -65,7 +65,7 @@
 		</property>
 	</bean>
 
-	<bean id="H2" class="org.springframework.jdbc.support.SQLErrorCodes">
+	<bean id="H2" class="org.springframework.com.whz.spring.jdbc.support.SQLErrorCodes">
 		<property name="badSqlGrammarCodes">
 			<value>42000,42001,42101,42102,42111,42112,42121,42122,42132</value>
 		</property>
@@ -83,7 +83,7 @@
 		</property>
 	</bean>
 
-	<bean id="HSQL" class="org.springframework.jdbc.support.SQLErrorCodes">
+	<bean id="HSQL" class="org.springframework.com.whz.spring.jdbc.support.SQLErrorCodes">
 		<property name="databaseProductName">
 			<value>HSQL Database Engine</value>
 		</property>
@@ -101,7 +101,7 @@
 		</property>
 	</bean>
 
-	<bean id="Informix" class="org.springframework.jdbc.support.SQLErrorCodes">
+	<bean id="Informix" class="org.springframework.com.whz.spring.jdbc.support.SQLErrorCodes">
 		<property name="databaseProductName">
 			<value>Informix Dynamic Server</value>
 		</property>
@@ -116,7 +116,7 @@
 		</property>
 	</bean>
 
-	<bean id="MS-SQL" class="org.springframework.jdbc.support.SQLErrorCodes">
+	<bean id="MS-SQL" class="org.springframework.com.whz.spring.jdbc.support.SQLErrorCodes">
 		<property name="databaseProductName">
 			<value>Microsoft SQL Server</value>
 		</property>
@@ -143,7 +143,7 @@
 		</property>
 	</bean>
 
-	<bean id="MySQL" class="org.springframework.jdbc.support.SQLErrorCodes">
+	<bean id="MySQL" class="org.springframework.com.whz.spring.jdbc.support.SQLErrorCodes">
 		<property name="badSqlGrammarCodes">
 			<value>1054,1064,1146</value>
 		</property>
@@ -164,7 +164,7 @@
 		</property>
 	</bean>
 
-	<bean id="Oracle" class="org.springframework.jdbc.support.SQLErrorCodes">
+	<bean id="Oracle" class="org.springframework.com.whz.spring.jdbc.support.SQLErrorCodes">
 		<property name="badSqlGrammarCodes">
 			<value>900,903,904,917,936,942,17006,6550</value>
 		</property>
@@ -191,7 +191,7 @@
 		</property>
 	</bean>
 
-	<bean id="PostgreSQL" class="org.springframework.jdbc.support.SQLErrorCodes">
+	<bean id="PostgreSQL" class="org.springframework.com.whz.spring.jdbc.support.SQLErrorCodes">
 		<property name="useSqlStateForTranslation">
 			<value>true</value>
 		</property>
@@ -218,7 +218,7 @@
 		</property>
 	</bean>
 
-	<bean id="Sybase" class="org.springframework.jdbc.support.SQLErrorCodes">
+	<bean id="Sybase" class="org.springframework.com.whz.spring.jdbc.support.SQLErrorCodes">
 		<property name="databaseProductNames">
 			<list>
 				<value>Sybase SQL Server</value>

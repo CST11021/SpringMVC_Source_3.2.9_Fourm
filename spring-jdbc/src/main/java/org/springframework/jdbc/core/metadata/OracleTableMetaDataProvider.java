@@ -82,7 +82,7 @@ public class OracleTableMetaDataProvider extends GenericTableMetaDataProvider {
 		}
 		boolean isOracleCon;
 		try {
-			Class<?> oracleConClass = con.getClass().getClassLoader().loadClass("oracle.jdbc.OracleConnection");
+			Class<?> oracleConClass = con.getClass().getClassLoader().loadClass("oracle.com.whz.spring.jdbc.OracleConnection");
 			isOracleCon = oracleConClass.isInstance(con);
 		}
 		catch (ClassNotFoundException ex) {

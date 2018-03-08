@@ -6,7 +6,7 @@
  * are "disconnected" from the database.
  *
  * <p>This higher level of JDBC abstraction depends on the lower-level
- * abstraction in the {@code org.springframework.jdbc.core} package.
+ * abstraction in the {@code org.springframework.com.whz.spring.jdbc.core} package.
  * Exceptions thrown are as in the {@code org.springframework.dao} package,
  * meaning that code using this package does not need to implement JDBC or
  * RDBMS-specific error handling.

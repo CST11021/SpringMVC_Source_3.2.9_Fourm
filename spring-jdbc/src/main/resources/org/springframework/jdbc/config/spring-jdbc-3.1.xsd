@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<xsd:schema xmlns="http://www.springframework.org/schema/jdbc"
+<xsd:schema xmlns="http://www.springframework.org/schema/com.whz.spring.jdbc"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:tool="http://www.springframework.org/schema/tool"
-	targetNamespace="http://www.springframework.org/schema/jdbc"
+	targetNamespace="http://www.springframework.org/schema/com.whz.spring.jdbc"
 	elementFormDefault="qualified" attributeFormDefault="unqualified">
 
 	<xsd:import namespace="http://www.springframework.org/schema/beans"
@@ -12,7 +12,7 @@
 
 	<xsd:element name="embedded-database">
 		<xsd:annotation>
-			<xsd:documentation source="java:org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactoryBean"><![CDATA[
+			<xsd:documentation source="java:org.springframework.com.whz.spring.jdbc.datasource.embedded.EmbeddedDatabaseFactoryBean"><![CDATA[
 	Creates an embedded database instance and makes it available to other beans as a javax.sql.DataSource.
 			]]></xsd:documentation>
 			<xsd:appinfo>
@@ -47,7 +47,7 @@
 
 	<xsd:element name="initialize-database">
 		<xsd:annotation>
-			<xsd:documentation source="java:org.springframework.jdbc.datasource.init.DataSourceInitializer"><![CDATA[
+			<xsd:documentation source="java:org.springframework.com.whz.spring.jdbc.datasource.init.DataSourceInitializer"><![CDATA[
 	Initializes a database instance with SQL scripts provided in nested <script/> elements.
 			]]></xsd:documentation>
 		</xsd:annotation>

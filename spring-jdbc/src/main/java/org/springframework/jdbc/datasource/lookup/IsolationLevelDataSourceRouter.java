@@ -42,7 +42,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * "myRepeatableReadDataSource", "mySerializableDataSource" and "myDefaultDataSource":
  *
  * <pre>
- * &lt;bean id="dataSourceRouter" class="org.springframework.jdbc.datasource.lookup.IsolationLevelDataSourceRouter"&gt;
+ * &lt;bean id="dataSourceRouter" class="org.springframework.com.whz.spring.jdbc.datasource.lookup.IsolationLevelDataSourceRouter"&gt;
  *   &lt;property name="targetDataSources"&gt;
  *     &lt;map&gt;
  *       &lt;entry key="ISOLATION_REPEATABLE_READ" value-ref="myRepeatableReadDataSource"/&gt;
@@ -58,14 +58,14 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * without the need for separate DataSource bean definitions.
  *
  * <pre>
- * &lt;bean id="dataSourceRouter" class="org.springframework.jdbc.datasource.lookup.IsolationLevelDataSourceRouter"&gt;
+ * &lt;bean id="dataSourceRouter" class="org.springframework.com.whz.spring.jdbc.datasource.lookup.IsolationLevelDataSourceRouter"&gt;
  *   &lt;property name="targetDataSources"&gt;
  *     &lt;map&gt;
- *       &lt;entry key="ISOLATION_REPEATABLE_READ" value="java:comp/env/jdbc/myrrds"/&gt;
- *       &lt;entry key="ISOLATION_SERIALIZABLE" value="java:comp/env/jdbc/myserds"/&gt;
+ *       &lt;entry key="ISOLATION_REPEATABLE_READ" value="java:comp/env/com.whz.spring.jdbc/myrrds"/&gt;
+ *       &lt;entry key="ISOLATION_SERIALIZABLE" value="java:comp/env/com.whz.spring.jdbc/myserds"/&gt;
  *     &lt;/map&gt;
  *   &lt;/property&gt;
- *   &lt;property name="defaultTargetDataSource" value="java:comp/env/jdbc/mydefds"/&gt;
+ *   &lt;property name="defaultTargetDataSource" value="java:comp/env/com.whz.spring.jdbc/mydefds"/&gt;
  * &lt;/bean&gt;</pre>
  *
  * Note: If you are using this router in combination with Spring's

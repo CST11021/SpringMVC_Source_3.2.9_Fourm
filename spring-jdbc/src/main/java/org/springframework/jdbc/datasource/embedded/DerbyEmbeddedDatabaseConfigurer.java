@@ -38,7 +38,7 @@ final class DerbyEmbeddedDatabaseConfigurer implements EmbeddedDatabaseConfigure
 
 	private static final Log logger = LogFactory.getLog(DerbyEmbeddedDatabaseConfigurer.class);
 
-	private static final String URL_TEMPLATE = "jdbc:derby:memory:%s;%s";
+	private static final String URL_TEMPLATE = "com.whz.spring.jdbc:derby:memory:%s;%s";
 
 	// Error code that indicates successful shutdown
 	private static final String SHUTDOWN_CODE = "08006";

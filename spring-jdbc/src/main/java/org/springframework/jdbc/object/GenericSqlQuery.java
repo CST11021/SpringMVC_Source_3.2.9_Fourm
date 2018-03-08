@@ -34,7 +34,7 @@ public class GenericSqlQuery extends SqlQuery {
 		if (!RowMapper.class.isAssignableFrom(rowMapperClass))
 			throw new IllegalStateException("The specified class '" +
 					rowMapperClass.getName() + " is not a sub class of " +
-					"'org.springframework.jdbc.core.RowMapper'");
+					"'org.springframework.com.whz.spring.jdbc.core.RowMapper'");
 	}
 
 	public void afterPropertiesSet() {

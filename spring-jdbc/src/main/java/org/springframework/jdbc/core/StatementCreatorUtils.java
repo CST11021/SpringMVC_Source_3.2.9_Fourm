@@ -72,7 +72,7 @@ public abstract class StatementCreatorUtils {
 	 * a connection pool setting back the {@link PreparedStatement} instance in case of an exception
 	 * thrown from {@code getParameterType} (as reported on JBoss AS 7).
 	 */
-	public static final String IGNORE_GETPARAMETERTYPE_PROPERTY_NAME = "spring.jdbc.getParameterType.ignore";
+	public static final String IGNORE_GETPARAMETERTYPE_PROPERTY_NAME = "spring.com.whz.spring.jdbc.getParameterType.ignore";
 
 
 	static final boolean shouldIgnoreGetParameterType = SpringProperties.getFlag(IGNORE_GETPARAMETERTYPE_PROPERTY_NAME);

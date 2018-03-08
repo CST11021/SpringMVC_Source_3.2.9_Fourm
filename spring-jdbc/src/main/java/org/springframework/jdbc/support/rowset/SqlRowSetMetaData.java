@@ -25,7 +25,7 @@ import org.springframework.jdbc.InvalidResultSetAccessException;
  * <p>The main difference to the standard JDBC RowSetMetaData is that an SQLException
  * is never thrown here. This allows a SqlRowSetMetaData to be used without having
  * to deal with checked exceptions. A SqlRowSetMetaData will throw Spring's
- * {@code org.springframework.jdbc.InvalidResultSetAccessException}
+ * {@code org.springframework.com.whz.spring.jdbc.InvalidResultSetAccessException}
  * instead (when appropriate).
  *
  * @author Thomas Risberg

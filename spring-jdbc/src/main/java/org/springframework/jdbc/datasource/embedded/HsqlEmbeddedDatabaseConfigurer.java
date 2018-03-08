@@ -54,7 +54,7 @@ final class HsqlEmbeddedDatabaseConfigurer extends AbstractEmbeddedDatabaseConfi
 
 	public void configureConnectionProperties(ConnectionProperties properties, String databaseName) {
 		properties.setDriverClass(this.driverClass);
-		properties.setUrl("jdbc:hsqldb:mem:" + databaseName);
+		properties.setUrl("com.whz.spring.jdbc:hsqldb:mem:" + databaseName);
 		properties.setUsername("sa");
 		properties.setPassword("");
 	}

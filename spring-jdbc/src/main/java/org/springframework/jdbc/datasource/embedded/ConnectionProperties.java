@@ -31,7 +31,7 @@ public interface ConnectionProperties {
 
 	/**
 	 * Set the JDBC driver to use to connect to the database.
-	 * @param driverClass the jdbc driver class
+	 * @param driverClass the com.whz.spring.jdbc driver class
 	 */
 	void setDriverClass(Class<? extends Driver> driverClass);
 

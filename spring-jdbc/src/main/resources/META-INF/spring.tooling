@@ -1,4 +1,4 @@
-# Tooling related information for the jdbc namespace
-http\://www.springframework.org/schema/jdbc@name=jdbc Namespace
-http\://www.springframework.org/schema/jdbc@prefix=jdbc
-http\://www.springframework.org/schema/jdbc@icon=org/springframework/jdbc/config/spring-jdbc.gif
+# Tooling related information for the com.whz.spring.jdbc namespace
+http\://www.springframework.org/schema/com.whz.spring.jdbc@name=com.whz.spring.jdbc Namespace
+http\://www.springframework.org/schema/com.whz.spring.jdbc@prefix=com.whz.spring.jdbc
+http\://www.springframework.org/schema/com.whz.spring.jdbc@icon=org/springframework/com.whz.spring.jdbc/config/spring-com.whz.spring.jdbc.gif

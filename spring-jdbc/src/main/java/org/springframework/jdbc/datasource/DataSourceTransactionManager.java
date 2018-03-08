@@ -305,14 +305,12 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 	private static class DataSourceTransactionObject extends JdbcTransactionObjectSupport {
 
 		private boolean newConnectionHolder;
-
 		private boolean mustRestoreAutoCommit;
 
 		public void setConnectionHolder(ConnectionHolder connectionHolder, boolean newConnectionHolder) {
 			super.setConnectionHolder(connectionHolder);
 			this.newConnectionHolder = newConnectionHolder;
 		}
-
 		public boolean isNewConnectionHolder() {
 			return this.newConnectionHolder;
 		}
@@ -320,7 +318,6 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 		public void setMustRestoreAutoCommit(boolean mustRestoreAutoCommit) {
 			this.mustRestoreAutoCommit = mustRestoreAutoCommit;
 		}
-
 		public boolean isMustRestoreAutoCommit() {
 			return this.mustRestoreAutoCommit;
 		}
@@ -328,7 +325,6 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 		public void setRollbackOnly() {
 			getConnectionHolder().setRollbackOnly();
 		}
-
 		public boolean isRollbackOnly() {
 			return getConnectionHolder().isRollbackOnly();
 		}

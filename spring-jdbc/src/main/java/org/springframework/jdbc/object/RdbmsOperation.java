@@ -41,7 +41,7 @@ import org.springframework.jdbc.core.SqlParameter;
  *
  * <p>This class and subclasses throw runtime exceptions, defined in the
  * <codeorg.springframework.dao package</code> (and as thrown by the
- * {@code org.springframework.jdbc.core} package, which the classes
+ * {@code org.springframework.com.whz.spring.jdbc.core} package, which the classes
  * in this package use under the hood to perform raw JDBC operations).
  *
  * <p>Subclasses should set SQL and add parameters before invoking the

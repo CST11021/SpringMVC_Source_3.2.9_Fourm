@@ -34,7 +34,7 @@ import org.springframework.util.ReflectionUtils;
  * <p>Returns the underlying native Connection, Statement, etc to
  * application code instead of JBoss' wrapper implementations.
  * The returned JDBC classes can then safely be cast, e.g. to
- * {@code oracle.jdbc.OracleConnection}.
+ * {@code oracle.com.whz.spring.jdbc.OracleConnection}.
  *
  * <p>This NativeJdbcExtractor can be set just to <i>allow</i> working with
  * a JBoss connection pool: If a given object is not a JBoss wrapper,
@@ -49,10 +49,10 @@ import org.springframework.util.ReflectionUtils;
 public class JBossNativeJdbcExtractor extends NativeJdbcExtractorAdapter {
 
 	// JBoss 7
-	private static final String JBOSS_JCA_PREFIX = "org.jboss.jca.adapters.jdbc.";
+	private static final String JBOSS_JCA_PREFIX = "org.jboss.jca.adapters.com.whz.spring.jdbc.";
 
 	// JBoss <= 6
-	private static final String JBOSS_RESOURCE_PREFIX = "org.jboss.resource.adapter.jdbc.";
+	private static final String JBOSS_RESOURCE_PREFIX = "org.jboss.resource.adapter.com.whz.spring.jdbc.";
 
 
 	private Class wrappedConnectionClass;

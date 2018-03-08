@@ -77,7 +77,7 @@ import org.springframework.util.LinkedCaseInsensitiveMap;
  * interface, there should be no need to subclass it.
  *
  * <p>All SQL operations performed by this class are logged at debug level,
- * using "org.springframework.jdbc.core.JdbcTemplate" as log category.
+ * using "org.springframework.com.whz.spring.jdbc.core.JdbcTemplate" as log category.
  *
  * @author Rod Johnson
  * @author Juergen Hoeller

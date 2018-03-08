@@ -29,7 +29,7 @@ import org.springframework.util.ReflectionUtils;
  * <p>Returns the underlying native Connection to application code instead
  * of WebSphere's wrapper implementation; unwraps the Connection for
  * native statements. The returned JDBC classes can then safely be cast,
- * e.g. to {@code oracle.jdbc.OracleConnection}.
+ * e.g. to {@code oracle.com.whz.spring.jdbc.OracleConnection}.
  *
  * <p>This NativeJdbcExtractor can be set just to <i>allow</i> working
  * with a WebSphere DataSource: If a given object is not a WebSphere
@@ -40,9 +40,9 @@ import org.springframework.util.ReflectionUtils;
  */
 public class WebSphereNativeJdbcExtractor extends NativeJdbcExtractorAdapter {
 
-	private static final String JDBC_ADAPTER_CONNECTION_NAME = "com.ibm.ws.rsadapter.jdbc.WSJdbcConnection";
+	private static final String JDBC_ADAPTER_CONNECTION_NAME = "com.ibm.ws.rsadapter.com.whz.spring.jdbc.WSJdbcConnection";
 
-	private static final String JDBC_ADAPTER_UTIL_NAME = "com.ibm.ws.rsadapter.jdbc.WSJdbcUtil";
+	private static final String JDBC_ADAPTER_UTIL_NAME = "com.ibm.ws.rsadapter.com.whz.spring.jdbc.WSJdbcUtil";
 
 
 	private Class webSphereConnectionClass;

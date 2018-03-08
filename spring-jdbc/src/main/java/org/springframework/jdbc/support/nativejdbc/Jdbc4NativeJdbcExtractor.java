@@ -58,35 +58,35 @@ public class Jdbc4NativeJdbcExtractor extends NativeJdbcExtractorAdapter {
 
 
 	/**
-	 * Set the vendor's Connection type, e.g. {@code oracle.jdbc.OracleConnection}.
+	 * Set the vendor's Connection type, e.g. {@code oracle.com.whz.spring.jdbc.OracleConnection}.
 	 */
 	public void setConnectionType(Class<? extends Connection> connectionType) {
 		this.connectionType = connectionType;
 	}
 
 	/**
-	 * Set the vendor's Statement type, e.g. {@code oracle.jdbc.OracleStatement}.
+	 * Set the vendor's Statement type, e.g. {@code oracle.com.whz.spring.jdbc.OracleStatement}.
 	 */
 	public void setStatementType(Class<? extends Statement> statementType) {
 		this.statementType = statementType;
 	}
 
 	/**
-	 * Set the vendor's PreparedStatement type, e.g. {@code oracle.jdbc.OraclePreparedStatement}.
+	 * Set the vendor's PreparedStatement type, e.g. {@code oracle.com.whz.spring.jdbc.OraclePreparedStatement}.
 	 */
 	public void setPreparedStatementType(Class<? extends PreparedStatement> preparedStatementType) {
 		this.preparedStatementType = preparedStatementType;
 	}
 
 	/**
-	 * Set the vendor's CallableStatement type, e.g. {@code oracle.jdbc.OracleCallableStatement}.
+	 * Set the vendor's CallableStatement type, e.g. {@code oracle.com.whz.spring.jdbc.OracleCallableStatement}.
 	 */
 	public void setCallableStatementType(Class<? extends CallableStatement> callableStatementType) {
 		this.callableStatementType = callableStatementType;
 	}
 
 	/**
-	 * Set the vendor's ResultSet type, e.g. {@code oracle.jdbc.OracleResultSet}.
+	 * Set the vendor's ResultSet type, e.g. {@code oracle.com.whz.spring.jdbc.OracleResultSet}.
 	 */
 	public void setResultSetType(Class<? extends ResultSet> resultSetType) {
 		this.resultSetType = resultSetType;

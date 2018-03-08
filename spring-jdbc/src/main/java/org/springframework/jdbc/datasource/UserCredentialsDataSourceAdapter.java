@@ -40,10 +40,10 @@ import org.springframework.util.StringUtils;
  *
  * <pre class="code">
  * &lt;bean id="myTargetDataSource" class="org.springframework.jndi.JndiObjectFactoryBean"&gt;
- *   &lt;property name="jndiName" value="java:comp/env/jdbc/myds"/&gt;
+ *   &lt;property name="jndiName" value="java:comp/env/com.whz.spring.jdbc/myds"/&gt;
  * &lt;/bean&gt;
  *
- * &lt;bean id="myDataSource" class="org.springframework.jdbc.datasource.UserCredentialsDataSourceAdapter"&gt;
+ * &lt;bean id="myDataSource" class="org.springframework.com.whz.spring.jdbc.datasource.UserCredentialsDataSourceAdapter"&gt;
  *   &lt;property name="targetDataSource" ref="myTargetDataSource"/&gt;
  *   &lt;property name="username" value="myusername"/&gt;
  *   &lt;property name="password" value="mypassword"/&gt;
