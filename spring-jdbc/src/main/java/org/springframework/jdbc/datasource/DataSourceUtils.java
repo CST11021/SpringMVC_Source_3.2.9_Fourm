@@ -55,7 +55,7 @@ public abstract class DataSourceUtils {
 	public static final int CONNECTION_SYNCHRONIZATION_ORDER = 1000;
 
 	// 根据 DataSource 获取一个 Connection
-	// 从指定的DataSource获取或者释放连接。与直接从DataSource取得Connection不同，DataSourceUtils会将取得的Connection绑定
+	// 从指定的DataSource获取或者释放连接。与直接从DataSourceUtils取得Connection不同，DataSourceUtils会将取得的Connection绑定
 	// 到当前线程，以便在使用Spring提供的统一事务抽象层进行事务管理的时候使用。
 	public static Connection getConnection(DataSource dataSource) throws CannotGetJdbcConnectionException {
 		try {
@@ -119,7 +119,7 @@ public abstract class DataSourceUtils {
 
 		Assert.notNull(con, "No Connection specified");
 
-		// Set read-only flag.
+		// 给Connection对象设置为只读
 		if (definition != null && definition.isReadOnly()) {
 			try {
 				if (logger.isDebugEnabled()) {

@@ -51,18 +51,16 @@ public abstract class JdbcTransactionObjectSupport implements SavepointManager, 
 
 	private static final Log logger = LogFactory.getLog(JdbcTransactionObjectSupport.class);
 
-
 	private ConnectionHolder connectionHolder;
-
+	// 表示该事务的隔离级别
 	private Integer previousIsolationLevel;
-
+	// 是否允许有保存点
 	private boolean savepointAllowed = false;
 
 
 	public void setConnectionHolder(ConnectionHolder connectionHolder) {
 		this.connectionHolder = connectionHolder;
 	}
-
 	public ConnectionHolder getConnectionHolder() {
 		return this.connectionHolder;
 	}
@@ -74,15 +72,14 @@ public abstract class JdbcTransactionObjectSupport implements SavepointManager, 
 	public void setPreviousIsolationLevel(Integer previousIsolationLevel) {
 		this.previousIsolationLevel = previousIsolationLevel;
 	}
-
 	public Integer getPreviousIsolationLevel() {
 		return this.previousIsolationLevel;
 	}
 
+	// 设置是否允许设置保存点（取决于是否允许嵌套事务，设置保存点就是为了嵌套事务回滚时，能回滚到保存点）
 	public void setSavepointAllowed(boolean savepointAllowed) {
 		this.savepointAllowed = savepointAllowed;
 	}
-
 	public boolean isSavepointAllowed() {
 		return this.savepointAllowed;
 	}
@@ -92,14 +89,11 @@ public abstract class JdbcTransactionObjectSupport implements SavepointManager, 
 	}
 
 
-	//---------------------------------------------------------------------
-	// Implementation of SavepointManager
-	//---------------------------------------------------------------------
+	/* ---------------------- 实现 SavepointManager 接口 ---------------------- */
 
-	/**
-	 * This implementation creates a JDBC 3.0 Savepoint and returns it.
-	 * @see java.sql.Connection#setSavepoint
-	 */
+	// 该方法创建一个JDBC 3.0 Savepoint
+	// 创建一个保存点对象，以便在后面可以利用rollbackToSavepoint(Object savepoint)方法使事务回滚到特定的保存点上，也可以
+	// 通过releaseSavepoint()方法释放一个已经不用的保存点。
 	public Object createSavepoint() throws TransactionException {
 		ConnectionHolder conHolder = getConnectionHolderForSavepoint();
 		try {
@@ -120,10 +114,7 @@ public abstract class JdbcTransactionObjectSupport implements SavepointManager, 
 		}
 	}
 
-	/**
-	 * This implementation rolls back to the given JDBC 3.0 Savepoint.
-	 * @see java.sql.Connection#rollback(java.sql.Savepoint)
-	 */
+	// 回滚到设置的JDBC 3.0 Savepoint
 	public void rollbackToSavepoint(Object savepoint) throws TransactionException {
 		try {
 			getConnectionHolderForSavepoint().getConnection().rollback((Savepoint) savepoint);
@@ -133,10 +124,7 @@ public abstract class JdbcTransactionObjectSupport implements SavepointManager, 
 		}
 	}
 
-	/**
-	 * This implementation releases the given JDBC 3.0 Savepoint.
-	 * @see java.sql.Connection#releaseSavepoint
-	 */
+	// 释放一个保存点。如果事务提交，则所有的保存点会被自动释放，无需手工清除。
 	public void releaseSavepoint(Object savepoint) throws TransactionException {
 		try {
 			getConnectionHolderForSavepoint().getConnection().releaseSavepoint((Savepoint) savepoint);
