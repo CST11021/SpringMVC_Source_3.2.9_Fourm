@@ -127,6 +127,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 
 	// 根据 TransactionDefinition 创建一个 TransactionStatus
 	public final TransactionStatus getTransaction(TransactionDefinition definition) throws TransactionException {
+		// 获取底层的一个事务对象
 		Object transaction = doGetTransaction();
 
 		boolean debugEnabled = logger.isDebugEnabled();
@@ -195,7 +196,8 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 			return prepareTransactionStatus(definition, null, true, newSynchronization, debugEnabled, null);
 		}
 	}
-	// 返回当前事务状态对应的一个事务对象，该对象可用于执行开始事务，提交事务和事务回滚操作
+	// 返回当前事务状态对应的一个事务对象，该对象可用于执行开始事务，提交事务和事务回滚操作，该方法由子类扩展，根据不同的
+	// 持久化技术，返回不同的事务对象
 	protected abstract Object doGetTransaction() throws TransactionException;
 	// 判断当前线程是否存在事务，默认否
 	protected boolean isExistingTransaction(Object transaction) throws TransactionException {

@@ -27,6 +27,20 @@ package org.springframework.transaction;
 		tran.rollback(status);
 		System.out.println("出错了，事务回滚...");
 	}
+
+ Spring将事务管理委托给底层具体的持久化实现框架来完成。因此，Spring为不同的持久化框架提供了PlatformTransactionManager接口的实现类，如下表：
+
+ 不同持久化技术对应的事务管理器实现类
+ ---------------------------------------------------------------------------------------------
+ JpaTransactionManager			使用JPA进行持久化时，使用该事务管理器
+ HibernateTransactionManager	使用Hibernate X.0(X可为3,4,5）版本进行持久化时，使用该事务管理器
+ DataSourceTransactionManager	使用Spring JDBC或MyBatis等基于DataSource数据源的持久化技术时，使用该事务管理器
+ JdoTransactionManager			使用JDO进行持久化时，使用该事务管理器
+ JtaTransactionManager			具有多个数据源的全局事务使用该事务管理器（不管采用何种持久化技术）
+
+ 这些事务管理器都是对特定事务实现框架的代理，这样就可以通过Spring所提交的高级抽象对不同种类的事务实现使用相同的方式进行管理，而不用关心具体的实现。
+ 要实现事务管理，首先要再Spring中配置好相应的事务管理器，为事务管理器指定数据资源及一些其他事务管理控制属性。
+
  */
 public interface PlatformTransactionManager {
 

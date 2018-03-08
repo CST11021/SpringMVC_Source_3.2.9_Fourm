@@ -36,6 +36,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 public interface ResourceTransactionManager extends PlatformTransactionManager {
 
 	/**
+	 * 返回一个资源对象工厂，或资源对象，比如DataSource或ConnectionFactory
+	 *
 	 * Return the resource factory that this transaction manager operates on,
 	 * e.g. a JDBC DataSource or a JMS ConnectionFactory.
 	 * <p>This target resource factory is usually used as resource key for
