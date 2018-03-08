@@ -85,7 +85,7 @@ public class Test {
         DataSource datasource = (DataSource) app.getBean("dataSource");
 
         PlatformTransactionManager tran = new DataSourceTransactionManager(datasource);// 事务管理器
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();// 事务定义类
+        TransactionDefinition def = new DefaultTransactionDefinition();// 事务定义类
         TransactionStatus status = tran.getTransaction(def);// 返回事务对象
         try {
             userService.saveWithoutTransaction(zhangsanUser);

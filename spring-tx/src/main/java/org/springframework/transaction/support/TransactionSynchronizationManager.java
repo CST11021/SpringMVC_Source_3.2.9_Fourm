@@ -32,56 +32,46 @@ import org.springframework.core.OrderComparator;
 import org.springframework.util.Assert;
 
 /**
- * Central delegate that manages resources and transaction synchronizations per thread.
- * To be used by resource management code but not by typical application code.
- *
- * <p>Supports one resource per key without overwriting, that is, a resource needs
- * to be removed before a new one can be set for the same key.
- * Supports a list of transaction synchronizations if synchronization is active.
- *
- * <p>Resource management code should check for thread-bound resources, e.g. JDBC
- * Connections or Hibernate Sessions, via {@code getResource}. Such code is
- * normally not supposed to bind resources to threads, as this is the responsibility
- * of transaction managers. A further option is to lazily bind on first use if
- * transaction synchronization is active, for performing transactions that span
- * an arbitrary number of resources.
- *
- * <p>Transaction synchronization must be activated and deactivated by a transaction
- * manager via {@link #initSynchronization()} and {@link #clearSynchronization()}.
- * This is automatically supported by {@link AbstractPlatformTransactionManager},
- * and thus by all standard Spring transaction managers, such as
- * {@link org.springframework.transaction.jta.JtaTransactionManager} and
- * {@link org.springframework.jdbc.datasource.DataSourceTransactionManager}.
- *
- * <p>Resource management code should only register synchronizations when this
- * manager is active, which can be checked via {@link #isSynchronizationActive};
- * it should perform immediate resource cleanup else. If transaction synchronization
- * isn't active, there is either no current transaction, or the transaction manager
- * doesn't support transaction synchronization.
- *
- * <p>Synchronization is for example used to always return the same resources
- * within a JTA transaction, e.g. a JDBC Connection or a Hibernate Session for
- * any given DataSource or SessionFactory, respectively.
- *
- * @author Juergen Hoeller
- * @since 02.06.2003
- * @see #isSynchronizationActive
- * @see #registerSynchronization
- * @see TransactionSynchronization
- * @see AbstractPlatformTransactionManager#setTransactionSynchronization
- * @see org.springframework.transaction.jta.JtaTransactionManager
- * @see org.springframework.jdbc.datasource.DataSourceTransactionManager
- * @see org.springframework.jdbc.datasource.DataSourceUtils#getConnection
+ Spring将JDBC的Connection、Hibernate的Session等访问数据库的连接或会话对象统称为资源，这些资源在同一时刻是不能多线程共享的。
+ 为了让DAO、Service类可能做到singleton，Spring的事务同步管理器类SynchronizationManager使用ThreadLocal为不同事务线程提供了
+ 独立的资源副本，同时维护事务配置的属性和运行状态信息。事务同步管理器是Spring事务管理的基石，不管用户使用的编程式事务管理，
+ 还是声明式事务管理，都离不开事务同步管理器。
+ Spring框架为不同的持久化技术提供了一套从TransactionSynchronizationManager中获取对应线程绑定资源的工具类，如下表：
+ ------------------------------------------------------------
+ Spring JDBC或Mybatis	DataSourceUtils
+ Hibernate X.0			SessionFactoryUtils
+ JPA					EntityManagerFactoryUtils
+ JDO					PersistenceManagerFactoryUtils
+-------------------------------------------------------------
+ 	这些工具类都提供了静态的方法，通过这些方法可以获取和当前线程绑定的资源，如DataSourceUtils.getConnection(DataSource dataSource)
+ 方法可以从指定的数据源中获取和当前线程绑定的Connection，而Hibernate的SessionFactoryUtils.getSession(SessionFactory sessionFactory, boolean allowCreate)
+ 方法则可以从指定的SessionFactory中获取和当前线程绑定的Session。
+ 	当需要脱离模板类，手工操作底层持久化技术的元素API时，就需要通过这些工具类获取线程绑定的资源，而不应该直接从DataSource
+ 或SessionFactory中获取。因为后者不能获得与本线程相关的资源，因此无法让数据操作参与到与本线程相关的事务环境中。
+ 	这些工具类还有另外一个重要的用途：将特定异常转换为Spring的DAO异常。
+ 	Spring为不同的持久化技术提供模板类，模板类在内部通过资源获取工具间接访问TransactionSynchronizationManager中的线程绑定
+ 资源。所以，如果DAO使用模板类进行持久化操作，这些DAO就可以配置成singleton。如果不使用模板类，也可以直接通过资源获取工具
+ 类访问线程相关的资源
+
+ TransactionSynchronizationManager将DAO、Service类中影响线程安全的所有“状态”统一抽取到该类中，并用ThreadLocal进行替换，
+ 从DAO（必须是基于模板类或资源获取工具类创建的DAO）和Service（必须采用Spring事务管理机制）摘掉了非线程安全的帽子，完成了
+ 脱胎换骨式的身份转变。
  */
 public abstract class TransactionSynchronizationManager {
 
 	private static final Log logger = LogFactory.getLog(TransactionSynchronizationManager.class);
 
+	// 用于保存每个事务线程对应的Connection或Session等类型的资源
 	private static final ThreadLocal<Map<Object, Object>> resources = new NamedThreadLocal<Map<Object, Object>>("Transactional resources");
+	//
 	private static final ThreadLocal<Set<TransactionSynchronization>> synchronizations = new NamedThreadLocal<Set<TransactionSynchronization>>("Transaction synchronizations");
+	// 用于保存每个事务线程对应事务的名称
 	private static final ThreadLocal<String> currentTransactionName = new NamedThreadLocal<String>("Current transaction name");
+	// 用于保存每个事务线程对应事务的read-only状态
 	private static final ThreadLocal<Boolean> currentTransactionReadOnly = new NamedThreadLocal<Boolean>("Current transaction read-only status");
+	// 用于保存每个事务线程对应事务的隔离级别
 	private static final ThreadLocal<Integer> currentTransactionIsolationLevel = new NamedThreadLocal<Integer>("Current transaction isolation level");
+	// 用于保存每个事务线程对应事务的激活状态
 	private static final ThreadLocal<Boolean> actualTransactionActive = new NamedThreadLocal<Boolean>("Actual transaction active");
 
 

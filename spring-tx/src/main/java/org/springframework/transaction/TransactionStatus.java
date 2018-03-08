@@ -17,48 +17,21 @@
 package org.springframework.transaction;
 
 /**
- * Representation of the status of a transaction.
- *
- * <p>Transactional code can use this to retrieve status information,
- * and to programmatically request a rollback (instead of throwing
- * an exception that causes an implicit rollback).
- *
- * <p>Derives from the SavepointManager interface to provide access
- * to savepoint management facilities. Note that savepoint management
- * is only available if supported by the underlying transaction manager.
- *
- * @author Juergen Hoeller
- * @since 27.03.2003
- * @see #setRollbackOnly()
- * @see PlatformTransactionManager#getTransaction
- * @see org.springframework.transaction.support.TransactionCallback#doInTransaction
- * @see org.springframework.transaction.interceptor.TransactionInterceptor#currentTransactionStatus()
+ TransactionStatus代表一个事务的具体运行状态。事务管理器可以通过该接口获取事务运行期的状态信息，也可以通过该接口间接地回
+ 滚事务，它相比于在抛出异常时回滚事务的方式更具可控性。该接口继承与SavepointManager接口
  */
 public interface TransactionStatus extends SavepointManager {
 
-	// 是否是一个新的事务
+	// 判断当前事务是否是一个新的事务，如果返回false，则表示当前事务是一个已经存在的事务，或者当前操作未运行在事务环境中
 	boolean isNewTransaction();
 
-	// 是否有回滚的保存点
+	// 判断当前事务是否在内部创建了一个保存点，该保存点是为了支持Spring的嵌套事务而创建的
 	boolean hasSavepoint();
 
-	/**
-	 * Set the transaction rollback-only. This instructs the transaction manager
-	 * that the only possible outcome of the transaction may be a rollback, as
-	 * alternative to throwing an exception which would in turn trigger a rollback.
-	 * <p>This is mainly intended for transactions managed by
-	 * {@link org.springframework.transaction.support.TransactionTemplate} or
-	 * {@link org.springframework.transaction.interceptor.TransactionInterceptor},
-	 * where the actual commit/rollback decision is made by the container.
-	 * @see org.springframework.transaction.support.TransactionCallback#doInTransaction
-	 * @see org.springframework.transaction.interceptor.TransactionAttribute#rollbackOn
-	 */
+	// 将当前事务设置为rollback-only。通过该标识通知事务管理器只能将事务回滚，事务管理器通过显示调用回滚命令或抛出异常的方式回滚事务
 	void setRollbackOnly();
 
-	/**
-	 * Return whether the transaction has been marked as rollback-only
-	 * (either by the application or by the transaction infrastructure).
-	 */
+	// 判断当前事务是否已经被标识为rollback-only
 	boolean isRollbackOnly();
 
 	/**
