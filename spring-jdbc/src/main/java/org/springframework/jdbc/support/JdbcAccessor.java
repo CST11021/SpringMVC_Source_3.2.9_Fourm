@@ -39,15 +39,15 @@ public abstract class JdbcAccessor implements InitializingBean {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	// 数据源对象
 	private DataSource dataSource;
 	// 异常转换器
 	private SQLExceptionTranslator exceptionTranslator;
 	// 是否延迟初始化异常转换器
 	private boolean lazyInit = true;
 
-
+	// 该方法会在 JdbcTemplate 设置完数据源属性后被调用，数据源不允许为空
 	public void afterPropertiesSet() {
-		// 该方法会在 JdbcTemplate 设置完数据源属性后被调用，数据源不允许为空
 		if (getDataSource() == null) {
 			throw new IllegalArgumentException("Property 'dataSource' is required");
 		}
@@ -55,6 +55,9 @@ public abstract class JdbcAccessor implements InitializingBean {
 			getExceptionTranslator();
 		}
 	}
+
+
+	// getter and setter ...
 
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
@@ -88,7 +91,6 @@ public abstract class JdbcAccessor implements InitializingBean {
 	public boolean isLazyInit() {
 		return this.lazyInit;
 	}
-
 
 
 }

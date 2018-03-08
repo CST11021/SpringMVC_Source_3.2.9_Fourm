@@ -144,142 +144,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	}
 
 
-	/* --------------------------- getter and setter ... --------------------------------------------------------------- */
-	/**
-	 * Set a NativeJdbcExtractor to extract native JDBC objects from wrapped handles.
-	 * Useful if native Statement and/or ResultSet handles are expected for casting
-	 * to database-specific implementation classes, but a connection pool that wraps
-	 * JDBC objects is used (note: <i>any</i> pool will return wrapped Connections).
-	 */
-	public void setNativeJdbcExtractor(NativeJdbcExtractor extractor) {
-		this.nativeJdbcExtractor = extractor;
-	}
-	/**
-	 * Return the current NativeJdbcExtractor implementation.
-	 */
-	public NativeJdbcExtractor getNativeJdbcExtractor() {
-		return this.nativeJdbcExtractor;
-	}
-	/**
-	 * Set whether or not we want to ignore SQLWarnings.
-	 * <p>Default is "true", swallowing and logging all warnings. Switch this flag
-	 * to "false" to make the JdbcTemplate throw a SQLWarningException instead.
-	 * @see java.sql.SQLWarning
-	 * @see org.springframework.jdbc.SQLWarningException
-	 * @see #handleWarnings
-	 */
-	public void setIgnoreWarnings(boolean ignoreWarnings) {
-		this.ignoreWarnings = ignoreWarnings;
-	}
-	/**
-	 * Return whether or not we ignore SQLWarnings.
-	 */
-	public boolean isIgnoreWarnings() {
-		return this.ignoreWarnings;
-	}
-	/**
-	 * Set the fetch size for this JdbcTemplate. This is important for processing
-	 * large result sets: Setting this higher than the default value will increase
-	 * processing speed at the cost of memory consumption; setting this lower can
-	 * avoid transferring row data that will never be read by the application.
-	 * <p>Default is 0, indicating to use the JDBC driver's default.
-	 * @see java.sql.Statement#setFetchSize
-	 */
-	public void setFetchSize(int fetchSize) {
-		this.fetchSize = fetchSize;
-	}
-	/**
-	 * Return the fetch size specified for this JdbcTemplate.
-	 */
-	public int getFetchSize() {
-		return this.fetchSize;
-	}
-	/**
-	 * Set the maximum number of rows for this JdbcTemplate. This is important
-	 * for processing subsets of large result sets, avoiding to read and hold
-	 * the entire result set in the database or in the JDBC driver if we're
-	 * never interested in the entire result in the first place (for example,
-	 * when performing searches that might return a large number of matches).
-	 * <p>Default is 0, indicating to use the JDBC driver's default.
-	 * @see java.sql.Statement#setMaxRows
-	 */
-	public void setMaxRows(int maxRows) {
-		this.maxRows = maxRows;
-	}
-	/**
-	 * Return the maximum number of rows specified for this JdbcTemplate.
-	 */
-	public int getMaxRows() {
-		return this.maxRows;
-	}
-	/**
-	 * Set the query timeout for statements that this JdbcTemplate executes.
-	 * <p>Default is 0, indicating to use the JDBC driver's default.
-	 * <p>Note: Any timeout specified here will be overridden by the remaining
-	 * transaction timeout when executing within a transaction that has a
-	 * timeout specified at the transaction level.
-	 * @see java.sql.Statement#setQueryTimeout
-	 */
-	public void setQueryTimeout(int queryTimeout) {
-		this.queryTimeout = queryTimeout;
-	}
-	/**
-	 * Return the query timeout for statements that this JdbcTemplate executes.
-	 */
-	public int getQueryTimeout() {
-		return this.queryTimeout;
-	}
-	/**
-	 * Set whether results processing should be skipped. Can be used to optimize callable
-	 * statement processing when we know that no results are being passed back - the processing
-	 * of out parameter will still take place. This can be used to avoid a bug in some older
-	 * Oracle JDBC drivers like 10.1.0.2.
-	 */
-	public void setSkipResultsProcessing(boolean skipResultsProcessing) {
-		this.skipResultsProcessing = skipResultsProcessing;
-	}
-	/**
-	 * Return whether results processing should be skipped.
-	 */
-	public boolean isSkipResultsProcessing() {
-		return this.skipResultsProcessing;
-	}
-	/**
-	 * Set whether undeclared results should be skipped.
-	 */
-	public void setSkipUndeclaredResults(boolean skipUndeclaredResults) {
-		this.skipUndeclaredResults = skipUndeclaredResults;
-	}
-	/**
-	 * Return whether undeclared results should be skipped.
-	 */
-	public boolean isSkipUndeclaredResults() {
-		return this.skipUndeclaredResults;
-	}
-	/**
-	 * Set whether execution of a CallableStatement will return the results in a Map
-	 * that uses case insensitive names for the parameters.
-	 */
-	public void setResultsMapCaseInsensitive(boolean resultsMapCaseInsensitive) {
-		this.resultsMapCaseInsensitive = resultsMapCaseInsensitive;
-	}
-	/**
-	 * Return whether execution of a CallableStatement will return the results in a Map
-	 * that uses case insensitive names for the parameters.
-	 */
-	public boolean isResultsMapCaseInsensitive() {
-		return this.resultsMapCaseInsensitive;
-	}
-	/* --------------------------- getter and setter ... --------------------------------------------------------------- */
 
-
-
-
-
-
-
-
-	/* ------------------------------------------------------------------------- */
 	// Methods dealing with a plain java.sql.Connection
 	public <T> T execute(ConnectionCallback<T> action) throws DataAccessException {
 		Assert.notNull(action, "Callback object must not be null");
@@ -325,16 +190,10 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 				new Class<?>[] {ConnectionProxy.class},
 				new CloseSuppressingInvocationHandler(con));
 	}
-	/* ------------------------------------------------------------------------- */
 
 
 
 
-
-
-
-
-	//-------------------------------------------------------------------------
 	// Methods dealing with static SQL (java.sql.Statement)
 	/* ------------------ 以下这些方法最后都会来调用 execute(StatementCallback<T> action) 这个方法 ------------------ */
 	public <T> T execute(StatementCallback<T> action) throws DataAccessException {
@@ -503,20 +362,13 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		Number number = queryForObject(sql, Integer.class);
 		return (number != null ? number.intValue() : 0);
 	}
-	/* ------------------ 以上这些方法最后都会来调用 execute(StatementCallback<T> action) 这个方法 ------------------ */
 
 
 
 
 
-
-
-
-
-
-	//-------------------------------------------------------------------------
 	// Methods dealing with prepared statements
-	/* ----------------------- 以下方法最终都来调用 execute(PreparedStatementCreator psc, PreparedStatementCallback<T> action) ，它是核心方法 ----------------------- */
+	/* 以下方法最终都来调用 execute(PreparedStatementCreator psc, PreparedStatementCallback<T> action) ，它是核心方法 */
 	// execute 作为数据操作的核心入口，将大多数数据库操作相同的步骤统一封装，而将个性化的操作使用 PreparedStatementCallback 进行回调。
 	public <T> T execute(PreparedStatementCreator psc, PreparedStatementCallback<T> action) throws DataAccessException {
 
@@ -888,23 +740,11 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			}
 		});
 	}
-	/* ----------------------- 以下方法最终都来调用 execute(PreparedStatementCreator psc, PreparedStatementCallback<T> action) ，它是核心方法 ----------------------- */
 
 
 
-
-
-
-
-
-
-
-
-
-
-	//-------------------------------------------------------------------------
 	// Methods dealing with callable statements
-	/* --------------------------------- 以下这些方法最终都会来调用 execute(CallableStatementCreator csc, CallableStatementCallback<T> action) 这个方法 ---------------------------------------- */
+	/* 以下这些方法最终都会来调用 execute(CallableStatementCreator csc, CallableStatementCallback<T> action) 这个方法 */
 	public <T> T execute(CallableStatementCreator csc, CallableStatementCallback<T> action) throws DataAccessException {
 
 		Assert.notNull(csc, "CallableStatementCreator must not be null");
@@ -1133,20 +973,12 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		}
 		return returnedResults;
 	}
-	/*--------------------------------- 以上这些方法最终都会来调用 execute(CallableStatementCreator csc, CallableStatementCallback<T> action) 这个方法 ----------------------------------------*/
 
 
 
 
 
-
-
-
-
-
-	//-------------------------------------------------------------------------
 	// Implementation hooks and helper methods
-	//-------------------------------------------------------------------------
 	/**
 	 * Create a new RowMapper for reading columns as key-value pairs.
 	 * @return the RowMapper to use
@@ -1259,6 +1091,139 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			return null;
 		}
 	}
+
+
+
+	/* --------------------------- getter and setter ... ------------------------------ */
+	/**
+	 * Set a NativeJdbcExtractor to extract native JDBC objects from wrapped handles.
+	 * Useful if native Statement and/or ResultSet handles are expected for casting
+	 * to database-specific implementation classes, but a connection pool that wraps
+	 * JDBC objects is used (note: <i>any</i> pool will return wrapped Connections).
+	 */
+	public void setNativeJdbcExtractor(NativeJdbcExtractor extractor) {
+		this.nativeJdbcExtractor = extractor;
+	}
+	/**
+	 * Return the current NativeJdbcExtractor implementation.
+	 */
+	public NativeJdbcExtractor getNativeJdbcExtractor() {
+		return this.nativeJdbcExtractor;
+	}
+	/**
+	 * Set whether or not we want to ignore SQLWarnings.
+	 * <p>Default is "true", swallowing and logging all warnings. Switch this flag
+	 * to "false" to make the JdbcTemplate throw a SQLWarningException instead.
+	 * @see java.sql.SQLWarning
+	 * @see org.springframework.jdbc.SQLWarningException
+	 * @see #handleWarnings
+	 */
+	public void setIgnoreWarnings(boolean ignoreWarnings) {
+		this.ignoreWarnings = ignoreWarnings;
+	}
+	/**
+	 * Return whether or not we ignore SQLWarnings.
+	 */
+	public boolean isIgnoreWarnings() {
+		return this.ignoreWarnings;
+	}
+	/**
+	 * Set the fetch size for this JdbcTemplate. This is important for processing
+	 * large result sets: Setting this higher than the default value will increase
+	 * processing speed at the cost of memory consumption; setting this lower can
+	 * avoid transferring row data that will never be read by the application.
+	 * <p>Default is 0, indicating to use the JDBC driver's default.
+	 * @see java.sql.Statement#setFetchSize
+	 */
+	public void setFetchSize(int fetchSize) {
+		this.fetchSize = fetchSize;
+	}
+	/**
+	 * Return the fetch size specified for this JdbcTemplate.
+	 */
+	public int getFetchSize() {
+		return this.fetchSize;
+	}
+	/**
+	 * Set the maximum number of rows for this JdbcTemplate. This is important
+	 * for processing subsets of large result sets, avoiding to read and hold
+	 * the entire result set in the database or in the JDBC driver if we're
+	 * never interested in the entire result in the first place (for example,
+	 * when performing searches that might return a large number of matches).
+	 * <p>Default is 0, indicating to use the JDBC driver's default.
+	 * @see java.sql.Statement#setMaxRows
+	 */
+	public void setMaxRows(int maxRows) {
+		this.maxRows = maxRows;
+	}
+	/**
+	 * Return the maximum number of rows specified for this JdbcTemplate.
+	 */
+	public int getMaxRows() {
+		return this.maxRows;
+	}
+	/**
+	 * Set the query timeout for statements that this JdbcTemplate executes.
+	 * <p>Default is 0, indicating to use the JDBC driver's default.
+	 * <p>Note: Any timeout specified here will be overridden by the remaining
+	 * transaction timeout when executing within a transaction that has a
+	 * timeout specified at the transaction level.
+	 * @see java.sql.Statement#setQueryTimeout
+	 */
+	public void setQueryTimeout(int queryTimeout) {
+		this.queryTimeout = queryTimeout;
+	}
+	/**
+	 * Return the query timeout for statements that this JdbcTemplate executes.
+	 */
+	public int getQueryTimeout() {
+		return this.queryTimeout;
+	}
+	/**
+	 * Set whether results processing should be skipped. Can be used to optimize callable
+	 * statement processing when we know that no results are being passed back - the processing
+	 * of out parameter will still take place. This can be used to avoid a bug in some older
+	 * Oracle JDBC drivers like 10.1.0.2.
+	 */
+	public void setSkipResultsProcessing(boolean skipResultsProcessing) {
+		this.skipResultsProcessing = skipResultsProcessing;
+	}
+	/**
+	 * Return whether results processing should be skipped.
+	 */
+	public boolean isSkipResultsProcessing() {
+		return this.skipResultsProcessing;
+	}
+	/**
+	 * Set whether undeclared results should be skipped.
+	 */
+	public void setSkipUndeclaredResults(boolean skipUndeclaredResults) {
+		this.skipUndeclaredResults = skipUndeclaredResults;
+	}
+	/**
+	 * Return whether undeclared results should be skipped.
+	 */
+	public boolean isSkipUndeclaredResults() {
+		return this.skipUndeclaredResults;
+	}
+	/**
+	 * Set whether execution of a CallableStatement will return the results in a Map
+	 * that uses case insensitive names for the parameters.
+	 */
+	public void setResultsMapCaseInsensitive(boolean resultsMapCaseInsensitive) {
+		this.resultsMapCaseInsensitive = resultsMapCaseInsensitive;
+	}
+	/**
+	 * Return whether execution of a CallableStatement will return the results in a Map
+	 * that uses case insensitive names for the parameters.
+	 */
+	public boolean isResultsMapCaseInsensitive() {
+		return this.resultsMapCaseInsensitive;
+	}
+
+
+
+
 
 
 	/**
