@@ -33,32 +33,20 @@ package org.springframework.transaction.support;
  * @see AbstractPlatformTransactionManager
  * @see org.springframework.jdbc.datasource.DataSourceUtils#CONNECTION_SYNCHRONIZATION_ORDER
  */
+// TransactionSynchronization主要用于事务同步，提供了挂起、恢复还有提交前、提交后等钩子方法：
 public interface TransactionSynchronization {
 
-	/** Completion status in case of proper commit */
+	//** Completion status in case of proper commit */
 	int STATUS_COMMITTED = 0;
-
-	/** Completion status in case of proper rollback */
+	//** Completion status in case of proper rollback */
 	int STATUS_ROLLED_BACK = 1;
-
-	/** Completion status in case of heuristic mixed completion or system errors */
+	//** Completion status in case of heuristic mixed completion or system errors */
 	int STATUS_UNKNOWN = 2;
 
-
-	/**
-	 * Suspend this synchronization.
-	 * Supposed to unbind resources from TransactionSynchronizationManager if managing any.
-	 * @see TransactionSynchronizationManager#unbindResource
-	 */
+	// 挂起（暂停）事务
 	void suspend();
-
-	/**
-	 * Resume this synchronization.
-	 * Supposed to rebind resources to TransactionSynchronizationManager if managing any.
-	 * @see TransactionSynchronizationManager#bindResource
-	 */
+	// 恢复事务
 	void resume();
-
 	/**
 	 * Flush the underlying session to the datastore, if applicable:
 	 * for example, a Hibernate/JPA session.
@@ -66,70 +54,14 @@ public interface TransactionSynchronization {
 	 */
 	void flush();
 
-	/**
-	 * Invoked before transaction commit (before "beforeCompletion").
-	 * Can e.g. flush transactional O/R Mapping sessions to the database.
-	 * <p>This callback does <i>not</i> mean that the transaction will actually be committed.
-	 * A rollback decision can still occur after this method has been called. This callback
-	 * is rather meant to perform work that's only relevant if a commit still has a chance
-	 * to happen, such as flushing SQL statements to the database.
-	 * <p>Note that exceptions will get propagated to the commit caller and cause a
-	 * rollback of the transaction.
-	 * @param readOnly whether the transaction is defined as read-only transaction
-	 * @throws RuntimeException in case of errors; will be <b>propagated to the caller</b>
-	 * (note: do not throw TransactionException subclasses here!)
-	 * @see #beforeCompletion
-	 */
+
+	// 在事务提交前调用该方法，该方法在beforeCompletion()方法前调用
 	void beforeCommit(boolean readOnly);
-
-	/**
-	 * Invoked before transaction commit/rollback.
-	 * Can perform resource cleanup <i>before</i> transaction completion.
-	 * <p>This method will be invoked after {@code beforeCommit}, even when
-	 * {@code beforeCommit} threw an exception. This callback allows for
-	 * closing resources before transaction completion, for any outcome.
-	 * @throws RuntimeException in case of errors; will be <b>logged but not propagated</b>
-	 * (note: do not throw TransactionException subclasses here!)
-	 * @see #beforeCommit
-	 * @see #afterCompletion
-	 */
+	// 在事务提交或回滚前该方法被调用
 	void beforeCompletion();
-
-	/**
-	 * Invoked after transaction commit. Can perform further operations right
-	 * <i>after</i> the main transaction has <i>successfully</i> committed.
-	 * <p>Can e.g. commit further operations that are supposed to follow on a successful
-	 * commit of the main transaction, like confirmation messages or emails.
-	 * <p><b>NOTE:</b> The transaction will have been committed already, but the
-	 * transactional resources might still be active and accessible. As a consequence,
-	 * any data access code triggered at this point will still "participate" in the
-	 * original transaction, allowing to perform some cleanup (with no commit following
-	 * anymore!), unless it explicitly declares that it needs to run in a separate
-	 * transaction. Hence: <b>Use {@code PROPAGATION_REQUIRES_NEW} for any
-	 * transactional operation that is called from here.</b>
-	 * @throws RuntimeException in case of errors; will be <b>propagated to the caller</b>
-	 * (note: do not throw TransactionException subclasses here!)
-	 */
+	// 该方法在事务提交后调用，该方法在afterCompletion()方法前盗用
 	void afterCommit();
-
-	/**
-	 * Invoked after transaction commit/rollback.
-	 * Can perform resource cleanup <i>after</i> transaction completion.
-	 * <p><b>NOTE:</b> The transaction will have been committed or rolled back already,
-	 * but the transactional resources might still be active and accessible. As a
-	 * consequence, any data access code triggered at this point will still "participate"
-	 * in the original transaction, allowing to perform some cleanup (with no commit
-	 * following anymore!), unless it explicitly declares that it needs to run in a
-	 * separate transaction. Hence: <b>Use {@code PROPAGATION_REQUIRES_NEW}
-	 * for any transactional operation that is called from here.</b>
-	 * @param status completion status according to the {@code STATUS_*} constants
-	 * @throws RuntimeException in case of errors; will be <b>logged but not propagated</b>
-	 * (note: do not throw TransactionException subclasses here!)
-	 * @see #STATUS_COMMITTED
-	 * @see #STATUS_ROLLED_BACK
-	 * @see #STATUS_UNKNOWN
-	 * @see #beforeCompletion
-	 */
+	// 该方法在事务提交或回滚后被调用
 	void afterCompletion(int status);
 
 }

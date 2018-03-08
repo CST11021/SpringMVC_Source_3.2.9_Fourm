@@ -138,24 +138,21 @@ public abstract class TransactionSynchronizationManager {
 		}
 		return value;
 	}
-	/**
-	 * Bind the given resource for the given key to the current thread.
-	 * @param key the key to bind the value to (usually the resource factory)
-	 * @param value the value to bind (usually the active resource object)
-	 * @throws IllegalStateException if there is already a value bound to the thread
-	 * @see ResourceTransactionManager#getResourceFactory()
-	 */
+
+	// 绑定资源到当前线程，value通常就是一个资源对象
 	public static void bindResource(Object key, Object value) throws IllegalStateException {
+		// 如果传入的key是一个代理对象，则需要这里进行获取原始的目标对象
 		Object actualKey = TransactionSynchronizationUtils.unwrapResourceIfNecessary(key);
 		Assert.notNull(value, "Value must not be null");
+
 		Map<Object, Object> map = resources.get();
-		// set ThreadLocal Map if none found
 		if (map == null) {
 			map = new HashMap<Object, Object>();
 			resources.set(map);
 		}
+
 		Object oldValue = map.put(actualKey, value);
-		// Transparently suppress a ResourceHolder that was marked as void...
+		// 如果是一个 ResourceHolder 对象，则这里赋值为null，以防止连接泄露
 		if (oldValue instanceof ResourceHolder && ((ResourceHolder) oldValue).isVoid()) {
 			oldValue = null;
 		}
@@ -221,11 +218,7 @@ public abstract class TransactionSynchronizationManager {
 
 	// ------------------------------------ 管理的事务同步相关方法 -------------------------------------
 
-	/**
-	 * Return if transaction synchronization is active for the current thread.
-	 * Can be called before register to avoid unnecessary instance creation.
-	 * @see #registerSynchronization
-	 */
+	// 判断当前线程是否有正在执行的事务操作，正在执行的事务会被保存在 synchronizations 属性中
 	public static boolean isSynchronizationActive() {
 		return (synchronizations.get() != null);
 	}

@@ -34,14 +34,13 @@ import org.springframework.transaction.TransactionTimedOutException;
  */
 public abstract class ResourceHolderSupport implements ResourceHolder {
 
+	// 当事务对象绑定了ConnectionHolder对象后，则该属性置为true
 	private boolean synchronizedWithTransaction = false;
-
+	// 标识是否要回滚
 	private boolean rollbackOnly = false;
-
+	// 根据超时时长，计算出deadline
 	private Date deadline;
-
 	private int referenceCount = 0;
-
 	private boolean isVoid = false;
 
 
@@ -51,7 +50,6 @@ public abstract class ResourceHolderSupport implements ResourceHolder {
 	public void setSynchronizedWithTransaction(boolean synchronizedWithTransaction) {
 		this.synchronizedWithTransaction = synchronizedWithTransaction;
 	}
-
 	/**
 	 * Return whether the resource is synchronized with a transaction.
 	 */
@@ -65,7 +63,6 @@ public abstract class ResourceHolderSupport implements ResourceHolder {
 	public void setRollbackOnly() {
 		this.rollbackOnly = true;
 	}
-
 	/**
 	 * Return whether the resource transaction is marked as rollback-only.
 	 */
@@ -80,7 +77,6 @@ public abstract class ResourceHolderSupport implements ResourceHolder {
 	public void setTimeoutInSeconds(int seconds) {
 		setTimeoutInMillis(seconds * 1000);
 	}
-
 	/**
 	 * Set the timeout for this object in milliseconds.
 	 * @param millis number of milliseconds until expiration
@@ -89,9 +85,7 @@ public abstract class ResourceHolderSupport implements ResourceHolder {
 		this.deadline = new Date(System.currentTimeMillis() + millis);
 	}
 
-	/**
-	 * Return whether this object has an associated timeout.
-	 */
+	// 判断是否有超时的deadline
 	public boolean hasTimeout() {
 		return (this.deadline != null);
 	}

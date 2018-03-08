@@ -35,6 +35,7 @@ import org.springframework.util.ClassUtils;
  * @see TransactionSynchronization
  * @see TransactionSynchronizationManager#getSynchronizations()
  */
+// 该类用于调用 TransactionSynchronization 接口中相关的方法
 public abstract class TransactionSynchronizationUtils {
 
 	private static final Log logger = LogFactory.getLog(TransactionSynchronizationUtils.class);
@@ -52,16 +53,12 @@ public abstract class TransactionSynchronizationUtils {
 	public static boolean sameResourceFactory(ResourceTransactionManager tm, Object resourceFactory) {
 		return unwrapResourceIfNecessary(tm.getResourceFactory()).equals(unwrapResourceIfNecessary(resourceFactory));
 	}
-
-	/**
-	 * Unwrap the given resource handle if necessary; otherwise return
-	 * the given handle as-is.
-	 * @see org.springframework.core.InfrastructureProxy#getWrappedObject()
-	 */
+	// 根据需要，获取原始对象，传入的资源对象可能是一个代理对象或者被包装后的对象，该方法用于获取原始的对象
 	static Object unwrapResourceIfNecessary(Object resource) {
 		Assert.notNull(resource, "Resource must not be null");
 		Object resourceRef = resource;
-		// unwrap infrastructure proxy
+
+		// 如果该资源对象是一个代理带向，获取目标对象
 		if (resourceRef instanceof InfrastructureProxy) {
 			resourceRef = ((InfrastructureProxy) resourceRef).getWrappedObject();
 		}
@@ -84,13 +81,13 @@ public abstract class TransactionSynchronizationUtils {
 		}
 	}
 
+
 	// 事务提交前被调用
 	public static void triggerBeforeCommit(boolean readOnly) {
 		for (TransactionSynchronization synchronization : TransactionSynchronizationManager.getSynchronizations()) {
 			synchronization.beforeCommit(readOnly);
 		}
 	}
-
 	/**
 	 * Trigger {@code beforeCompletion} callbacks on all currently registered synchronizations.
 	 * @see TransactionSynchronization#beforeCompletion()
@@ -106,6 +103,7 @@ public abstract class TransactionSynchronizationUtils {
 		}
 	}
 
+
 	/**
 	 * Trigger {@code afterCommit} callbacks on all currently registered synchronizations.
 	 * @throws RuntimeException if thrown by a {@code afterCommit} callback
@@ -115,7 +113,6 @@ public abstract class TransactionSynchronizationUtils {
 	public static void triggerAfterCommit() {
 		invokeAfterCommit(TransactionSynchronizationManager.getSynchronizations());
 	}
-
 	/**
 	 * Actually invoke the {@code afterCommit} methods of the
 	 * given Spring TransactionSynchronization objects.
@@ -129,6 +126,7 @@ public abstract class TransactionSynchronizationUtils {
 			}
 		}
 	}
+
 
 	/**
 	 * Trigger {@code afterCompletion} callbacks on all currently registered synchronizations.
@@ -144,7 +142,6 @@ public abstract class TransactionSynchronizationUtils {
 		List<TransactionSynchronization> synchronizations = TransactionSynchronizationManager.getSynchronizations();
 		invokeAfterCompletion(synchronizations, completionStatus);
 	}
-
 	/**
 	 * Actually invoke the {@code afterCompletion} methods of the
 	 * given Spring TransactionSynchronization objects.

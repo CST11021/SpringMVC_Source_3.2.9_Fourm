@@ -34,24 +34,7 @@ import org.springframework.transaction.TransactionStatus;
  */
 public interface TransactionCallback<T> {
 
-	/**
-	 * Gets called by {@link TransactionTemplate#execute} within a transactional context.
-	 * Does not need to care about transactions itself, although it can retrieve
-	 * and influence the status of the current transaction via the given status
-	 * object, e.g. setting rollback-only.
-	 *
-	 * <p>Allows for returning a result object created within the transaction, i.e.
-	 * a domain object or a collection of domain objects. A RuntimeException thrown
-	 * by the callback is treated as application exception that enforces a rollback.
-	 * Any such exception will be propagated to the caller of the template, unless
-	 * there is a problem rolling back, in which case a TransactionException will be
-	 * thrown.
-	 *
-	 * @param status associated transaction status
-	 * @return a result object, or {@code null}
-	 * @see TransactionTemplate#execute
-	 * @see CallbackPreferringPlatformTransactionManager#execute
-	 */
+	// 事务模板类的回调接口，可以通过实现该接口执行一系列的持久化操作
 	T doInTransaction(TransactionStatus status);
 
 }

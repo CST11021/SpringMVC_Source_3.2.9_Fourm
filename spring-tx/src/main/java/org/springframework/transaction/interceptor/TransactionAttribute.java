@@ -29,6 +29,12 @@ import org.springframework.transaction.TransactionDefinition;
  * @see DefaultTransactionAttribute
  * @see RuleBasedTransactionAttribute
  */
+// 它主要添加了一个获取qualifier的方法和一个决定事务是否需要回滚的rollbackOn方法，getQualifier返回的实际是
+// TransactionManager的实例的BeanName，而rollbackOn会遍历前面说到的rollbackRule列表计算出winner，如果winner为null，会判
+// 断异常是否为RuntimeException或者Error类型，存在winner或者异常为RuntimeException或者Error类型的时候返回true，即进行事
+// 务回滚。TransactionAttribute的标准实现类是DefaultTransactionAttribute，它继承于DefaultTransactionDefinition，主要添加
+// 了getQualifier和rollbackOn的实现，另外，添加了descriptor(String类型，实际上是方法描述符，通俗来说就是”
+// className.methodName”，用于获取方法描述符的降级逻辑)获取和设值方法。
 public interface TransactionAttribute extends TransactionDefinition {
 
 	/**

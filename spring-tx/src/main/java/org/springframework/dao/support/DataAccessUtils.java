@@ -35,15 +35,7 @@ import org.springframework.util.NumberUtils;
  */
 public abstract class DataAccessUtils {
 
-	/**
-	 * Return a single result object from the given Collection.
-	 * <p>Returns {@code null} if 0 result objects found;
-	 * throws an exception if more than 1 element found.
-	 * @param results the result Collection (can be {@code null})
-	 * @return the single result object, or {@code null} if none
-	 * @throws IncorrectResultSizeDataAccessException if more than one
-	 * element has been found in the given Collection
-	 */
+	// 返回results的第一个元素；如果results大小为0，返回null；如果results存在多个元素，则抛出异常
 	public static <T> T singleResult(Collection<T> results) throws IncorrectResultSizeDataAccessException {
 		int size = (results != null ? results.size() : 0);
 		if (size == 0) {
@@ -54,17 +46,7 @@ public abstract class DataAccessUtils {
 		}
 		return results.iterator().next();
 	}
-
-	/**
-	 * Return a single result object from the given Collection.
-	 * <p>Throws an exception if 0 or more than 1 element found.
-	 * @param results the result Collection (can be {@code null})
-	 * @return the single result object
-	 * @throws IncorrectResultSizeDataAccessException if more than one
-	 * element has been found in the given Collection
-	 * @throws EmptyResultDataAccessException if no element at all
-	 * has been found in the given Collection
-	 */
+	// 返回results的第一个元素；如果results大小不为1，则抛出异常
 	public static <T> T requiredSingleResult(Collection<T> results) throws IncorrectResultSizeDataAccessException {
 		int size = (results != null ? results.size() : 0);
 		if (size == 0) {
@@ -75,17 +57,7 @@ public abstract class DataAccessUtils {
 		}
 		return results.iterator().next();
 	}
-
-	/**
-	 * Return a unique result object from the given Collection.
-	 * <p>Returns {@code null} if 0 result objects found;
-	 * throws an exception if more than 1 instance found.
-	 * @param results the result Collection (can be {@code null})
-	 * @return the unique result object, or {@code null} if none
-	 * @throws IncorrectResultSizeDataAccessException if more than one
-	 * result object has been found in the given Collection
-	 * @see org.springframework.util.CollectionUtils#hasUniqueObject
-	 */
+	// 返回results的第一个元素；如果results不唯一则抛出异常
 	public static <T> T uniqueResult(Collection<T> results) throws IncorrectResultSizeDataAccessException {
 		int size = (results != null ? results.size() : 0);
 		if (size == 0) {
@@ -96,18 +68,6 @@ public abstract class DataAccessUtils {
 		}
 		return results.iterator().next();
 	}
-
-	/**
-	 * Return a unique result object from the given Collection.
-	 * <p>Throws an exception if 0 or more than 1 instance found.
-	 * @param results the result Collection (can be {@code null})
-	 * @return the unique result object
-	 * @throws IncorrectResultSizeDataAccessException if more than one
-	 * result object has been found in the given Collection
-	 * @throws EmptyResultDataAccessException if no result object at all
-	 * has been found in the given Collection
-	 * @see org.springframework.util.CollectionUtils#hasUniqueObject
-	 */
 	public static <T> T requiredUniqueResult(Collection<T> results) throws IncorrectResultSizeDataAccessException {
 		int size = (results != null ? results.size() : 0);
 		if (size == 0) {
@@ -119,20 +79,7 @@ public abstract class DataAccessUtils {
 		return results.iterator().next();
 	}
 
-	/**
-	 * Return a unique result object from the given Collection.
-	 * Throws an exception if 0 or more than 1 result objects found,
-	 * of if the unique result object is not convertable to the
-	 * specified required type.
-	 * @param results the result Collection (can be {@code null})
-	 * @return the unique result object
-	 * @throws IncorrectResultSizeDataAccessException if more than one
-	 * result object has been found in the given Collection
-	 * @throws EmptyResultDataAccessException if no result object
-	 * at all has been found in the given Collection
-	 * @throws TypeMismatchDataAccessException if the unique object does
-	 * not match the specified required type
-	 */
+	// 返回results的第一个元素，并按指定的类型返回
 	@SuppressWarnings("unchecked")
 	public static <T> T objectResult(Collection<?> results, Class<T> requiredType)
 			throws IncorrectResultSizeDataAccessException, TypeMismatchDataAccessException {
@@ -158,39 +105,13 @@ public abstract class DataAccessUtils {
 		}
 		return (T) result;
 	}
-
-	/**
-	 * Return a unique int result from the given Collection.
-	 * Throws an exception if 0 or more than 1 result objects found,
-	 * of if the unique result object is not convertable to an int.
-	 * @param results the result Collection (can be {@code null})
-	 * @return the unique int result
-	 * @throws IncorrectResultSizeDataAccessException if more than one
-	 * result object has been found in the given Collection
-	 * @throws EmptyResultDataAccessException if no result object
-	 * at all has been found in the given Collection
-	 * @throws TypeMismatchDataAccessException if the unique object
-	 * in the collection is not convertable to an int
-	 */
+	// 返回results的第一个元素，并转为int类型
 	public static int intResult(Collection results)
 			throws IncorrectResultSizeDataAccessException, TypeMismatchDataAccessException {
 
 		return objectResult(results, Number.class).intValue();
 	}
-
-	/**
-	 * Return a unique long result from the given Collection.
-	 * Throws an exception if 0 or more than 1 result objects found,
-	 * of if the unique result object is not convertable to a long.
-	 * @param results the result Collection (can be {@code null})
-	 * @return the unique long result
-	 * @throws IncorrectResultSizeDataAccessException if more than one
-	 * result object has been found in the given Collection
-	 * @throws EmptyResultDataAccessException if no result object
-	 * at all has been found in the given Collection
-	 * @throws TypeMismatchDataAccessException if the unique object
-	 * in the collection is not convertable to a long
-	 */
+	// 返回results的第一个元素，并转为long类型
 	public static long longResult(Collection results)
 			throws IncorrectResultSizeDataAccessException, TypeMismatchDataAccessException {
 
@@ -206,8 +127,7 @@ public abstract class DataAccessUtils {
 	 * @return a translated exception if translation is possible, or
 	 * the raw exception if it is not
 	 */
-	public static RuntimeException translateIfNecessary(
-			RuntimeException rawException, PersistenceExceptionTranslator pet) {
+	public static RuntimeException translateIfNecessary(RuntimeException rawException, PersistenceExceptionTranslator pet) {
 
 		Assert.notNull(pet, "PersistenceExceptionTranslator must not be null");
 		DataAccessException dex = pet.translateExceptionIfPossible(rawException);

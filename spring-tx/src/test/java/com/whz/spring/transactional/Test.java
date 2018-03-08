@@ -18,6 +18,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
+// 源码解析请参考：http://throwable.coding.me/2017/12/11/spring-transaction/#DataSourceTransactionObject–事务实体
 public class Test {
 
     User zhangsanUser = new User("张三",20,"男");

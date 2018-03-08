@@ -34,10 +34,7 @@ public interface TransactionStatus extends SavepointManager {
 	// 判断当前事务是否已经被标识为rollback-only
 	boolean isRollbackOnly();
 
-	/**
-	 * Flush the underlying session to the datastore, if applicable:
-	 * for example, all affected Hibernate/JPA sessions.
-	 */
+	// 用于刷新底层会话中的修改到数据库，一般用于刷新如Hibernate/JPA的会话，可能对如JDBC类型的事务无任何影响；
 	void flush();
 
 	// 判断事务是否已经完成，比如已提交或已经回滚

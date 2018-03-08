@@ -48,11 +48,16 @@ import org.springframework.transaction.SavepointManager;
  */
 public class DefaultTransactionStatus extends AbstractTransactionStatus {
 
+	// 表示一个事务对象
 	private final Object transaction;
+	// 标识当前是否为一个新的事务
 	private final boolean newTransaction;
+	// 标识是否已经为此事务打开了新的事务同步：事务同步就是将当前的资源绑定到线程
 	private final boolean newSynchronization;
+	// 是否为只读事务
 	private final boolean readOnly;
 	private final boolean debug;
+	// 持有一个被暂停的资源
 	private final Object suspendedResources;
 
 
@@ -71,8 +76,7 @@ public class DefaultTransactionStatus extends AbstractTransactionStatus {
 	 * @param suspendedResources a holder for resources that have been suspended
 	 * for this transaction, if any
 	 */
-	public DefaultTransactionStatus(
-			Object transaction, boolean newTransaction, boolean newSynchronization,
+	public DefaultTransactionStatus(Object transaction, boolean newTransaction, boolean newSynchronization,
 			boolean readOnly, boolean debug, Object suspendedResources) {
 
 		this.transaction = transaction;
@@ -103,8 +107,7 @@ public class DefaultTransactionStatus extends AbstractTransactionStatus {
 	}
 
 	/**
-	 * Return if a new transaction synchronization has been opened
-	 * for this transaction.
+	 * Return if a new transaction synchronization has been opened for this transaction.
 	 */
 	public boolean isNewSynchronization() {
 		return this.newSynchronization;

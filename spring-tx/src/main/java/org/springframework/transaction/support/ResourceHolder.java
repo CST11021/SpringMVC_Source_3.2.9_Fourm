@@ -25,7 +25,7 @@ package org.springframework.transaction.support;
  * @see ResourceHolderSupport
  * @see ResourceHolderSynchronization
  */
-// 由资源持有者实现的通用接口
+// 由资源持有者实现的通用接口（Spring将JDBC的Connection、Hibernate的Session等访问数据库的连接或会话对象统称为资源）
 public interface ResourceHolder {
 
 	// 重置这个holder的事务状态

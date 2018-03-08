@@ -67,11 +67,8 @@ Spring的数据访问层那样，使用模板方法模式与Callback相结合的
 @SuppressWarnings("serial")
 public class TransactionTemplate extends DefaultTransactionDefinition implements TransactionOperations, InitializingBean {
 
-	/** Logger available to subclasses */
 	protected final Log logger = LogFactory.getLog(getClass());
-
 	private PlatformTransactionManager transactionManager;
-
 
 	public TransactionTemplate() {}
 	public TransactionTemplate(PlatformTransactionManager transactionManager) {
@@ -83,26 +80,8 @@ public class TransactionTemplate extends DefaultTransactionDefinition implements
 	}
 
 
-	/**
-	 * Set the transaction management strategy to be used.
-	 */
-	public void setTransactionManager(PlatformTransactionManager transactionManager) {
-		this.transactionManager = transactionManager;
-	}
-	/**
-	 * Return the transaction management strategy to be used.
-	 */
-	public PlatformTransactionManager getTransactionManager() {
-		return this.transactionManager;
-	}
 
-	public void afterPropertiesSet() {
-		if (this.transactionManager == null) {
-			throw new IllegalArgumentException("Property 'transactionManager' is required");
-		}
-	}
-
-
+	// 执行持久化操作的回调接口方法
 	public <T> T execute(TransactionCallback<T> action) throws TransactionException {
 		if (this.transactionManager instanceof CallbackPreferringPlatformTransactionManager) {
 			return ((CallbackPreferringPlatformTransactionManager) this.transactionManager).execute(this, action);
@@ -132,13 +111,7 @@ public class TransactionTemplate extends DefaultTransactionDefinition implements
 			return result;
 		}
 	}
-
-	/**
-	 * Perform a rollback, handling rollback exceptions properly.
-	 * @param status object representing the transaction
-	 * @param ex the thrown application exception or error
-	 * @throws TransactionException in case of a rollback error
-	 */
+	// 在事务范围内异常时被调用，用于事务回滚
 	private void rollbackOnException(TransactionStatus status, Throwable ex) throws TransactionException {
 		logger.debug("Initiating transaction rollback on application exception", ex);
 		try {
@@ -158,5 +131,27 @@ public class TransactionTemplate extends DefaultTransactionDefinition implements
 			throw err;
 		}
 	}
+
+
+
+
+	// 设置事务管理器，一般该方法用于解析配置时注入事务管理器
+	public void setTransactionManager(PlatformTransactionManager transactionManager) {
+		this.transactionManager = transactionManager;
+	}
+	public PlatformTransactionManager getTransactionManager() {
+		return this.transactionManager;
+	}
+
+
+
+	// Bean初始化后处理器方法，此处用来校验事务模板是否已经注入了事务管理器对象
+	public void afterPropertiesSet() {
+		if (this.transactionManager == null) {
+			throw new IllegalArgumentException("Property 'transactionManager' is required");
+		}
+	}
+
+
 
 }

@@ -118,6 +118,7 @@ import org.springframework.util.StringUtils;
  * @see #setTransactionManager
  * @see WebLogicJtaTransactionManager
  */
+// 具有多个数据源的全局事务使用该事务管理器（不管采用何种持久化技术）
 @SuppressWarnings("serial")
 public class JtaTransactionManager extends AbstractPlatformTransactionManager
 		implements TransactionFactory, InitializingBean, Serializable {
