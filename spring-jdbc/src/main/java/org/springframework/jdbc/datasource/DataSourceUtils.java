@@ -68,6 +68,22 @@ public abstract class DataSourceUtils {
 	public static Connection doGetConnection(DataSource dataSource) throws SQLException {
 		Assert.notNull(dataSource, "No DataSource specified");
 
+		//Spring将JDBC的Connection、Hibernate的Session等访问数据库的连接或会话对象统称为资源，这些资源在同一时刻是不能多线
+		//程共享的。为了让DAO、Service类可能做到singleton，Spring的事务同步管理器类SynchronizationManager使用ThreadLocal为
+		//不同事务线程提供了独立的资源副本，同时维护事务配置的属性和运行状态信息。事务同步管理器是Spring事务管理的基石，不
+		//管用户使用的编程式事务管理，还是声明式事务管理，都离不开事务同步管理器。
+        //
+		//Spring框架为不同的持久化技术提供了一套从TransactionSynchronizationManager中获取对应线程绑定资源的工具类，如下表：
+		//------------------------------------------------------------
+		//Spring JDBC或Mybatis	DataSourceUtils
+		//Hibernate X.0			SessionFactoryUtils
+		//JPA						EntityManagerFactoryUtils
+		//JDO						PersistenceManagerFactoryUtils
+		//-------------------------------------------------------------
+        //
+		//这些工具类都提供了静态的方法，通过这些方法可以获取和当前线程绑定的资源，如DataSourceUtils.getConnection(DataSource dataSource)
+		//方法可以从指定的数据源中获取和当前线程绑定的Connection，而Hibernate的SessionFactoryUtils
+		//	.getSession(SessionFactory sessionFactory, boolean allowCreate)方法则可以从指定的SessionFactory中获取和当前线程绑定的Session。
 		ConnectionHolder conHolder = (ConnectionHolder) TransactionSynchronizationManager.getResource(dataSource);
 		if (conHolder != null && (conHolder.hasConnection() || conHolder.isSynchronizedWithTransaction())) {
 			conHolder.requested();
@@ -82,11 +98,10 @@ public abstract class DataSourceUtils {
 		logger.debug("Fetching JDBC Connection from DataSource");
 		Connection con = dataSource.getConnection();
 
-		// 当前线程支持同步
+		// 当前线程支持同步，则需要使用事务同步管理器将资源绑定到当前线程
 		if (TransactionSynchronizationManager.isSynchronizationActive()) {
 			logger.debug("Registering transaction synchronization for JDBC Connection");
-			// 在事务中使用相同的连接来进行进一步的JDBC操作
-			// 在事务完成时，线程绑定的对象将被同步化
+			// 在事务中使用相同的连接来进行进一步的JDBC操作，在事务完成时，线程绑定的对象将被同步化
 			ConnectionHolder holderToUse = conHolder;
 			if (holderToUse == null) {
 				holderToUse = new ConnectionHolder(con);
@@ -95,11 +110,12 @@ public abstract class DataSourceUtils {
 				holderToUse.setConnection(con);
 			}
 
-			// 记录数据库连接
+			// 记录数据库连接次数
 			holderToUse.requested();
 			TransactionSynchronizationManager.registerSynchronization(new ConnectionSynchronization(holderToUse, dataSource));
 			holderToUse.setSynchronizedWithTransaction(true);
 			if (holderToUse != conHolder) {
+				// 使用事务同步管理器将资源绑定到当前线程
 				TransactionSynchronizationManager.bindResource(dataSource, holderToUse);
 			}
 		}
@@ -107,14 +123,7 @@ public abstract class DataSourceUtils {
 		return con;
 	}
 
-	/**
-	 * Prepare the given Connection with the given transaction semantics.
-	 * @param con the Connection to prepare
-	 * @param definition the transaction definition to apply
-	 * @return the previous isolation level, if any
-	 * @throws SQLException if thrown by JDBC methods
-	 * @see #resetConnectionAfterTransaction
-	 */
+	// 为这个连接对象设置事务信息，并返回事务隔离级别
 	public static Integer prepareConnectionForTransaction(Connection con, TransactionDefinition definition) throws SQLException {
 
 		Assert.notNull(con, "No Connection specified");
@@ -153,7 +162,7 @@ public abstract class DataSourceUtils {
 			}
 		}
 
-		// Apply specific isolation level, if any.
+		// 设置事务隔离级别
 		Integer previousIsolationLevel = null;
 		if (definition != null && definition.getIsolationLevel() != TransactionDefinition.ISOLATION_DEFAULT) {
 			if (logger.isDebugEnabled()) {
@@ -170,17 +179,12 @@ public abstract class DataSourceUtils {
 		return previousIsolationLevel;
 	}
 
-	/**
-	 * Reset the given Connection after a transaction,
-	 * regarding read-only flag and isolation level.
-	 * @param con the Connection to reset
-	 * @param previousIsolationLevel the isolation level to restore, if any
-	 * @see #prepareConnectionForTransaction
-	 */
+	// 事务完成后会来重置连接对象的事务信息
 	public static void resetConnectionAfterTransaction(Connection con, Integer previousIsolationLevel) {
 		Assert.notNull(con, "No Connection specified");
 		try {
 			// Reset transaction isolation to previous value, if changed for the transaction.
+			// 将事务隔离级别重置为事务之前的默认值
 			if (previousIsolationLevel != null) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("Resetting isolation level of JDBC Connection [" +
@@ -202,14 +206,7 @@ public abstract class DataSourceUtils {
 		}
 	}
 
-	/**
-	 * Determine whether the given JDBC Connection is transactional, that is,
-	 * bound to the current thread by Spring's transaction facilities.
-	 * @param con the Connection to check
-	 * @param dataSource the DataSource that the Connection was obtained from
-	 * (may be {@code null})
-	 * @return whether the Connection is transactional
-	 */
+	// 判断这个连接对象是否是一个事务，判断依据是通过事务管理器看看这个连接对象是否有绑定到当前线程
 	public static boolean isConnectionTransactional(Connection con, DataSource dataSource) {
 		if (dataSource == null) {
 			return false;
@@ -236,7 +233,6 @@ public abstract class DataSourceUtils {
 			stmt.setQueryTimeout(timeout);
 		}
 	}
-
 
 	// 释放 Connection
 	public static void releaseConnection(Connection con, DataSource dataSource) {

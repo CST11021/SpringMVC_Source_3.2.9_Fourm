@@ -199,6 +199,8 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	public <T> T execute(StatementCallback<T> action) throws DataAccessException {
 		Assert.notNull(action, "Callback object must not be null");
 
+		// 使用DataSourceUtils获取连接对象，比如是一个事务操作，则会将连接等资源绑定到当前线程，则需要通过DataSourceUtils
+		// 来获取同当前线程绑定的线程（如果有绑定的话），直接从DataSource对象获取的连接对象不能保证是同一个事务中使用的连接对象
 		Connection con = DataSourceUtils.getConnection(getDataSource());
 		Statement stmt = null;
 		try {
