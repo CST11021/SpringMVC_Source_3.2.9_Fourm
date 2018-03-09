@@ -451,13 +451,9 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 	protected final class TransactionInfo {
 
 		private final PlatformTransactionManager transactionManager;
-
 		private final TransactionAttribute transactionAttribute;
-
 		private final String joinpointIdentification;
-
 		private TransactionStatus transactionStatus;
-
 		private TransactionInfo oldTransactionInfo;
 
 		public TransactionInfo(PlatformTransactionManager transactionManager,

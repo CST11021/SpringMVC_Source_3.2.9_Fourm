@@ -29,7 +29,7 @@
 
 
 	<!--方式二：-->
-	<!--使用tx命名空间式的配置-->
+	<!--使用tx命名空间式的配置，这种方式更简便，使用自动代理的方式为指定的多个类进行事务代理-->
 	<aop:config>
 		<aop:pointcut id="serviceMethod" expression="execution(* com.whz.spring.transactional.*Service.*(..))" />
 		<aop:advisor pointcut-ref="serviceMethod" advice-ref="txAdvice" />

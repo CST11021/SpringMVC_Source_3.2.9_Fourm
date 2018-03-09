@@ -48,24 +48,13 @@ public class TransactionAttributeSourceAdvisor extends AbstractPointcutAdvisor {
 	};
 
 
-	/**
-	 * Create a new TransactionAttributeSourceAdvisor.
-	 */
 	public TransactionAttributeSourceAdvisor() {
 	}
-
-	/**
-	 * Create a new TransactionAttributeSourceAdvisor.
-	 * @param interceptor the transaction interceptor to use for this advisor
-	 */
 	public TransactionAttributeSourceAdvisor(TransactionInterceptor interceptor) {
 		setTransactionInterceptor(interceptor);
 	}
 
 
-	/**
-	 * Set the transaction interceptor to use for this advisor.
-	 */
 	public void setTransactionInterceptor(TransactionInterceptor interceptor) {
 		this.transactionInterceptor = interceptor;
 	}

@@ -110,6 +110,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @see TransactionInterceptor
  * @see org.springframework.aop.framework.ProxyFactoryBean
  */
+// 事务代理工厂类，可以使用该工厂类代理指定的目标类，使目标类的指定方法带有事务功能
 @SuppressWarnings("serial")
 public class TransactionProxyFactoryBean extends AbstractSingletonProxyFactoryBean implements BeanFactoryAware {
 
@@ -148,8 +149,6 @@ public class TransactionProxyFactoryBean extends AbstractSingletonProxyFactoryBe
 	public void setPointcut(Pointcut pointcut) {
 		this.pointcut = pointcut;
 	}
-
-
 
 
 }
