@@ -60,12 +60,15 @@ public abstract class AbstractSingletonProxyFactoryBean extends ProxyConfig
 
 	// 设置目标类、增强和代理接口等信息，生成的代理对象也是在该方法中创建的
 	public void afterPropertiesSet() {
+		// 代理工厂要代理的目标可能不能为空
 		if (this.target == null) {
 			throw new IllegalArgumentException("Property 'target' is required");
 		}
+		// 要代理的目标类，必须指向一个Bean（也就是目标类必须声明为一个Bean）
 		if (this.target instanceof String) {
 			throw new IllegalArgumentException("'target' needs to be a bean reference, not a bean name as value");
 		}
+		// 如果没有设置类加载器，则使用默认的类加载器
 		if (this.proxyClassLoader == null) {
 			this.proxyClassLoader = ClassUtils.getDefaultClassLoader();
 		}
@@ -80,14 +83,17 @@ public abstract class AbstractSingletonProxyFactoryBean extends ProxyConfig
 		}
 
 		// Add the main interceptor (typically an Advisor).
+		// 给代理工厂添加主要的拦截器（比较典型的一种增强）
 		proxyFactory.addAdvisor(this.advisorAdapterRegistry.wrap(createMainInterceptor()));
 
+		// 给代理工厂设置增强信息，将拦截器包装为Advisor
 		if (this.postInterceptors != null) {
 			for (Object interceptor : this.postInterceptors) {
 				proxyFactory.addAdvisor(this.advisorAdapterRegistry.wrap(interceptor));
 			}
 		}
 
+		// 复制代理的配置信息（从this中拷贝代理信息到代理工厂，注意：AbstractSingletonProxyFactoryBean extends ProxyConfig）
 		proxyFactory.copyFrom(this);
 
 		TargetSource targetSource = createTargetSource(this.target);
@@ -105,6 +111,7 @@ public abstract class AbstractSingletonProxyFactoryBean extends ProxyConfig
 		this.proxy = proxyFactory.getProxy(this.proxyClassLoader);
 	}
 	public Object getObject() {
+		// 这里的 this.proxy 在Bean的后置处理器方法afterPropertiesSet()中被创建了
 		if (this.proxy == null) {
 			throw new FactoryBeanNotInitializedException();
 		}
