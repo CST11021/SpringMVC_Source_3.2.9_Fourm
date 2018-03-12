@@ -41,6 +41,7 @@ public interface TransactionAttributeSource {
 	 * @return TransactionAttribute the matching transaction attribute,
 	 * or {@code null} if none found
 	 */
+	// 根据方法名，获取这个方法配置的事务信息
 	TransactionAttribute getTransactionAttribute(Method method, Class<?> targetClass);
 
 }

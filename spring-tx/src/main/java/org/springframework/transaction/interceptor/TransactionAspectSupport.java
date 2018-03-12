@@ -109,7 +109,9 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 		}
 		return currentTransactionInfo().transactionStatus;
 	}
+	// 表示要使用的事务管理器的Bean名称
 	private String transactionManagerBeanName;
+	// 表示要使用的事务管理器
 	private PlatformTransactionManager transactionManager;
 	private TransactionAttributeSource transactionAttributeSource;
 	private BeanFactory beanFactory;
