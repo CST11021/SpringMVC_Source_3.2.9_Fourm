@@ -42,13 +42,10 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 public abstract class AbstractMultipartHttpServletRequest extends HttpServletRequestWrapper
 		implements MultipartHttpServletRequest {
 
+	// 表示上传文件请求的parameter信息，MultipartFile 用于表示上传的文件
 	private MultiValueMap<String, MultipartFile> multipartFiles;
 
 
-	/**
-	 * Wrap the given HttpServletRequest in a MultipartHttpServletRequest.
-	 * @param request the request to wrap
-	 */
 	protected AbstractMultipartHttpServletRequest(HttpServletRequest request) {
 		super(request);
 	}

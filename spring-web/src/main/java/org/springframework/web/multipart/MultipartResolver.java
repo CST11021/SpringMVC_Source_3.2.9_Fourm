@@ -92,30 +92,10 @@ public interface MultipartResolver {
 	// 判断这个request是不是文件上传的请求
 	boolean isMultipart(HttpServletRequest request);
 
-	/**
-	 * Parse the given HTTP request into multipart files and parameters,
-	 * and wrap the request inside a
-	 * {@link org.springframework.web.multipart.MultipartHttpServletRequest} object
-	 * that provides access to file descriptors and makes contained
-	 * parameters accessible via the standard ServletRequest methods.
-	 * @param request the servlet request to wrap (must be of a multipart content type)
-	 * @return the wrapped servlet request
-	 * @throws MultipartException if the servlet request is not multipart, or if
-	 * implementation-specific problems are encountered (such as exceeding file size limits)
-	 * @see MultipartHttpServletRequest#getFile
-	 * @see MultipartHttpServletRequest#getFileNames
-	 * @see MultipartHttpServletRequest#getFileMap
-	 * @see javax.servlet.http.HttpServletRequest#getParameter
-	 * @see javax.servlet.http.HttpServletRequest#getParameterNames
-	 * @see javax.servlet.http.HttpServletRequest#getParameterMap
-	 */
+	// 如果这个request是一个文件上传的请求，则会将改request转为一个MultipartHttpServletRequest对象
 	MultipartHttpServletRequest resolveMultipart(HttpServletRequest request) throws MultipartException;
 
-	/**
-	 * Cleanup any resources used for the multipart handling,
-	 * like a storage for the uploaded files.
-	 * @param request the request to cleanup resources for
-	 */
+	// 释放 multiPartRequest 持有的所有资源
 	void cleanupMultipart(MultipartHttpServletRequest request);
 
 }

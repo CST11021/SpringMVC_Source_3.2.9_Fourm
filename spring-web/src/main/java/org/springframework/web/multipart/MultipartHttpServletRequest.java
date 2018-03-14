@@ -47,14 +47,10 @@ import org.springframework.http.HttpMethod;
  */
 public interface MultipartHttpServletRequest extends HttpServletRequest, MultipartRequest {
 
-	/**
-	 * Return this request's method as a convenient HttpMethod instance.
-	 */
+	// 返回这个请求的方法类型
 	HttpMethod getRequestMethod();
 
-	/**
-	 * Return this request's headers as a convenient HttpHeaders instance.
-	 */
+	// 返回请求头信息
 	HttpHeaders getRequestHeaders();
 
 	/**

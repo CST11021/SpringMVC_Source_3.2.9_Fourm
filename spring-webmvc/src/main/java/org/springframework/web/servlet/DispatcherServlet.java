@@ -318,6 +318,8 @@ public class DispatcherServlet extends FrameworkServlet {
 	private boolean detectAllViewResolvers = true;
 	//** Perform cleanup of request attributes after include request? */
 	private boolean cleanupAfterInclude = true;
+	// 表示会被dispatchcherServlet 用到的视图解析器
+	private List<ViewResolver> viewResolvers;
 
 
 	//--------这些属性将在web容器启动时调用initStrategies()方法进行初始化--------
@@ -334,8 +336,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	//--------这些属性将在web容器启动时调用initStrategies()方法进行初始化--------
 
 
-	// 表示会被dispatchcherServlet 用到的视图解析器
-	private List<ViewResolver> viewResolvers;
+
 
 
 
@@ -347,54 +348,18 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	// ------- 一系列的setter 方法----------------------------------------------------------
-	/**
-	 * Set whether to detect all HandlerMapping beans in this servlet's context. Otherwise,
-	 * just a single bean with name "handlerMapping" will be expected.
-	 * <p>Default is "true". Turn this off if you want this servlet to use a single
-	 * HandlerMapping, despite multiple HandlerMapping beans being defined in the context.
-	 */
 	public void setDetectAllHandlerMappings(boolean detectAllHandlerMappings) {
 		this.detectAllHandlerMappings = detectAllHandlerMappings;
 	}
-	/**
-	 * Set whether to detect all HandlerAdapter beans in this servlet's context. Otherwise,
-	 * just a single bean with name "handlerAdapter" will be expected.
-	 * <p>Default is "true". Turn this off if you want this servlet to use a single
-	 * HandlerAdapter, despite multiple HandlerAdapter beans being defined in the context.
-	 */
 	public void setDetectAllHandlerAdapters(boolean detectAllHandlerAdapters) {
 		this.detectAllHandlerAdapters = detectAllHandlerAdapters;
 	}
-	/**
-	 * Set whether to detect all HandlerExceptionResolver beans in this servlet's context. Otherwise,
-	 * just a single bean with name "handlerExceptionResolver" will be expected.
-	 * <p>Default is "true". Turn this off if you want this servlet to use a single
-	 * HandlerExceptionResolver, despite multiple HandlerExceptionResolver beans being defined in the context.
-	 */
 	public void setDetectAllHandlerExceptionResolvers(boolean detectAllHandlerExceptionResolvers) {
 		this.detectAllHandlerExceptionResolvers = detectAllHandlerExceptionResolvers;
 	}
-	/**
-	 * Set whether to detect all ViewResolver beans in this servlet's context. Otherwise,
-	 * just a single bean with name "viewResolver" will be expected.
-	 * <p>Default is "true". Turn this off if you want this servlet to use a single
-	 * ViewResolver, despite multiple ViewResolver beans being defined in the context.
-	 */
 	public void setDetectAllViewResolvers(boolean detectAllViewResolvers) {
 		this.detectAllViewResolvers = detectAllViewResolvers;
 	}
-	/**
-	 * Set whether to perform cleanup of request attributes after an include request, that is,
-	 * whether to reset the original state of all request attributes after the DispatcherServlet
-	 * has processed within an include request. Otherwise, just the DispatcherServlet's own
-	 * request attributes will be reset, but not model attributes for JSPs or special attributes
-	 * set by views (for example, JSTL's).
-	 * <p>Default is "true", which is strongly recommended. Views should not rely on request attributes
-	 * having been set by (dynamic) includes. This allows JSP views rendered by an included controller
-	 * to use any model attributes, even with the same names as in the main JSP, without causing side
-	 * effects. Only turn this off for special needs, for example to deliberately allow main JSPs to
-	 * access attributes from JSP views rendered by an included controller.
-	 */
 	public void setCleanupAfterInclude(boolean cleanupAfterInclude) {
 		this.cleanupAfterInclude = cleanupAfterInclude;
 	}
@@ -846,7 +811,8 @@ public class DispatcherServlet extends FrameworkServlet {
 
 				try {
 					// 用 handlerAdaptor 来处理请求并返回 ModelAndView
-					// 如果是http请求会调用相应的HandlerMethod 这里里面包含了具体的方法，通过反射调用，如果有返回的视图，那么ModelAndView会返回相应的视图对象，如果只是普通请求或者json请求会返回null
+					// 如果是http请求会调用相应的HandlerMethod 这里里面包含了具体的方法，通过反射调用，如果有返回的视图，
+					// 那么ModelAndView会返回相应的视图对象，如果只是普通请求或者json请求会返回null
 					mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
 				}
 				finally {
@@ -891,7 +857,8 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	// 优先判断一下是不是文件上传的 request
-	// 对于请求的处理，Spring首先考虑的是对于Multipart的处理，如果是MultipartContent类型的Request，则转换request为MultipartHttpServletRequest类型的request
+	// 对于请求的处理，Spring首先考虑的是对于Multipart的处理，如果是MultipartContent类型的Request，则转换request为
+	// MultipartHttpServletRequest类型的request
 	protected HttpServletRequest checkMultipart(HttpServletRequest request) throws MultipartException {
 		if (this.multipartResolver != null && this.multipartResolver.isMultipart(request)) {
 			if (request instanceof MultipartHttpServletRequest) {

@@ -60,6 +60,7 @@ public class StandardServletMultipartResolver implements MultipartResolver {
 	}
 
 
+	// 根据请求头的contentType属性是否包含“multipart/”为依据，判断该请求是否为文件上传的请求
 	@Override
 	public boolean isMultipart(HttpServletRequest request) {
 		// Same check as in Commons FileUpload...
@@ -70,13 +71,14 @@ public class StandardServletMultipartResolver implements MultipartResolver {
 		return (contentType != null && contentType.toLowerCase().startsWith("multipart/"));
 	}
 
+	// 如果这个request是一个文件上传的请求，则会将改request转为一个MultipartHttpServletRequest对象
 	public MultipartHttpServletRequest resolveMultipart(HttpServletRequest request) throws MultipartException {
 		return new StandardMultipartHttpServletRequest(request, this.resolveLazily);
 	}
 
+	// 释放 multiPartRequest 持有的所有资源
 	public void cleanupMultipart(MultipartHttpServletRequest request) {
-		// To be on the safe side: explicitly delete the parts,
-		// but only actual file parts (for Resin compatibility)
+		// To be on the safe side: explicitly delete the parts, but only actual file parts (for Resin compatibility)
 		try {
 			for (Part part : request.getParts()) {
 				if (request.getFile(part.getName()) != null) {

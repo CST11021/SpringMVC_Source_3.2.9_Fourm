@@ -44,19 +44,10 @@ import org.springframework.web.multipart.MultipartFile;
 public class DefaultMultipartHttpServletRequest extends AbstractMultipartHttpServletRequest {
 
 	private static final String CONTENT_TYPE = "Content-Type";
-
 	private Map<String, String[]> multipartParameters;
-
 	private Map<String, String> multipartParameterContentTypes;
 
 
-	/**
-	 * Wrap the given HttpServletRequest in a MultipartHttpServletRequest.
-	 * @param request the servlet request to wrap
-	 * @param mpFiles a map of the multipart files
-	 * @param mpParams a map of the parameters to expose,
-	 * with Strings as keys and String arrays as values
-	 */
 	public DefaultMultipartHttpServletRequest(HttpServletRequest request, MultiValueMap<String, MultipartFile> mpFiles,
 			Map<String, String[]> mpParams, Map<String, String> mpParamContentTypes) {
 
@@ -65,11 +56,6 @@ public class DefaultMultipartHttpServletRequest extends AbstractMultipartHttpSer
 		setMultipartParameters(mpParams);
 		setMultipartParameterContentTypes(mpParamContentTypes);
 	}
-
-	/**
-	 * Wrap the given HttpServletRequest in a MultipartHttpServletRequest.
-	 * @param request the servlet request to wrap
-	 */
 	public DefaultMultipartHttpServletRequest(HttpServletRequest request) {
 		super(request);
 	}
@@ -83,7 +69,6 @@ public class DefaultMultipartHttpServletRequest extends AbstractMultipartHttpSer
 		}
 		return super.getParameter(name);
 	}
-
 	@Override
 	public String[] getParameterValues(String name) {
 		String[] values = getMultipartParameters().get(name);
@@ -92,7 +77,6 @@ public class DefaultMultipartHttpServletRequest extends AbstractMultipartHttpSer
 		}
 		return super.getParameterValues(name);
 	}
-
 	@Override
 	public Enumeration<String> getParameterNames() {
 		Map<String, String[]> multipartParameters = getMultipartParameters();
@@ -108,7 +92,6 @@ public class DefaultMultipartHttpServletRequest extends AbstractMultipartHttpSer
 		paramNames.addAll(multipartParameters.keySet());
 		return Collections.enumeration(paramNames);
 	}
-
 	@Override
 	public Map<String, String[]> getParameterMap() {
 		Map<String, String[]> multipartParameters = getMultipartParameters();
@@ -131,7 +114,6 @@ public class DefaultMultipartHttpServletRequest extends AbstractMultipartHttpSer
 			return getMultipartParameterContentTypes().get(paramOrFileName);
 		}
 	}
-
 	public HttpHeaders getMultipartHeaders(String paramOrFileName) {
 		String contentType = getMultipartContentType(paramOrFileName);
 		if (contentType != null) {

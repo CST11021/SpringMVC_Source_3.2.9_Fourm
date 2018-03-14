@@ -48,29 +48,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class StandardMultipartHttpServletRequest extends AbstractMultipartHttpServletRequest {
 
 	private static final String CONTENT_DISPOSITION = "content-disposition";
-
 	private static final String FILENAME_KEY = "filename=";
-
 	private Set<String> multipartParameterNames;
 
 
-	/**
-	 * Create a new StandardMultipartHttpServletRequest wrapper for the given request,
-	 * immediately parsing the multipart content.
-	 * @param request the servlet request to wrap
-	 * @throws MultipartException if parsing failed
-	 */
+
 	public StandardMultipartHttpServletRequest(HttpServletRequest request) throws MultipartException {
 		this(request, false);
 	}
-
-	/**
-	 * Create a new StandardMultipartHttpServletRequest wrapper for the given request.
-	 * @param request the servlet request to wrap
-	 * @param lazyParsing whether multipart parsing should be triggered lazily on
-	 * first access of multipart files or parameters
-	 * @throws MultipartException if an immediate parsing attempt failed
-	 */
 	public StandardMultipartHttpServletRequest(HttpServletRequest request, boolean lazyParsing) throws MultipartException {
 		super(request);
 		if (!lazyParsing) {

@@ -42,15 +42,12 @@ public class CommonsMultipartFile implements MultipartFile, Serializable {
 
 	protected static final Log logger = LogFactory.getLog(CommonsMultipartFile.class);
 
+	// commons-fileupload.jar包中的类，用来表示一个文件上传的文件
 	private final FileItem fileItem;
-
+	// 表示上传文件的大小
 	private final long size;
 
 
-	/**
-	 * Create an instance wrapping the given FileItem.
-	 * @param fileItem the FileItem to wrap
-	 */
 	public CommonsMultipartFile(FileItem fileItem) {
 		this.fileItem = fileItem;
 		this.size = this.fileItem.getSize();

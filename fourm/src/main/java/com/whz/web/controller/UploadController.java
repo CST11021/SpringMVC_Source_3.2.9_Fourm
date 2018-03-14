@@ -25,7 +25,7 @@ public class UploadController {
 
     @RequestMapping("/testFileUpAndDownLoad")
     public String testFileUpAndDownLoad(HttpServletRequest request, HttpServletResponse response) {
-        return "forward:/WEB-INF/jsp/testFileUpAndDownLoad.jsp";
+        return "forward:/WEB-INF/views/jsp/testFileUpAndDownLoad.jsp";
     }
 
     /**

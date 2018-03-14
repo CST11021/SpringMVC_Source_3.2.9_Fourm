@@ -10,7 +10,8 @@
            http://www.springframework.org/schema/context
            http://www.springframework.org/schema/context/spring-context-3.2.xsd">
 
-	<!--Spring MVC上下文中默认没有装配MultipartResolver，因此默认情况下不能处理文件的上传工作。如果想使用Spring的文件上传功能，需要现在上下文中配置MultipartResolver-->
+	<!--Spring MVC上下文中默认没有装配MultipartResolver，因此默认情况下不能处理文件的上传工作。如果想使用Spring的文件上传
+	功能，需要现在上下文中配置MultipartResolver-->
 	<!--p:maxUploadSize="5242880" 上传文件大小限制、单位为字节，这里表示5MB-->
 	<!--p:uploadTempDir="upload/temp" 上传文件的临时路径-->
 	<bean id="multipartResolver"

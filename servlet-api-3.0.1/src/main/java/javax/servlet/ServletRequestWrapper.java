@@ -75,7 +75,7 @@ import java.util.Map;
  *
  * @since Servlet 2.3
  */
-
+// ServletRequest 对象的一个包装类
 public class ServletRequestWrapper implements ServletRequest {
 
     private ServletRequest request;

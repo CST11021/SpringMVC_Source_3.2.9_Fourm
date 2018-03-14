@@ -63,9 +63,7 @@ public abstract class CommonsFileUploadSupport {
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	private final DiskFileItemFactory fileItemFactory;
-
 	private final FileUpload fileUpload;
-
 	private boolean uploadTempDirSpecified = false;
 
 
@@ -163,7 +161,6 @@ public abstract class CommonsFileUploadSupport {
 		return this.uploadTempDirSpecified;
 	}
 
-
 	/**
 	 * Factory method for a Commons DiskFileItemFactory instance.
 	 * <p>Default implementation returns a standard DiskFileItemFactory.
@@ -181,7 +178,6 @@ public abstract class CommonsFileUploadSupport {
 	 * @return the Commons FileUpload instance
 	 */
 	protected abstract FileUpload newFileUpload(FileItemFactory fileItemFactory);
-
 
 	/**
 	 * Determine an appropriate FileUpload instance for the given encoding.
@@ -265,13 +261,7 @@ public abstract class CommonsFileUploadSupport {
 		return new MultipartParsingResult(multipartFiles, multipartParameters, multipartParameterContentTypes);
 	}
 
-	/**
-	 * Cleanup the Spring MultipartFiles created during multipart parsing,
-	 * potentially holding temporary data on disk.
-	 * <p>Deletes the underlying Commons FileItem instances.
-	 * @param multipartFiles Collection of MultipartFile instances
-	 * @see org.apache.commons.fileupload.FileItem#delete()
-	 */
+	// 删除 MultipartFile 持有的文件资源
 	protected void cleanupFileItems(MultiValueMap<String, MultipartFile> multipartFiles) {
 		for (List<MultipartFile> files : multipartFiles.values()) {
 			for (MultipartFile file : files) {
@@ -296,7 +286,6 @@ public abstract class CommonsFileUploadSupport {
 		return (charset != null ? charset.name() : defaultEncoding);
 	}
 
-
 	/**
 	 * Holder for a Map of Spring MultipartFiles and a Map of
 	 * multipart parameters.
@@ -304,9 +293,7 @@ public abstract class CommonsFileUploadSupport {
 	protected static class MultipartParsingResult {
 
 		private final MultiValueMap<String, MultipartFile> multipartFiles;
-
 		private final Map<String, String[]> multipartParameters;
-
 		private final Map<String, String> multipartParameterContentTypes;
 
 		public MultipartParsingResult(MultiValueMap<String, MultipartFile> mpFiles,
@@ -319,11 +306,9 @@ public abstract class CommonsFileUploadSupport {
 		public MultiValueMap<String, MultipartFile> getMultipartFiles() {
 			return this.multipartFiles;
 		}
-
 		public Map<String, String[]> getMultipartParameters() {
 			return this.multipartParameters;
 		}
-
 		public Map<String, String> getMultipartParameterContentTypes() {
 			return this.multipartParameterContentTypes;
 		}

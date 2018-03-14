@@ -102,11 +102,13 @@ public class CommonsMultipartResolver extends CommonsFileUploadSupport implement
 		}
 	}
 
-	// 判断是否为上传请求
+	// 判断是否为上传文件的请求
 	public boolean isMultipart(HttpServletRequest request) {
+		// 判断逻辑委托给：ServletFileUpload#isMultipartContent 方法，其判断依据是根据请求头的contentType属性是否包含“multipart/”
 		return (request != null && ServletFileUpload.isMultipartContent(request));
 	}
 
+	// 如果这个request是一个文件上传的请求，则会将改request转为一个MultipartHttpServletRequest对象
 	public MultipartHttpServletRequest resolveMultipart(final HttpServletRequest request) throws MultipartException {
 		Assert.notNull(request, "Request must not be null");
 		if (this.resolveLazily) {
@@ -167,6 +169,7 @@ public class CommonsMultipartResolver extends CommonsFileUploadSupport implement
 		return encoding;
 	}
 
+	// 释放 multiPartRequest 持有的所有资源
 	public void cleanupMultipart(MultipartHttpServletRequest request) {
 		if (request != null) {
 			try {
