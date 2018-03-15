@@ -25,6 +25,7 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 
 public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocumentReader {
+	protected final Log logger = LogFactory.getLog(getClass());
 
 	public static final String BEAN_ELEMENT = BeanDefinitionParserDelegate.BEAN_ELEMENT;
 	public static final String NESTED_BEANS_ELEMENT = "beans";
@@ -36,10 +37,9 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	public static final String PROFILE_ATTRIBUTE = "profile";
 
 
-	protected final Log logger = LogFactory.getLog(getClass());
-
 	private Environment environment;
 	private XmlReaderContext readerContext;
+	// 该类主要解析<bean>标签
 	private BeanDefinitionParserDelegate delegate;
 
 
@@ -89,7 +89,6 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		}
 		return delegate;
 	}
-
 	@Deprecated
 	protected BeanDefinitionParserDelegate createHelper(XmlReaderContext readerContext, Element root, BeanDefinitionParserDelegate parentDelegate) {
 
@@ -274,7 +273,8 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 			catch (BeanDefinitionStoreException ex) {
 				getReaderContext().error("Failed to register bean definition with name '" + bdHolder.getBeanName() + "'", ele, ex);
 			}
-			// 通知监听器解析已经注册完成，当程序开发人员需要对注册BeanDefinition事件进行监听时，可以通过注册监听器的方式将处理逻辑写入监听器中，目前在Spring中并没有对此事件做任何逻辑处理
+			// 通知监听器解析已经注册完成，当程序开发人员需要对注册BeanDefinition事件进行监听时，可以通过注册监听器的方
+			// 式将处理逻辑写入监听器中，目前在Spring中并没有对此事件做任何逻辑处理
 			getReaderContext().fireComponentRegistered(new BeanComponentDefinition(bdHolder));
 		}
 	}

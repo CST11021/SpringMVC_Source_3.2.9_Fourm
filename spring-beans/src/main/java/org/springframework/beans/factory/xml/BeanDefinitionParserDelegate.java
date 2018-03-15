@@ -138,13 +138,15 @@ public class BeanDefinitionParserDelegate {
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	private final XmlReaderContext readerContext;
+	// 该对象封装了 Bean 中哪些有默认值的属性
 	private final DocumentDefaultsDefinition defaults = new DocumentDefaultsDefinition();
 	//用来记录当前解析的bean
 	private final ParseState parseState = new ParseState();
 	private Environment environment;
 
 	// 记录bean的Name以及对应的alias，用来检查唯一性
-	// 存储所有使用过的bean名称，这样我们就可以在bean元素基础上强制唯一性。重复的bean ID /名称可能不存在于相同级别的bean元素嵌套中，但可以跨级别复制。
+	// 存储所有使用过的bean名称，这样我们就可以在bean元素基础上强制唯一性。重复的bean ID /名称可能不存在于相同级别的bean
+	// 元素嵌套中，但可以跨级别复制。
 	private final Set<String> usedNames = new HashSet<String>();
 
 
@@ -160,131 +162,7 @@ public class BeanDefinitionParserDelegate {
 	}
 
 
-	public final XmlReaderContext getReaderContext() {
-		return this.readerContext;
-	}
-	public final Environment getEnvironment() {
-		return this.environment;
-	}
 
-	/**
-	 * Invoke the {@link org.springframework.beans.factory.parsing.SourceExtractor} to pull the
-	 * source metadata from the supplied {@link Element}.
-	 */
-	protected Object extractSource(Element ele) {
-		return this.readerContext.extractSource(ele);
-	}
-
-
-	// 报告一个错误消息
-	protected void error(String message, Node source) {
-		this.readerContext.error(message, source, this.parseState.snapshot());
-	}
-	protected void error(String message, Element source) {
-		this.readerContext.error(message, source, this.parseState.snapshot());
-	}
-	protected void error(String message, Element source, Throwable cause) {
-		this.readerContext.error(message, source, this.parseState.snapshot(), cause);
-	}
-
-
-	// Initialize the default lazy-init, autowire, dependency check settings, init-method, destroy-method and merge settings. Support nested 'beans'  element use cases by falling back to the given parent in case the defaults are not explicitly set locally.
-	public void initDefaults(Element root, BeanDefinitionParserDelegate parent) {
-		populateDefaults(this.defaults, (parent != null ? parent.defaults : null), root);
-		this.readerContext.fireDefaultsRegistered(this.defaults);
-	}
-
-	/**
-	 * Initialize the default settings assuming a {@code null} parent delegate.
-	 * @deprecated in Spring 3.1 in favor of
-	 * {@link #initDefaults(Element, BeanDefinitionParserDelegate)}
-	 */
-	@Deprecated
-	public void initDefaults(Element root) {
-		initDefaults(root, null);
-	}
-
-	/**
-	 * Populate the given DocumentDefaultsDefinition instance with the default lazy-init,
-	 * autowire, dependency check settings, init-method, destroy-method and merge settings.
-	 * Support nested 'beans' element use cases by falling back to
-	 * <literal>parentDefaults</literal> in case the defaults are not explicitly set
-	 * locally.
-	 * @param defaults the defaults to populate
-	 * @param parentDefaults the parent BeanDefinitionParserDelegate (if any) defaults to fall back to
-	 * @param root the root element of the current bean definition document (or nested beans element)
-	 */
-	protected void populateDefaults(DocumentDefaultsDefinition defaults, DocumentDefaultsDefinition parentDefaults, Element root) {
-		String lazyInit = root.getAttribute(DEFAULT_LAZY_INIT_ATTRIBUTE);
-		if (DEFAULT_VALUE.equals(lazyInit)) {
-			lazyInit = parentDefaults != null ? parentDefaults.getLazyInit() : FALSE_VALUE;
-		}
-		defaults.setLazyInit(lazyInit);
-
-		String merge = root.getAttribute(DEFAULT_MERGE_ATTRIBUTE);
-		if (DEFAULT_VALUE.equals(merge)) {
-			merge = parentDefaults != null ? parentDefaults.getMerge() : FALSE_VALUE;
-		}
-		defaults.setMerge(merge);
-
-		String autowire = root.getAttribute(DEFAULT_AUTOWIRE_ATTRIBUTE);
-		if (DEFAULT_VALUE.equals(autowire)) {
-			autowire = parentDefaults != null ? parentDefaults.getAutowire() : AUTOWIRE_NO_VALUE;
-		}
-		defaults.setAutowire(autowire);
-
-		// don't fall back to parentDefaults for dependency-check as it's no
-		// longer supported in <beans> as of 3.0. Therefore, no nested <beans>
-		// would ever need to fall back to it.
-		defaults.setDependencyCheck(root.getAttribute(DEFAULT_DEPENDENCY_CHECK_ATTRIBUTE));
-
-		if (root.hasAttribute(DEFAULT_AUTOWIRE_CANDIDATES_ATTRIBUTE)) {
-			defaults.setAutowireCandidates(root.getAttribute(DEFAULT_AUTOWIRE_CANDIDATES_ATTRIBUTE));
-		}
-		else if (parentDefaults != null) {
-			defaults.setAutowireCandidates(parentDefaults.getAutowireCandidates());
-		}
-
-		if (root.hasAttribute(DEFAULT_INIT_METHOD_ATTRIBUTE)) {
-			defaults.setInitMethod(root.getAttribute(DEFAULT_INIT_METHOD_ATTRIBUTE));
-		}
-		else if (parentDefaults != null) {
-			defaults.setInitMethod(parentDefaults.getInitMethod());
-		}
-
-		if (root.hasAttribute(DEFAULT_DESTROY_METHOD_ATTRIBUTE)) {
-			defaults.setDestroyMethod(root.getAttribute(DEFAULT_DESTROY_METHOD_ATTRIBUTE));
-		}
-		else if (parentDefaults != null) {
-			defaults.setDestroyMethod(parentDefaults.getDestroyMethod());
-		}
-
-		defaults.setSource(this.readerContext.extractSource(root));
-	}
-
-
-	public DocumentDefaultsDefinition getDefaults() {
-		return this.defaults;
-	}
-
-	// 返回一个默认设置的 BeanDefinitionDefaults 对象
-	public BeanDefinitionDefaults getBeanDefinitionDefaults() {
-		BeanDefinitionDefaults bdd = new BeanDefinitionDefaults();
-		bdd.setLazyInit("TRUE".equalsIgnoreCase(this.defaults.getLazyInit()));
-		bdd.setDependencyCheck(this.getDependencyCheck(DEFAULT_VALUE));
-		bdd.setAutowireMode(this.getAutowireMode(DEFAULT_VALUE));
-		bdd.setInitMethodName(this.defaults.getInitMethod());
-		bdd.setDestroyMethodName(this.defaults.getDestroyMethod());
-		return bdd;
-	}
-
-	/**
-	 * Return any patterns provided in the 'default-autowire-candidates' attribute of the top-level beans element.
-	 */
-	public String[] getAutowireCandidatePatterns() {
-		String candidatePattern = this.defaults.getAutowireCandidates();
-		return (candidatePattern != null ? StringUtils.commaDelimitedListToStringArray(candidatePattern) : null);
-	}
 
 
 	//-------- 解析<bean>标签-------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1260,6 +1138,7 @@ public class BeanDefinitionParserDelegate {
 
 
 	// -------------------解析自定义命名空间的标签----------------------------------------------------------------------
+
 	public BeanDefinition parseCustomElement(Element ele) {
 		return parseCustomElement(ele, null);
 	}
@@ -1339,7 +1218,6 @@ public class BeanDefinitionParserDelegate {
 		return isDefaultNamespace(getNamespaceURI(node));
 	}
 
-	// ---------------------修饰BeanDefinition-----------------------------------------------------------------------------------------------
 
 
 
@@ -1352,6 +1230,132 @@ public class BeanDefinitionParserDelegate {
 
 
 
+	public final XmlReaderContext getReaderContext() {
+		return this.readerContext;
+	}
+	public final Environment getEnvironment() {
+		return this.environment;
+	}
+
+	/**
+	 * Invoke the {@link org.springframework.beans.factory.parsing.SourceExtractor} to pull the
+	 * source metadata from the supplied {@link Element}.
+	 */
+	protected Object extractSource(Element ele) {
+		return this.readerContext.extractSource(ele);
+	}
+
+
+	// 报告一个错误消息
+	protected void error(String message, Node source) {
+		this.readerContext.error(message, source, this.parseState.snapshot());
+	}
+	protected void error(String message, Element source) {
+		this.readerContext.error(message, source, this.parseState.snapshot());
+	}
+	protected void error(String message, Element source, Throwable cause) {
+		this.readerContext.error(message, source, this.parseState.snapshot(), cause);
+	}
+
+
+	// Initialize the default lazy-init, autowire, dependency check settings, init-method, destroy-method and merge settings.
+	// Support nested 'beans'  element use cases by falling back to the given parent in case the defaults are not explicitly set locally.
+	public void initDefaults(Element root, BeanDefinitionParserDelegate parent) {
+		populateDefaults(this.defaults, (parent != null ? parent.defaults : null), root);
+		this.readerContext.fireDefaultsRegistered(this.defaults);
+	}
+
+	/**
+	 * Initialize the default settings assuming a {@code null} parent delegate.
+	 * @deprecated in Spring 3.1 in favor of
+	 * {@link #initDefaults(Element, BeanDefinitionParserDelegate)}
+	 */
+	@Deprecated
+	public void initDefaults(Element root) {
+		initDefaults(root, null);
+	}
+
+	/**
+	 * Populate the given DocumentDefaultsDefinition instance with the default lazy-init,
+	 * autowire, dependency check settings, init-method, destroy-method and merge settings.
+	 * Support nested 'beans' element use cases by falling back to
+	 * <literal>parentDefaults</literal> in case the defaults are not explicitly set
+	 * locally.
+	 * @param defaults the defaults to populate
+	 * @param parentDefaults the parent BeanDefinitionParserDelegate (if any) defaults to fall back to
+	 * @param root the root element of the current bean definition document (or nested beans element)
+	 */
+	protected void populateDefaults(DocumentDefaultsDefinition defaults, DocumentDefaultsDefinition parentDefaults, Element root) {
+		String lazyInit = root.getAttribute(DEFAULT_LAZY_INIT_ATTRIBUTE);
+		if (DEFAULT_VALUE.equals(lazyInit)) {
+			lazyInit = parentDefaults != null ? parentDefaults.getLazyInit() : FALSE_VALUE;
+		}
+		defaults.setLazyInit(lazyInit);
+
+		String merge = root.getAttribute(DEFAULT_MERGE_ATTRIBUTE);
+		if (DEFAULT_VALUE.equals(merge)) {
+			merge = parentDefaults != null ? parentDefaults.getMerge() : FALSE_VALUE;
+		}
+		defaults.setMerge(merge);
+
+		String autowire = root.getAttribute(DEFAULT_AUTOWIRE_ATTRIBUTE);
+		if (DEFAULT_VALUE.equals(autowire)) {
+			autowire = parentDefaults != null ? parentDefaults.getAutowire() : AUTOWIRE_NO_VALUE;
+		}
+		defaults.setAutowire(autowire);
+
+		// don't fall back to parentDefaults for dependency-check as it's no
+		// longer supported in <beans> as of 3.0. Therefore, no nested <beans>
+		// would ever need to fall back to it.
+		defaults.setDependencyCheck(root.getAttribute(DEFAULT_DEPENDENCY_CHECK_ATTRIBUTE));
+
+		if (root.hasAttribute(DEFAULT_AUTOWIRE_CANDIDATES_ATTRIBUTE)) {
+			defaults.setAutowireCandidates(root.getAttribute(DEFAULT_AUTOWIRE_CANDIDATES_ATTRIBUTE));
+		}
+		else if (parentDefaults != null) {
+			defaults.setAutowireCandidates(parentDefaults.getAutowireCandidates());
+		}
+
+		if (root.hasAttribute(DEFAULT_INIT_METHOD_ATTRIBUTE)) {
+			defaults.setInitMethod(root.getAttribute(DEFAULT_INIT_METHOD_ATTRIBUTE));
+		}
+		else if (parentDefaults != null) {
+			defaults.setInitMethod(parentDefaults.getInitMethod());
+		}
+
+		if (root.hasAttribute(DEFAULT_DESTROY_METHOD_ATTRIBUTE)) {
+			defaults.setDestroyMethod(root.getAttribute(DEFAULT_DESTROY_METHOD_ATTRIBUTE));
+		}
+		else if (parentDefaults != null) {
+			defaults.setDestroyMethod(parentDefaults.getDestroyMethod());
+		}
+
+		defaults.setSource(this.readerContext.extractSource(root));
+	}
+
+
+	public DocumentDefaultsDefinition getDefaults() {
+		return this.defaults;
+	}
+
+	// 返回一个默认设置的 BeanDefinitionDefaults 对象
+	public BeanDefinitionDefaults getBeanDefinitionDefaults() {
+		BeanDefinitionDefaults bdd = new BeanDefinitionDefaults();
+		bdd.setLazyInit("TRUE".equalsIgnoreCase(this.defaults.getLazyInit()));
+		bdd.setDependencyCheck(this.getDependencyCheck(DEFAULT_VALUE));
+		bdd.setAutowireMode(this.getAutowireMode(DEFAULT_VALUE));
+		bdd.setInitMethodName(this.defaults.getInitMethod());
+		bdd.setDestroyMethodName(this.defaults.getDestroyMethod());
+		return bdd;
+	}
+
+	/**
+	 * Return any patterns provided in the 'default-autowire-candidates' attribute of the top-level beans element.
+	 */
+	public String[] getAutowireCandidatePatterns() {
+		String candidatePattern = this.defaults.getAutowireCandidates();
+		return (candidatePattern != null ? StringUtils.commaDelimitedListToStringArray(candidatePattern) : null);
+	}
 
 
 

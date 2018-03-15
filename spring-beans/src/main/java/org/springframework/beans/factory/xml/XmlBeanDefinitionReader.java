@@ -158,9 +158,11 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 			currentResources = new HashSet<EncodedResource>(4);
 			this.resourcesCurrentlyBeingLoaded.set(currentResources);
 		}
+
 		if (!currentResources.add(encodedResource)) {
 			throw new BeanDefinitionStoreException("Detected cyclic loading of " + encodedResource + " - check your import definitions!");
 		}
+
 		try {
 			InputStream inputStream = encodedResource.getResource().getInputStream();
 			try {
@@ -185,6 +187,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 				this.resourcesCurrentlyBeingLoaded.remove();
 			}
 		}
+
 	}
 	public int loadBeanDefinitions(InputSource inputSource) throws BeanDefinitionStoreException {
 		return loadBeanDefinitions(inputSource, "resource loaded through SAX InputSource");
