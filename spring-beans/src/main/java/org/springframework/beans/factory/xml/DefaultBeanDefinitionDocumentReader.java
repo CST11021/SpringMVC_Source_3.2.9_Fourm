@@ -38,15 +38,13 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 
 
 	private Environment environment;
+	// 解析XML文件的上下文
 	private XmlReaderContext readerContext;
-	// 该类主要解析<bean>标签
+	// 该类主要用来解析<bean>标签，它内部也存在一个 XmlReaderContext 的引用
 	private BeanDefinitionParserDelegate delegate;
 
 
 
-	public void setEnvironment(Environment environment) {
-		this.environment = environment;
-	}
 
 	public void registerBeanDefinitions(Document doc, XmlReaderContext readerContext) {
 		this.readerContext = readerContext;
@@ -95,6 +93,9 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		return null;
 	}
 
+	public void setEnvironment(Environment environment) {
+		this.environment = environment;
+	}
 
 	protected final XmlReaderContext getReaderContext() {
 		return this.readerContext;

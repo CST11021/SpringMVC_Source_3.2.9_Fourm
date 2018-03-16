@@ -52,6 +52,9 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	private int validationMode = VALIDATION_AUTO;
 	// 设置xml命名空间是否敏感
 	private boolean namespaceAware = false;
+	// XmlBeanDefinitionReader 将 Resource 转为一个Document对象后，会使用 BeanDefinitionDocumentReader 来解析XML，解析从
+	// 根节点开始，这里的Class表示 BeanDefinitionDocumentReader 接口的一个实现，后续会在createBeanDefinitionDocumentReader()
+	// 方法中使用反射的技术进行实例化，至于为什么要通过反射的方式进行实例化也是百思不得解？？？？？？？？？？？？？？？？
 	private Class<?> documentReaderClass = DefaultBeanDefinitionDocumentReader.class;
 	private ProblemReporter problemReporter = new FailFastProblemReporter();
 	private ReaderEventListener eventListener = new EmptyReaderEventListener();
@@ -74,71 +77,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	}
 
 
-	// 设置验证模式，如果验证模式被关闭则会切换命名空间
-	public void setValidating(boolean validating) {
-		this.validationMode = (validating ? VALIDATION_AUTO : VALIDATION_NONE);
-		this.namespaceAware = !validating;
-	}
 
-	// 设置/获取 验证模式
-	public void setValidationModeName(String validationModeName) {
-		setValidationMode(constants.asNumber(validationModeName).intValue());
-	}
-	public void setValidationMode(int validationMode) {
-		this.validationMode = validationMode;
-	}
-	public int getValidationMode() {
-		return this.validationMode;
-	}
-
-	public void setEntityResolver(EntityResolver entityResolver) {
-		this.entityResolver = entityResolver;
-	}
-	protected EntityResolver getEntityResolver() {
-		if (this.entityResolver == null) {
-			// Determine default EntityResolver to use.
-			ResourceLoader resourceLoader = getResourceLoader();
-			if (resourceLoader != null) {
-				this.entityResolver = new ResourceEntityResolver(resourceLoader);
-			}
-			else {
-				this.entityResolver = new DelegatingEntityResolver(getBeanClassLoader());
-			}
-		}
-		return this.entityResolver;
-	}
-
-	public void setErrorHandler(ErrorHandler errorHandler) {
-		this.errorHandler = errorHandler;
-	}
-	public void setDocumentReaderClass(Class<?> documentReaderClass) {
-		if (documentReaderClass == null || !BeanDefinitionDocumentReader.class.isAssignableFrom(documentReaderClass)) {
-			throw new IllegalArgumentException("documentReaderClass must be an implementation of the BeanDefinitionDocumentReader interface");
-		}
-		this.documentReaderClass = documentReaderClass;
-	}
-
-	public void setNamespaceAware(boolean namespaceAware) {
-		this.namespaceAware = namespaceAware;
-	}
-	public boolean isNamespaceAware() {
-		return this.namespaceAware;
-	}
-	public void setProblemReporter(ProblemReporter problemReporter) {
-		this.problemReporter = (problemReporter != null ? problemReporter : new FailFastProblemReporter());
-	}
-	public void setEventListener(ReaderEventListener eventListener) {
-		this.eventListener = (eventListener != null ? eventListener : new EmptyReaderEventListener());
-	}
-	public void setSourceExtractor(SourceExtractor sourceExtractor) {
-		this.sourceExtractor = (sourceExtractor != null ? sourceExtractor : new NullSourceExtractor());
-	}
-	public void setNamespaceHandlerResolver(NamespaceHandlerResolver namespaceHandlerResolver) {
-		this.namespaceHandlerResolver = namespaceHandlerResolver;
-	}
-	public void setDocumentLoader(DocumentLoader documentLoader) {
-		this.documentLoader = (documentLoader != null ? documentLoader : new DefaultDocumentLoader());
-	}
 
 	// -------------------------- 从xml配置文件中解析并加载bean --------------------------------------------------------------------------
 
@@ -277,7 +216,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		documentReader.setEnvironment(this.getEnvironment());
 		// 记录统计前BeanDefinition的加载个数
 		int countBefore = getRegistry().getBeanDefinitionCount();
-		// 加载及注册bean
+		// 解析这个doc，并注册bean
 		documentReader.registerBeanDefinitions(doc, createReaderContext(resource));
 		// 返回本次加载的BeanDefinition个数
 		return getRegistry().getBeanDefinitionCount() - countBefore;
@@ -291,11 +230,84 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	protected NamespaceHandlerResolver createDefaultNamespaceHandlerResolver() {
 		return new DefaultNamespaceHandlerResolver(getResourceLoader().getClassLoader());
 	}
-	// 使用DefaultBeanDefinitionDocumentReader实例化
+	// 使用反射的方式实例化一个 DefaultBeanDefinitionDocumentReader 对象
 	protected BeanDefinitionDocumentReader createBeanDefinitionDocumentReader() {
 		return BeanDefinitionDocumentReader.class.cast(BeanUtils.instantiateClass(this.documentReaderClass));
 	}
 
 	// -------------------------- 从xml配置文件中解析并加载bean --------------------------------------------------------------------------
+
+
+
+
+
+
+
+	// 设置验证模式，如果验证模式被关闭则会切换命名空间
+	public void setValidating(boolean validating) {
+		this.validationMode = (validating ? VALIDATION_AUTO : VALIDATION_NONE);
+		this.namespaceAware = !validating;
+	}
+
+	// 设置/获取 验证模式
+	public void setValidationModeName(String validationModeName) {
+		setValidationMode(constants.asNumber(validationModeName).intValue());
+	}
+	public void setValidationMode(int validationMode) {
+		this.validationMode = validationMode;
+	}
+	public int getValidationMode() {
+		return this.validationMode;
+	}
+
+	public void setEntityResolver(EntityResolver entityResolver) {
+		this.entityResolver = entityResolver;
+	}
+	protected EntityResolver getEntityResolver() {
+		if (this.entityResolver == null) {
+			// Determine default EntityResolver to use.
+			ResourceLoader resourceLoader = getResourceLoader();
+			if (resourceLoader != null) {
+				this.entityResolver = new ResourceEntityResolver(resourceLoader);
+			}
+			else {
+				this.entityResolver = new DelegatingEntityResolver(getBeanClassLoader());
+			}
+		}
+		return this.entityResolver;
+	}
+
+	public void setErrorHandler(ErrorHandler errorHandler) {
+		this.errorHandler = errorHandler;
+	}
+	public void setDocumentReaderClass(Class<?> documentReaderClass) {
+		if (documentReaderClass == null || !BeanDefinitionDocumentReader.class.isAssignableFrom(documentReaderClass)) {
+			throw new IllegalArgumentException("documentReaderClass must be an implementation of the BeanDefinitionDocumentReader interface");
+		}
+		this.documentReaderClass = documentReaderClass;
+	}
+
+	public void setNamespaceAware(boolean namespaceAware) {
+		this.namespaceAware = namespaceAware;
+	}
+	public boolean isNamespaceAware() {
+		return this.namespaceAware;
+	}
+	public void setProblemReporter(ProblemReporter problemReporter) {
+		this.problemReporter = (problemReporter != null ? problemReporter : new FailFastProblemReporter());
+	}
+	public void setEventListener(ReaderEventListener eventListener) {
+		this.eventListener = (eventListener != null ? eventListener : new EmptyReaderEventListener());
+	}
+	public void setSourceExtractor(SourceExtractor sourceExtractor) {
+		this.sourceExtractor = (sourceExtractor != null ? sourceExtractor : new NullSourceExtractor());
+	}
+	public void setNamespaceHandlerResolver(NamespaceHandlerResolver namespaceHandlerResolver) {
+		this.namespaceHandlerResolver = namespaceHandlerResolver;
+	}
+	public void setDocumentLoader(DocumentLoader documentLoader) {
+		this.documentLoader = (documentLoader != null ? documentLoader : new DefaultDocumentLoader());
+	}
+
 
 }

@@ -10,7 +10,7 @@ public interface ReaderEventListener extends EventListener {
 	// Notification that the given defaults has been registered.
 	void defaultsRegistered(DefaultsDefinition defaultsDefinition);
 
-	// Notification that the given component has been registered.
+	// 当解析完后一个Bean，并将BeanDefinition注册到注册表后，会来调用这个方法
 	void componentRegistered(ComponentDefinition componentDefinition);
 
 	// Notification that the given alias has been registered.

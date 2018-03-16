@@ -1,5 +1,6 @@
 package com.whz.beanfactory;
 
+import org.springframework.beans.factory.support.BeanDefinitionReader;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.ClassPathResource;
@@ -13,10 +14,9 @@ public class Test {
     @org.junit.Test
     public void testFactoryBean() {
         DefaultListableBeanFactory appFactory = new DefaultListableBeanFactory();
-        new XmlBeanDefinitionReader(appFactory)
-            .loadBeanDefinitions(new ClassPathResource("spring-factoryBeanTest.xml"));
-
-        System.out.println();
+        BeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(appFactory);
+        beanDefinitionReader.loadBeanDefinitions(new ClassPathResource("spring-factoryBeanTest.xml"));
+        System.out.println(appFactory.getBeansOfType(Object.class));
     }
 
 }
