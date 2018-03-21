@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="helloRMIServiceImpl" class="com.whz.spring.rmi.HelloRMIServiceImpl"/>
+
+    <!--RmiServiceExporter显示地支持使用RMI调用器暴露任何非RMI服务-->
+    <bean id="myRMI" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="service" ref="helloRMIServiceImpl"/>
+        <!--定义要暴露的服务名可以与输出的bean不同名，客户端通过这个名字来调用服务-->
+        <property name="serviceName" value ="helloRMI"/>
+        <property name="serviceInterface" value="com.whz.spring.rmi.HelloRMIService"/>
+        <property name="registryPort" value="9999"/>
+        <!--<property name="registryHost" value="30.6.28.128"/>-->
+    </bean>
+
+</beans>

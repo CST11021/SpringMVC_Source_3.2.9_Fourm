@@ -34,8 +34,9 @@ import org.springframework.util.ClassUtils;
  */
 public abstract class RemoteExporter extends RemotingSupport {
 
+	// 表示服务接口的实现对象，服务启动时，该对象必须不能为空
 	private Object service;
-
+	// 要暴露的服务接口类型
 	private Class serviceInterface;
 
 	private Boolean registerTraceInterceptor;

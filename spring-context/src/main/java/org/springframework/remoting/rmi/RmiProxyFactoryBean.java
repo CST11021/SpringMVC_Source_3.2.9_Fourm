@@ -60,6 +60,7 @@ import org.springframework.beans.factory.FactoryBean;
  */
 public class RmiProxyFactoryBean extends RmiClientInterceptor implements FactoryBean<Object>, BeanClassLoaderAware {
 
+	// 表示服务接口的代理对象
 	private Object serviceProxy;
 
 
@@ -76,11 +77,9 @@ public class RmiProxyFactoryBean extends RmiClientInterceptor implements Factory
 	public Object getObject() {
 		return this.serviceProxy;
 	}
-
 	public Class<?> getObjectType() {
 		return getServiceInterface();
 	}
-
 	public boolean isSingleton() {
 		return true;
 	}
