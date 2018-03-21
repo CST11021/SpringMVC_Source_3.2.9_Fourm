@@ -31,6 +31,8 @@ import org.w3c.dom.NodeList;
 /**
  * Parser for the 'scheduled-tasks' element of the scheduling namespace.
  *
+ * 该解析类没有直接实现 BeanDefinitionParser 接口，而是通过继承 AbstractSingleBeanDefinitionParser 来扩展
+ *
  * @author Mark Fisher
  * @author Chris Beams
  * @since 3.0
@@ -41,17 +43,19 @@ public class ScheduledTasksBeanDefinitionParser extends AbstractSingleBeanDefini
 
 	private static final long ZERO_INITIAL_DELAY = 0;
 
-
+	// 重载父类方法，该方法返回true表示，beanId交由Spring子生成
 	@Override
 	protected boolean shouldGenerateId() {
 		return true;
 	}
 
+	// 解析<task:scheduled-tasks>标签会注册一个 ContextLifecycleScheduledTaskRegistrar 的Bean
 	@Override
 	protected String getBeanClassName(Element element) {
 		return "org.springframework.scheduling.config.ContextLifecycleScheduledTaskRegistrar";
 	}
 
+	// 重载父类方法，该方法用来解析<task:scheduled-tasks>标签
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		builder.setLazyInit(false); // lazy scheduled tasks are a contradiction in terms -> force to false
@@ -59,6 +63,7 @@ public class ScheduledTasksBeanDefinitionParser extends AbstractSingleBeanDefini
 		ManagedList<RuntimeBeanReference> fixedDelayTaskList = new ManagedList<RuntimeBeanReference>();
 		ManagedList<RuntimeBeanReference> fixedRateTaskList = new ManagedList<RuntimeBeanReference>();
 		ManagedList<RuntimeBeanReference> triggerTaskList = new ManagedList<RuntimeBeanReference>();
+
 		NodeList childNodes = element.getChildNodes();
 		for (int i = 0; i < childNodes.getLength(); i++) {
 			Node child = childNodes.item(i);
@@ -89,14 +94,12 @@ public class ScheduledTasksBeanDefinitionParser extends AbstractSingleBeanDefini
 			boolean hasInitialDelayAttribute = StringUtils.hasText(initialDelayAttribute);
 
 			if (!(hasCronAttribute || hasFixedDelayAttribute || hasFixedRateAttribute || hasTriggerAttribute)) {
-				parserContext.getReaderContext().error(
-						"one of the 'cron', 'fixed-delay', 'fixed-rate', or 'trigger' attributes is required", taskElement);
+				parserContext.getReaderContext().error("one of the 'cron', 'fixed-delay', 'fixed-rate', or 'trigger' attributes is required", taskElement);
 				continue; // with the possible next task element
 			}
 
 			if (hasInitialDelayAttribute && (hasCronAttribute || hasTriggerAttribute)) {
-				parserContext.getReaderContext().error(
-						"the 'initial-delay' attribute may not be used with cron and trigger tasks", taskElement);
+				parserContext.getReaderContext().error("the 'initial-delay' attribute may not be used with cron and trigger tasks", taskElement);
 				continue; // with the possible next task element
 			}
 
@@ -112,19 +115,18 @@ public class ScheduledTasksBeanDefinitionParser extends AbstractSingleBeanDefini
 						initialDelayAttribute, fixedRateAttribute, taskElement, parserContext));
 			}
 			if (hasCronAttribute) {
-				cronTaskList.add(cronTaskReference(runnableName, cronAttribute,
-						taskElement, parserContext));
+				cronTaskList.add(cronTaskReference(runnableName, cronAttribute, taskElement, parserContext));
 			}
 			if (hasTriggerAttribute) {
 				String triggerName = new RuntimeBeanReference(triggerAttribute).getBeanName();
-				triggerTaskList.add(triggerTaskReference(runnableName, triggerName,
-						taskElement, parserContext));
+				triggerTaskList.add(triggerTaskReference(runnableName, triggerName, taskElement, parserContext));
 			}
 		}
 		String schedulerRef = element.getAttribute("scheduler");
 		if (StringUtils.hasText(schedulerRef)) {
 			builder.addPropertyReference("taskScheduler", schedulerRef);
 		}
+
 		builder.addPropertyValue("cronTasksList", cronTaskList);
 		builder.addPropertyValue("fixedDelayTasksList", fixedDelayTaskList);
 		builder.addPropertyValue("fixedRateTasksList", fixedRateTaskList);
