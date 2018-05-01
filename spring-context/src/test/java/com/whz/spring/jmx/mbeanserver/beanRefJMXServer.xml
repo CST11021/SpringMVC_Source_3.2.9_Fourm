@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="registry" class="org.springframework.remoting.rmi.RmiRegistryFactoryBean" destroy-method="destroy">
+        <property name="port" value="1699"/>
+    </bean>
+    <bean id="serverConnector" class="org.springframework.jmx.support.ConnectorServerFactoryBean">
+        <property name="objectName" value="connector:name=rmi"/>
+        <property name="serviceUrl" value="service:jmx:rmi:///jndi/rmi://localhost:1699/myConnector"/>
+    </bean>
+
+    <!-- MBeanExporter -->
+    <bean id="exporter" class="org.springframework.jmx.export.MBeanExporter">
+        <property name="beans">
+            <map>
+                <entry key="JmxTest:name=RuntimeInfo" value-ref="managerRuntime"/>
+                <entry key="MX4J:name=HttpAdaptor" value-ref="httpAdaptor"/>
+            </map>
+        </property>
+        <property name="assembler">
+            <bean id="assembler" class="org.springframework.jmx.export.assembler.MetadataMBeanInfoAssembler">
+                <property name="attributeSource">
+                    <bean id="attributeSource" class="org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource"/>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+
+    <!-- HttpAdaptor & XSLTProcessor -->
+    <bean id="httpAdaptor" class="mx4j.tools.adaptor.http.HttpAdaptor">
+        <property name="processor">
+            <bean id="xsltProcessor" class="mx4j.tools.adaptor.http.XSLTProcessor"/>
+        </property>
+        <property name="port" value="7788"/>
+    </bean>
+    <bean id="managerRuntime" class="com.whz.spring.jmx.mbeanserver.ManagerRuntimeMBean"/>
+
+</beans>

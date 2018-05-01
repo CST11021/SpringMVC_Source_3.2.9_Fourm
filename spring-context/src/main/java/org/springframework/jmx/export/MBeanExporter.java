@@ -95,6 +95,14 @@ import org.springframework.util.ObjectUtils;
  * @see #setListeners
  * @see org.springframework.jmx.export.assembler.MBeanInfoAssembler
  * @see MBeanExporterListener
+ *
+ *
+Spring的MBeanExporter是将Spring Bean转变为MBean的关
+键。MBeanExporter可以把一个或多个Spring bean导出为MBean服
+务器（MBean server）内的模型 MBean。MBean服务器（有时候也被
+称为MBean代理）是MBean生存的容器。对MBean的访问，也是通过
+MBean服务器来实现的。
+ *
  */
 public class MBeanExporter extends MBeanRegistrationSupport
 		implements MBeanExportOperations, BeanClassLoaderAware, BeanFactoryAware, InitializingBean, DisposableBean {

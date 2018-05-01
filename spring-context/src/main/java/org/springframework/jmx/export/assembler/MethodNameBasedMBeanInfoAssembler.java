@@ -51,38 +51,23 @@ import org.springframework.util.StringUtils;
  * @see SimpleReflectiveMBeanInfoAssembler
  * @see MethodExclusionMBeanInfoAssembler
  * @see org.springframework.jmx.export.MBeanExporter
+ *
+ *
+	MBean信息装配器（MBean info assembler）是限制哪些方法和属性将在MBean上暴露的关键。其中有一个MBean信息装配器是
+MethodNameBasedMBeanInfoAssembler。这个装配器指定了需要暴露为MBean操作的方法名称列表。
+ *
  */
 public class MethodNameBasedMBeanInfoAssembler extends AbstractConfigurableMBeanInfoAssembler {
 
-	/**
-	 * Stores the set of method names to use for creating the management interface.
-	 */
+	/** Stores the set of method names to use for creating the management interface. */
 	private Set<String> managedMethods;
-
-	/**
-	 * Stores the mappings of bean keys to an array of method names.
-	 */
+	/** Stores the mappings of bean keys to an array of method names. */
 	private Map<String, Set<String>> methodMappings;
 
 
-	/**
-	 * Set the array of method names to use for creating the management info.
-	 * These method names will be used for a bean if no entry corresponding to
-	 * that bean is found in the {@code methodMappings} property.
-	 * @param methodNames an array of method names indicating the methods to use
-	 * @see #setMethodMappings
-	 */
 	public void setManagedMethods(String[] methodNames) {
 		this.managedMethods = new HashSet<String>(Arrays.asList(methodNames));
 	}
-
-	/**
-	 * Set the mappings of bean keys to a comma-separated list of method names.
-	 * The property key should match the bean key and the property value should match
-	 * the list of method names. When searching for method names for a bean, Spring
-	 * will check these mappings first.
-	 * @param mappings the mappins of bean keys to method names
-	 */
 	public void setMethodMappings(Properties mappings) {
 		this.methodMappings = new HashMap<String, Set<String>>();
 		for (Enumeration en = mappings.keys(); en.hasMoreElements();) {
