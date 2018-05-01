@@ -31,7 +31,6 @@ import org.springframework.util.ClassUtils;
  */
 public abstract class RemotingSupport implements BeanClassLoaderAware {
 
-	/** Logger available to subclasses */
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
@@ -41,10 +40,6 @@ public abstract class RemotingSupport implements BeanClassLoaderAware {
 		this.beanClassLoader = classLoader;
 	}
 
-	/**
-	 * Return the ClassLoader that this accessor operates in,
-	 * to be used for deserializing and for generating proxies.
-	 */
 	protected ClassLoader getBeanClassLoader() {
 		return this.beanClassLoader;
 	}

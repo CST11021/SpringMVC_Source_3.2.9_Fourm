@@ -35,23 +35,17 @@ import org.springframework.util.Assert;
  */
 class RmiInvocationWrapper implements RmiInvocationHandler {
 
+	/** 指向服务接口的实例对象的代理 */
 	private final Object wrappedObject;
 
 	private final RmiBasedExporter rmiExporter;
 
-
-	/**
-	 * Create a new RmiInvocationWrapper for the given object
-	 * @param wrappedObject the object to wrap with an RmiInvocationHandler
-	 * @param rmiExporter the RMI exporter to handle the actual invocation
-	 */
 	public RmiInvocationWrapper(Object wrappedObject, RmiBasedExporter rmiExporter) {
 		Assert.notNull(wrappedObject, "Object to wrap is required");
 		Assert.notNull(rmiExporter, "RMI exporter is required");
 		this.wrappedObject = wrappedObject;
 		this.rmiExporter = rmiExporter;
 	}
-
 
 	/**
 	 * Exposes the exporter's service interface, if any, as target interface.
@@ -66,9 +60,7 @@ class RmiInvocationWrapper implements RmiInvocationHandler {
 	 * Delegates the actual invocation handling to the RMI exporter.
 	 * @see RmiBasedExporter#invoke(org.springframework.remoting.support.RemoteInvocation, Object)
 	 */
-	public Object invoke(RemoteInvocation invocation)
-		throws RemoteException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-
+	public Object invoke(RemoteInvocation invocation) throws RemoteException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 		return this.rmiExporter.invoke(invocation, this.wrappedObject);
 	}
 

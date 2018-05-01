@@ -60,9 +60,8 @@ import org.springframework.beans.factory.FactoryBean;
  */
 public class RmiProxyFactoryBean extends RmiClientInterceptor implements FactoryBean<Object>, BeanClassLoaderAware {
 
-	// 表示服务接口的代理对象
+	/** 表示服务接口的代理对象 */
 	private Object serviceProxy;
-
 
 	@Override
 	public void afterPropertiesSet() {
@@ -72,7 +71,6 @@ public class RmiProxyFactoryBean extends RmiClientInterceptor implements Factory
 		}
 		this.serviceProxy = new ProxyFactory(getServiceInterface(), this).getProxy(getBeanClassLoader());
 	}
-
 
 	public Object getObject() {
 		return this.serviceProxy;

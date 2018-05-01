@@ -46,12 +46,9 @@ import org.springframework.util.ClassUtils;
  * @see #doReadRemoteInvocation
  * @see #doWriteRemoteInvocationResult
  */
-public abstract class RemoteInvocationSerializingExporter extends RemoteInvocationBasedExporter
-		implements InitializingBean {
+public abstract class RemoteInvocationSerializingExporter extends RemoteInvocationBasedExporter implements InitializingBean {
 
-	/**
-	 * Default content type: "application/x-java-serialized-object"
-	 */
+	/** Default content type: "application/x-java-serialized-object" */
 	public static final String CONTENT_TYPE_SERIALIZED_OBJECT = "application/x-java-serialized-object";
 
 
@@ -110,7 +107,6 @@ public abstract class RemoteInvocationSerializingExporter extends RemoteInvocati
 		return this.proxy;
 	}
 
-
 	/**
 	 * Create an ObjectInputStream for the given InputStream.
 	 * <p>The default implementation creates a Spring {@link CodebaseAwareObjectInputStream}.
@@ -135,8 +131,7 @@ public abstract class RemoteInvocationSerializingExporter extends RemoteInvocati
 	 * @throws ClassNotFoundException if case of a transferred class not
 	 * being found in the local ClassLoader
 	 */
-	protected RemoteInvocation doReadRemoteInvocation(ObjectInputStream ois)
-			throws IOException, ClassNotFoundException {
+	protected RemoteInvocation doReadRemoteInvocation(ObjectInputStream ois) throws IOException, ClassNotFoundException {
 
 		Object obj = ois.readObject();
 		if (!(obj instanceof RemoteInvocation)) {
@@ -169,8 +164,7 @@ public abstract class RemoteInvocationSerializingExporter extends RemoteInvocati
 	 * @param oos the ObjectOutputStream to write to
 	 * @throws java.io.IOException if thrown by I/O methods
 	 */
-	protected void doWriteRemoteInvocationResult(RemoteInvocationResult result, ObjectOutputStream oos)
-			throws IOException {
+	protected void doWriteRemoteInvocationResult(RemoteInvocationResult result, ObjectOutputStream oos) throws IOException {
 
 		oos.writeObject(result);
 	}

@@ -72,7 +72,9 @@ public class RmiServiceExporter extends RmiBasedExporter implements Initializing
 	private String serviceName;
 
 	private int servicePort = 0;
+	/** clientSocketFactory用于调用端建立套接字发起连接 */
 	private RMIClientSocketFactory clientSocketFactory;
+	/** 客户端与服务端通信时会使用 serverSocketFactory 创建连接套接字，发起调用请求 */
 	private RMIServerSocketFactory serverSocketFactory;
 
 	/** 注册中心：RMI服务端发布的服务都会注册到该对象中 */
@@ -81,7 +83,12 @@ public class RmiServiceExporter extends RmiBasedExporter implements Initializing
 	private String registryHost;
 	/** 注册中心的端口 */
 	private int registryPort = Registry.REGISTRY_PORT;
+	/**
+	 * 当服务端暴露服务时，也就是当使用 LocateRegistry.createRegistry(registryPort,clientSocketFactory,serverSockerFactory)
+	 * 方法创建Registry实例时会在服务端机器使用serverSocketFactory创建套接字等待连接
+	 */
 	private RMIClientSocketFactory registryClientSocketFactory;
+
 	private RMIServerSocketFactory registryServerSocketFactory;
 
 	/** 用于标识是否总是创建一个新的注册中心 */
@@ -147,18 +154,16 @@ public class RmiServiceExporter extends RmiBasedExporter implements Initializing
 			this.createdRegistry = true;
 		}
 
-		// Initialize and cache exported object.
-		// 初始化以及缓存导出的Object
-		// 此时通常情况下是使用RMIInvocationWrapper封装的JDK代理类，切面为RemoteInvocationTraceInterceptor
+		// 初始化以及缓存暴露远程调用对象，通常情况下是使用RMIInvocationWrapper封装的JDK代理类，切面为RemoteInvocationTraceInterceptor
 		this.exportedObject = getObjectToExport();
 
 		if (logger.isInfoEnabled()) {
 			logger.info("Binding service '" + this.serviceName + "' to RMI registry: " + this.registry);
 		}
 
-		// Export RMI object.
+		// 暴露RMI服务对象
 		if (this.clientSocketFactory != null) {
-			// 使用由给定的套接字工厂指定的传送方式导出远程对象，一遍能够接收传入的调用
+			// 使用由给定的套接字工厂指定的传送方式导出远程对象，以便能够接收传入的调用
 			// clientSocketFactory:进行远程对象调用的客户端套接字工厂
 			// serverSocketFactory:接收远程调用的服务端套接字工厂
 			UnicastRemoteObject.exportObject(
@@ -169,7 +174,7 @@ public class RmiServiceExporter extends RmiBasedExporter implements Initializing
 			UnicastRemoteObject.exportObject(this.exportedObject, this.servicePort);
 		}
 
-		// Bind RMI object to registry.
+		// 绑定RMI服务对象到注册表
 		try {
 			if (this.replaceExistingBinding) {
 				this.registry.rebind(this.serviceName, this.exportedObject);
@@ -182,8 +187,7 @@ public class RmiServiceExporter extends RmiBasedExporter implements Initializing
 		catch (AlreadyBoundException ex) {
 			// Already an RMI object bound for the specified service name...
 			unexportObjectSilently();
-			throw new IllegalStateException(
-					"Already an RMI object bound for name '"  + this.serviceName + "': " + ex.toString());
+			throw new IllegalStateException("Already an RMI object bound for name '"  + this.serviceName + "': " + ex.toString());
 		}
 		catch (RemoteException ex) {
 			// Registry binding failed: let's unexport the RMI object as well.

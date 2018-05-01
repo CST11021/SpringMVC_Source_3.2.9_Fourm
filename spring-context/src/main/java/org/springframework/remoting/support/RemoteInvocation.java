@@ -27,6 +27,10 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.util.ClassUtils;
 
 /**
+ *
+ * 利用反射技术调用目标方法的一个工具类，该类实现了序列化接口，客户端调用的时候，会将调用信息封装为一个RemoteInvocation对象，
+ * 通过网络传输，服务端反序列化该对象，进行方法调用
+ *
  * Encapsulates a remote invocation, providing core method invocation properties
  * in a serializable fashion. Used for RMI and HTTP-based serialization invokers.
  *
@@ -45,41 +49,24 @@ import org.springframework.util.ClassUtils;
  */
 public class RemoteInvocation implements Serializable {
 
-	/** use serialVersionUID from Spring 1.1 for interoperability */
 	private static final long serialVersionUID = 6876024250231820554L;
-
-
+	/** 要调用的方法名 */
 	private String methodName;
-
+	/** 调用方法的入参类型 */
 	private Class[] parameterTypes;
-
+	/** 调用方法的入参 */
 	private Object[] arguments;
 
 	private Map<String, Serializable> attributes;
 
 
-	/**
-	 * Create a new RemoteInvocation for use as JavaBean.
-	 */
 	public RemoteInvocation() {
 	}
-
-	/**
-	 * Create a new RemoteInvocation for the given parameters.
-	 * @param methodName the name of the method to invoke
-	 * @param parameterTypes the parameter types of the method
-	 * @param arguments the arguments for the invocation
-	 */
 	public RemoteInvocation(String methodName, Class[] parameterTypes, Object[] arguments) {
 		this.methodName = methodName;
 		this.parameterTypes = parameterTypes;
 		this.arguments = arguments;
 	}
-
-	/**
-	 * Create a new RemoteInvocation for the given AOP method invocation.
-	 * @param methodInvocation the AOP invocation to convert
-	 */
 	public RemoteInvocation(MethodInvocation methodInvocation) {
 		this.methodName = methodInvocation.getMethod().getName();
 		this.parameterTypes = methodInvocation.getMethod().getParameterTypes();
@@ -88,45 +75,16 @@ public class RemoteInvocation implements Serializable {
 
 
 	/**
-	 * Set the name of the target method.
+	 * 利用反射技术调用目标方法
+	 * @param targetObject
+	 * @return 返回目标方法调用的执行结果
+	 * @throws NoSuchMethodException
+	 * @throws IllegalAccessException
+	 * @throws InvocationTargetException
 	 */
-	public void setMethodName(String methodName) {
-		this.methodName = methodName;
-	}
-
-	/**
-	 * Return the name of the target method.
-	 */
-	public String getMethodName() {
-		return this.methodName;
-	}
-
-	/**
-	 * Set the parameter types of the target method.
-	 */
-	public void setParameterTypes(Class[] parameterTypes) {
-		this.parameterTypes = parameterTypes;
-	}
-
-	/**
-	 * Return the parameter types of the target method.
-	 */
-	public Class[] getParameterTypes() {
-		return this.parameterTypes;
-	}
-
-	/**
-	 * Set the arguments for the target method call.
-	 */
-	public void setArguments(Object[] arguments) {
-		this.arguments = arguments;
-	}
-
-	/**
-	 * Return the arguments for the target method call.
-	 */
-	public Object[] getArguments() {
-		return this.arguments;
+	public Object invoke(Object targetObject) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+		Method method = targetObject.getClass().getMethod(this.methodName, this.parameterTypes);
+		return method.invoke(targetObject, this.arguments);
 	}
 
 
@@ -150,7 +108,6 @@ public class RemoteInvocation implements Serializable {
 		}
 		this.attributes.put(key, value);
 	}
-
 	/**
 	 * Retrieve the attribute for the given key, if any.
 	 * <p>The implementation avoids to unnecessarily create the attributes
@@ -165,46 +122,34 @@ public class RemoteInvocation implements Serializable {
 		return this.attributes.get(key);
 	}
 
-	/**
-	 * Set the attributes Map. Only here for special purposes:
-	 * Preferably, use {@link #addAttribute} and {@link #getAttribute}.
-	 * @param attributes the attributes Map
-	 * @see #addAttribute
-	 * @see #getAttribute
-	 */
+
+
+
+	// getter and setter ...
+	public void setMethodName(String methodName) {
+		this.methodName = methodName;
+	}
+	public String getMethodName() {
+		return this.methodName;
+	}
+	public void setParameterTypes(Class[] parameterTypes) {
+		this.parameterTypes = parameterTypes;
+	}
+	public Class[] getParameterTypes() {
+		return this.parameterTypes;
+	}
+	public void setArguments(Object[] arguments) {
+		this.arguments = arguments;
+	}
+	public Object[] getArguments() {
+		return this.arguments;
+	}
 	public void setAttributes(Map<String, Serializable> attributes) {
 		this.attributes = attributes;
 	}
-
-	/**
-	 * Return the attributes Map. Mainly here for debugging purposes:
-	 * Preferably, use {@link #addAttribute} and {@link #getAttribute}.
-	 * @return the attributes Map, or {@code null} if none created
-	 * @see #addAttribute
-	 * @see #getAttribute
-	 */
 	public Map<String, Serializable> getAttributes() {
 		return this.attributes;
 	}
-
-
-	/**
-	 * Perform this invocation on the given target object.
-	 * Typically called when a RemoteInvocation is received on the server.
-	 * @param targetObject the target object to apply the invocation to
-	 * @return the invocation result
-	 * @throws NoSuchMethodException if the method name could not be resolved
-	 * @throws IllegalAccessException if the method could not be accessed
-	 * @throws InvocationTargetException if the method invocation resulted in an exception
-	 * @see java.lang.reflect.Method#invoke
-	 */
-	public Object invoke(Object targetObject)
-			throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-
-		Method method = targetObject.getClass().getMethod(this.methodName, this.parameterTypes);
-		return method.invoke(targetObject, this.arguments);
-	}
-
 
 	@Override
 	public String toString() {

@@ -34,106 +34,19 @@ import org.springframework.util.ClassUtils;
  */
 public abstract class RemoteExporter extends RemotingSupport {
 
-	// 表示服务接口的实现对象，服务启动时，该对象必须不能为空
+	/** 表示服务接口的实现对象，服务启动时，该对象必须不能为空 */
 	private Object service;
-	// 要暴露的服务接口类型
+	/** 要暴露的服务接口类型 */
 	private Class serviceInterface;
-
+    /** 用于标识生成服务接口实例的代理时，是否织入日志跟踪拦截器 */
 	private Boolean registerTraceInterceptor;
-
+	/** 表示生成代理对象时，要织入的增强 */
 	private Object[] interceptors;
 
 
-
-	public void setService(Object service) {
-		this.service = service;
-	}
-	public Object getService() {
-		return this.service;
-	}
-
 	/**
-	 * Set the interface of the service to export.
-	 * The interface must be suitable for the particular service and remoting strategy.
-	 */
-	public void setServiceInterface(Class serviceInterface) {
-		if (serviceInterface != null && !serviceInterface.isInterface()) {
-			throw new IllegalArgumentException("'serviceInterface' must be an interface");
-		}
-		this.serviceInterface = serviceInterface;
-	}
-	/**
-	 * Return the interface of the service to export.
-	 */
-	public Class getServiceInterface() {
-		return this.serviceInterface;
-	}
-
-	/**
-	 * Set whether to register a RemoteInvocationTraceInterceptor for exported
-	 * services. Only applied when a subclass uses {@code getProxyForService}
-	 * for creating the proxy to expose.
-	 * <p>Default is "true". RemoteInvocationTraceInterceptor's most important value
-	 * is that it logs exception stacktraces on the server, before propagating an
-	 * exception to the client. Note that RemoteInvocationTraceInterceptor will <i>not</i>
-	 * be registered by default if the "interceptors" property has been specified.
-	 * @see #setInterceptors
-	 * @see #getProxyForService
-	 * @see RemoteInvocationTraceInterceptor
-	 */
-	public void setRegisterTraceInterceptor(boolean registerTraceInterceptor) {
-		this.registerTraceInterceptor = Boolean.valueOf(registerTraceInterceptor);
-	}
-	/**
-	 * Set additional interceptors (or advisors) to be applied before the
-	 * remote endpoint, e.g. a PerformanceMonitorInterceptor.
-	 * <p>You may specify any AOP Alliance MethodInterceptors or other
-	 * Spring AOP Advices, as well as Spring AOP Advisors.
-	 * @see #getProxyForService
-	 * @see org.springframework.aop.interceptor.PerformanceMonitorInterceptor
-	 */
-	public void setInterceptors(Object[] interceptors) {
-		this.interceptors = interceptors;
-	}
-
-
-	/**
-	 * 检查暴露的服务接口是有对应的实现类，并且是否有没有声明为Bean
-	 * @see #setService
-	 */
-	protected void checkService() throws IllegalArgumentException {
-		if (getService() == null) {
-			throw new IllegalArgumentException("Property 'service' is required");
-		}
-	}
-
-	/**
-	 * Check whether a service reference has been set,
-	 * and whether it matches the specified service.
-	 * @see #setServiceInterface
-	 * @see #setService
-	 */
-	protected void checkServiceInterface() throws IllegalArgumentException {
-		Class serviceInterface = getServiceInterface();
-		Object service = getService();
-		if (serviceInterface == null) {
-			throw new IllegalArgumentException("Property 'serviceInterface' is required");
-		}
-		if (service instanceof String) {
-			throw new IllegalArgumentException("Service [" + service + "] is a String " +
-					"rather than an actual service reference: Have you accidentally specified " +
-					"the service bean name as value instead of as reference?");
-		}
-		if (!serviceInterface.isInstance(service)) {
-			throw new IllegalArgumentException("Service interface [" + serviceInterface.getName() +
-					"] needs to be implemented by service [" + service + "] of class [" +
-					service.getClass().getName() + "]");
-		}
-	}
-
-	/**
-	 * Get a proxy for the given service object, implementing the specified
-	 * service interface.
+     * 为这个要暴露的服务创建一个代理对象，该代理主要是用于织入日志跟踪拦截器
+	 * Get a proxy for the given service object, implementing the specified service interface.
 	 * <p>Used to export a proxy that does not expose any internals but just
 	 * a specific interface intended for remote access. Furthermore, a
 	 * {@link RemoteInvocationTraceInterceptor} will be registered (by default).
@@ -158,10 +71,42 @@ public abstract class RemoteExporter extends RemotingSupport {
 			}
 		}
 		proxyFactory.setTarget(getService());
+        // 设置生成的代理对象可以强制转型为Advised
 		proxyFactory.setOpaque(true);
 		return proxyFactory.getProxy(getBeanClassLoader());
 	}
-
+	/**
+	 * 检查暴露的服务接口是有对应的实现类，并且是否有没有声明为Bean
+	 * @see #setService
+	 */
+	protected void checkService() throws IllegalArgumentException {
+		if (getService() == null) {
+			throw new IllegalArgumentException("Property 'service' is required");
+		}
+	}
+	/**
+	 * Check whether a service reference has been set,
+	 * and whether it matches the specified service.
+	 * @see #setServiceInterface
+	 * @see #setService
+	 */
+	protected void checkServiceInterface() throws IllegalArgumentException {
+		Class serviceInterface = getServiceInterface();
+		Object service = getService();
+		if (serviceInterface == null) {
+			throw new IllegalArgumentException("Property 'serviceInterface' is required");
+		}
+		if (service instanceof String) {
+			throw new IllegalArgumentException("Service [" + service + "] is a String " +
+					"rather than an actual service reference: Have you accidentally specified " +
+					"the service bean name as value instead of as reference?");
+		}
+		if (!serviceInterface.isInstance(service)) {
+			throw new IllegalArgumentException("Service interface [" + serviceInterface.getName() +
+					"] needs to be implemented by service [" + service + "] of class [" +
+					service.getClass().getName() + "]");
+		}
+	}
 	/**
 	 * Return a short name for this exporter.
 	 * Used for tracing of remote invocations.
@@ -174,5 +119,28 @@ public abstract class RemoteExporter extends RemotingSupport {
 	protected String getExporterName() {
 		return ClassUtils.getShortName(getClass());
 	}
+
+
+    public void setService(Object service) {
+        this.service = service;
+    }
+    public Object getService() {
+        return this.service;
+    }
+    public void setServiceInterface(Class serviceInterface) {
+        if (serviceInterface != null && !serviceInterface.isInterface()) {
+            throw new IllegalArgumentException("'serviceInterface' must be an interface");
+        }
+        this.serviceInterface = serviceInterface;
+    }
+    public Class getServiceInterface() {
+        return this.serviceInterface;
+    }
+    public void setRegisterTraceInterceptor(boolean registerTraceInterceptor) {
+        this.registerTraceInterceptor = Boolean.valueOf(registerTraceInterceptor);
+    }
+    public void setInterceptors(Object[] interceptors) {
+        this.interceptors = interceptors;
+    }
 
 }

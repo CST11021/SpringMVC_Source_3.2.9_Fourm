@@ -40,11 +40,11 @@ import org.springframework.remoting.support.RemoteInvocationBasedExporter;
 public abstract class RmiBasedExporter extends RemoteInvocationBasedExporter {
 
 	/**
-	 * Determine the object to export: either the service object itself
-	 * or a RmiInvocationWrapper in case of a non-RMI service object.
-	 * @return the RMI object to export
-	 * @see #setService
-	 * @see #setServiceInterface
+	 * 当请求RMI服务时会由注册表Registry实例将请求转向之前注册的处理类去处理，也就是之前封装的RMIInvocationWrapper，然后由
+	 * RMIInvocationWrapper中的invoke方法进行处理，那么为什么不是在invoke方法中直接使用service，而是通过代理再次将service封装呢？
+	 * 这其中的一个关键点是，在创建代理时添加了一个增强拦截器RemoteInvocationTraceInterceptor，目的是为了对方法调用进行打印跟踪，
+	 * 但是如果直接在invoke方法硬编码这些日志，会使代码看起来很不优雅，而且耦合度很高，使用代理的方法就会解决这样的问题，而且会有很高的可扩展性。
+	 * @return
 	 */
 	protected Remote getObjectToExport() {
 		// determine remote object
@@ -52,8 +52,7 @@ public abstract class RmiBasedExporter extends RemoteInvocationBasedExporter {
 				(getServiceInterface() == null || Remote.class.isAssignableFrom(getServiceInterface()))) {
 			// conventional RMI service
 			return (Remote) getService();
-		}
-		else {
+		} else {
 			// RMI invoker
 			if (logger.isDebugEnabled()) {
 				logger.debug("RMI service [" + getService() + "] is an RMI invoker");
@@ -63,8 +62,13 @@ public abstract class RmiBasedExporter extends RemoteInvocationBasedExporter {
 	}
 
 	/**
-	 * Redefined here to be visible to RmiInvocationWrapper.
-	 * Simply delegates to the corresponding superclass method.
+	 *
+	 * @param invocation the remote invocation
+	 * @param targetObject 这个目标对象其实是服务接口实现的一个代理
+	 * @return
+	 * @throws NoSuchMethodException
+	 * @throws IllegalAccessException
+	 * @throws InvocationTargetException
 	 */
 	@Override
 	protected Object invoke(RemoteInvocation invocation, Object targetObject)

@@ -42,6 +42,9 @@ import org.springframework.util.ClassUtils;
  * @since 1.2
  * @see RemoteExporter#setRegisterTraceInterceptor
  * @see RemoteExporter#getProxyForService
+ *
+ *
+ * 远程调用跟踪拦截器，该拦截器主要用于日志跟踪
  */
 public class RemoteInvocationTraceInterceptor implements MethodInterceptor {
 
@@ -49,23 +52,12 @@ public class RemoteInvocationTraceInterceptor implements MethodInterceptor {
 
 	private final String exporterNameClause;
 
-
-	/**
-	 * Create a new RemoteInvocationTraceInterceptor.
-	 */
 	public RemoteInvocationTraceInterceptor() {
 		this.exporterNameClause = "";
 	}
-
-	/**
-	 * Create a new RemoteInvocationTraceInterceptor.
-	 * @param exporterName the name of the remote exporter
-	 * (to be used as context information in log messages)
-	 */
 	public RemoteInvocationTraceInterceptor(String exporterName) {
 		this.exporterNameClause = exporterName + " ";
 	}
-
 
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 		Method method = invocation.getMethod();

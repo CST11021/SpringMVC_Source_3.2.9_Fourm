@@ -70,9 +70,11 @@ import org.springframework.remoting.support.RemoteInvocationUtils;
 public class RmiClientInterceptor extends RemoteInvocationBasedAccessor implements MethodInterceptor {
 
 	private boolean lookupStubOnStartup = true;
+	/** 用于标识是否要缓存生成的RMI服务接口代理*/
 	private boolean cacheStub = true;
 	private boolean refreshStubOnConnectFailure = false;
 	private RMIClientSocketFactory registryClientSocketFactory;
+	/** 执行RMI服务接口的代理对象 */
 	private Remote cachedStub;
 	private final Object stubMonitor = new Object();
 
@@ -82,7 +84,6 @@ public class RmiClientInterceptor extends RemoteInvocationBasedAccessor implemen
 		super.afterPropertiesSet();
 		prepare();
 	}
-
 	/**
 	 * Fetches RMI stub on startup, if necessary.
 	 * @throws RemoteLookupFailureException if RMI stub creation failed
@@ -109,7 +110,6 @@ public class RmiClientInterceptor extends RemoteInvocationBasedAccessor implemen
 			}
 		}
 	}
-
 	/**
 	 * Create the RMI stub, typically by looking it up.
 	 * <p>Called on interceptor initialization if "cacheStub" is "true";
@@ -125,21 +125,20 @@ public class RmiClientInterceptor extends RemoteInvocationBasedAccessor implemen
 		try {
 			Remote stub = null;
 			if (this.registryClientSocketFactory != null) {
-				// RMIClientSocketFactory specified for registry access.
-				// Unfortunately, due to RMI API limitations, this means
-				// that we need to parse the RMI URL ourselves and perform
-				// straight LocateRegistry.getRegistry/Registry.lookup calls.
+
 				URL url = new URL(null, getServiceUrl(), new DummyURLStreamHandler());
 				String protocol = url.getProtocol();
 				if (protocol != null && !"rmi".equals(protocol)) {
 					throw new MalformedURLException("Invalid URL scheme '" + protocol + "'");
 				}
+
 				String host = url.getHost();
 				int port = url.getPort();
 				String name = url.getPath();
 				if (name != null && name.startsWith("/")) {
 					name = name.substring(1);
 				}
+
 				Registry registry = LocateRegistry.getRegistry(host, port, this.registryClientSocketFactory);
 				stub = registry.lookup(name);
 			}
@@ -163,7 +162,6 @@ public class RmiClientInterceptor extends RemoteInvocationBasedAccessor implemen
 			throw new RemoteLookupFailureException("Lookup of RMI stub failed", ex);
 		}
 	}
-
 	/**
 	 * Return the RMI stub to use. Called for each invocation.
 	 * <p>The default implementation returns the stub created on initialization,
@@ -217,7 +215,6 @@ public class RmiClientInterceptor extends RemoteInvocationBasedAccessor implemen
 			}
 		}
 	}
-
 	/**
 	 * Determine whether the given RMI exception indicates a connect failure.
 	 * <p>The default implementation delegates to
@@ -228,7 +225,6 @@ public class RmiClientInterceptor extends RemoteInvocationBasedAccessor implemen
 	protected boolean isConnectFailure(RemoteException ex) {
 		return RmiClientInterceptorUtils.isConnectFailure(ex);
 	}
-
 	/**
 	 * Refresh the stub and retry the remote invocation if necessary.
 	 * <p>If not configured to refresh on connect failure, this method
@@ -256,7 +252,6 @@ public class RmiClientInterceptor extends RemoteInvocationBasedAccessor implemen
 			throw ex;
 		}
 	}
-
 	/**
 	 * Refresh the RMI stub and retry the given invocation.
 	 * Called by invoke on connect failure.
@@ -276,7 +271,6 @@ public class RmiClientInterceptor extends RemoteInvocationBasedAccessor implemen
 		}
 		return doInvoke(invocation, freshStub);
 	}
-
 	/**
 	 * Perform the given invocation on the given RMI stub.
 	 * @param invocation the AOP method invocation
@@ -322,7 +316,6 @@ public class RmiClientInterceptor extends RemoteInvocationBasedAccessor implemen
 			}
 		}
 	}
-
 	/**
 	 * Apply the given AOP method invocation to the given {@link RmiInvocationHandler}.
 	 * <p>The default implementation delegates to {@link #createRemoteInvocation}.
@@ -362,6 +355,8 @@ public class RmiClientInterceptor extends RemoteInvocationBasedAccessor implemen
 
 
 	/**
+	 * Dummy 是傀儡的意思
+	 *
 	 * Dummy URLStreamHandler that's just specified to suppress the standard
 	 * {@code java.net.URL} URLStreamHandler lookup, to be able to
 	 * use the standard URL class for parsing "rmi:..." URLs.

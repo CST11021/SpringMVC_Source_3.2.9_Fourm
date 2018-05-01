@@ -36,25 +36,6 @@ public abstract class RemoteInvocationBasedAccessor extends UrlBasedRemoteAccess
 
 	private RemoteInvocationFactory remoteInvocationFactory = new DefaultRemoteInvocationFactory();
 
-
-	/**
-	 * Set the RemoteInvocationFactory to use for this accessor.
-	 * Default is a {@link DefaultRemoteInvocationFactory}.
-	 * <p>A custom invocation factory can add further context information
-	 * to the invocation, for example user credentials.
-	 */
-	public void setRemoteInvocationFactory(RemoteInvocationFactory remoteInvocationFactory) {
-		this.remoteInvocationFactory =
-				(remoteInvocationFactory != null ? remoteInvocationFactory : new DefaultRemoteInvocationFactory());
-	}
-
-	/**
-	 * Return the RemoteInvocationFactory used by this accessor.
-	 */
-	public RemoteInvocationFactory getRemoteInvocationFactory() {
-		return this.remoteInvocationFactory;
-	}
-
 	/**
 	 * Create a new RemoteInvocation object for the given AOP method invocation.
 	 * <p>The default implementation delegates to the configured
@@ -83,6 +64,15 @@ public abstract class RemoteInvocationBasedAccessor extends UrlBasedRemoteAccess
 	 */
 	protected Object recreateRemoteInvocationResult(RemoteInvocationResult result) throws Throwable {
 		return result.recreate();
+	}
+
+
+	public void setRemoteInvocationFactory(RemoteInvocationFactory remoteInvocationFactory) {
+		this.remoteInvocationFactory =
+				(remoteInvocationFactory != null ? remoteInvocationFactory : new DefaultRemoteInvocationFactory());
+	}
+	public RemoteInvocationFactory getRemoteInvocationFactory() {
+		return this.remoteInvocationFactory;
 	}
 
 }
