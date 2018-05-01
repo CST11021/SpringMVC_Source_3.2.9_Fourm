@@ -12,7 +12,7 @@ public class ServerTest {
         Registry registry = LocateRegistry.createRegistry(1099);
 
         IOperation iOperation = new OperationImpl();
-        Naming.rebind("rmi://127.0.0.1:1099/Operation", iOperation);
+        Naming.rebind("rmi://localhost:1099/Operation", iOperation);
 
         System.out.println("service running...");
     }

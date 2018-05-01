@@ -12,6 +12,7 @@
         <property name="serviceName" value ="helloRMI"/>
         <property name="serviceInterface" value="com.whz.spring.rmi.HelloRMIService"/>
         <property name="registryPort" value="9999"/>
+        <!--注册中心地址为空的话，默认使用本地注册中心-->
         <!--<property name="registryHost" value="30.6.28.128"/>-->
     </bean>
 

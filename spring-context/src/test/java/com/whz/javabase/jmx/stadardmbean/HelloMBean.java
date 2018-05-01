@@ -1,4 +1,4 @@
-package com.whz.javabase.jmx;
+package com.whz.javabase.jmx.stadardmbean;
 
 public interface HelloMBean {
 

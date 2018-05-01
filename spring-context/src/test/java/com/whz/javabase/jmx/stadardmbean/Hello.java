@@ -1,4 +1,4 @@
-package com.whz.javabase.jmx;
+package com.whz.javabase.jmx.stadardmbean;
 
 /*
  * 该类名称必须与实现的接口的前缀保持一致（即MBean前面的名称）

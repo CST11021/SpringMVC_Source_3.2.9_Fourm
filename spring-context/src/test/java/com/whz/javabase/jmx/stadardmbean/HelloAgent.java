@@ -1,4 +1,4 @@
-package com.whz.javabase.jmx;
+package com.whz.javabase.jmx.stadardmbean;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;

@@ -44,17 +44,10 @@ public abstract class RemoteExporter extends RemotingSupport {
 	private Object[] interceptors;
 
 
-	/**
-	 * Set the service to export.
-	 * Typically populated via a bean reference.
-	 */
+
 	public void setService(Object service) {
 		this.service = service;
 	}
-
-	/**
-	 * Return the service to export.
-	 */
 	public Object getService() {
 		return this.service;
 	}
@@ -69,7 +62,6 @@ public abstract class RemoteExporter extends RemotingSupport {
 		}
 		this.serviceInterface = serviceInterface;
 	}
-
 	/**
 	 * Return the interface of the service to export.
 	 */
@@ -92,7 +84,6 @@ public abstract class RemoteExporter extends RemotingSupport {
 	public void setRegisterTraceInterceptor(boolean registerTraceInterceptor) {
 		this.registerTraceInterceptor = Boolean.valueOf(registerTraceInterceptor);
 	}
-
 	/**
 	 * Set additional interceptors (or advisors) to be applied before the
 	 * remote endpoint, e.g. a PerformanceMonitorInterceptor.
@@ -107,7 +98,7 @@ public abstract class RemoteExporter extends RemotingSupport {
 
 
 	/**
-	 * Check whether the service reference has been set.
+	 * 检查暴露的服务接口是有对应的实现类，并且是否有没有声明为Bean
 	 * @see #setService
 	 */
 	protected void checkService() throws IllegalArgumentException {
