@@ -39,11 +39,6 @@ public class ContextLifecycleScheduledTaskRegistrar extends ScheduledTaskRegistr
 		this.applicationContext = applicationContext;
 	}
 
-
-	/**
-	 * If we're running within an ApplicationContext, don't schedule the tasks
-	 * right here; wait for this context's ContextRefreshedEvent instead.
-	 */
 	@Override
 	public void afterPropertiesSet() {
 		if (this.applicationContext == null) {
@@ -51,10 +46,7 @@ public class ContextLifecycleScheduledTaskRegistrar extends ScheduledTaskRegistr
 		}
 	}
 
-	/**
-	 * Actually schedule the tasks at the right time of the context lifecycle,
-	 * if we're running within an ApplicationContext.
-	 */
+	// Spring定时任务的开始时间是在容器刷新的时候，通过监听机制触发的
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		if (event.getApplicationContext() != this.applicationContext) {
 			return;

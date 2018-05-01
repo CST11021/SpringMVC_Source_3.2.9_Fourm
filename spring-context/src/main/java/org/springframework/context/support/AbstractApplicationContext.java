@@ -75,6 +75,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	static {
+		// Eagerly load the ContextClosedEvent class to avoid weird classloader issues on application shutdown in WebLogic 8.1. (Reported by Dustin Woods.)
+		// 加载 ContextClosedEvent 类，避免在WebLogic 8.1中应用程序关闭的奇怪类加载问题。
+		ContextClosedEvent.class.getName();
+	}
+
 	// 工厂中的MessageSource bean的名称。如果没有提供，则将消息解析委托给父容器，默认使用 DelegatingMessageSource。
 	public static final String MESSAGE_SOURCE_BEAN_NAME = "messageSource";
 	// 工厂中的 LifecycleProcessor（生命周期处理器）的bean名称。如果没有提供，默认使用 DefaultLifecycleProcessor 。
@@ -82,23 +88,18 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	// ApplicationEventMulticaster bean在工厂的名称。如果没有提供,使用一个默认SimpleApplicationEventMulticaster。
 	public static final String APPLICATION_EVENT_MULTICASTER_BEAN_NAME = "applicationEventMulticaster";
 
-	static {
-		// Eagerly load the ContextClosedEvent class to avoid weird classloader issues on application shutdown in WebLogic 8.1. (Reported by Dustin Woods.)
-		// 加载 ContextClosedEvent 类，避免在WebLogic 8.1中应用程序关闭的奇怪类加载问题。
-		ContextClosedEvent.class.getName();
-	}
 
-	// 以“org.springframework.context.support.AbstractApplicationContext + @ + 16进制哈希值串” 作为id
+	// 以“org.springframework.context.support.AbstractApplicationContext + @ + 16进制哈希值串” 作为Spring容器的id
 	private String id = ObjectUtils.identityToString(this);
 	private String displayName = ObjectUtils.identityToString(this);
-	// 父容器
+	// 表示当前容器的父容器
 	private ApplicationContext parent;
-	// beanfactorypostprocessor应用在刷新
+	// 用于保存Spring容器的后置处理器
 	private final List<BeanFactoryPostProcessor> beanFactoryPostProcessors = new ArrayList<BeanFactoryPostProcessor>();
-	//用于记录容器启动时间
+	// 用于记录容器启动时间
 	private long startupDate;
 
-	// 容器是否处于“活动”状态的同步监视器
+	// 作为一个同步监视器锁：监视容器是否处于“活动”的状态
 	private final Object activeMonitor = new Object();
 	//AtomicBoolean用于比较两个Boolean类型的值，如果一致，执行方法内的语句。其实就是一个if语句，值得注意的是比较和执行两
 	// 个操作是作为一个原子性的事务操作，中间不会出现线程暂停的情况，主要为多线程的控制提供解决的方案。
@@ -106,22 +107,31 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	private boolean closed = false;// 标记容器是否是关闭状态
 
 
-	//** Synchronization monitor for the "refresh" and "destroy"
+	//** 作为一个同步监视器锁：Synchronization monitor for the "refresh" and "destroy"
 	private final Object startupShutdownMonitor = new Object();
-	//** Reference to the JVM shutdown hook, if registered
+	/**
+	 在Java程序中可以通过添加关闭钩子，实现在程序退出时关闭资源、平滑退出的功能。
+	 使用Runtime.addShutdownHook(Thread hook)方法，可以注册一个JVM关闭的钩子，这个钩子可以在以下几种场景被调用：
+	 1. 程序正常退出
+	 2. 使用System.exit()
+	 3. 终端使用Ctrl+C触发的中断
+	 4. 系统关闭
+	 5. 使用Kill pid命令干掉进程
+	 */
 	private Thread shutdownHook;
-	//** ResourcePatternResolver used by this context
+	//** 用于获取配置文件的Resource对象，该实例是在构造器中初始化的，默认实现是PathMatchingResourcePatternResolver
 	private ResourcePatternResolver resourcePatternResolver;
 	//** LifecycleProcessor for managing the lifecycle of beans within this context
 	private LifecycleProcessor lifecycleProcessor;
 	//** MessageSource we delegate our implementation of this interface to
 	private MessageSource messageSource;
-	//** Helper class used in event publishing
+	//** 事件广播器，Spring的事件广播机制就通过ApplicationEventMulticaster来实现的，该实例在refresh()方法中初始化，默认
+	// 实现是SimpleApplicationEventMulticaster
 	private ApplicationEventMulticaster applicationEventMulticaster;
 	//** Statically specified listeners
 	private Set<ApplicationListener<?>> applicationListeners = new LinkedHashSet<ApplicationListener<?>>();
 
-	//初始化时使用标准的Envirionment实现类 StandardEnvironment
+	// 初始化时使用标准的Envirionment实现类 StandardEnvironment
 	private ConfigurableEnvironment environment;
 
 
@@ -136,7 +146,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	}
 
 
-	// Implementation of ApplicationContext interface
+	// ------------------------------------------- 实现 ApplicationContext 接口 ----------------------------------------
+
 	public void setId(String id) {
 		this.id = id;
 	}
@@ -202,49 +213,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	}
 
 
-
-	// Implementation of ConfigurableApplicationContext interface
-	/**
-	 * {@inheritDoc}
-	 * <p>The parent {@linkplain ApplicationContext#getEnvironment() environment} is
-	 * {@linkplain ConfigurableEnvironment#merge(ConfigurableEnvironment) merged} with
-	 * this (child) application context environment if the parent is non-{@code null} and
-	 * its environment is an instance of {@link ConfigurableEnvironment}.
-	 * @see ConfigurableEnvironment#merge(ConfigurableEnvironment)
-	 */
-	public void setParent(ApplicationContext parent) {
-		this.parent = parent;
-		if (parent != null) {
-			Environment parentEnvironment = parent.getEnvironment();
-			if (parentEnvironment instanceof ConfigurableEnvironment) {
-				getEnvironment().merge((ConfigurableEnvironment) parentEnvironment);
-			}
-		}
-	}
-	public void addBeanFactoryPostProcessor(BeanFactoryPostProcessor beanFactoryPostProcessor) {
-		this.beanFactoryPostProcessors.add(beanFactoryPostProcessor);
-	}
-	public List<BeanFactoryPostProcessor> getBeanFactoryPostProcessors() {
-		return this.beanFactoryPostProcessors;
-	}
-	public void addApplicationListener(ApplicationListener<?> listener) {
-		if (this.applicationEventMulticaster != null) {
-			this.applicationEventMulticaster.addApplicationListener(listener);
-		}
-		else {
-			this.applicationListeners.add(listener);
-		}
-	}
-	/**
-	 * Return the list of statically specified ApplicationListeners.
-	 */
-	public Collection<ApplicationListener<?>> getApplicationListeners() {
-		return this.applicationListeners;
-	}
-	// 创建一个 StandardEnvironment 实例
-	protected ConfigurableEnvironment createEnvironment() {
-		return new StandardEnvironment();
-	}
+	// ------------------------------------------- 实现 ConfigurableApplicationContext 接口 ----------------------------
 
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
@@ -265,13 +234,21 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 				// 4、子类覆盖方法做额外的处理，默认空实现
 				postProcessBeanFactory(beanFactory);
 
-				// 5、调用并执行所有相关的处理器
-				// 其中的一个应用是运用后处理器，处理BeanDefinition注册表中的一些占位符，因为Spring在解析Bean的时候时候
-				// 如果有引用占位符，在解析阶段占位符是不会被翻译的，ApplicationContext 通过后处理器的方式来进行翻译相应
-				// 的占位符，如果你使用BeanFactory级别的容器，那么调用getBean方法返回的Bean的属性信息是永远不会被解析的。
+				// 5、执行所有 BeanDefinitionRegistryPostProcessor 和 BeanFactoryPostProcessor 类型的处理器
+				// ①BeanDefinitionRegistryPostProcessor其中的一个应用是运用后处理器，处理BeanDefinition注册表中的一些占位符，
+				// 因为Spring在解析Bean的时候时候，如果有引用占位符，在解析阶段占位符是不会被翻译的，ApplicationContext 通过
+				// 后处理器的方式来进行翻译相应的占位符，如果你使用BeanFactory级别的容器，那么调用getBean方法返回的Bean的属性
+				// 信息是永远不会被解析的；
+				// ②BeanFactoryProcess 是工厂后处理器，spring容器解析完配置文件（注册了所有的BeanDefinition）之后，并在所有
+				// bean实例化之前被调用的
+				// 另外，BeanDefinitionRegistryPostProcessor 继承自 BeanFactoryPostProcessor
 				invokeBeanFactoryPostProcessors(beanFactory);
 
-				// 6、注册拦截Bean创建的Bean处理器，这里只是注册，真正的调用是在getBean时候
+				// 6、注册拦截Bean创建的Bean处理器，这里只是注册处理器，处理器执行是在getBean时候
+				// BeanPostProcessor 处理器是Bean调用构造函数实例化前和实例化后执行的处理器，还有MergedBeanDefinitionPostProcessor
+				// 类型的处理器（该处理器在BeanDefinition 被包装为 BeanWrapper 后，会调用该处理器，将类型为beanType和beanName
+				// 对应的bean注入到beanDefinition；
+				// MergedBeanDefinitionPostProcessor 继承自 BeanPostProcessor
 				registerBeanPostProcessors(beanFactory);
 
 				// 7、为上下文初始化Message源，即不同语言的消息体，国际化处理
@@ -402,9 +379,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	}
 	// 4、子类覆盖方法做额外的处理
 	protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {}
-	// 5、调用并执行所有相关的处理器
+	// 5、执行所有BeanDefinitionRegistryPostProcessor和BeanFactoryPostProcessor类型的处理器
+	// BeanDefinitionRegistryPostProcessor 的一个典型应用是扫描指定包及其子包下面拥有指定注解的类，你会发现在BeanFactory中并没有
+	// 使用到该后处理器，该后处理器为Spring容器扩展而设计的，IOC容器只加载一些常规的Bean配置，而像@Service、@Repository等这些注解
+	// 定义的Bean是Spring容器中才扩展出来的，其中 BeanDefinitionRegistryPostProcessor 还有一个典型的应用是Mybatis中的@Mapper.
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
-		// Invoke BeanDefinitionRegistryPostProcessors first, if any.
+
+		// --------------------------------第一步：处理 BeanDefinitionRegistryPostProcessor 类型的处理器-----------------
+
 		Set<String> processedBeans = new HashSet<String>();
 		if (beanFactory instanceof BeanDefinitionRegistry) {
 			BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
@@ -414,7 +396,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			// 保存Spring容器中BeanDefinitionRegistryPostProcessor类型的处理器（在完成 BeanDefinition 注册后，实例化bean之前调用）
 			List<BeanDefinitionRegistryPostProcessor> registryPostProcessors = new LinkedList<BeanDefinitionRegistryPostProcessor>();
 
-			// 1、执行Spring容器中的BeanDefinitionRegistryPostProcessor后处理器
+			// 1、遍历Spring容器中所有的处理器，做分类，并执行所有BeanDefinitionRegistryPostProcessor后处理器
 			for (BeanFactoryPostProcessor postProcessor : getBeanFactoryPostProcessors()) {
 				if (postProcessor instanceof BeanDefinitionRegistryPostProcessor) {
 					BeanDefinitionRegistryPostProcessor registryPostProcessor = (BeanDefinitionRegistryPostProcessor) postProcessor;
@@ -436,20 +418,29 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			}
 
 
-			// 3、注意：invokeBeanFactoryPostProcessors()执行的是处理器的postProcessBeanFactory()方法
-			// 将Spring容器中BeanDefinitionRegistryPostProcessor类型的处理器应用到IOC容器中
+			// 3、注意：invokeBeanFactoryPostProcessors()执行的是BeanFactoryPostProcessor#postProcessBeanFactory()方法，
+			// BeanFactoryPostProcessor处理器是在spring容器解析完配置文件（注册了所有BeanDefinition）之后，并在所有的bean实
+			// 例化之前被调用的
+
+			// 应用Spring容器中的工厂后处理器
 			invokeBeanFactoryPostProcessors(registryPostProcessors, beanFactory);
-			// 将IOC容器中BeanDefinitionRegistryPostProcessor类型的处理器Bean应用到IOC容器中
+			// 应用IOC容器中的工厂后处理器
 			invokeBeanFactoryPostProcessors(registryPostProcessorBeans, beanFactory);
-			// 将Spring容器中非BeanDefinitionRegistryPostProcessor类型的处理器应用到IOC容器中
+			// 应用Spring容器中非BeanDefinitionRegistryPostProcessor类型的工厂后处理器
+			// （BeanDefinitionRegistryPostProcessor类型的处理应在上面执行过了）
 			invokeBeanFactoryPostProcessors(regularPostProcessors, beanFactory);
 			processedBeans.addAll(beanMap.keySet());
 		}
 		else {
-			// Invoke factory processors registered with the context instance.
+			// 如果 beanFactory 不是一个BeanDefinition的注册表对象，就只执行工厂后处理器
 			invokeBeanFactoryPostProcessors(getBeanFactoryPostProcessors(), beanFactory);
 		}
 
+
+
+
+
+		// ----------------------------第二步：处理 BeanFactoryPostProcessor 类型的处理器--------------------------------
 		// 不要在这里初始化factorybean:我们需要让所有的常规bean都没有初始化，以便对它们使用bean工厂的后处理程序
 		// Spring中通过配置一些实现了BeanFactoryPostProcessor后处理接口的Bean，来进行一些操作，这些对于使用Spring的用户来
 		// 说是透明，所有有时候会让用户觉得，Spring好神奇。
@@ -502,7 +493,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		}
 		invokeBeanFactoryPostProcessors(nonOrderedPostProcessors, beanFactory);
 	}
-	// 将后处理器应用到对应的BeanFactory中
+	// 将BeanFactory后处理器应用到对应的BeanFactory中，BeanFactoryPostProcessor处理器是在spring容器解析完配置文件（注册了所
+	// 有BeanDefinition）之后，并在所有的bean实例化之前被调用的
 	private void invokeBeanFactoryPostProcessors(Collection<? extends BeanFactoryPostProcessor> postProcessors, ConfigurableListableBeanFactory beanFactory) {
 
 		for (BeanFactoryPostProcessor postProcessor : postProcessors) {
@@ -520,32 +512,38 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		int beanProcessorTargetCount = beanFactory.getBeanPostProcessorCount() + 1 + postProcessorNames.length;
 		beanFactory.addBeanPostProcessor(new BeanPostProcessorChecker(beanFactory, beanProcessorTargetCount));
 
-		// Separate between BeanPostProcessors that implement PriorityOrdered, Ordered, and the rest.
+		// 给处理进行分类
 		List<BeanPostProcessor> priorityOrderedPostProcessors = new ArrayList<BeanPostProcessor>();
 		List<BeanPostProcessor> internalPostProcessors = new ArrayList<BeanPostProcessor>();
 		List<String> orderedPostProcessorNames = new ArrayList<String>();
 		List<String> nonOrderedPostProcessorNames = new ArrayList<String>();
 		for (String ppName : postProcessorNames) {
+			// 有优先级顺序的处理器
 			if (isTypeMatch(ppName, PriorityOrdered.class)) {
 				BeanPostProcessor pp = beanFactory.getBean(ppName, BeanPostProcessor.class);
 				priorityOrderedPostProcessors.add(pp);
+				// BeanDefinition 被包装为 BeanWrapper 后，会调用该方法，将执行MergedBeanDefinitionPostProcessor处理器，
+				// 将类型为beanType和beanName对应的bean注入到beanDefinition
 				if (pp instanceof MergedBeanDefinitionPostProcessor) {
 					internalPostProcessors.add(pp);
 				}
 			}
+			// 按顺序执行的处理器
 			else if (isTypeMatch(ppName, Ordered.class)) {
 				orderedPostProcessorNames.add(ppName);
 			}
+			// 没指定顺序的处理器
 			else {
 				nonOrderedPostProcessorNames.add(ppName);
 			}
 		}
 
-		// First, register the BeanPostProcessors that implement PriorityOrdered.
+		// 注册BeanPostProcessor（这里只是注册，不是执行，触发执行动作的交由IOC处理）
+		// 1、注册有按优先级执行的处理器
 		OrderComparator.sort(priorityOrderedPostProcessors);
 		registerBeanPostProcessors(beanFactory, priorityOrderedPostProcessors);
 
-		// Next, register the BeanPostProcessors that implement Ordered.
+		// 2、注册按顺序执行的处理器
 		List<BeanPostProcessor> orderedPostProcessors = new ArrayList<BeanPostProcessor>();
 		for (String ppName : orderedPostProcessorNames) {
 			BeanPostProcessor pp = beanFactory.getBean(ppName, BeanPostProcessor.class);
@@ -557,7 +555,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		OrderComparator.sort(orderedPostProcessors);
 		registerBeanPostProcessors(beanFactory, orderedPostProcessors);
 
-		// Now, register all regular BeanPostProcessors.
+		// 3、注册没有指定顺序的处理器
 		List<BeanPostProcessor> nonOrderedPostProcessors = new ArrayList<BeanPostProcessor>();
 		for (String ppName : nonOrderedPostProcessorNames) {
 			BeanPostProcessor pp = beanFactory.getBean(ppName, BeanPostProcessor.class);
@@ -568,9 +566,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		}
 		registerBeanPostProcessors(beanFactory, nonOrderedPostProcessors);
 
-		// Finally, re-register all internal BeanPostProcessors.
+		// 4、注册 MergedBeanDefinitionPostProcessor 类型的处理器
 		OrderComparator.sort(internalPostProcessors);
 		registerBeanPostProcessors(beanFactory, internalPostProcessors);
+
 
 		beanFactory.addBeanPostProcessor(new ApplicationListenerDetector());
 	}
@@ -710,7 +709,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	}
 	// 12、完成刷新过程，通知生命周期处理器lifecycleProcessor 刷新过程，同时发出ContextRefreshEvent通知别人
 	protected void finishRefresh() {
-		// 当ApplicationContext 启动或停止时，他会通过LifecycleProcessor来与所有声明的bean的周期做状态更新，而在LifecycleProcessor的使用前首先需要初始化。
+		// 当ApplicationContext 启动或停止时，他会通过LifecycleProcessor来与所有声明的bean的周期做状态更新，
+		// 而在LifecycleProcessor的使用前首先需要初始化。
 		initLifecycleProcessor();
 
 		// Propagate refresh to lifecycle processor first.
@@ -872,8 +872,51 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * <p>The parent {@linkplain ApplicationContext#getEnvironment() environment} is
+	 * {@linkplain ConfigurableEnvironment#merge(ConfigurableEnvironment) merged} with
+	 * this (child) application context environment if the parent is non-{@code null} and
+	 * its environment is an instance of {@link ConfigurableEnvironment}.
+	 * @see ConfigurableEnvironment#merge(ConfigurableEnvironment)
+	 */
+	public void setParent(ApplicationContext parent) {
+		this.parent = parent;
+		if (parent != null) {
+			Environment parentEnvironment = parent.getEnvironment();
+			if (parentEnvironment instanceof ConfigurableEnvironment) {
+				getEnvironment().merge((ConfigurableEnvironment) parentEnvironment);
+			}
+		}
+	}
+	public void addBeanFactoryPostProcessor(BeanFactoryPostProcessor beanFactoryPostProcessor) {
+		this.beanFactoryPostProcessors.add(beanFactoryPostProcessor);
+	}
+	public List<BeanFactoryPostProcessor> getBeanFactoryPostProcessors() {
+		return this.beanFactoryPostProcessors;
+	}
+	public void addApplicationListener(ApplicationListener<?> listener) {
+		if (this.applicationEventMulticaster != null) {
+			this.applicationEventMulticaster.addApplicationListener(listener);
+		}
+		else {
+			this.applicationListeners.add(listener);
+		}
+	}
+	/**
+	 * Return the list of statically specified ApplicationListeners.
+	 */
+	public Collection<ApplicationListener<?>> getApplicationListeners() {
+		return this.applicationListeners;
+	}
+	// 创建一个 StandardEnvironment 实例
+	protected ConfigurableEnvironment createEnvironment() {
+		return new StandardEnvironment();
+	}
 
-	// ------------------------------------------- Implementation of BeanFactory interface -------------------------------------------
+
+	// ------------------------------------------- 实现 BeanFactory 接口 -----------------------------------------------
+
 	public Object getBean(String name) throws BeansException {
 		return getBeanFactory().getBean(name);
 	}
@@ -906,7 +949,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	}
 
 
-	// ------------------------------------------- Implementation of ListableBeanFactory interface -------------------------------------------
+	// ------------------------------------------- 实现ListableBeanFactory 接口 ----------------------------------------
+
 	public boolean containsBeanDefinition(String beanName) {
 		return getBeanFactory().containsBeanDefinition(beanName);
 	}
@@ -938,10 +982,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	}
 
 
-	// ------------------------------------------- Implementation of HierarchicalBeanFactory interface -------------------------------------------
+	// ------------------------------------------- 实现 HierarchicalBeanFactory 接口 -----------------------------------
+
+	// 获取Spring的父容器
 	public BeanFactory getParentBeanFactory() {
 		return getParent();
 	}
+	// 判断本地是否包含一个指定的Bean
 	public boolean containsLocalBean(String name) {
 		return getBeanFactory().containsLocalBean(name);
 	}
@@ -952,7 +999,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	}
 
 
-	// ------------------------------------------- Implementation of MessageSource interface -------------------------------------------
+	// ------------------------------------------- 实现 MessageSource 接口 ---------------------------------------------
+
 	public String getMessage(String code, Object args[], String defaultMessage, Locale locale) {
 		return getMessageSource().getMessage(code, args, defaultMessage, locale);
 	}
@@ -977,13 +1025,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	}
 
 
-	// ------------------------------------------- Implementation of ResourcePatternResolver interface -------------------------------------------
+	// ------------------------------------------- 实现 ResourcePatternResolver 接口 -----------------------------------
+
 	public Resource[] getResources(String locationPattern) throws IOException {
 		return this.resourcePatternResolver.getResources(locationPattern);
 	}
 
 
-	// ------------------------------------------- Implementation of Lifecycle interface -------------------------------------------
+	// ------------------------------------------- 实现 Lifecycle 接口 -------------------------------------------------
+
 	public void start() {
 		getLifecycleProcessor().start();
 		publishEvent(new ContextStartedEvent(this));
@@ -997,11 +1047,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	}
 
 
-	// ------------------------------------------- Abstract methods that must be implemented by subclasses -------------------------------------------
 
-	// 由子类实现，初始化一个 BeanFactory 给上层的 ApplicationContext 容器，该方法有 refresh() 调用，如果发现已经有一个 BeanFactory 实例了，则销毁全部的bean实例，并关闭容器，然后重新初始化一个BeanFactory
-	// ------------------------------------------- 由子类实现的抽象方法 -------------------------------------------
-	// 创建一个BeanFactory 以供上层 ApplicationContext 使用
+	// ------------------------------------------- 由子类实现的抽象方法 ------------------------------------------------
+	// 由子类实现，初始化一个 BeanFactory 给上层的 ApplicationContext 容器，该方法由 refresh() 调用，如果发现已经有一个
+	// BeanFactory 实例了，则销毁全部的bean实例，并关闭容器，然后重新初始化一个BeanFactory
 	protected abstract void refreshBeanFactory() throws BeansException, IllegalStateException;
 	protected abstract void closeBeanFactory();
 	/**
@@ -1022,6 +1071,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
 
 
+
+	// 内部类声明
 
 	/**
 	 * BeanPostProcessor that logs an info message when a bean is created during BeanPostProcessor instantiation,
@@ -1096,8 +1147,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			return bean;
 		}
 	}
-
-
 
 	@Override
 	public String toString() {

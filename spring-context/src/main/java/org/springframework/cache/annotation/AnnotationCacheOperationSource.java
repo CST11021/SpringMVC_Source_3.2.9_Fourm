@@ -42,50 +42,29 @@ import org.springframework.util.Assert;
  * @author Juergen Hoeller
  * @since 3.1
  */
+// 该类用于判断目标类的指定方法，是否有被缓存注解修饰，如果有则返回缓存注解的CacheOperation对象，如果没有则返回null
 @SuppressWarnings("serial")
-public class AnnotationCacheOperationSource extends AbstractFallbackCacheOperationSource
-		implements Serializable {
+public class AnnotationCacheOperationSource extends AbstractFallbackCacheOperationSource implements Serializable {
 
+	// 表示缓存注解方法是否只可以作用于public方法，默认true
 	private final boolean publicMethodsOnly;
-
+	// 表示一系列缓存注解解析器
 	private final Set<CacheAnnotationParser> annotationParsers;
 
-
-	/**
-	 * Create a default AnnotationCacheOperationSource, supporting public methods
-	 * that carry the {@code Cacheable} and {@code CacheEvict} annotations.
-	 */
+	// 构造器
 	public AnnotationCacheOperationSource() {
 		this(true);
 	}
-
-	/**
-	 * Create a default {@code AnnotationCacheOperationSource}, supporting public methods
-	 * that carry the {@code Cacheable} and {@code CacheEvict} annotations.
-	 * @param publicMethodsOnly whether to support only annotated public methods
-	 * typically for use with proxy-based AOP), or protected/private methods as well
-	 * (typically used with AspectJ class weaving)
-	 */
 	public AnnotationCacheOperationSource(boolean publicMethodsOnly) {
 		this.publicMethodsOnly = publicMethodsOnly;
 		this.annotationParsers = new LinkedHashSet<CacheAnnotationParser>(1);
 		this.annotationParsers.add(new SpringCacheAnnotationParser());
 	}
-
-	/**
-	 * Create a custom AnnotationCacheOperationSource.
-	 * @param annotationParser the CacheAnnotationParser to use
-	 */
 	public AnnotationCacheOperationSource(CacheAnnotationParser annotationParser) {
 		this.publicMethodsOnly = true;
 		Assert.notNull(annotationParser, "CacheAnnotationParser must not be null");
 		this.annotationParsers = Collections.singleton(annotationParser);
 	}
-
-	/**
-	 * Create a custom AnnotationCacheOperationSource.
-	 * @param annotationParsers the CacheAnnotationParser to use
-	 */
 	public AnnotationCacheOperationSource(CacheAnnotationParser... annotationParsers) {
 		this.publicMethodsOnly = true;
 		Assert.notEmpty(annotationParsers, "At least one CacheAnnotationParser needs to be specified");
@@ -93,11 +72,6 @@ public class AnnotationCacheOperationSource extends AbstractFallbackCacheOperati
 		Collections.addAll(parsers, annotationParsers);
 		this.annotationParsers = parsers;
 	}
-
-	/**
-	 * Create a custom AnnotationCacheOperationSource.
-	 * @param annotationParsers the CacheAnnotationParser to use
-	 */
 	public AnnotationCacheOperationSource(Set<CacheAnnotationParser> annotationParsers) {
 		this.publicMethodsOnly = true;
 		Assert.notEmpty(annotationParsers, "At least one CacheAnnotationParser needs to be specified");
@@ -109,22 +83,12 @@ public class AnnotationCacheOperationSource extends AbstractFallbackCacheOperati
 	protected Collection<CacheOperation> findCacheOperations(Class<?> clazz) {
 		return determineCacheOperations(clazz);
 	}
-
 	@Override
 	protected Collection<CacheOperation> findCacheOperations(Method method) {
 		return determineCacheOperations(method);
 	}
-
-	/**
-	 * Determine the cache operation(s) for the given method or class.
-	 * <p>This implementation delegates to configured
-	 * {@link CacheAnnotationParser}s for parsing known annotations into
-	 * Spring's metadata attribute class.
-	 * <p>Can be overridden to support custom annotations that carry
-	 * caching metadata.
-	 * @param ae the annotated method or class
-	 * @return the configured caching operations, or {@code null} if none found
-	 */
+	// 入参AnnotatedElement表示一个Class或一个Method对象，该方法用来判断给定的Class或者Method的是否有被Spring缓存注解修饰
+	// 如果有，则返回配置的缓存注解信息，这些配置信息被抽象为一个CacheOperation对象
 	protected Collection<CacheOperation> determineCacheOperations(AnnotatedElement ae) {
 		Collection<CacheOperation> ops = null;
 		for (CacheAnnotationParser annotationParser : this.annotationParsers) {
@@ -139,9 +103,7 @@ public class AnnotationCacheOperationSource extends AbstractFallbackCacheOperati
 		return ops;
 	}
 
-	/**
-	 * By default, only public methods can be made cacheable.
-	 */
+
 	@Override
 	protected boolean allowPublicMethodsOnly() {
 		return this.publicMethodsOnly;
@@ -160,7 +122,6 @@ public class AnnotationCacheOperationSource extends AbstractFallbackCacheOperati
 		return (this.annotationParsers.equals(otherCos.annotationParsers) &&
 				this.publicMethodsOnly == otherCos.publicMethodsOnly);
 	}
-
 	@Override
 	public int hashCode() {
 		return this.annotationParsers.hashCode();

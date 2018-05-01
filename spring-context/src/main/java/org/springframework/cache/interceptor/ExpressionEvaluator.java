@@ -41,18 +41,12 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 class ExpressionEvaluator {
 
 	public static final Object NO_RESULT = new Object();
-
 	private final SpelExpressionParser parser = new SpelExpressionParser();
-
 	// shared param discoverer since it caches data internally
 	private final ParameterNameDiscoverer paramNameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
-
 	private final Map<String, Expression> keyCache = new ConcurrentHashMap<String, Expression>(64);
-
 	private final Map<String, Expression> conditionCache = new ConcurrentHashMap<String, Expression>(64);
-
 	private final Map<String, Expression> unlessCache = new ConcurrentHashMap<String, Expression>(64);
-
 	private final Map<String, Method> targetMethodCache = new ConcurrentHashMap<String, Method>(64);
 
 
@@ -60,10 +54,9 @@ class ExpressionEvaluator {
 	 * Create an {@link EvaluationContext} without a return value.
 	 * @see #createEvaluationContext(Collection, Method, Object[], Object, Class, Object)
 	 */
-	public EvaluationContext createEvaluationContext(Collection<Cache> caches,
-			Method method, Object[] args, Object target, Class<?> targetClass) {
-		return createEvaluationContext(caches, method, args, target, targetClass,
-				NO_RESULT);
+	public EvaluationContext createEvaluationContext(
+		Collection<Cache> caches, Method method, Object[] args, Object target, Class<?> targetClass) {
+		return createEvaluationContext(caches, method, args, target, targetClass, NO_RESULT);
 	}
 
 	/**
@@ -78,9 +71,8 @@ class ExpressionEvaluator {
 	 *        {@link #NO_RESULT} if there is no return at this time
 	 * @return the evalulation context
 	 */
-	public EvaluationContext createEvaluationContext(Collection<Cache> caches,
-			Method method, Object[] args, Object target, Class<?> targetClass,
-			final Object result) {
+	public EvaluationContext createEvaluationContext(
+		Collection<Cache> caches, Method method, Object[] args, Object target, Class<?> targetClass, final Object result) {
 		CacheExpressionRootObject rootObject = new CacheExpressionRootObject(caches,
 				method, args, target, targetClass);
 		LazyParamAwareEvaluationContext evaluationContext = new LazyParamAwareEvaluationContext(rootObject,
@@ -101,8 +93,7 @@ class ExpressionEvaluator {
 	}
 
 	public boolean unless(String unlessExpression, Method method, EvaluationContext evalContext) {
-		return getExpression(this.unlessCache, unlessExpression, method).getValue(
-				evalContext, boolean.class);
+		return getExpression(this.unlessCache, unlessExpression, method).getValue(evalContext, boolean.class);
 	}
 
 	private Expression getExpression(Map<String, Expression> cache, String expression, Method method) {

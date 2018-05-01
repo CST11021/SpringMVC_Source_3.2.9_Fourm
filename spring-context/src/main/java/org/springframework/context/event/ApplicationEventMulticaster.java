@@ -34,7 +34,7 @@ public interface ApplicationEventMulticaster {
 	// 移除所有监听器
 	void removeAllListeners();
 
-	// 将给定Spring事件广播给相应的监听器
+	// 将给定Spring事件广播给所有相应的监听器，通知监听器该事件发生了
 	void multicastEvent(ApplicationEvent event);
 
 }

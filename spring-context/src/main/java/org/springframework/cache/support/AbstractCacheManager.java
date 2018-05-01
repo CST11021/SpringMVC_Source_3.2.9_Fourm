@@ -37,11 +37,15 @@ import org.springframework.cache.CacheManager;
  */
 public abstract class AbstractCacheManager implements CacheManager, InitializingBean {
 
+	// Key：缓存名 - Value:缓存对象
 	private final ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<String, Cache>(16);
 
+	// 用于存储该缓存管理器管理的缓存名
 	private Set<String> cacheNames = new LinkedHashSet<String>(16);
 
 
+	// 在它设置了所有的bean属性之后，由BeanFactory调用
+	// 该方法用于初始化 cacheMap 和 cacheNames
 	public void afterPropertiesSet() {
 		Collection<? extends Cache> caches = loadCaches();
 
@@ -59,30 +63,22 @@ public abstract class AbstractCacheManager implements CacheManager, Initializing
 		this.cacheNames.add(cache.getName());
 	}
 
-	/**
-	 * Decorate the given Cache object if necessary.
-	 * @param cache the Cache object to be added to this CacheManager
-	 * @return the decorated Cache object to be used instead,
-	 * or simply the passed-in Cache object by default
-	 */
+	// 用来修饰缓对象的，默认不包装，缓存管理器可以修改该方法实现
 	protected Cache decorateCache(Cache cache) {
 		return cache;
 	}
 
-
+	// 根据名称获取一个缓存对象
 	public Cache getCache(String name) {
 		return this.cacheMap.get(name);
 	}
 
+	// 返回所有缓存名称
 	public Collection<String> getCacheNames() {
 		return Collections.unmodifiableSet(this.cacheNames);
 	}
 
-
-	/**
-	 * Load the caches for this cache manager. Occurs at startup.
-	 * The returned collection must not be null.
-	 */
+	/** Load the caches for this cache manager. Occurs at startup.The returned collection must not be null.*/
 	protected abstract Collection<? extends Cache> loadCaches();
 
 }

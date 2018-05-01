@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <!--注册邮件发送事件的监听器-->
+    <bean class="com.whz.spring.event.MailSendListener"/>
+    <!--注册一个邮件发送器-->
+    <bean id="mailSender" class="com.whz.spring.event.MailSender"/>
+
+    <bean class="com.whz.spring.event.ContextRefreshedListener"/>
+
+
+    <!--如果这里没有声明applicationEventMulticaster这个Bean，Spring自己也会注册一个事件广播器的Bean，事件广播器中有一个线程池-->
+    <!--对象，我们可以通过初始化该线程池对象，来实现异步监听；注意，如果没有声明“applicationEventMulticaster”这个Bean，Spring-->
+    <!--也具有事件监听机制，但是它监听器同步的，而不是异步的，你可以通过注释掉该bean的声明来查看同步和异步监听的区别-->
+    <bean id="applicationEventMulticaster" class="org.springframework.context.event.SimpleApplicationEventMulticaster">
+        <property name="taskExecutor">
+            <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor"
+                  destroy-method="shutdown">
+                <property name="corePoolSize" value="5" />
+                <property name="maxPoolSize" value="10" />
+                <property name="WaitForTasksToCompleteOnShutdown" value="true" />
+            </bean>
+        </property>
+    </bean>
+
+</beans>

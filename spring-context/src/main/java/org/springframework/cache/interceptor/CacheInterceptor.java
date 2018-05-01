@@ -38,16 +38,12 @@ import org.aopalliance.intercept.MethodInvocation;
  * @author Juergen Hoeller
  * @since 3.1
  */
+// 当一个方法上配置了Cacheable之类的注解后，这个方法被调用时，就会被一个叫CacheInterceptor的拦截器拦截，进入该类的invoke()
+// 方法中，如果当前context已经初始化完成，该方法紧接着会调用execute()。execute()方法中会读取原来被调用业务方法上的注解信
+// 息，通过这些信息进行相应的缓存操作，再跟据操作的结果决定是否调用原方法中的业务逻辑。这就是spring通过注解操作缓存的总
+// 体流程。
 @SuppressWarnings("serial")
 public class CacheInterceptor extends CacheAspectSupport implements MethodInterceptor, Serializable {
-
-	private static class ThrowableWrapper extends RuntimeException {
-		private final Throwable original;
-
-		ThrowableWrapper(Throwable original) {
-			this.original = original;
-		}
-	}
 
 	public Object invoke(final MethodInvocation invocation) throws Throwable {
 		Method method = invocation.getMethod();
@@ -63,9 +59,24 @@ public class CacheInterceptor extends CacheAspectSupport implements MethodInterc
 		};
 
 		try {
+			//  CacheInterceptor在执行execute()的过程中会调用事先注入的CacheResolver实例的resolveCaches()方法解析业务方
+			// 法中需要操作的缓存Cache列表（resolveCaches()方法内部实现是通过调用此CacheResolver实例中的cacheManager属性
+			// 的getCache()方法获取Cache）。获取到需要操作的Cache列表后，遍历这个列表，然后都过调用doGet(Cache cache)或
+			// doPut(Cachecache)方法进行缓存操作。
+			// 总体上说，CacheInterceptor的execute()中对缓存的操作就是通过事先注一个CacheResolver和CacheManager实例，然
+			// 后通过调用这个CacheResolver实例的resolveCaches()获得需要操作的Cache列表，再遍历列表，将每个Cache实例作为
+			// 参数传入doGet()或doPut()来实现缓存读取。当然，还需要一些Key之类的参数，这个是由keyGenerator自动生成的。
 			return execute(aopAllianceInvoker, invocation.getThis(), method, invocation.getArguments());
 		} catch (ThrowableWrapper th) {
 			throw th.original;
+		}
+	}
+
+	private static class ThrowableWrapper extends RuntimeException {
+		private final Throwable original;
+
+		ThrowableWrapper(Throwable original) {
+			this.original = original;
 		}
 	}
 }

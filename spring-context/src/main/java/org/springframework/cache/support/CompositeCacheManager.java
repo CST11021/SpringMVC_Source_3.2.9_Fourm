@@ -50,24 +50,22 @@ import org.springframework.cache.CacheManager;
  * @see #setFallbackToNoOpCache
  * @see org.springframework.cache.concurrent.ConcurrentMapCacheManager#setCacheNames
  */
+// 这里简单再说一下具体实现的方式：CompositeCacheManager中维护一个CacheManager列表，用户可以通过配置，把多个CacheManager
+// 配置到这个列表中，使得应用可以同时管理多个缓存管理器。这个类对于getCache(String)方法实现是通过遍历这个列表，匹配出name
+// 相同的Cache实例并返回。这个类还可以通过配置指定一个boolean的fallbackToNoOpCache标志属性，它的作用就是，当通过
+// getCache(string)获取不到Cache实例时，是否不进行任何缓存操作。在默认情况或者fallbackToNoOpCache值为false时，在通过
+// getCache(string)获取不到Cache实例时，业务层上可能会抛出运行时异常（比如提示“找不到XXX名称的Cache”）。但如果为true时，
+// 这时候不进行任何缓存操作也不抛异常，这种场景主要用于在不具备缓存条件的时候，在不改代码的情况下，禁用缓存。spring对于
+// 这种机制的实现，是通过上图中没有画出的两个特殊的类来实现的: NoOpCacheManager和NoOpCache类。这两个类分别是CacheManager
+// 类Cache类的子类，表示不进行任何缓存操作。
 public class CompositeCacheManager implements CacheManager, InitializingBean {
 
 	private final List<CacheManager> cacheManagers = new ArrayList<CacheManager>();
-
 	private boolean fallbackToNoOpCache = false;
 
 
-	/**
-	 * Construct an empty CompositeCacheManager, with delegate CacheManagers to
-	 * be added via the {@link #setCacheManagers "cacheManagers"} property.
-	 */
 	public CompositeCacheManager() {
 	}
-
-	/**
-	 * Construct a CompositeCacheManager from the given delegate CacheManagers.
-	 * @param cacheManagers the CacheManagers to delegate to
-	 */
 	public CompositeCacheManager(CacheManager... cacheManagers) {
 		setCacheManagers(Arrays.asList(cacheManagers));
 	}

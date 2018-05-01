@@ -52,7 +52,11 @@ import org.springframework.util.ObjectUtils;
  * @author Juergen Hoeller
  * @since 3.1
  */
+// 该类是一个抽象类，可以通过继承该方法，判断目标类的指定方法，是否有被缓存注解修饰，如果有则返回缓存注解的CacheOperation
+// 对象，如果没有则返回null
 public abstract class AbstractFallbackCacheOperationSource implements CacheOperationSource {
+
+	protected final Log logger = LogFactory.getLog(getClass());
 
 	/**
 	 * Canonical value held in cache to indicate no caching attribute was
@@ -61,20 +65,11 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 	private final static Collection<CacheOperation> NULL_CACHING_ATTRIBUTE = Collections.emptyList();
 
 	/**
-	 * Logger available to subclasses.
-	 * <p>As this base class is not marked Serializable, the logger will be recreated
-	 * after serialization - provided that the concrete subclass is Serializable.
-	 */
-	protected final Log logger = LogFactory.getLog(getClass());
-
-	/**
 	 * Cache of CacheOperations, keyed by DefaultCacheKey (Method + target Class).
 	 * <p>As this base class is not marked Serializable, the cache will be recreated
 	 * after serialization - provided that the concrete subclass is Serializable.
 	 */
-	final Map<Object, Collection<CacheOperation>> attributeCache =
-			new ConcurrentHashMap<Object, Collection<CacheOperation>>(1024);
-
+	final Map<Object, Collection<CacheOperation>> attributeCache = new ConcurrentHashMap<Object, Collection<CacheOperation>>(1024);
 
 	/**
 	 * Determine the caching attribute for this method invocation.
@@ -112,7 +107,6 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 			return cacheOps;
 		}
 	}
-
 	/**
 	 * Determine a cache key for the given method and target class.
 	 * <p>Must not produce same key for overloaded methods.
@@ -124,7 +118,6 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 	protected Object getCacheKey(Method method, Class<?> targetClass) {
 		return new DefaultCacheKey(method, targetClass);
 	}
-
 	private Collection<CacheOperation> computeCacheOperations(Method method, Class<?> targetClass) {
 		// Don't allow no-public methods as required.
 		if (allowPublicMethodsOnly() && !Modifier.isPublic(method.getModifiers())) {
@@ -160,8 +153,6 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 		}
 		return null;
 	}
-
-
 	/**
 	 * Subclasses need to implement this to return the caching attribute
 	 * for the given method, if any.
@@ -170,7 +161,6 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 	 * (or {@code null} if none)
 	 */
 	protected abstract Collection<CacheOperation> findCacheOperations(Method method);
-
 	/**
 	 * Subclasses need to implement this to return the caching attribute
 	 * for the given class, if any.
@@ -180,22 +170,16 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 	 */
 	protected abstract Collection<CacheOperation> findCacheOperations(Class<?> clazz);
 
-	/**
-	 * Should only public methods be allowed to have caching semantics?
-	 * <p>The default implementation returns {@code false}.
-	 */
+	// 表示缓存注解方法是否只可以作用于public方法，默认返回false，子类可以覆盖该方法
 	protected boolean allowPublicMethodsOnly() {
 		return false;
 	}
 
 
-	/**
-	 * Default cache key for the CacheOperation cache.
-	 */
+	// 默认将一个目标类和目标方法，作为缓存Key
 	private static class DefaultCacheKey {
 
 		private final Method method;
-
 		private final Class<?> targetClass;
 
 		public DefaultCacheKey(Method method, Class<?> targetClass) {
@@ -215,7 +199,6 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 			return (this.method.equals(otherKey.method) && ObjectUtils.nullSafeEquals(this.targetClass,
 					otherKey.targetClass));
 		}
-
 		@Override
 		public int hashCode() {
 			return this.method.hashCode() * 29 + (this.targetClass != null ? this.targetClass.hashCode() : 0);

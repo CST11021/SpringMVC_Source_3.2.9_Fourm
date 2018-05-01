@@ -34,6 +34,19 @@ import org.springframework.cache.Cache;
  * @author Costin Leau
  * @author Phillip Webb
  * @since 3.1
+
+
+	在支持Spring Cache的环境下，对于使用@Cacheable标注的方法，Spring在每次执行前都会检查Cache中是否存在相同key的缓存元素，
+	如果存在就不再执行该方法，而是直接从缓存中获取结果进行返回，否则才会执行并将返回结果存入指定的缓存中。@CachePut也可以
+	声明一个方法支持缓存功能。与@Cacheable不同的是使用@CachePut标注的方法在执行前不会去检查缓存中是否存在之前执行过的结果，
+	而是每次都会执行该方法，并将执行结果以键值对的形式存入指定的缓存中。@CachePut也可以标注在类上和方法上。使用@CachePut
+	时我们可以指定的属性跟@Cacheable是一样的。
+
+	// 每次调用后会将返回结果加入缓存，但和 @Cacheable 不同的是，它每次都会触发真实方法的调用
+ 	@CachePut("users")
+	public User find(Integer id) {
+		return null;
+	}
  */
 @Target({ ElementType.METHOD, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
@@ -41,31 +54,10 @@ import org.springframework.cache.Cache;
 @Documented
 public @interface CachePut {
 
-	/**
-	 * Name of the caches in which the update takes place.
-	 * <p>May be used to determine the target cache (or caches), matching the
-	 * qualifier value (or the bean name(s)) of (a) specific bean definition.
-	 */
+	// 以下各属性的语义请参照@Cacheable注解的属性说明
+
 	String[] value();
-
-	/**
-	 * Spring Expression Language (SpEL) attribute for computing the key dynamically.
-	 * <p>Default is "", meaning all method parameters are considered as a key.
-	 */
 	String key() default "";
-
-	/**
-	 * Spring Expression Language (SpEL) attribute used for conditioning the cache update.
-	 * <p>Default is "", meaning the method result is always cached.
-	 */
 	String condition() default "";
-
-	/**
-	 * Spring Expression Language (SpEL) attribute used to veto the cache update.
-	 * <p>Unlike {@link #condition()}, this expression is evaluated after the method
-	 * has been called and can therefore refer to the {@code result}. Default is "",
-	 * meaning that caching is never vetoed.
-	 * @since 3.2
-	 */
 	String unless() default "";
 }

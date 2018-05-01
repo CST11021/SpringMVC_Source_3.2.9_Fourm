@@ -27,35 +27,34 @@ import org.springframework.util.Assert;
  *
  * @author Costin Leau
  */
+// 该抽象类是CacheEvictOperation、CachePutOperation和CacheableOperation的父类，用来封装Spring缓存注解的配置信息
 public abstract class CacheOperation {
-
+	// 表示缓存注解配置的value值，如：@Cacheable(value="accountCache")
 	private Set<String> cacheNames = Collections.emptySet();
+	// 表示缓存注解配置的condition值
 	private String condition = "";
+	// 表示缓存注解配置的key值
 	private String key = "";
+	// 表示缓存注解修饰的方法或类
 	private String name = "";
 
 
 	public Set<String> getCacheNames() {
 		return cacheNames;
 	}
-
 	public String getCondition() {
 		return condition;
 	}
-
 	public String getKey() {
 		return key;
 	}
-
 	public String getName() {
 		return name;
 	}
-
 	public void setCacheName(String cacheName) {
 		Assert.hasText(cacheName);
 		this.cacheNames = Collections.singleton(cacheName);
 	}
-
 	public void setCacheNames(String[] cacheNames) {
 		Assert.notEmpty(cacheNames);
 		this.cacheNames = new LinkedHashSet<String>(cacheNames.length);
@@ -63,55 +62,32 @@ public abstract class CacheOperation {
 			this.cacheNames.add(string);
 		}
 	}
-
 	public void setCondition(String condition) {
 		Assert.notNull(condition);
 		this.condition = condition;
 	}
-
 	public void setKey(String key) {
 		Assert.notNull(key);
 		this.key = key;
 	}
-
 	public void setName(String name) {
 		Assert.hasText(name);
 		this.name = name;
 	}
 
-	/**
-	 * This implementation compares the {@code toString()} results.
-	 * @see #toString()
-	 */
+
 	@Override
 	public boolean equals(Object other) {
 		return (other instanceof CacheOperation && toString().equals(other.toString()));
 	}
-
-	/**
-	 * This implementation returns {@code toString()}'s hash code.
-	 * @see #toString()
-	 */
 	@Override
 	public int hashCode() {
 		return toString().hashCode();
 	}
-
-	/**
-	 * Return an identifying description for this cache operation.
-	 * <p>Has to be overridden in subclasses for correct {@code equals}
-	 * and {@code hashCode} behavior. Alternatively, {@link #equals}
-	 * and {@link #hashCode} can be overridden themselves.
-	 */
 	@Override
 	public String toString() {
 		return getOperationDescription().toString();
 	}
-
-	/**
-	 * Return an identifying description for this caching operation.
-	 * <p>Available to subclasses, for inclusion in their {@code toString()} result.
-	 */
 	protected StringBuilder getOperationDescription() {
 		StringBuilder result = new StringBuilder();
 		result.append(getClass().getSimpleName());

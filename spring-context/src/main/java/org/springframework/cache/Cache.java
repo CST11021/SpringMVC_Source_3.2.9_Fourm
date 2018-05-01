@@ -26,10 +26,16 @@ package org.springframework.cache;
  * @author Costin Leau
  * @since 3.1
  */
-// 一个公共的缓存操作接口
+// 一个公共的缓存操作接口,所有被包装的Cache，都由CacheManager实例进行统一管理
+// spring缓存模块对可用的Cache采用适配器模式进行了统一的封装。具体代码在spring-context-xxx.jar包中的
+// org.springframework.cache.Cache接口，此接口声明一些储如get(Object key)，put(Objectkey,Object value)等缓存操作的统一
+// api。在这个接口中，还声明了一个叫getNativeCache()的方法，返回它适配的具体的缓存实现(比如在集成ehcache时，这个接口实现
+// 类的实例调用getNativeCache()时会返回net.sf.ehcache.Cache类型的实例)。每一个Cache实例都通过名称加以区分，所以在Cache接
+// 口中，还声明了一个getName()返回此实例的名称。spring提供一个叫ConcurrentMapCache的基于Map的Cache实现类，作为它内置的本
+// 地缓存实现方案。
 public interface Cache {
 
-	// Return the cache name.
+	// 返回缓存名
 	String getName();
 
 	// Return the the underlying native cache provider.

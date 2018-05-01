@@ -14,6 +14,8 @@ public class Test {
     @Autowired
     private AccountService1 accountService1;
 
+    // AccountService2中使用了Spring缓存注解，该注入的Bean是一个被代理后的Bean，它通过Spring自动代理机制，以及Bean初始化
+    // 后的后置处理器方法实现的
     @Autowired
     private AccountService2 accountService2;
 
