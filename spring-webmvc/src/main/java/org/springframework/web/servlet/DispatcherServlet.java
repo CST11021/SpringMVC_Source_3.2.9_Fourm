@@ -208,7 +208,7 @@ import org.springframework.web.util.WebUtils;
 @SuppressWarnings("serial")
 public class DispatcherServlet extends FrameworkServlet {
 
-	//** Well-known name for the MultipartResolver object in the bean factory for this namespace. */
+	// 多文件上传处理器Bean的BeanName
 	public static final String MULTIPART_RESOLVER_BEAN_NAME = "multipartResolver";
 	/** Well-known name for the LocaleResolver object in the bean factory for this namespace. */
 	public static final String LOCALE_RESOLVER_BEAN_NAME = "localeResolver";
@@ -760,7 +760,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		// 标记请求是否转换成了处理 multipart 的请求
 		boolean multipartRequestParsed = false;
 
-		// 放一个 WebAsyncManager 对象到 request 中
+		// 从请求中获取一个异步管理器
 		WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
 
 		try {
@@ -769,8 +769,8 @@ public class DispatcherServlet extends FrameworkServlet {
 
 			try {
 				// 优先判断一下是不是文件上传的 request
-				// 对于请求的处理，Spring首先考虑的是对于Multipart的处理，如果是MultipartContent类型的Request，则转换
-				// request为MultipartHttpServletRequest类型的request
+				// 对于请求的处理，Spring首先考虑的是对于Multipart的处理，如果是MultipartContent类型的Request，则将request转换
+				// 为 MultipartHttpServletRequest 类型的Request
 				processedRequest = checkMultipart(request);
 				// 是否真的转换:multipartRequestParsed 为 true 的话，说明已经做了转换
 				multipartRequestParsed = processedRequest != request;

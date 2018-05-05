@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
+ * 表示从一个上传文件请求中提取的文件对象
+ *
  * A representation of an uploaded file received in a multipart request.
  *
  * <p>The file contents are either stored in memory or temporarily on disk.

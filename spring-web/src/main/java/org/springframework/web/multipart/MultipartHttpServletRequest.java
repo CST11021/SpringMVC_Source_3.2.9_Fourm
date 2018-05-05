@@ -22,6 +22,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 
 /**
+ * 表示一个多文件上传的请求
+ *
  * Provides additional methods for dealing with multipart content within a
  * servlet request, allowing to access uploaded files.
  * Implementations also need to override the standard

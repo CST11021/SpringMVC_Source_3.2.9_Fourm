@@ -23,6 +23,8 @@ import java.util.Map;
 import org.springframework.util.MultiValueMap;
 
 /**
+ * 表示多文件上传的请求，实现该接口可以获取上传的文件的相关信息
+ *
  * This interface defines the multipart request access operations that are exposed for actual multipart requests.
  * It is extended by {@link MultipartHttpServletRequest} and the Portlet
  * {@link org.springframework.web.portlet.multipart.MultipartActionRequest}.
@@ -31,7 +33,6 @@ import org.springframework.util.MultiValueMap;
  * @author Arjen Poutsma
  * @since 2.5.2
  */
-// 实现该接口可以获取上传的文件的相关信息
 public interface MultipartRequest {
 
 	// 返回上传文件的所有组件名（一个请求可上传多个文件，通常使用<input type="file" name="file">这种组件，该方法返回的是组件名“file”）

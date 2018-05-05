@@ -86,6 +86,13 @@ import javax.servlet.http.HttpServletRequest;
  * @see org.springframework.web.multipart.support.ByteArrayMultipartFileEditor
  * @see org.springframework.web.multipart.support.StringMultipartFileEditor
  * @see org.springframework.web.servlet.DispatcherServlet
+ *
+ *
+从Spring3.1开始，Spring提供了两个MultipartResolver的实现用于处理multipart请求：
+	CommonsMultipartResolver使用commons Fileupload来处理multipart请求，所以在使用时，必须要引入相应的jar包；
+	StandardServletMultipartResolver是基于Servlet3.0来处理multipart请求的，所以不需要引用其他jar包，但是必须使用支持Servlet3.0的容器才可以。
+以tomcat为例，从Tomcat 7.0.x的版本开始就支持Servlet3.0了。
+ *
  */
 public interface MultipartResolver {
 

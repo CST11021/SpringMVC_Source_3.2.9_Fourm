@@ -38,7 +38,7 @@ public abstract class WebAsyncUtils {
 	private static Constructor<?> standardAsyncRequestConstructor;
 
 
-	// 获取当前请求的WebAsyncManager，或者如果没有找到，创建并将其与请求联系起来
+	// 从请求中获取一个异步管理器，如果没有则创建一个新的异步管理器
 	public static WebAsyncManager getAsyncManager(ServletRequest servletRequest) {
 		WebAsyncManager asyncManager = (WebAsyncManager) servletRequest.getAttribute(WEB_ASYNC_MANAGER_ATTRIBUTE);
 		if (asyncManager == null) {

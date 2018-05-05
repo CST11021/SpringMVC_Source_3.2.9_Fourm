@@ -47,10 +47,13 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public class StandardMultipartHttpServletRequest extends AbstractMultipartHttpServletRequest {
 
+	// Content-Disposition属性有两种类型：inline 和 attachment
+	// inline ：将文件内容直接显示在页面
+	// attachment：弹出对话框让用户下载
 	private static final String CONTENT_DISPOSITION = "content-disposition";
 	private static final String FILENAME_KEY = "filename=";
+	// 表示请求参数的Name，这里仅保存键值对的键信息
 	private Set<String> multipartParameterNames;
-
 
 
 	public StandardMultipartHttpServletRequest(HttpServletRequest request) throws MultipartException {
@@ -64,12 +67,19 @@ public class StandardMultipartHttpServletRequest extends AbstractMultipartHttpSe
 	}
 
 
+	@Override
+	protected void initializeMultipart() {
+		parseRequest(getRequest());
+	}
+	// 从请求对象中解析出请求参数的Name和上传的文件类型
 	private void parseRequest(HttpServletRequest request) {
 		try {
 			Collection<Part> parts = request.getParts();
 			this.multipartParameterNames = new LinkedHashSet<String>(parts.size());
 			MultiValueMap<String, MultipartFile> files = new LinkedMultiValueMap<String, MultipartFile>(parts.size());
+
 			for (Part part : parts) {
+
 				String filename = extractFilename(part.getHeader(CONTENT_DISPOSITION));
 				if (filename != null) {
 					files.add(part.getName(), new StandardMultipartFile(part, filename));
@@ -84,7 +94,7 @@ public class StandardMultipartHttpServletRequest extends AbstractMultipartHttpSe
 			throw new MultipartException("Could not parse multipart servlet request", ex);
 		}
 	}
-
+	// 从请求首部的 content-disposition 信息中提取文件文件名
 	private String extractFilename(String contentDisposition) {
 		if (contentDisposition == null) {
 			return null;
@@ -108,12 +118,6 @@ public class StandardMultipartHttpServletRequest extends AbstractMultipartHttpSe
 			}
 		}
 		return filename;
-	}
-
-
-	@Override
-	protected void initializeMultipart() {
-		parseRequest(getRequest());
 	}
 
 	@Override
@@ -188,13 +192,9 @@ public class StandardMultipartHttpServletRequest extends AbstractMultipartHttpSe
 	}
 
 
-	/**
-	 * Spring MultipartFile adapter, wrapping a Servlet 3.0 Part object.
-	 */
 	private static class StandardMultipartFile implements MultipartFile {
 
 		private final Part part;
-
 		private final String filename;
 
 		public StandardMultipartFile(Part part, String filename) {
@@ -205,31 +205,24 @@ public class StandardMultipartHttpServletRequest extends AbstractMultipartHttpSe
 		public String getName() {
 			return this.part.getName();
 		}
-
 		public String getOriginalFilename() {
 			return this.filename;
 		}
-
 		public String getContentType() {
 			return this.part.getContentType();
 		}
-
 		public boolean isEmpty() {
 			return (this.part.getSize() == 0);
 		}
-
 		public long getSize() {
 			return this.part.getSize();
 		}
-
 		public byte[] getBytes() throws IOException {
 			return FileCopyUtils.copyToByteArray(this.part.getInputStream());
 		}
-
 		public InputStream getInputStream() throws IOException {
 			return this.part.getInputStream();
 		}
-
 		public void transferTo(File dest) throws IOException, IllegalStateException {
 			this.part.write(dest.getPath());
 		}
