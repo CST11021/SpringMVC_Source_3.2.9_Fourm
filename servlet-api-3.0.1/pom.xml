@@ -13,4 +13,6 @@
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
 
+    <!-- 该包不依赖任何jar包 -->
+
 </project>

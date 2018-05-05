@@ -78,21 +78,13 @@ import javax.servlet.ServletRequest;
 
 public interface HttpServletRequest extends ServletRequest {
 
-    /**
-    * String identifier for Basic authentication. Value "BASIC"
-    */
+    /** String identifier for Basic authentication. Value "BASIC" */
     public static final String BASIC_AUTH = "BASIC";
-    /**
-    * String identifier for Form authentication. Value "FORM"
-    */
+    /** String identifier for Form authentication. Value "FORM" */
     public static final String FORM_AUTH = "FORM";
-    /**
-    * String identifier for Client Certificate authentication. Value "CLIENT_CERT"
-    */
+    /** String identifier for Client Certificate authentication. Value "CLIENT_CERT" */
     public static final String CLIENT_CERT_AUTH = "CLIENT_CERT";
-    /**
-    * String identifier for Digest authentication. Value "DIGEST"
-    */
+    /** String identifier for Digest authentication. Value "DIGEST" */
     public static final String DIGEST_AUTH = "DIGEST";
 
     /**

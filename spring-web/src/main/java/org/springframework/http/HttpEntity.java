@@ -53,45 +53,25 @@ import org.springframework.util.ObjectUtils;
  */
 public class HttpEntity<T> {
 
-	/**
-	 * The empty {@code HttpEntity}, with no body or headers.
-	 */
+	/** 表示一个空的报文主体 */
 	public static final HttpEntity EMPTY = new HttpEntity();
 
-
+	/** 表示报文头部分*/
 	private final HttpHeaders headers;
 
+	/** 表示报文主体对象 */
 	private final T body;
 
 
-	/**
-	 * Create a new, empty {@code HttpEntity}.
-	 */
 	protected HttpEntity() {
 		this(null, null);
 	}
-
-	/**
-	 * Create a new {@code HttpEntity} with the given body and no headers.
-	 * @param body the entity body
-	 */
 	public HttpEntity(T body) {
 		this(body, null);
 	}
-
-	/**
-	 * Create a new {@code HttpEntity} with the given headers and no body.
-	 * @param headers the entity headers
-	 */
 	public HttpEntity(MultiValueMap<String, String> headers) {
 		this(null, headers);
 	}
-
-	/**
-	 * Create a new {@code HttpEntity} with the given body and headers.
-	 * @param body the entity body
-	 * @param headers the entity headers
-	 */
 	public HttpEntity(T body, MultiValueMap<String, String> headers) {
 		this.body = body;
 		HttpHeaders tempHeaders = new HttpHeaders();
@@ -102,23 +82,13 @@ public class HttpEntity<T> {
 	}
 
 
-	/**
-	 * Returns the headers of this entity.
-	 */
+	// getter and setter ...
 	public HttpHeaders getHeaders() {
 		return this.headers;
 	}
-
-	/**
-	 * Returns the body of this entity.
-	 */
 	public T getBody() {
 		return this.body;
 	}
-
-	/**
-	 * Indicates whether this entity has a body.
-	 */
 	public boolean hasBody() {
 		return (this.body != null);
 	}
@@ -135,12 +105,10 @@ public class HttpEntity<T> {
 		return (ObjectUtils.nullSafeEquals(this.headers, otherEntity.headers) &&
 				ObjectUtils.nullSafeEquals(this.body, otherEntity.body));
 	}
-
 	@Override
 	public int hashCode() {
 		return ObjectUtils.nullSafeHashCode(this.headers) * 29 + ObjectUtils.nullSafeHashCode(this.body);
 	}
-
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder("<");

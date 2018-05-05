@@ -143,53 +143,27 @@ import org.springframework.web.util.WebUtils;
  * {@link org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter RequestMappingHandlerAdapter}
  */
 @Deprecated
-public class AnnotationMethodHandlerAdapter extends WebContentGenerator
-		implements HandlerAdapter, Ordered, BeanFactoryAware {
+public class AnnotationMethodHandlerAdapter extends WebContentGenerator implements HandlerAdapter, Ordered, BeanFactoryAware {
 
-	/**
-	 * Log category to use when no mapped handler is found for a request.
-	 * @see #pageNotFoundLogger
-	 */
+
 	public static final String PAGE_NOT_FOUND_LOG_CATEGORY = "org.springframework.web.servlet.PageNotFound";
-
-	/**
-	 * Additional logger to use when no mapped handler is found for a request.
-	 * @see #PAGE_NOT_FOUND_LOG_CATEGORY
-	 */
 	protected static final Log pageNotFoundLogger = LogFactory.getLog(PAGE_NOT_FOUND_LOG_CATEGORY);
-
-
 	private UrlPathHelper urlPathHelper = new UrlPathHelper();
-
 	private PathMatcher pathMatcher = new AntPathMatcher();
-
 	private MethodNameResolver methodNameResolver = new InternalPathMethodNameResolver();
-
 	private WebBindingInitializer webBindingInitializer;
-
 	private SessionAttributeStore sessionAttributeStore = new DefaultSessionAttributeStore();
-
 	private int cacheSecondsForSessionAttributeHandlers = 0;
-
 	private boolean synchronizeOnSession = false;
-
 	private ParameterNameDiscoverer parameterNameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
-
 	private WebArgumentResolver[] customArgumentResolvers;
-
 	private ModelAndViewResolver[] customModelAndViewResolvers;
-
+	// HTTP消息转换器，在构造器中初始化
 	private HttpMessageConverter<?>[] messageConverters;
-
 	private int order = Ordered.LOWEST_PRECEDENCE;
-
 	private ConfigurableBeanFactory beanFactory;
-
 	private BeanExpressionContext expressionContext;
-
-	private final Map<Class<?>, ServletHandlerMethodResolver> methodResolverCache =
-			new ConcurrentHashMap<Class<?>, ServletHandlerMethodResolver>(64);
-
+	private final Map<Class<?>, ServletHandlerMethodResolver> methodResolverCache = new ConcurrentHashMap<Class<?>, ServletHandlerMethodResolver>(64);
 	private final Map<Class<?>, Boolean> sessionAnnotatedClassesCache = new ConcurrentHashMap<Class<?>, Boolean>(64);
 
 
@@ -200,8 +174,12 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
 		// See SPR-7316
 		StringHttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverter();
 		stringHttpMessageConverter.setWriteAcceptCharset(false);
-		this.messageConverters = new HttpMessageConverter[]{new ByteArrayHttpMessageConverter(), stringHttpMessageConverter,
-				new SourceHttpMessageConverter(), new XmlAwareFormHttpMessageConverter()};
+		this.messageConverters = new HttpMessageConverter[]{
+				new ByteArrayHttpMessageConverter(),
+				stringHttpMessageConverter,
+				new SourceHttpMessageConverter(),
+				new XmlAwareFormHttpMessageConverter()
+		};
 	}
 
 
@@ -389,13 +367,11 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
 		}
 	}
 
-
 	public boolean supports(Object handler) {
 		return getMethodResolver(handler).hasHandlerMethods();
 	}
 
-	public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler)
-			throws Exception {
+	public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
 		Class<?> clazz = ClassUtils.getUserClass(handler);
 		Boolean annotatedWithSessionAttributes = this.sessionAnnotatedClassesCache.get(clazz);
@@ -428,8 +404,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
 		return invokeHandlerMethod(request, response, handler);
 	}
 
-	protected ModelAndView invokeHandlerMethod(HttpServletRequest request, HttpServletResponse response, Object handler)
-			throws Exception {
+	protected ModelAndView invokeHandlerMethod(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
 		ServletHandlerMethodResolver methodResolver = getMethodResolver(handler);
 		Method handlerMethod = methodResolver.resolveHandlerMethod(request);
@@ -456,7 +431,6 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
 		return -1;
 	}
 
-
 	/**
 	 * Build a HandlerMethodResolver for the given handler type.
 	 */
@@ -474,7 +448,6 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
 		}
 		return resolver;
 	}
-
 
 	/**
 	 * Template method for creating a new ServletRequestDataBinder instance.
@@ -760,7 +733,6 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
 			}
 		}
 	}
-
 
 	/**
 	 * Servlet-specific subclass of {@link HandlerMethodInvoker}.
@@ -1057,7 +1029,6 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
 
 	}
 
-
 	/**
 	 * Holder for request mapping metadata.
 	 */
@@ -1155,7 +1126,6 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
 		}
 	}
 
-
 	/**
 	 * Subclass of {@link RequestMappingInfo} that holds request-specific data.
 	 */
@@ -1183,7 +1153,6 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
 			return (!this.matchedPatterns.isEmpty() ? this.matchedPatterns.get(0) : null);
 		}
 	}
-
 
 	/**
 	 * Comparator capable of sorting {@link RequestSpecificMappingInfo}s (RHIs) so that

@@ -37,6 +37,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.util.comparator.CompoundComparator;
 
 /**
+ * 表示HTTP报文传输的资源类型
+ *
  * Represents an Internet Media Type, as defined in the HTTP specification.
  *
  * <p>Consists of a {@linkplain #getType() type} and a {@linkplain #getSubtype() subtype}.
@@ -51,162 +53,70 @@ import org.springframework.util.comparator.CompoundComparator;
  */
 public class MediaType implements Comparable<MediaType> {
 
-	/**
-	 * Public constant media type that includes all media ranges (i.e. {@code &#42;/&#42;}).
-	 */
+	/** Public constant media type that includes all media ranges (i.e. {@code &#42;/&#42;}). */
 	public static final MediaType ALL;
-
-	/**
-	 * A String equivalent of {@link MediaType#ALL}.
-	 */
+	/** A String equivalent of {@link MediaType#ALL}. */
 	public static final String ALL_VALUE = "*/*";
-
-	/**
-	 *  Public constant media type for {@code application/atom+xml}.
-	 */
+	/** Public constant media type for {@code application/atom+xml}. */
 	public final static MediaType APPLICATION_ATOM_XML;
-
-	/**
-	 * A String equivalent of {@link MediaType#APPLICATION_ATOM_XML}.
-	 */
+	/** A String equivalent of {@link MediaType#APPLICATION_ATOM_XML}. */
 	public final static String APPLICATION_ATOM_XML_VALUE = "application/atom+xml";
-
-	/**
-	 * Public constant media type for {@code application/x-www-form-urlencoded}.
-	 *  */
+	/** Public constant media type for {@code application/x-www-form-urlencoded}. */
 	public final static MediaType APPLICATION_FORM_URLENCODED;
-
-	/**
-	 * A String equivalent of {@link MediaType#APPLICATION_FORM_URLENCODED}.
-	 */
+	/** A String equivalent of {@link MediaType#APPLICATION_FORM_URLENCODED}. */
 	public final static String APPLICATION_FORM_URLENCODED_VALUE = "application/x-www-form-urlencoded";
-
-	/**
-	 * Public constant media type for {@code application/json}.
-	 * */
+	/** Public constant media type for {@code application/json}. */
 	public final static MediaType APPLICATION_JSON;
-
-	/**
-	 * A String equivalent of {@link MediaType#APPLICATION_JSON}.
-	 */
+	/** A String equivalent of {@link MediaType#APPLICATION_JSON}. */
 	public final static String APPLICATION_JSON_VALUE = "application/json";
-
-	/**
-	 * Public constant media type for {@code application/octet-stream}.
-	 *  */
+	/** Public constant media type for {@code application/octet-stream}. */
 	public final static MediaType APPLICATION_OCTET_STREAM;
-
-	/**
-	 * A String equivalent of {@link MediaType#APPLICATION_OCTET_STREAM}.
-	 */
+	/** A String equivalent of {@link MediaType#APPLICATION_OCTET_STREAM}. */
 	public final static String APPLICATION_OCTET_STREAM_VALUE = "application/octet-stream";
-
-	/**
-	 * Public constant media type for {@code application/xhtml+xml}.
-	 *  */
+	/** Public constant media type for {@code application/xhtml+xml}. */
 	public final static MediaType APPLICATION_XHTML_XML;
-
-	/**
-	 * A String equivalent of {@link MediaType#APPLICATION_XHTML_XML}.
-	 */
+	/** A String equivalent of {@link MediaType#APPLICATION_XHTML_XML}. */
 	public final static String APPLICATION_XHTML_XML_VALUE = "application/xhtml+xml";
-
-	/**
-	 * Public constant media type for {@code application/xml}.
-	 */
+	/** Public constant media type for {@code application/xml}. */
 	public final static MediaType APPLICATION_XML;
-
-	/**
-	 * A String equivalent of {@link MediaType#APPLICATION_XML}.
-	 */
+	/** A String equivalent of {@link MediaType#APPLICATION_XML}. */
 	public final static String APPLICATION_XML_VALUE = "application/xml";
-
-	/**
-	 * Public constant media type for {@code image/gif}.
-	 */
+	/** Public constant media type for {@code image/gif}. */
 	public final static MediaType IMAGE_GIF;
-
-	/**
-	 * A String equivalent of {@link MediaType#IMAGE_GIF}.
-	 */
+	/** A String equivalent of {@link MediaType#IMAGE_GIF}. */
 	public final static String IMAGE_GIF_VALUE = "image/gif";
-
-	/**
-	 * Public constant media type for {@code image/jpeg}.
-	 */
+	/** Public constant media type for {@code image/jpeg}. */
 	public final static MediaType IMAGE_JPEG;
-
-	/**
-	 * A String equivalent of {@link MediaType#IMAGE_JPEG}.
-	 */
+	/** A String equivalent of {@link MediaType#IMAGE_JPEG}. */
 	public final static String IMAGE_JPEG_VALUE = "image/jpeg";
-
-	/**
-	 * Public constant media type for {@code image/png}.
-	 */
+	/** Public constant media type for {@code image/png}. */
 	public final static MediaType IMAGE_PNG;
-
-	/**
-	 * A String equivalent of {@link MediaType#IMAGE_PNG}.
-	 */
+	/** A String equivalent of {@link MediaType#IMAGE_PNG}. */
 	public final static String IMAGE_PNG_VALUE = "image/png";
-
-	/**
-	 * Public constant media type for {@code multipart/form-data}.
-	 *  */
+	/** Public constant media type for {@code multipart/form-data}. */
 	public final static MediaType MULTIPART_FORM_DATA;
-
-	/**
-	 * A String equivalent of {@link MediaType#MULTIPART_FORM_DATA}.
-	 */
+	/** A String equivalent of {@link MediaType#MULTIPART_FORM_DATA}. */
 	public final static String MULTIPART_FORM_DATA_VALUE = "multipart/form-data";
-
-	/**
-	 * Public constant media type for {@code text/html}.
-	 *  */
+	/** Public constant media type for {@code text/html}. */
 	public final static MediaType TEXT_HTML;
-
-	/**
-	 * A String equivalent of {@link MediaType#TEXT_HTML}.
-	 */
+	/** A String equivalent of {@link MediaType#TEXT_HTML}. */
 	public final static String TEXT_HTML_VALUE = "text/html";
-
-	/**
-	 * Public constant media type for {@code text/plain}.
-	 *  */
+	/** Public constant media type for {@code text/plain}. */
 	public final static MediaType TEXT_PLAIN;
-
-	/**
-	 * A String equivalent of {@link MediaType#TEXT_PLAIN}.
-	 */
+	/** A String equivalent of {@link MediaType#TEXT_PLAIN}. */
 	public final static String TEXT_PLAIN_VALUE = "text/plain";
-
-	/**
-	 * Public constant media type for {@code text/xml}.
-	 *  */
+	/** Public constant media type for {@code text/xml}. */
 	public final static MediaType TEXT_XML;
-
-	/**
-	 * A String equivalent of {@link MediaType#TEXT_XML}.
-	 */
+	/** A String equivalent of {@link MediaType#TEXT_XML}. */
 	public final static String TEXT_XML_VALUE = "text/xml";
 
-
 	private static final BitSet TOKEN;
-
 	private static final String WILDCARD_TYPE = "*";
-
 	private static final String PARAM_QUALITY_FACTOR = "q";
-
 	private static final String PARAM_CHARSET = "charset";
-
-
 	private final String type;
-
 	private final String subtype;
-
 	private final Map<String, String> parameters;
-
 
 	static {
 		// variable names refer to RFC 2616, section 2.2
@@ -258,68 +168,21 @@ public class MediaType implements Comparable<MediaType> {
 		TEXT_XML = MediaType.valueOf(TEXT_XML_VALUE);
 	}
 
-
-	/**
-	 * Create a new {@code MediaType} for the given primary type.
-	 * <p>The {@linkplain #getSubtype() subtype} is set to {@code &#42;}, parameters empty.
-	 * @param type the primary type
-	 * @throws IllegalArgumentException if any of the parameters contain illegal characters
-	 */
 	public MediaType(String type) {
 		this(type, WILDCARD_TYPE);
 	}
-
-	/**
-	 * Create a new {@code MediaType} for the given primary type and subtype.
-	 * <p>The parameters are empty.
-	 * @param type the primary type
-	 * @param subtype the subtype
-	 * @throws IllegalArgumentException if any of the parameters contain illegal characters
-	 */
 	public MediaType(String type, String subtype) {
 		this(type, subtype, Collections.<String, String>emptyMap());
 	}
-
-	/**
-	 * Create a new {@code MediaType} for the given type, subtype, and character set.
-	 * @param type the primary type
-	 * @param subtype the subtype
-	 * @param charset the character set
-	 * @throws IllegalArgumentException if any of the parameters contain illegal characters
-	 */
 	public MediaType(String type, String subtype, Charset charset) {
 		this(type, subtype, Collections.singletonMap(PARAM_CHARSET, charset.name()));
 	}
-
-	/**
-	 * Create a new {@code MediaType} for the given type, subtype, and quality value.
-	 * @param type the primary type
-	 * @param subtype the subtype
-	 * @param qualityValue the quality value
-	 * @throws IllegalArgumentException if any of the parameters contain illegal characters
-	 */
 	public MediaType(String type, String subtype, double qualityValue) {
 		this(type, subtype, Collections.singletonMap(PARAM_QUALITY_FACTOR, Double.toString(qualityValue)));
 	}
-
-	/**
-	 * Copy-constructor that copies the type and subtype of the given {@code MediaType},
-	 * and allows for different parameter.
-	 * @param other the other media type
-	 * @param parameters the parameters, may be {@code null}
-	 * @throws IllegalArgumentException if any of the parameters contain illegal characters
-	 */
 	public MediaType(MediaType other, Map<String, String> parameters) {
 		this(other.getType(), other.getSubtype(), parameters);
 	}
-
-	/**
-	 * Create a new {@code MediaType} for the given type, subtype, and parameters.
-	 * @param type the primary type
-	 * @param subtype the subtype
-	 * @param parameters the parameters, may be {@code null}
-	 * @throws IllegalArgumentException if any of the parameters contain illegal characters
-	 */
 	public MediaType(String type, String subtype, Map<String, String> parameters) {
 		Assert.hasLength(type, "type must not be empty");
 		Assert.hasLength(subtype, "subtype must not be empty");
@@ -508,13 +371,7 @@ public class MediaType implements Comparable<MediaType> {
 		return false;
 	}
 
-	/**
-	 * Indicate whether this {@code MediaType} is compatible with the given media type.
-	 * <p>For instance, {@code text/*} is compatible with {@code text/plain}, {@code text/html}, and vice versa.
-	 * In effect, this method is similar to {@link #includes(MediaType)}, except that it <b>is</b> symmetric.
-	 * @param other the reference media type with which to compare
-	 * @return {@code true} if this media type is compatible with the given media type; {@code false} otherwise
-	 */
+	// 判断当前MediaType是否支持对应的MediaType，比如：text/* 兼容 text/plain 和 text/html
 	public boolean isCompatibleWith(MediaType other) {
 		if (other == null) {
 			return false;
@@ -578,11 +435,7 @@ public class MediaType implements Comparable<MediaType> {
 		return new MediaType(this, params);
 	}
 
-	/**
-	 * Compares this {@code MediaType} to another alphabetically.
-	 * @param other media type to compare to
-	 * @see #sortBySpecificity(List)
-	 */
+
 	public int compareTo(MediaType other) {
 		int comp = this.type.compareToIgnoreCase(other.type);
 		if (comp != 0) {
@@ -622,67 +475,12 @@ public class MediaType implements Comparable<MediaType> {
 		return 0;
 	}
 
-	@Override
-	public boolean equals(Object other) {
-		if (this == other) {
-			return true;
-		}
-		if (!(other instanceof MediaType)) {
-			return false;
-		}
-		MediaType otherType = (MediaType) other;
-		return (this.type.equalsIgnoreCase(otherType.type) && this.subtype.equalsIgnoreCase(otherType.subtype) &&
-				this.parameters.equals(otherType.parameters));
-	}
-
-	@Override
-	public int hashCode() {
-		int result = this.type.hashCode();
-		result = 31 * result + this.subtype.hashCode();
-		result = 31 * result + this.parameters.hashCode();
-		return result;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		appendTo(builder);
-		return builder.toString();
-	}
-
-	private void appendTo(StringBuilder builder) {
-		builder.append(this.type);
-		builder.append('/');
-		builder.append(this.subtype);
-		appendTo(this.parameters, builder);
-	}
-
-	private void appendTo(Map<String, String> map, StringBuilder builder) {
-		for (Map.Entry<String, String> entry : map.entrySet()) {
-			builder.append(';');
-			builder.append(entry.getKey());
-			builder.append('=');
-			builder.append(entry.getValue());
-		}
-	}
 
 
-	/**
-	 * Parse the given String value into a {@code MediaType} object,
-	 * with this method name following the 'valueOf' naming convention
-	 * (as supported by {@link org.springframework.core.convert.ConversionService}.
-	 * @see #parseMediaType(String)
-	 */
+	// 将报文首部中的MediaType字符串转为对应的MediaType对象
 	public static MediaType valueOf(String value) {
 		return parseMediaType(value);
 	}
-
-	/**
-	 * Parse the given String into a single {@code MediaType}.
-	 * @param mediaType the string to parse
-	 * @return the media type
-	 * @throws InvalidMediaTypeException if the string cannot be parsed
-	 */
 	public static MediaType parseMediaType(String mediaType) {
 		Assert.hasLength(mediaType, "'mediaType' must not be empty");
 		String[] parts = StringUtils.tokenizeToStringArray(mediaType, ";");
@@ -729,15 +527,6 @@ public class MediaType implements Comparable<MediaType> {
 			throw new InvalidMediaTypeException(mediaType, ex.getMessage());
 		}
 	}
-
-
-	/**
-	 * Parse the given, comma-separated string into a list of {@code MediaType} objects.
-	 * <p>This method can be used to parse an Accept or Content-Type header.
-	 * @param mediaTypes the string to parse
-	 * @return the list of media types
-	 * @throws IllegalArgumentException if the string cannot be parsed
-	 */
 	public static List<MediaType> parseMediaTypes(String mediaTypes) {
 		if (!StringUtils.hasLength(mediaTypes)) {
 			return Collections.emptyList();
@@ -750,91 +539,21 @@ public class MediaType implements Comparable<MediaType> {
 		return result;
 	}
 
-	/**
-	 * Return a string representation of the given list of {@code MediaType} objects.
-	 * <p>This method can be used to for an {@code Accept} or {@code Content-Type} header.
-	 * @param mediaTypes the string to parse
-	 * @return the list of media types
-	 * @throws IllegalArgumentException if the String cannot be parsed
-	 */
-	public static String toString(Collection<MediaType> mediaTypes) {
-		StringBuilder builder = new StringBuilder();
-		for (Iterator<MediaType> iterator = mediaTypes.iterator(); iterator.hasNext();) {
-			MediaType mediaType = iterator.next();
-			mediaType.appendTo(builder);
-			if (iterator.hasNext()) {
-				builder.append(", ");
-			}
-		}
-		return builder.toString();
-	}
 
-	/**
-	 * Sorts the given list of {@code MediaType} objects by specificity.
-	 * <p>Given two media types:
-	 * <ol>
-	 * <li>if either media type has a {@linkplain #isWildcardType() wildcard type}, then the media type without the
-	 * wildcard is ordered before the other.</li>
-	 * <li>if the two media types have different {@linkplain #getType() types}, then they are considered equal and
-	 * remain their current order.</li>
-	 * <li>if either media type has a {@linkplain #isWildcardSubtype() wildcard subtype}, then the media type without
-	 * the wildcard is sorted before the other.</li>
-	 * <li>if the two media types have different {@linkplain #getSubtype() subtypes}, then they are considered equal
-	 * and remain their current order.</li>
-	 * <li>if the two media types have different {@linkplain #getQualityValue() quality value}, then the media type
-	 * with the highest quality value is ordered before the other.</li>
-	 * <li>if the two media types have a different amount of {@linkplain #getParameter(String) parameters}, then the
-	 * media type with the most parameters is ordered before the other.</li>
-	 * </ol>
-	 * <p>For example:
-	 * <blockquote>audio/basic &lt; audio/* &lt; *&#047;*</blockquote>
-	 * <blockquote>audio/* &lt; audio/*;q=0.7; audio/*;q=0.3</blockquote>
-	 * <blockquote>audio/basic;level=1 &lt; audio/basic</blockquote>
-	 * <blockquote>audio/basic == text/html</blockquote>
-	 * <blockquote>audio/basic == audio/wave</blockquote>
-	 * @param mediaTypes the list of media types to be sorted
-	 * @see <a href="http://tools.ietf.org/html/rfc2616#section-14.1">HTTP 1.1, section 14.1</a>
-	 */
+	// 根据实现Comparator接口进行排序
 	public static void sortBySpecificity(List<MediaType> mediaTypes) {
 		Assert.notNull(mediaTypes, "'mediaTypes' must not be null");
 		if (mediaTypes.size() > 1) {
 			Collections.sort(mediaTypes, SPECIFICITY_COMPARATOR);
 		}
 	}
-
-	/**
-	 * Sorts the given list of {@code MediaType} objects by quality value.
-	 * <p>Given two media types:
-	 * <ol>
-	 * <li>if the two media types have different {@linkplain #getQualityValue() quality value}, then the media type
-	 * with the highest quality value is ordered before the other.</li>
-	 * <li>if either media type has a {@linkplain #isWildcardType() wildcard type}, then the media type without the
-	 * wildcard is ordered before the other.</li>
-	 * <li>if the two media types have different {@linkplain #getType() types}, then they are considered equal and
-	 * remain their current order.</li>
-	 * <li>if either media type has a {@linkplain #isWildcardSubtype() wildcard subtype}, then the media type without
-	 * the wildcard is sorted before the other.</li>
-	 * <li>if the two media types have different {@linkplain #getSubtype() subtypes}, then they are considered equal
-	 * and remain their current order.</li>
-	 * <li>if the two media types have a different amount of {@linkplain #getParameter(String) parameters}, then the
-	 * media type with the most parameters is ordered before the other.</li>
-	 * </ol>
-	 * @param mediaTypes the list of media types to be sorted
-	 * @see #getQualityValue()
-	 */
+	// 根据值排序
 	public static void sortByQualityValue(List<MediaType> mediaTypes) {
 		Assert.notNull(mediaTypes, "'mediaTypes' must not be null");
 		if (mediaTypes.size() > 1) {
 			Collections.sort(mediaTypes, QUALITY_VALUE_COMPARATOR);
 		}
 	}
-
-	/**
-	 * Sorts the given list of {@code MediaType} objects by specificity as the
-	 * primary criteria and quality value the secondary.
-	 * @see MediaType#sortBySpecificity(List)
-	 * @see MediaType#sortByQualityValue(List)
-	 */
 	public static void sortBySpecificityAndQuality(List<MediaType> mediaTypes) {
 		Assert.notNull(mediaTypes, "'mediaTypes' must not be null");
 		if (mediaTypes.size() > 1) {
@@ -843,12 +562,8 @@ public class MediaType implements Comparable<MediaType> {
 		}
 	}
 
-
-	/**
-	 * Comparator used by {@link #sortBySpecificity(List)}.
-	 */
+	/** Comparator used by {@link #sortBySpecificity(List)}. */
 	public static final Comparator<MediaType> SPECIFICITY_COMPARATOR = new Comparator<MediaType>() {
-
 		public int compare(MediaType mediaType1, MediaType mediaType2) {
 			if (mediaType1.isWildcardType() && !mediaType2.isWildcardType()) { // */* < audio/*
 				return 1;
@@ -885,13 +600,8 @@ public class MediaType implements Comparable<MediaType> {
 			}
 		}
 	};
-
-
-	/**
-	 * Comparator used by {@link #sortByQualityValue(List)}.
-	 */
+	/** Comparator used by {@link #sortByQualityValue(List)}. */
 	public static final Comparator<MediaType> QUALITY_VALUE_COMPARATOR = new Comparator<MediaType>() {
-
 		public int compare(MediaType mediaType1, MediaType mediaType2) {
 			double quality1 = mediaType1.getQualityValue();
 			double quality2 = mediaType2.getQualityValue();
@@ -927,4 +637,56 @@ public class MediaType implements Comparable<MediaType> {
 		}
 	};
 
+
+
+	@Override
+	public boolean equals(Object other) {
+		if (this == other) {
+			return true;
+		}
+		if (!(other instanceof MediaType)) {
+			return false;
+		}
+		MediaType otherType = (MediaType) other;
+		return (this.type.equalsIgnoreCase(otherType.type) && this.subtype.equalsIgnoreCase(otherType.subtype) &&
+				this.parameters.equals(otherType.parameters));
+	}
+	@Override
+	public int hashCode() {
+		int result = this.type.hashCode();
+		result = 31 * result + this.subtype.hashCode();
+		result = 31 * result + this.parameters.hashCode();
+		return result;
+	}
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		appendTo(builder);
+		return builder.toString();
+	}
+	private void appendTo(StringBuilder builder) {
+		builder.append(this.type);
+		builder.append('/');
+		builder.append(this.subtype);
+		appendTo(this.parameters, builder);
+	}
+	private void appendTo(Map<String, String> map, StringBuilder builder) {
+		for (Map.Entry<String, String> entry : map.entrySet()) {
+			builder.append(';');
+			builder.append(entry.getKey());
+			builder.append('=');
+			builder.append(entry.getValue());
+		}
+	}
+	public static String toString(Collection<MediaType> mediaTypes) {
+		StringBuilder builder = new StringBuilder();
+		for (Iterator<MediaType> iterator = mediaTypes.iterator(); iterator.hasNext();) {
+			MediaType mediaType = iterator.next();
+			mediaType.appendTo(builder);
+			if (iterator.hasNext()) {
+				builder.append(", ");
+			}
+		}
+		return builder.toString();
+	}
 }

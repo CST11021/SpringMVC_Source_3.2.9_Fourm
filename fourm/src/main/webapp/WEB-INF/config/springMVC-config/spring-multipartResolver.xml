@@ -1,14 +1,8 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	   xmlns:p="http://www.springframework.org/schema/p"
-	   xmlns:context="http://www.springframework.org/schema/context"
-	   xmlns:mvc="http://www.springframework.org/schema/mvc"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans
-           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
-           http://www.springframework.org/schema/mvc
-           http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
-           http://www.springframework.org/schema/context
-           http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
 
 	<!--Spring MVC上下文中默认没有装配MultipartResolver，因此默认情况下不能处理文件的上传工作。如果想使用Spring的文件上传
 	功能，需要现在上下文中配置MultipartResolver-->

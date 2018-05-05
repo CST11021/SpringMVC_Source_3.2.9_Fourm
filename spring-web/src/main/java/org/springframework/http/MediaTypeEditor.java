@@ -35,8 +35,7 @@ public class MediaTypeEditor extends PropertyEditorSupport {
 	public void setAsText(String text) {
 		if (StringUtils.hasText(text)) {
 			setValue(MediaType.parseMediaType(text));
-		}
-		else {
+		} else {
 			setValue(null);
 		}
 	}

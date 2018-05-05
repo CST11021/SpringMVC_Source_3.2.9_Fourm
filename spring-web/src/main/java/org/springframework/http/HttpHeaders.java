@@ -45,6 +45,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 /**
+ * 表示 HTTP 请求和响应报文的首部信息
+ *
  * Represents HTTP request and response headers, mapping string header names to list of string values.
  *
  * <p>In addition to the normal methods defined by {@link Map}, this class offers the following convenience methods:
@@ -63,12 +65,16 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 
 	private static final long serialVersionUID = -8578554704772377436L;
 
+	// 客户端通知服务器可以接受哪些媒体类型，如果客户端无法显示从服务端发过来的对象类型，就不会去下载该对象类型了
 	private static final String ACCEPT = "Accept";
 
+	// 客户端用来通知服务端可以接受哪些字符集或哪些优选字符集
 	private static final String ACCEPT_CHARSET = "Accept-Charset";
 
+	// 用于通知客户端可以对特定资源使用哪些HTTP方法
 	private static final String ALLOW = "Allow";
 
+	// 用于传输对象的缓存信息
 	private static final String CACHE_CONTROL = "Cache-Control";
 
 	private static final String CONTENT_DISPOSITION = "Content-Disposition";
@@ -105,9 +111,7 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	private final Map<String, List<String>> headers;
 
 
-	/**
-	 * Private constructor that can create read-only {@code HttpHeader} instances.
-	 */
+
 	private HttpHeaders(Map<String, List<String>> headers, boolean readOnly) {
 		Assert.notNull(headers, "'headers' must not be null");
 		if (readOnly) {
@@ -123,10 +127,6 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 			this.headers = headers;
 		}
 	}
-
-	/**
-	 * Constructs a new, empty instance of the {@code HttpHeaders} object.
-	 */
 	public HttpHeaders() {
 		this(new LinkedCaseInsensitiveMap<List<String>>(8, Locale.ENGLISH), false);
 	}
@@ -648,12 +648,10 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 		HttpHeaders otherHeaders = (HttpHeaders) other;
 		return this.headers.equals(otherHeaders.headers);
 	}
-
 	@Override
 	public int hashCode() {
 		return this.headers.hashCode();
 	}
-
 	@Override
 	public String toString() {
 		return this.headers.toString();

@@ -47,47 +47,22 @@ public class ResponseEntity<T> extends HttpEntity<T> {
 
 	private final HttpStatus statusCode;
 
-
-	/**
-	 * Create a new {@code ResponseEntity} with the given status code, and no body nor headers.
-	 * @param statusCode the status code
-	 */
 	public ResponseEntity(HttpStatus statusCode) {
 		super();
 		this.statusCode = statusCode;
 	}
-
-	/**
-	 * Create a new {@code ResponseEntity} with the given body and status code, and no headers.
-	 * @param body the entity body
-	 * @param statusCode the status code
-	 */
 	public ResponseEntity(T body, HttpStatus statusCode) {
 		super(body);
 		this.statusCode = statusCode;
 	}
-
-	/**
-	 * Create a new {@code HttpEntity} with the given headers and status code, and no body.
-	 * @param headers the entity headers
-	 * @param statusCode the status code
-	 */
 	public ResponseEntity(MultiValueMap<String, String> headers, HttpStatus statusCode) {
 		super(headers);
 		this.statusCode = statusCode;
 	}
-
-	/**
-	 * Create a new {@code HttpEntity} with the given body, headers, and status code.
-	 * @param body the entity body
-	 * @param headers the entity headers
-	 * @param statusCode the status code
-	 */
 	public ResponseEntity(T body, MultiValueMap<String, String> headers, HttpStatus statusCode) {
 		super(body, headers);
 		this.statusCode = statusCode;
 	}
-
 
 	/**
 	 * Return the HTTP status code of the response.
@@ -108,12 +83,10 @@ public class ResponseEntity<T> extends HttpEntity<T> {
 		ResponseEntity<?> otherEntity = (ResponseEntity<?>) other;
 		return (ObjectUtils.nullSafeEquals(this.statusCode, otherEntity.statusCode) && super.equals(other));
 	}
-
 	@Override
 	public int hashCode() {
 		return super.hashCode() * 29 + ObjectUtils.nullSafeHashCode(this.statusCode);
 	}
-
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder("<");

@@ -41,34 +41,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
 
-/**
- * Implementation of {@link HttpMessageConverter} that can handle form data, including multipart form data (i.e. file
- * uploads).
- *
- * <p>This converter can write the {@code application/x-www-form-urlencoded} and {@code multipart/form-data} media
- * types, and read the {@code application/x-www-form-urlencoded}) media type (but not {@code multipart/form-data}).
- *
- * <p>In other words, this converter can read and write 'normal' HTML forms (as {@link MultiValueMap
- * MultiValueMap&lt;String, String&gt;}), and it can write multipart form (as {@link MultiValueMap
- * MultiValueMap&lt;String, Object&gt;}. When writing multipart, this converter uses other {@link HttpMessageConverter
- * HttpMessageConverters} to write the respective MIME parts. By default, basic converters are registered (supporting
- * {@code Strings} and {@code Resources}, for instance); these can be overridden by setting the {@link
- * #setPartConverters(java.util.List) partConverters} property.
- *
- * <p>For example, the following snippet shows how to submit an HTML form: <pre class="code"> RestTemplate template =
- * new RestTemplate(); // FormHttpMessageConverter is configured by default MultiValueMap&lt;String, String&gt; form =
- * new LinkedMultiValueMap&lt;String, String&gt;(); form.add("field 1", "value 1"); form.add("field 2", "value 2");
- * form.add("field 2", "value 3"); template.postForLocation("http://example.com/myForm", form); </pre> <p>The following
- * snippet shows how to do a file upload: <pre class="code"> MultiValueMap&lt;String, Object&gt; parts = new
- * LinkedMultiValueMap&lt;String, Object&gt;(); parts.add("field 1", "value 1"); parts.add("file", new
- * ClassPathResource("myFile.jpg")); template.postForLocation("http://example.com/myFileUpload", parts); </pre>
- *
- * <p>Some methods in this class were inspired by {@link org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity}.
- *
- * @author Arjen Poutsma
- * @see MultiValueMap
- * @since 3.0
- */
+// 将表单数据读取到MultiValueMap中
 public class FormHttpMessageConverter implements HttpMessageConverter<MultiValueMap<String, ?>> {
 
 	private static final byte[] BOUNDARY_CHARS =
@@ -78,11 +51,9 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 					'V', 'W', 'X', 'Y', 'Z'};
 
 	private final Random rnd = new Random();
-
 	private Charset charset = Charset.forName("UTF-8");
-
+	// 表示该转换器支持的Media类型
 	private List<MediaType> supportedMediaTypes = new ArrayList<MediaType>();
-
 	private List<HttpMessageConverter<?>> partConverters = new ArrayList<HttpMessageConverter<?>>();
 
 
@@ -98,25 +69,15 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 	}
 
 
-	/**
-	 * Set the message body converters to use. These converters are used to convert objects to MIME parts.
-	 */
 	public final void setPartConverters(List<HttpMessageConverter<?>> partConverters) {
 		Assert.notEmpty(partConverters, "'partConverters' must not be empty");
 		this.partConverters = partConverters;
 	}
-
-	/**
-	 * Add a message body converter. Such a converters is used to convert objects to MIME parts.
-	 */
 	public final void addPartConverter(HttpMessageConverter<?> partConverter) {
 		Assert.notNull(partConverter, "'partConverter' must not be NULL");
 		this.partConverters.add(partConverter);
 	}
 
-	/**
-	 * Sets the character set used for writing form data.
-	 */
 	public void setCharset(Charset charset) {
 		this.charset = charset;
 	}
@@ -146,6 +107,7 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 			return true;
 		}
 		for (MediaType supportedMediaType : getSupportedMediaTypes()) {
+			// 判断当前MediaType是否支持对应的MediaType，比如：text/* 兼容 text/plain 和 text/html
 			if (supportedMediaType.isCompatibleWith(mediaType)) {
 				return true;
 			}
@@ -153,28 +115,27 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 		return false;
 	}
 
-	/**
-	 * Set the list of {@link MediaType} objects supported by this converter.
-	 */
-	public void setSupportedMediaTypes(List<MediaType> supportedMediaTypes) {
-		this.supportedMediaTypes = supportedMediaTypes;
-	}
 
 	public List<MediaType> getSupportedMediaTypes() {
 		return Collections.unmodifiableList(this.supportedMediaTypes);
 	}
+	public void setSupportedMediaTypes(List<MediaType> supportedMediaTypes) {
+		this.supportedMediaTypes = supportedMediaTypes;
+	}
 
-	public MultiValueMap<String, String> read(Class<? extends MultiValueMap<String, ?>> clazz,
-			HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
 
+	public MultiValueMap<String, String> read(Class<? extends MultiValueMap<String, ?>> clazz, HttpInputMessage inputMessage)
+			throws IOException, HttpMessageNotReadableException {
+
+		// 从请求报文中读取MediaType
 		MediaType contentType = inputMessage.getHeaders().getContentType();
+		// 获取MediaType支持的字符集
 		Charset charset = contentType.getCharSet() != null ? contentType.getCharSet() : this.charset;
+		// 解析出请求报文中的表单数据，解析结果和URL传参的格式相同，以键值对的形式，通过&隔离
 		String body = StreamUtils.copyToString(inputMessage.getBody(), charset);
 
 		String[] pairs = StringUtils.tokenizeToStringArray(body, "&");
-
 		MultiValueMap<String, String> result = new LinkedMultiValueMap<String, String>(pairs.length);
-
 		for (String pair : pairs) {
 			int idx = pair.indexOf('=');
 			if (idx == -1) {
@@ -194,12 +155,12 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 			throws IOException, HttpMessageNotWritableException {
 		if (!isMultipart(map, contentType)) {
 			writeForm((MultiValueMap<String, String>) map, contentType, outputMessage);
-		}
-		else {
+		} else {
 			writeMultipart((MultiValueMap<String, Object>) map, outputMessage);
 		}
 	}
 
+	// MediaType 必须是 multipart/form-data
 	private boolean isMultipart(MultiValueMap<String, ?> map, MediaType contentType) {
 		if (contentType != null) {
 			return MediaType.MULTIPART_FORM_DATA.equals(contentType);
@@ -214,8 +175,7 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 		return false;
 	}
 
-	private void writeForm(MultiValueMap<String, String> form, MediaType contentType, HttpOutputMessage outputMessage)
-			throws IOException {
+	private void writeForm(MultiValueMap<String, String> form, MediaType contentType, HttpOutputMessage outputMessage) throws IOException {
 		Charset charset;
 		if (contentType != null) {
 			outputMessage.getHeaders().setContentType(contentType);
@@ -248,8 +208,7 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 		StreamUtils.copy(bytes, outputMessage.getBody());
 	}
 
-	private void writeMultipart(MultiValueMap<String, Object> parts, HttpOutputMessage outputMessage)
-			throws IOException {
+	private void writeMultipart(MultiValueMap<String, Object> parts, HttpOutputMessage outputMessage) throws IOException {
 		byte[] boundary = generateMultipartBoundary();
 
 		Map<String, String> parameters = Collections.singletonMap("boundary", new String(boundary, "US-ASCII"));
@@ -274,6 +233,7 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 		}
 	}
 
+	// 以流的形式写入输出流
 	private void writeBoundary(byte[] boundary, OutputStream os) throws IOException {
 		os.write('-');
 		os.write('-');

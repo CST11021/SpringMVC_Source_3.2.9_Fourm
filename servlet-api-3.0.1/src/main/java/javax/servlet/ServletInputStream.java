@@ -80,24 +80,16 @@ import java.io.IOException;
  *
  * @author 	Various
  *
- * @see		ServletRequest 
+ * @see		ServletRequest
+ *
+ *
+ * 通过该对象从请求报文中获取请求主体数据
  *
  */
-
 public abstract class ServletInputStream extends InputStream {
-
-
-
-    /**
-     * Does nothing, because this is an abstract class.
-     *
-     */
 
     protected ServletInputStream() { }
 
-  
-  
-    
     /**
      *
      * Reads the input stream, one line at a time. Starting at an
@@ -124,7 +116,6 @@ public abstract class ServletInputStream extends InputStream {
      * @exception IOException	if an input or output exception has occurred
      *
      */
-     
     public int readLine(byte[] b, int off, int len) throws IOException {
 
 	if (len <= 0) {

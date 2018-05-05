@@ -35,25 +35,16 @@ import org.springframework.util.Assert;
 public class ServletServerHttpResponse implements ServerHttpResponse {
 
 	private final HttpServletResponse servletResponse;
-
 	private final HttpHeaders headers = new HttpHeaders();
-
 	private boolean headersWritten = false;
 
 
-	/**
-	 * Construct a new instance of the ServletServerHttpResponse based on the given {@link HttpServletResponse}.
-	 * @param servletResponse the servlet response
-	 */
 	public ServletServerHttpResponse(HttpServletResponse servletResponse) {
 		Assert.notNull(servletResponse, "'servletResponse' must not be null");
 		this.servletResponse = servletResponse;
 	}
 
 
-	/**
-	 * Return the {@code HttpServletResponse} this object is based on.
-	 */
 	public HttpServletResponse getServletResponse() {
 		return this.servletResponse;
 	}

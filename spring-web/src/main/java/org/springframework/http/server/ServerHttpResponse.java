@@ -35,9 +35,7 @@ public interface ServerHttpResponse extends HttpOutputMessage, Closeable {
 	 */
 	void setStatusCode(HttpStatus status);
 
-	/**
-	 * Close this response, freeing any resources created.
-	 */
+	/** Close this response, freeing any resources created. */
 	void close();
 
 }

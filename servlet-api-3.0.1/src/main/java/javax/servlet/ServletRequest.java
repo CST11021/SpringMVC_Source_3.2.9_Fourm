@@ -79,61 +79,68 @@ import java.util.*;
  */
 public interface ServletRequest {
 
-    // 返回request中键名为name对应的属性值
+    /** 返回request中键名为name对应的属性值 */
     public Object getAttribute(String name);
-    // 返回所有的AttributeName
-    public Enumeration<String> getAttributeNames();
     public void setAttribute(String name, Object o);
+    /** 返回所有的AttributeName
+    Enumeration 接口是Iterator迭代器的“古老版本”，从JDK 1.0开始，Enumeration接口就已经存在了（Iterator从JDK 1.2才出现）。
+    Enumeration接口只有两个方法：
+        boolean hasMoreElements()
+            如果此迭代器还有剩下的元素，则返回true
+        Object nextElement()
+            返回该迭代器的下一个元素，如果还有的话(否则抛出异常)
+     */
+    public Enumeration<String> getAttributeNames();
     public void removeAttribute(String name);
 
 
-    // 返回该请求主体中使用的字符编码，如果请求没有指定字符编码，则该方法返回null
+    /** 返回该请求报文主体中使用的字符编码，如果请求没有指定字符编码，则该方法返回null */
     public String getCharacterEncoding();
-
-    // 覆盖该请求主体中使用的字符编码，在读取请求参数或使用getReader()读取输入之前，必须调用此方法。否则无效
+    /** 覆盖该请求报文主体中使用的字符编码，在读取请求参数或使用getReader()读取输入之前，必须调用此方法。否则无效 */
     public void setCharacterEncoding(String env) throws UnsupportedEncodingException;
 
-    // 返回请求主体的长度，并由输入流提供，如果长度未知，则返回-1。对于HTTP servlet，与CGI变量内容长度的值相同。
+    /** 返回请求报文主体的长度，如果长度未知，则返回-1。对于HTTP servlet，与CGI变量内容长度的值相同。 */
     public int getContentLength();
 
-    // 返回请求主体的MIME类型，如果类型未知，则返回null。对于HTTP servlet，与CGI变量内容类型的值相同。
+    /** 返回请求报文主体的MIME类型，如果类型未知，则返回null。对于HTTP servlet，与CGI变量内容类型的值相同。 */
     public String getContentType();
 
-    // 以ServletInputStream 的形式返回请求主体的数据，这种方法或getReader可能被调用来读取主体
+    /** 以ServletInputStream 的形式返回请求报文主体的数据，这种方法或getReader可能被调用来读取主体 */
     public ServletInputStream getInputStream() throws IOException;
     public BufferedReader getReader() throws IOException;
 
 
-    // 获取请求参数
+    // 获取请求参数，即对应URL中的 key-value
+
     public String getParameter(String name);
     public Enumeration<String> getParameterNames();
     public String[] getParameterValues(String name);
     public Map<String, String[]> getParameterMap();
 
 
-    // 返回这个HTTP请求的协议名称和版本号
+    /** 返回这个HTTP请求的协议名称和版本号 */
     public String getProtocol();
-    // 返回用于发出请求的scheme名称，例如：http、https或ftp
+    /** 返回用于发出请求的scheme名称，例如：http、https或ftp */
     public String getScheme();
 
-    // 返回请求的服务器地址
+    /** 返回请求的服务器地址 */
     public String getServerName();
-    // 返回请求的服务器端口号
+    /** 返回请求的服务器端口号 */
     public int getServerPort();
 
 
-    // 返回发送请求的客户端或最终代理的Internet协议(IP)地址
+    /** 返回发送请求的客户端或最终代理的Internet协议(IP)地址 */
     public String getRemoteAddr();
-    // 返回客户机的完全限定名或发送请求的最后一个代理
+    /** 返回客户机的完全限定名或发送请求的最后一个代理 */
     public String getRemoteHost();
 
-    // 根据accept-language头，返回客户端接受内容的首选语言环境。如果客户端请求没有提供一个接受语言的头部，这个方法将返回服务器的默认语言环境。
+    /** 根据accept-language头，返回客户端接受内容的首选语言环境，如果客户端请求没有提供一个接受语言的头部，这个方法将返回服务器的默认语言环境 */
     public Locale getLocale();
 
-    // 返回基于accept-language头的客户端可接受Locale，如果客户端请求没有提供一个可接受的语言头，该方法将返回一个包含一个地区的枚举，这是服务器的默认语言环境。
+    /** 返回基于accept-language头的客户端可接受Locale，如果客户端请求没有提供一个可接受的语言头，该方法将返回一个包含一个地区的枚举，这是服务器的默认语言环境 */
     public Enumeration<Locale> getLocales();
 
-    // 返回一个布尔值，指示是否使用HTTPS等安全通道进行此请求
+    /** 返回一个布尔值，指示是否使用HTTPS等安全通道进行此请求 */
     public boolean isSecure();
 
     /**
@@ -175,17 +182,17 @@ public interface ServletRequest {
      */
     public String getRealPath(String path);
 
-    // 返回Internet协议(IP)的源端口或发送这个请求的最后一个代理客户机
+    /** 返回Internet协议(IP)的源端口或发送这个请求的最后一个代理客户机 */
     public int getRemotePort();
 
-    // 返回接收到该请求的Internet协议(IP)的主机名
+    /** 返回接收到该请求的Internet协议(IP)的主机名 */
     public String getLocalName();
-    // 返回接收到该请求的Internet协议(IP)的地址
+    /** 返回接收到该请求的Internet协议(IP)的地址 */
     public String getLocalAddr();
-    // 返回接收到该请求的Internet协议(IP)的端口号
+    /** 返回接收到该请求的Internet协议(IP)的端口号 */
     public int getLocalPort();
 
-    // 获取servlet上下文，这个servlet上下文是最后一次发送的
+    /** 获取servlet上下文，这个servlet上下文是最后一次发送的 */
     public ServletContext getServletContext();
 
     /**

@@ -65,6 +65,48 @@ package javax.servlet;
  * </ol>
  *
  * @since Servlet 3.0
+ *
+ *
+
+为了支持异步处理，在Servlet 3.0中，在{@link ServletRequest}上提供了startAsync()方法：
+    AsyncContext startAsync() throws java.lang.IllegalStateException;
+    AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse) throws java.lang.IllegalStateException
+
+这两个方法都会返回AsyncContext接口的实现对象，前者会直接利用原有的请求与响应对象来创建AsyncContext，后者可以传入自行创建的请求、
+响应封装对象。在调用了startAsync()方法取得AsyncContext对象之后，此次请求的响应会被延后，并释放容器分配的线程。
+
+可以通过AsyncContext的getRequest()、getResponse()方法取得请求、响应对象，此次对客户端的响应将暂缓至调用AsyncContext的complete()
+或dispatch()方法为止，前者表示响应完成，后者表示将调派指定的URL进行响应。若要能调用ServletRequest的startAsync()以取得AsyncContext，
+必须告知容器此Servlet支持异步处理，如果使用@WebServlet来标注，则可以设置其asyncSupported为true。
+例如：
+ @WebServlet(urlPatterns = "/some.do", asyncSupported = true)
+ public class AsyncServlet extends HttpServlet {
+    ...
+ }
+
+ 如果使用web.xml设置Servlet，则可以在<servlet>中设置<async-supported>标签为true：
+ ...
+ <servlet>
+ <servlet-name>AsyncServlet</servlet-name>
+ <servlet-class>cc.openhome.AsyncServlet</servlet-class>
+ <async-supported>true</async-supported>
+ </servlet>
+ ...
+
+ 如果Servlet将会进行异步处理，若其前端有过滤器，则过滤器亦需标示其支持异步处理，如果使用@WebFilter，同样可以设置其asyncSupported为true。例如：
+ @WebFilter(urlPatterns = "/some.do", asyncSupported = true)
+ public class AsyncFilter implements Filter{
+    ...
+ }
+
+ 如果使用web.xml设置过滤器，则可以设置<async-supported>标签为true：
+ ...
+ <filter>
+ <filter-name>AsyncFilter</filter-name>
+ <filter-class>cc.openhome.AsyncFilter</filter-class>
+ <async-supported>true</async-supported>
+ </filter>
+ ...
  */
 public interface AsyncContext {
 
@@ -74,28 +116,24 @@ public interface AsyncContext {
      * {@link #dispatch(String)} or {@link #dispatch(ServletContext,String)} 
      */
     static final String ASYNC_REQUEST_URI = "javax.servlet.async.request_uri";
-
     /**
      * The name of the request attribute under which the original
      * context path is made available to the target of a
      * {@link #dispatch(String)} or {@link #dispatch(ServletContext,String)} 
      */
     static final String ASYNC_CONTEXT_PATH = "javax.servlet.async.context_path";
-
     /**
      * The name of the request attribute under which the original
      * path info is made available to the target of a
      * {@link #dispatch(String)} or {@link #dispatch(ServletContext,String)} 
      */
     static final String ASYNC_PATH_INFO = "javax.servlet.async.path_info";
-
     /**
      * The name of the request attribute under which the original
      * servlet path is made available to the target of a
      * {@link #dispatch(String)} or {@link #dispatch(ServletContext,String)}  
      */
     static final String ASYNC_SERVLET_PATH = "javax.servlet.async.servlet_path";
-
     /**
      * The name of the request attribute under which the original
      * query string is made available to the target of a
@@ -104,23 +142,10 @@ public interface AsyncContext {
     static final String ASYNC_QUERY_STRING = "javax.servlet.async.query_string";
 
 
-    /**
-     * Gets the request that was used to initialize this AsyncContext
-     * by calling {@link ServletRequest#startAsync()} or
-     * {@link ServletRequest#startAsync(ServletRequest, ServletResponse)}.
-     *
-     * @return the request that was used to initialize this AsyncContext
-     */
+    /** 从异步上下文中获取请求对象 */
     public ServletRequest getRequest();
 
-
-    /**
-     * Gets the response that was used to initialize this AsyncContext
-     * by calling {@link ServletRequest#startAsync()} or
-     * {@link ServletRequest#startAsync(ServletRequest, ServletResponse)}.
-     *
-     * @return the response that was used to initialize this AsyncContext
-     */
+    /** 从异步上下文中获取响应对象 */
     public ServletResponse getResponse();
 
 
@@ -144,7 +169,6 @@ public interface AsyncContext {
      * carried any application-provided wrappers; false otherwise
      */
     public boolean hasOriginalRequestAndResponse();
-
 
     /**
      * Dispatches the request and response objects of this AsyncContext
@@ -239,7 +263,6 @@ public interface AsyncContext {
      */
     public void dispatch();
 
-
     /**
      * Dispatches the request and response objects of this AsyncContext
      * to the given <tt>path</tt>.
@@ -280,7 +303,6 @@ public interface AsyncContext {
      * @see ServletRequest#getDispatcherType
      */
     public void dispatch(String path);
-
 
     /**
      * Dispatches the request and response objects of this AsyncContext
@@ -323,7 +345,6 @@ public interface AsyncContext {
      */
     public void dispatch(ServletContext context, String path);
 
-
     /**
      * Completes the asynchronous operation that was started on the request
      * that was used to initialze this AsyncContext, closing the response
@@ -347,7 +368,6 @@ public interface AsyncContext {
      */
     public void complete();
 
-
     /**
      * Causes the container to dispatch a thread, possibly from a managed
      * thread pool, to run the specified <tt>Runnable</tt>. The container may
@@ -356,7 +376,6 @@ public interface AsyncContext {
      * @param run the asynchronous handler
      */
     public void start(Runnable run);
-
 
     /**
      * Registers the given {@link AsyncListener} with the most recent
@@ -378,7 +397,6 @@ public interface AsyncContext {
      * returned to the container
      */
     public void addListener(AsyncListener listener);
-
 
     /**
      * Registers the given {@link AsyncListener} with the most recent
@@ -413,10 +431,7 @@ public interface AsyncContext {
      * {@link ServletRequest#startAsync} methods was called, has
      * returned to the container
      */
-    public void addListener(AsyncListener listener,
-                            ServletRequest servletRequest,
-                            ServletResponse servletResponse);
-
+    public void addListener(AsyncListener listener, ServletRequest servletRequest, ServletResponse servletResponse);
 
     /**
      * Instantiates the given {@link AsyncListener} class.
@@ -442,9 +457,7 @@ public interface AsyncContext {
      * @throws ServletException if the given <tt>clazz</tt> fails to be
      * instantiated
      */
-    public <T extends AsyncListener> T createListener(Class<T> clazz)
-        throws ServletException; 
-
+    public <T extends AsyncListener> T createListener(Class<T> clazz)throws ServletException;
 
     /**
      * Sets the timeout (in milliseconds) for this AsyncContext.
@@ -470,7 +483,6 @@ public interface AsyncContext {
      * returned to the container
      */
     public void setTimeout(long timeout);
-
 
     /**
      * Gets the timeout (in milliseconds) for this AsyncContext.

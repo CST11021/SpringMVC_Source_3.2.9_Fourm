@@ -23,9 +23,26 @@ package org.springframework.http;
  *
  * @author Arjen Poutsma
  * @since 3.0
+ *
+ * 表示HTTP的请求方法
  */
 public enum HttpMethod {
 
-	GET, POST, HEAD, OPTIONS, PUT, PATCH, DELETE, TRACE
+	// 用与从服务器获取一份文档
+	GET,
+	// 向服务器发送需要处理的数据
+	POST,
+	// 只从服务器获取文档的首部
+	HEAD,
+	// 决定可以在服务器上执行哪些方法
+	OPTIONS,
+	// 将请求的主体部分存储在服务器上
+	PUT,
+	//
+	PATCH,
+	// 从服务器上删除一份文档
+	DELETE,
+	// 对可能经过代理服务器传送到服务器上去的报文进行追踪
+	TRACE
 
 }

@@ -47,31 +47,21 @@ import org.springframework.util.Assert;
  */
 public class ServletServerHttpRequest implements ServerHttpRequest {
 
+	// 表示表单类型的 MediaType
 	protected static final String FORM_CONTENT_TYPE = "application/x-www-form-urlencoded";
-
 	protected static final String FORM_CHARSET = "UTF-8";
-
 	private static final String METHOD_POST = "POST";
-
-
 	private final HttpServletRequest servletRequest;
-
 	private HttpHeaders headers;
 
 
-	/**
-	 * Construct a new instance of the ServletServerHttpRequest based on the given {@link HttpServletRequest}.
-	 * @param servletRequest the servlet request
-	 */
 	public ServletServerHttpRequest(HttpServletRequest servletRequest) {
 		Assert.notNull(servletRequest, "HttpServletRequest must not be null");
 		this.servletRequest = servletRequest;
 	}
 
 
-	/**
-	 * Returns the {@code HttpServletRequest} this object is based on.
-	 */
+
 	public HttpServletRequest getServletRequest() {
 		return this.servletRequest;
 	}
@@ -132,6 +122,7 @@ public class ServletServerHttpRequest implements ServerHttpRequest {
 		}
 	}
 
+	// 判断是否为表单请求
 	private boolean isFormPost(HttpServletRequest request) {
 		return (request.getContentType() != null && request.getContentType().contains(FORM_CONTENT_TYPE) &&
 				METHOD_POST.equalsIgnoreCase(request.getMethod()));
