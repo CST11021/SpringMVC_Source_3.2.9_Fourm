@@ -59,7 +59,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 
 	private final Map<T, HandlerMethod> handlerMethods = new LinkedHashMap<T, HandlerMethod>();
 
-	//key表示有效的请求URL串，urlMap用于映射URL和处理器的映射关系
+	// key表示有效的请求URL串，urlMap用于映射URL和处理器的映射关系
 	private final MultiValueMap<String, T> urlMap = new LinkedMultiValueMap<String, T>();
 
 
@@ -209,15 +209,15 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	protected void handlerMethodsInitialized(Map<T, HandlerMethod> handlerMethods) {}
 
 
-	/**
-	 * Look up a handler method for the given request.
-	 */
+	// 直接返回控制器对应的方法，对应的方法被封装为HandlerMethod对象
 	@Override
 	protected HandlerMethod getHandlerInternal(HttpServletRequest request) throws Exception {
-		String lookupPath = getUrlPathHelper().getLookupPathForRequest(request);//截取用于匹配的url有效路径，比如：/test.html
+		//截取用于匹配的url有效路径，比如：/test.html
+		String lookupPath = getUrlPathHelper().getLookupPathForRequest(request);
 		if (logger.isDebugEnabled()) {
 			logger.debug("Looking up handler method for path " + lookupPath);
 		}
+		// 通过有效路径获取对应的控制器方法
 		HandlerMethod handlerMethod = lookupHandlerMethod(lookupPath, request);
 		if (logger.isDebugEnabled()) {
 			if (handlerMethod != null) {
@@ -229,16 +229,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 		}
 		return (handlerMethod != null ? handlerMethod.createWithResolvedBean() : null);
 	}
-
-	/**
-	 * Look up the best-matching handler method for the current request.
-	 * If multiple matches are found, the best match is selected.
-	 * @param lookupPath mapping lookup path within the current servlet mapping
-	 * @param request the current request
-	 * @return the best-matching handler method, or {@code null} if no match
-	 * @see #handleMatch(Object, String, HttpServletRequest)
-	 * @see #handleNoMatch(Set, String, HttpServletRequest)
-	 */
+	// 通过有效路径获取对应的控制器方法
 	protected HandlerMethod lookupHandlerMethod(String lookupPath, HttpServletRequest request) throws Exception {
 		List<Match> matches = new ArrayList<Match>();
 		List<T> directPathMatches = this.urlMap.get(lookupPath);

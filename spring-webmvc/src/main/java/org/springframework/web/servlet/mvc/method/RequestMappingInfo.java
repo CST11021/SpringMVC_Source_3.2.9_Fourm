@@ -46,26 +46,21 @@ import org.springframework.web.servlet.mvc.condition.RequestMethodsRequestCondit
 public final class RequestMappingInfo implements RequestCondition<RequestMappingInfo> {
 
 	private final PatternsRequestCondition patternsCondition;
-
 	private final RequestMethodsRequestCondition methodsCondition;
-
 	private final ParamsRequestCondition paramsCondition;
-
 	private final HeadersRequestCondition headersCondition;
-
 	private final ConsumesRequestCondition consumesCondition;
-
 	private final ProducesRequestCondition producesCondition;
-
 	private final RequestConditionHolder customConditionHolder;
 
 
-	/**
-	 * Creates a new instance with the given request conditions.
-	 */
-	public RequestMappingInfo(PatternsRequestCondition patterns, RequestMethodsRequestCondition methods,
-			ParamsRequestCondition params, HeadersRequestCondition headers, ConsumesRequestCondition consumes,
-			ProducesRequestCondition produces, RequestCondition<?> custom) {
+	public RequestMappingInfo(PatternsRequestCondition patterns,
+							  RequestMethodsRequestCondition methods,
+							  ParamsRequestCondition params,
+							  HeadersRequestCondition headers,
+							  ConsumesRequestCondition consumes,
+							  ProducesRequestCondition produces,
+							  RequestCondition<?> custom) {
 
 		this.patternsCondition = (patterns != null ? patterns : new PatternsRequestCondition());
 		this.methodsCondition = (methods != null ? methods : new RequestMethodsRequestCondition());
@@ -75,10 +70,6 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 		this.producesCondition = (produces != null ? produces : new ProducesRequestCondition());
 		this.customConditionHolder = new RequestConditionHolder(custom);
 	}
-
-	/**
-	 * Re-create a RequestMappingInfo with the given custom request condition.
-	 */
 	public RequestMappingInfo(RequestMappingInfo info, RequestCondition<?> customRequestCondition) {
 		this(info.patternsCondition, info.methodsCondition, info.paramsCondition, info.headersCondition,
 				info.consumesCondition, info.producesCondition, customRequestCondition);
@@ -245,7 +236,6 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 		}
 		return false;
 	}
-
 	@Override
 	public int hashCode() {
 		return (this.patternsCondition.hashCode() * 31 +  // primary differentiation
@@ -253,7 +243,6 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 				this.headersCondition.hashCode() + this.consumesCondition.hashCode() +
 				this.producesCondition.hashCode() + this.customConditionHolder.hashCode());
 	}
-
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder("{");

@@ -31,64 +31,23 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public final class MappedInterceptor {
 
 	private final String[] includePatterns;
-
 	private final String[] excludePatterns;
-
+	// 表示一个请求的拦截器
 	private final HandlerInterceptor interceptor;
 
-
-	/**
-	 * Create a new MappedInterceptor instance.
-	 * @param includePatterns the path patterns to map with a {@code null} value matching to all paths
-	 * @param interceptor the HandlerInterceptor instance to map to the given patterns
-	 */
 	public MappedInterceptor(String[] includePatterns, HandlerInterceptor interceptor) {
 		this(includePatterns, null, interceptor);
 	}
-
-	/**
-	 * Create a new MappedInterceptor instance.
-	 * @param includePatterns the path patterns to map with a {@code null} value matching to all paths
-	 * @param excludePatterns the path patterns to exclude
-	 * @param interceptor the HandlerInterceptor instance to map to the given patterns
-	 */
 	public MappedInterceptor(String[] includePatterns, String[] excludePatterns, HandlerInterceptor interceptor) {
 		this.includePatterns = includePatterns;
 		this.excludePatterns = excludePatterns;
 		this.interceptor = interceptor;
 	}
-
-	/**
-	 * Create a new MappedInterceptor instance.
-	 * @param includePatterns the path patterns to map with a {@code null} value matching to all paths
-	 * @param interceptor the WebRequestInterceptor instance to map to the given patterns
-	 */
 	public MappedInterceptor(String[] includePatterns, WebRequestInterceptor interceptor) {
 		this(includePatterns, null, interceptor);
 	}
-
-	/**
-	 * Create a new MappedInterceptor instance.
-	 * @param includePatterns the path patterns to map with a {@code null} value matching to all paths
-	 * @param interceptor the WebRequestInterceptor instance to map to the given patterns
-	 */
 	public MappedInterceptor(String[] includePatterns, String[] excludePatterns, WebRequestInterceptor interceptor) {
 		this(includePatterns, excludePatterns, new WebRequestHandlerInterceptorAdapter(interceptor));
-	}
-
-
-	/**
-	 * The path into the application the interceptor is mapped to.
-	 */
-	public String[] getPathPatterns() {
-		return this.includePatterns;
-	}
-
-	/**
-	 * The actual Interceptor reference.
-	 */
-	public HandlerInterceptor getInterceptor() {
-		return this.interceptor;
 	}
 
 	/**
@@ -116,4 +75,13 @@ public final class MappedInterceptor {
 			return false;
 		}
 	}
+
+	// getter and setter ...
+	public String[] getPathPatterns() {
+		return this.includePatterns;
+	}
+	public HandlerInterceptor getInterceptor() {
+		return this.interceptor;
+	}
+
 }

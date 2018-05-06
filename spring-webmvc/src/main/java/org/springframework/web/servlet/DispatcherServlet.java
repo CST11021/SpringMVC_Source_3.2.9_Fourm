@@ -445,6 +445,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		// 判断是否默认添加所有的HandlerMappings,默认true
 		if (this.detectAllHandlerMappings) {
 			// 在ApplicationContext中找到所有的 HandlerMapping，包括父容器中的 HandlerMapping
+			// HandlerMapping 的默认实现，请参照DispatchServlet.properties
 			Map<String, HandlerMapping> matchingBeans = BeanFactoryUtils.beansOfTypeIncludingAncestors(context, HandlerMapping.class, true, false);
 			if (!matchingBeans.isEmpty()) {
 				this.handlerMappings = new ArrayList<HandlerMapping>(matchingBeans.values());

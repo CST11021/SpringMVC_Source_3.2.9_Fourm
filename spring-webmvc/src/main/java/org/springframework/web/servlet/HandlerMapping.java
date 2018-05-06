@@ -3,7 +3,7 @@ package org.springframework.web.servlet;
 
 import javax.servlet.http.HttpServletRequest;
 
-/*
+/**
 
  	HandlerMapping映射处理器，HandlerMapping将请求映射为HandlerExecutionChain对象（包含一个Handler处理器（页面控制器）和
  多个 HandlerInterceptor拦截器）。在Spring容器初始化完成时，在上下文环境中已定义的所有 HandlerMapping 都已经被加载了，这

@@ -42,19 +42,12 @@ import org.springframework.util.Assert;
 public abstract class UriUtils {
 
 	private static final String SCHEME_PATTERN = "([^:/?#]+):";
-
 	private static final String HTTP_PATTERN = "(http|https):";
-
 	private static final String USERINFO_PATTERN = "([^@/]*)";
-
 	private static final String HOST_PATTERN = "([^/?#:]*)";
-
 	private static final String PORT_PATTERN = "(\\d*)";
-
 	private static final String PATH_PATTERN = "([^?#]*)";
-
 	private static final String QUERY_PATTERN = "([^#]*)";
-
 	private static final String LAST_PATTERN = "(.*)";
 
 	// Regex patterns that matches URIs. See RFC 3986, appendix B
@@ -68,7 +61,6 @@ public abstract class UriUtils {
 
 
 	// encoding
-
 	/**
 	 * Encodes the given source URI into an encoded String. All various URI components are
 	 * encoded according to their respective valid character sets.
@@ -106,7 +98,6 @@ public abstract class UriUtils {
 			throw new IllegalArgumentException("[" + uri + "] is not a valid URI");
 		}
 	}
-
 	/**
 	 * Encodes the given HTTP URI into an encoded String. All various URI components are
 	 * encoded according to their respective valid character sets.
@@ -145,7 +136,6 @@ public abstract class UriUtils {
 			throw new IllegalArgumentException("[" + httpUrl + "] is not a valid HTTP URL");
 		}
 	}
-
 	/**
 	 * Encodes the given source URI components into an encoded String. All various URI components
 	 * are optional, but encoded according to their respective valid character sets.
@@ -208,7 +198,6 @@ public abstract class UriUtils {
 
 
 	// encoding convenience methods
-
 	/**
 	 * Encodes the given URI scheme with the given encoding.
 	 * @param scheme the scheme to be encoded
@@ -219,7 +208,6 @@ public abstract class UriUtils {
 	public static String encodeScheme(String scheme, String encoding) throws UnsupportedEncodingException {
 		return HierarchicalUriComponents.encodeUriComponent(scheme, encoding, HierarchicalUriComponents.Type.SCHEME);
 	}
-
 	/**
 	 * Encodes the given URI authority with the given encoding.
 	 * @param authority the authority to be encoded
@@ -230,7 +218,6 @@ public abstract class UriUtils {
 	public static String encodeAuthority(String authority, String encoding) throws UnsupportedEncodingException {
 		return HierarchicalUriComponents.encodeUriComponent(authority, encoding, HierarchicalUriComponents.Type.AUTHORITY);
 	}
-
 	/**
 	 * Encodes the given URI user info with the given encoding.
 	 * @param userInfo the user info to be encoded
@@ -241,7 +228,6 @@ public abstract class UriUtils {
 	public static String encodeUserInfo(String userInfo, String encoding) throws UnsupportedEncodingException {
 		return HierarchicalUriComponents.encodeUriComponent(userInfo, encoding, HierarchicalUriComponents.Type.USER_INFO);
 	}
-
 	/**
 	 * Encodes the given URI host with the given encoding.
 	 * @param host the host to be encoded
@@ -252,7 +238,6 @@ public abstract class UriUtils {
 	public static String encodeHost(String host, String encoding) throws UnsupportedEncodingException {
 		return HierarchicalUriComponents.encodeUriComponent(host, encoding, HierarchicalUriComponents.Type.HOST);
 	}
-
 	/**
 	 * Encodes the given URI port with the given encoding.
 	 * @param port the port to be encoded
@@ -263,7 +248,6 @@ public abstract class UriUtils {
 	public static String encodePort(String port, String encoding) throws UnsupportedEncodingException {
 		return HierarchicalUriComponents.encodeUriComponent(port, encoding, HierarchicalUriComponents.Type.PORT);
 	}
-
 	/**
 	 * Encodes the given URI path with the given encoding.
 	 * @param path the path to be encoded
@@ -274,7 +258,6 @@ public abstract class UriUtils {
 	public static String encodePath(String path, String encoding) throws UnsupportedEncodingException {
 		return HierarchicalUriComponents.encodeUriComponent(path, encoding, HierarchicalUriComponents.Type.PATH);
 	}
-
 	/**
 	 * Encodes the given URI path segment with the given encoding.
 	 * @param segment the segment to be encoded
@@ -285,7 +268,6 @@ public abstract class UriUtils {
 	public static String encodePathSegment(String segment, String encoding) throws UnsupportedEncodingException {
 		return HierarchicalUriComponents.encodeUriComponent(segment, encoding, HierarchicalUriComponents.Type.PATH_SEGMENT);
 	}
-
 	/**
 	 * Encodes the given URI query with the given encoding.
 	 * @param query the query to be encoded
@@ -296,7 +278,6 @@ public abstract class UriUtils {
 	public static String encodeQuery(String query, String encoding) throws UnsupportedEncodingException {
 		return HierarchicalUriComponents.encodeUriComponent(query, encoding, HierarchicalUriComponents.Type.QUERY);
 	}
-
 	/**
 	 * Encodes the given URI query parameter with the given encoding.
 	 * @param queryParam the query parameter to be encoded
@@ -307,7 +288,6 @@ public abstract class UriUtils {
 	public static String encodeQueryParam(String queryParam, String encoding) throws UnsupportedEncodingException {
 		return HierarchicalUriComponents.encodeUriComponent(queryParam, encoding, HierarchicalUriComponents.Type.QUERY_PARAM);
 	}
-
 	/**
 	 * Encodes the given URI fragment with the given encoding.
 	 * @param fragment the fragment to be encoded
@@ -321,7 +301,6 @@ public abstract class UriUtils {
 
 
 	// decoding
-
 	/**
 	 * Decodes the given encoded source String into an URI. Based on the following rules:
 	 * <ul>
@@ -337,6 +316,7 @@ public abstract class UriUtils {
 	 * @throws UnsupportedEncodingException when the given encoding parameter is not supported
 	 * @see java.net.URLDecoder#decode(String, String)
 	 */
+	// 使用对应的编码格式进行解码
 	public static String decode(String source, String encoding) throws UnsupportedEncodingException {
 		Assert.notNull(source, "Source must not be null");
 		Assert.hasLength(encoding, "Encoding must not be empty");

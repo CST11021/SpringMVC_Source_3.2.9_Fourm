@@ -30,6 +30,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
+ * 表示控制器（即Controller）对应的方法
+ *
  * Encapsulates information about a handler method consisting of a {@linkplain #getMethod() method}
  * and a {@linkplain #getBean() bean}. Provides convenient access to method parameters,
  * method return value, method annotations.
@@ -44,23 +46,17 @@ import org.springframework.util.ClassUtils;
  */
 public class HandlerMethod {
 
-	/** Logger that is available to subclasses */
 	protected final Log logger = LogFactory.getLog(HandlerMethod.class);
-
+	// 表示该请求对应处理方法的所在控制器Bean
 	private final Object bean;
-
 	private final BeanFactory beanFactory;
-
+	// 表示该请求对应的处理方法
 	private final Method method;
-
 	private final Method bridgedMethod;
-
+	// 表示该请求对应处理方法的入参
 	private final MethodParameter[] parameters;
 
 
-	/**
-	 * Create an instance from a bean instance and a method.
-	 */
 	public HandlerMethod(Object bean, Method method) {
 		Assert.notNull(bean, "Bean is required");
 		Assert.notNull(method, "Method is required");
@@ -70,11 +66,6 @@ public class HandlerMethod {
 		this.bridgedMethod = BridgeMethodResolver.findBridgedMethod(method);
 		this.parameters = initMethodParameters();
 	}
-
-	/**
-	 * Create an instance from a bean instance, method name, and parameter types.
-	 * @throws NoSuchMethodException when the method cannot be found
-	 */
 	public HandlerMethod(Object bean, String methodName, Class<?>... parameterTypes) throws NoSuchMethodException {
 		Assert.notNull(bean, "Bean is required");
 		Assert.notNull(methodName, "Method name is required");
@@ -84,12 +75,6 @@ public class HandlerMethod {
 		this.bridgedMethod = BridgeMethodResolver.findBridgedMethod(this.method);
 		this.parameters = initMethodParameters();
 	}
-
-	/**
-	 * Create an instance from a bean name, a method, and a {@code BeanFactory}.
-	 * The method {@link #createWithResolvedBean()} may be used later to
-	 * re-create the {@code HandlerMethod} with an initialized the bean.
-	 */
 	public HandlerMethod(String beanName, BeanFactory beanFactory, Method method) {
 		Assert.hasText(beanName, "Bean name is required");
 		Assert.notNull(beanFactory, "BeanFactory is required");
@@ -102,10 +87,6 @@ public class HandlerMethod {
 		this.bridgedMethod = BridgeMethodResolver.findBridgedMethod(method);
 		this.parameters = initMethodParameters();
 	}
-
-	/**
-	 * Copy constructor for use in sub-classes.
-	 */
 	protected HandlerMethod(HandlerMethod handlerMethod) {
 		Assert.notNull(handlerMethod, "HandlerMethod is required");
 		this.bean = handlerMethod.bean;
@@ -114,10 +95,6 @@ public class HandlerMethod {
 		this.bridgedMethod = handlerMethod.bridgedMethod;
 		this.parameters = handlerMethod.parameters;
 	}
-
-	/**
-	 * Re-create HandlerMethod with the resolved handler.
-	 */
 	private HandlerMethod(HandlerMethod handlerMethod, Object handler) {
 		Assert.notNull(handlerMethod, "HandlerMethod is required");
 		Assert.notNull(handler, "Handler object is required");
@@ -221,6 +198,7 @@ public class HandlerMethod {
 		return new HandlerMethod(this, handler);
 	}
 
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -232,12 +210,10 @@ public class HandlerMethod {
 		}
 		return false;
 	}
-
 	@Override
 	public int hashCode() {
 		return this.bean.hashCode() * 31 + this.method.hashCode();
 	}
-
 	@Override
 	public String toString() {
 		return this.method.toGenericString();
@@ -263,7 +239,6 @@ public class HandlerMethod {
 			return HandlerMethod.this.getMethodAnnotation(annotationType);
 		}
 	}
-
 
 	/**
 	 * A MethodParameter for a HandlerMethod return type based on an actual return value.

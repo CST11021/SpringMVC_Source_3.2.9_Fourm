@@ -55,48 +55,30 @@ import org.springframework.web.util.UrlPathHelper;
  * @see org.springframework.web.servlet.HandlerInterceptor
  */
 public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport implements HandlerMapping, Ordered {
-
-	private int order = Integer.MAX_VALUE;  // default: same as non-Ordered
-
+	// default: same as non-Ordered
+	private int order = Integer.MAX_VALUE;
+	// 表示HTTP请求默认对应的 Controller，当从HandlerMapping中找不到对应的控制器时，就会使用该对象作为Controller
+	// （该字段可能是字符串表示这个控制器Bean的BeanName，也可能就是控制器Bean本身）
 	private Object defaultHandler;
-
 	private UrlPathHelper urlPathHelper = new UrlPathHelper();
-
 	private PathMatcher pathMatcher = new AntPathMatcher();
-
 	private final List<Object> interceptors = new ArrayList<Object>();
-
+	// 表示请求的拦截器，当请求被控制器处理器前，可能会经过多个拦截器进行处理
 	private final List<HandlerInterceptor> adaptedInterceptors = new ArrayList<HandlerInterceptor>();
-
 	private final List<MappedInterceptor> mappedInterceptors = new ArrayList<MappedInterceptor>();
 
 
-	/**
-	 * Specify the order value for this HandlerMapping bean.
-	 * <p>Default value is {@code Integer.MAX_VALUE}, meaning that it's non-ordered.
-	 * @see org.springframework.core.Ordered#getOrder()
-	 */
 	public final void setOrder(int order) {
 	  this.order = order;
 	}
-
 	public final int getOrder() {
 	  return this.order;
 	}
 
-	/**
-	 * Set the default handler for this handler mapping.
-	 * This handler will be returned if no specific mapping was found.
-	 * <p>Default is {@code null}, indicating no default handler.
-	 */
+
 	public void setDefaultHandler(Object defaultHandler) {
 		this.defaultHandler = defaultHandler;
 	}
-
-	/**
-	 * Return the default handler for this handler mapping,
-	 * or {@code null} if none.
-	 */
 	public Object getDefaultHandler() {
 		return this.defaultHandler;
 	}
@@ -267,14 +249,8 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 		}
 	}
 
-	/**
-	 * Return the adapted interceptors as {@link HandlerInterceptor} array.
-	 * @return the array of {@link HandlerInterceptor}s, or {@code null} if none
-	 */
-	protected final HandlerInterceptor[] getAdaptedInterceptors() {
-		int count = this.adaptedInterceptors.size();
-		return (count > 0 ? this.adaptedInterceptors.toArray(new HandlerInterceptor[count]) : null);
-	}
+
+
 
 	/**
 	 * Return all configured {@link MappedInterceptor}s as an array.
@@ -285,14 +261,9 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 		return (count > 0 ? this.mappedInterceptors.toArray(new MappedInterceptor[count]) : null);
 	}
 
-	/**
-	 * Look up a handler for the given request, falling back to the default
-	 * handler if no specific one is found.
-	 * @param request current HTTP request
-	 * @return the corresponding handler instance, or the default handler
-	 * @see #getHandlerInternal
-	 */
+
 	public final HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
+	    // 获取控制器对象
 		Object handler = getHandlerInternal(request);
 		if (handler == null) {
 			handler = getDefaultHandler();
@@ -300,6 +271,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 		if (handler == null) {
 			return null;
 		}
+
 		// Bean name or resolved handler?
 		if (handler instanceof String) {
 			String handlerName = (String) handler;
@@ -307,21 +279,10 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 		}
 		return getHandlerExecutionChain(handler, request);
 	}
-
-	/**
-	 * Look up a handler for the given request, returning {@code null} if no
-	 * specific one is found. This method is called by {@link #getHandler};
-	 * a {@code null} return value will lead to the default handler, if one is set.
-	 * <p>Note: This method may also return a pre-built {@link HandlerExecutionChain},
-	 * combining a handler object with dynamically determined interceptors.
-	 * Statically specified interceptors will get merged into such an existing chain.
-	 * @param request current HTTP request
-	 * @return the corresponding handler instance, or {@code null} if none found
-	 * @throws Exception if there is an internal error
-	 */
+	// 获取request对应的控制器（即Controller），这里返回的可能是一个控制器Bean，或是控制器BeanName或者HandlerExecutionChain
 	protected abstract Object getHandlerInternal(HttpServletRequest request) throws Exception;
 
-	//将配置中对应的拦截器加入到执行链中，以保证这些拦截器可以有效地作用于目标对象
+	// 将配置中对应的拦截器加入到执行链中，以保证这些拦截器可以有效地作用于目标对象
 	protected HandlerExecutionChain getHandlerExecutionChain(Object handler, HttpServletRequest request) {
 		HandlerExecutionChain chain = (handler instanceof HandlerExecutionChain ?
 				(HandlerExecutionChain) handler : new HandlerExecutionChain(handler));
@@ -335,6 +296,10 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 		}
 
 		return chain;
+	}
+	protected final HandlerInterceptor[] getAdaptedInterceptors() {
+		int count = this.adaptedInterceptors.size();
+		return (count > 0 ? this.adaptedInterceptors.toArray(new HandlerInterceptor[count]) : null);
 	}
 
 }

@@ -47,90 +47,40 @@ import org.springframework.util.StringUtils;
  */
 public class UrlPathHelper {
 
+	private static final Log logger = LogFactory.getLog(UrlPathHelper.class);
+
 	/**
 	 * Special WebSphere request attribute, indicating the original request URI.
 	 * Preferable over the standard Servlet 2.4 forward attribute on WebSphere,
 	 * simply because we need the very first URI in the request forwarding chain.
 	 */
 	private static final String WEBSPHERE_URI_ATTRIBUTE = "com.ibm.websphere.servlet.uri_non_decoded";
-
-	private static final Log logger = LogFactory.getLog(UrlPathHelper.class);
-
 	static volatile Boolean websphereComplianceFlag;
-
-
+	// alwaysUseFullPath默认是false，表示使用相对路径
 	private boolean alwaysUseFullPath = false;
-
+	// 标识请求的URL是否需要解码
 	private boolean urlDecode = true;
-
 	private boolean removeSemicolonContent = true;
-
+	// 表示请求路径的默认的编码，如果请求对象ServletRequest没有设置请求编码，则会使用默认的编码
 	private String defaultEncoding = WebUtils.DEFAULT_CHARACTER_ENCODING;
 
 
-	/**
-	 * Set if URL lookup should always use full path within current servlet
-	 * context. Else, the path within the current servlet mapping is used
-	 * if applicable (i.e. in the case of a ".../*" servlet mapping in web.xml).
-	 * Default is "false".
-	 */
+
 	public void setAlwaysUseFullPath(boolean alwaysUseFullPath) {
 		this.alwaysUseFullPath = alwaysUseFullPath;
 	}
-
-	/**
-	 * Set if context path and request URI should be URL-decoded.
-	 * Both are returned <i>undecoded</i> by the Servlet API,
-	 * in contrast to the servlet path.
-	 * <p>Uses either the request encoding or the default encoding according
-	 * to the Servlet spec (ISO-8859-1).
-	 * <p>Default is "true", as of Spring 2.5.
-	 * @see #getServletPath
-	 * @see #getContextPath
-	 * @see #getRequestUri
-	 * @see WebUtils#DEFAULT_CHARACTER_ENCODING
-	 * @see javax.servlet.ServletRequest#getCharacterEncoding()
-	 * @see java.net.URLDecoder#decode(String, String)
-	 */
 	public void setUrlDecode(boolean urlDecode) {
 		this.urlDecode = urlDecode;
 	}
-
-	/**
-	 * Set if ";" (semicolon) content should be stripped from the request URI.
-	 * <p>Default is "true".
-	 */
 	public void setRemoveSemicolonContent(boolean removeSemicolonContent) {
 		this.removeSemicolonContent = removeSemicolonContent;
 	}
-
-	/**
-	 * Whether configured to remove ";" (semicolon) content from the request URI.
-	 */
 	public boolean shouldRemoveSemicolonContent() {
 		return this.removeSemicolonContent;
 	}
-
-	/**
-	 * Set the default character encoding to use for URL decoding.
-	 * Default is ISO-8859-1, according to the Servlet spec.
-	 * <p>If the request specifies a character encoding itself, the request
-	 * encoding will override this setting. This also allows for generically
-	 * overriding the character encoding in a filter that invokes the
-	 * {@code ServletRequest.setCharacterEncoding} method.
-	 * @param defaultEncoding the character encoding to use
-	 * @see #determineEncoding
-	 * @see javax.servlet.ServletRequest#getCharacterEncoding()
-	 * @see javax.servlet.ServletRequest#setCharacterEncoding(String)
-	 * @see WebUtils#DEFAULT_CHARACTER_ENCODING
-	 */
 	public void setDefaultEncoding(String defaultEncoding) {
 		this.defaultEncoding = defaultEncoding;
 	}
-
-	/**
-	 * Return the default character encoding to use for URL decoding.
-	 */
 	protected String getDefaultEncoding() {
 		return this.defaultEncoding;
 	}
@@ -160,17 +110,6 @@ public class UrlPathHelper {
 		}
 	}
 
-	/**
-	 * Return the path within the servlet mapping for the given request,
-	 * i.e. the part of the request's URL beyond the part that called the servlet,
-	 * or "" if the whole URL has been used to identify the servlet.
-	 * <p>Detects include request URL if called within a RequestDispatcher include.
-	 * <p>E.g.: servlet mapping = "/test/*"; request URI = "/test/a" -> "/a".
-	 * <p>E.g.: servlet mapping = "/test"; request URI = "/test" -> "".
-	 * <p>E.g.: servlet mapping = "/*.test"; request URI = "/a.test" -> "".
-	 * @param request current HTTP request
-	 * @return the path within the servlet mapping, or ""
-	 */
 	public String getPathWithinServletMapping(HttpServletRequest request) {
 		String pathWithinApp = getPathWithinApplication(request);
 		String servletPath = getServletPath(request);
@@ -201,32 +140,75 @@ public class UrlPathHelper {
 			return servletPath;
 		}
 	}
-
-	/**
-	 * Return the path within the web application for the given request.
-	 * <p>Detects include request URL if called within a RequestDispatcher include.
-	 * @param request current HTTP request
-	 * @return the path within the web application
-	 */
+	// 获取应用内部路径，比如：http://localhost:8080/forum/board/listBoardTopics-10.html，这里返回的是：/board/listBoardTopics-10.html
 	public String getPathWithinApplication(HttpServletRequest request) {
+		// 获取上下根路径，比如：/forum
 		String contextPath = getContextPath(request);
+		// 获取请求路径，比如：/forum/board/listBoardTopics-10.html
 		String requestUri = getRequestUri(request);
+		// 获取请求路径，比如：/board/listBoardTopics-10.html
 		String path = getRemainingPath(requestUri, contextPath, true);
+
 		if (path != null) {
 			// Normal case: URI contains context path.
 			return (StringUtils.hasText(path) ? path : "/");
-		}
-		else {
+		} else {
 			return requestUri;
 		}
 	}
 
-	/**
-	 * Match the given "mapping" to the start of the "requestUri" and if there
-	 * is a match return the extra part. This method is needed because the
-	 * context path and the servlet path returned by the HttpServletRequest are
-	 * stripped of semicolon content unlike the requesUri.
-	 */
+	// 获取上下根路径
+	public String getContextPath(HttpServletRequest request) {
+		String contextPath = (String) request.getAttribute(WebUtils.INCLUDE_CONTEXT_PATH_ATTRIBUTE);
+		if (contextPath == null) {
+			// 获取上下文根路径，例如：http://localhost:8080/test/index.html，这里获取的根路径就是/test
+			contextPath = request.getContextPath();
+		}
+		if ("/".equals(contextPath)) {
+			// Invalid case, but happens for includes on Jetty: silently adapt it.
+			contextPath = "";
+		}
+		// 如果根路径被编码了，这里需要进行解码
+		return decodeRequestString(request, contextPath);
+	}
+	public String decodeRequestString(HttpServletRequest request, String source) {
+		if (this.urlDecode) {
+			return decodeInternal(request, source);
+		}
+		return source;
+	}
+	// 获取请求对应的编码格式进行解码
+	@SuppressWarnings("deprecation")
+	private String decodeInternal(HttpServletRequest request, String source) {
+		String enc = determineEncoding(request);
+		try {
+			return UriUtils.decode(source, enc);
+		}
+		catch (UnsupportedEncodingException ex) {
+			if (logger.isWarnEnabled()) {
+				logger.warn("Could not decode request string [" + source + "] with encoding '" + enc +
+						"': falling back to platform default encoding; exception message: " + ex.getMessage());
+			}
+			return URLDecoder.decode(source);
+		}
+	}
+	// 判断该请求的URL使用了哪种编码
+	protected String determineEncoding(HttpServletRequest request) {
+		String enc = request.getCharacterEncoding();
+		if (enc == null) {
+			enc = getDefaultEncoding();
+		}
+		return enc;
+	}
+
+	public String getRequestUri(HttpServletRequest request) {
+		String uri = (String) request.getAttribute(WebUtils.INCLUDE_REQUEST_URI_ATTRIBUTE);
+		if (uri == null) {
+			uri = request.getRequestURI();
+		}
+		return decodeAndCleanUriString(request, uri);
+	}
+
 	private String getRemainingPath(String requestUri, String mapping, boolean ignoreCase) {
 		int index1 = 0;
 		int index2 = 0;
@@ -260,44 +242,8 @@ public class UrlPathHelper {
 		return (index1 != -1 ? requestUri.substring(index1) : "");
 	}
 
-	/**
-	 * Return the request URI for the given request, detecting an include request
-	 * URL if called within a RequestDispatcher include.
-	 * <p>As the value returned by {@code request.getRequestURI()} is <i>not</i>
-	 * decoded by the servlet container, this method will decode it.
-	 * <p>The URI that the web container resolves <i>should</i> be correct, but some
-	 * containers like JBoss/Jetty incorrectly include ";" strings like ";jsessionid"
-	 * in the URI. This method cuts off such incorrect appendices.
-	 * @param request current HTTP request
-	 * @return the request URI
-	 */
-	public String getRequestUri(HttpServletRequest request) {
-		String uri = (String) request.getAttribute(WebUtils.INCLUDE_REQUEST_URI_ATTRIBUTE);
-		if (uri == null) {
-			uri = request.getRequestURI();
-		}
-		return decodeAndCleanUriString(request, uri);
-	}
 
-	/**
-	 * Return the context path for the given request, detecting an include request
-	 * URL if called within a RequestDispatcher include.
-	 * <p>As the value returned by {@code request.getContextPath()} is <i>not</i>
-	 * decoded by the servlet container, this method will decode it.
-	 * @param request current HTTP request
-	 * @return the context path
-	 */
-	public String getContextPath(HttpServletRequest request) {
-		String contextPath = (String) request.getAttribute(WebUtils.INCLUDE_CONTEXT_PATH_ATTRIBUTE);
-		if (contextPath == null) {
-			contextPath = request.getContextPath();
-		}
-		if ("/".equals(contextPath)) {
-			// Invalid case, but happens for includes on Jetty: silently adapt it.
-			contextPath = "";
-		}
-		return decodeRequestString(request, contextPath);
-	}
+
 
 	/**
 	 * Return the servlet path for the given request, regarding an include request
@@ -392,57 +338,7 @@ public class UrlPathHelper {
 		return uri;
 	}
 
-	/**
-	 * Decode the given source string with a URLDecoder. The encoding will be taken
-	 * from the request, falling back to the default "ISO-8859-1".
-	 * <p>The default implementation uses {@code URLDecoder.decode(input, enc)}.
-	 * @param request current HTTP request
-	 * @param source the String to decode
-	 * @return the decoded String
-	 * @see WebUtils#DEFAULT_CHARACTER_ENCODING
-	 * @see javax.servlet.ServletRequest#getCharacterEncoding
-	 * @see java.net.URLDecoder#decode(String, String)
-	 * @see java.net.URLDecoder#decode(String)
-	 */
-	public String decodeRequestString(HttpServletRequest request, String source) {
-		if (this.urlDecode) {
-			return decodeInternal(request, source);
-		}
-		return source;
-	}
 
-	@SuppressWarnings("deprecation")
-	private String decodeInternal(HttpServletRequest request, String source) {
-		String enc = determineEncoding(request);
-		try {
-			return UriUtils.decode(source, enc);
-		}
-		catch (UnsupportedEncodingException ex) {
-			if (logger.isWarnEnabled()) {
-				logger.warn("Could not decode request string [" + source + "] with encoding '" + enc +
-						"': falling back to platform default encoding; exception message: " + ex.getMessage());
-			}
-			return URLDecoder.decode(source);
-		}
-	}
-
-	/**
-	 * Determine the encoding for the given request.
-	 * Can be overridden in subclasses.
-	 * <p>The default implementation checks the request encoding,
-	 * falling back to the default encoding specified for this resolver.
-	 * @param request current HTTP request
-	 * @return the encoding for the request (never {@code null})
-	 * @see javax.servlet.ServletRequest#getCharacterEncoding()
-	 * @see #setDefaultEncoding
-	 */
-	protected String determineEncoding(HttpServletRequest request) {
-		String enc = request.getCharacterEncoding();
-		if (enc == null) {
-			enc = getDefaultEncoding();
-		}
-		return enc;
-	}
 
 	/**
 	 * Remove ";" (semicolon) content from the given request URI if the

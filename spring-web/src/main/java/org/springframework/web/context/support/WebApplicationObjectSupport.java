@@ -38,41 +38,13 @@ public abstract class WebApplicationObjectSupport extends ApplicationObjectSuppo
 
 	private ServletContext servletContext;
 
+	protected void initServletContext(ServletContext servletContext) {}
 	public final void setServletContext(ServletContext servletContext) {
 		if (servletContext != this.servletContext) {
 			this.servletContext = servletContext;
 			if (servletContext != null) {
 				initServletContext(servletContext);
 			}
-		}
-	}
-	@Override
-	protected void initApplicationContext(ApplicationContext context) {
-		super.initApplicationContext(context);
-		if (this.servletContext == null && context instanceof WebApplicationContext) {
-			this.servletContext = ((WebApplicationContext) context).getServletContext();
-			if (this.servletContext != null) {
-				initServletContext(this.servletContext);
-			}
-		}
-	}
-	protected void initServletContext(ServletContext servletContext) {}
-
-	@Override
-	protected boolean isContextRequired() {
-		return true;
-	}
-
-	protected final WebApplicationContext getWebApplicationContext() throws IllegalStateException {
-		ApplicationContext ctx = getApplicationContext();
-		if (ctx instanceof WebApplicationContext) {
-			return (WebApplicationContext) getApplicationContext();
-		}
-		else if (isContextRequired()) {
-			throw new IllegalStateException("WebApplicationObjectSupport instance [" + this + "] does not run in a WebApplicationContext but in: " + ctx);
-		}
-		else {
-			return null;
 		}
 	}
 	protected final ServletContext getServletContext() throws IllegalStateException {
@@ -85,6 +57,35 @@ public abstract class WebApplicationObjectSupport extends ApplicationObjectSuppo
 		}
 		return servletContext;
 	}
+
+	@Override
+	protected void initApplicationContext(ApplicationContext context) {
+		super.initApplicationContext(context);
+		if (this.servletContext == null && context instanceof WebApplicationContext) {
+			this.servletContext = ((WebApplicationContext) context).getServletContext();
+			if (this.servletContext != null) {
+				initServletContext(this.servletContext);
+			}
+		}
+	}
+	protected final WebApplicationContext getWebApplicationContext() throws IllegalStateException {
+		ApplicationContext ctx = getApplicationContext();
+		if (ctx instanceof WebApplicationContext) {
+			return (WebApplicationContext) getApplicationContext();
+		}
+		else if (isContextRequired()) {
+			throw new IllegalStateException("WebApplicationObjectSupport instance [" + this + "] does not run in a WebApplicationContext but in: " + ctx);
+		}
+		else {
+			return null;
+		}
+	}
+
+	@Override
+	protected boolean isContextRequired() {
+		return true;
+	}
+
 
 	// 返回当前web应用程序的临时目录，由servlet容器提供
 	protected final File getTempDir() throws IllegalStateException {
