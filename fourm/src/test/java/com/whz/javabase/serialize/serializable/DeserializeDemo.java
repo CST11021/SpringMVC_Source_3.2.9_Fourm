@@ -6,11 +6,11 @@ import java.io.ObjectInputStream;
 
 public class DeserializeDemo {
     public static void main(String[] args) {
-        Employee e = null;
+        SubEmployee e = null;
         try {
             FileInputStream fileIn = new FileInputStream("D:/employee.ser");
             ObjectInputStream in = new ObjectInputStream(fileIn);
-            e = (Employee) in.readObject();
+            e = (SubEmployee) in.readObject();
             in.close();
             fileIn.close();
         } catch (IOException i) {
@@ -26,5 +26,7 @@ public class DeserializeDemo {
         System.out.println("Address: " + e.address);
         System.out.println("SSN: " + e.SSN);
         System.out.println("Number: " + e.number);
+        System.out.println("ID:" + e.getId());
+        System.out.println("TestBean" + e.getTestBean());
     }
 }

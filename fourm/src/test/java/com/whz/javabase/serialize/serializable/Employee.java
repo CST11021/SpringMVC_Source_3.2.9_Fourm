@@ -1,5 +1,6 @@
 package com.whz.javabase.serialize.serializable;
 
+// 当一个父类实现序列化，子类自动实现序列化，不需要显式实现Serializable接口
 public class Employee implements java.io.Serializable {
     /**
      * 一个类可序列化,serialVersionUID建议给一个确定的值,不要由系统自动生成,否则在增减字段(或修改字段类型及长度)时,如果两边的类
