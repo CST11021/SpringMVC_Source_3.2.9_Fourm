@@ -1,4 +1,4 @@
-package com.whz.poi;
+package com.whz.utils.poi;
 
 public class Book {
    private int bookId;
