@@ -28,44 +28,41 @@ public class Test {
         HSSFWorkbook wb = new HSSFWorkbook();
         HSSFSheet sheet = wb.createSheet(sheetName);
 
+        sheet.setDefaultColumnWidth((short) (20));
+
         // 设置第一行
         buildRow1(wb, sheet);
 
         // 设置第二行
         HSSFRow row2 = sheet.createRow(1);
         HSSFCell outOrderCodeLabel = row2.createCell((short) 0);
-        outOrderCodeLabel.setCellValue("委外订单号：");
-        HSSFCell outOrderCode = row2.createCell((short) 1);
-        outOrderCode.setCellValue("12342342");
+        sheet.addMergedRegion(new CellRangeAddress(1,1,0,5));
+        outOrderCodeLabel.setCellValue("委外订单号：" + "12312312");
+
         HSSFCell factoryCellLabel = row2.createCell((short) 6);
-        factoryCellLabel.setCellValue("工厂：");
-        HSSFCell factoryCell = row2.createCell((short) 7);
-        factoryCell.setCellValue("bug工程");
+        sheet.addMergedRegion(new CellRangeAddress(1,1,6,7));
+        factoryCellLabel.setCellValue("工厂：" + "BUG工厂");
 
         // 设置第三行
         HSSFRow row3 = sheet.createRow(2);
         HSSFCell orderCodeLabel = row3.createCell((short) 0);
-        orderCodeLabel.setCellValue("工单编号：");
-        HSSFCell orderCode = row3.createCell((short) 1);
-        orderCode.setCellValue("1231212312312");
+        sheet.addMergedRegion(new CellRangeAddress(2,2,0,5));
+        orderCodeLabel.setCellValue("工单编号：" + "1231212312312");
         HSSFCell dateCellLabel = row3.createCell((short) 6);
-        dateCellLabel.setCellValue("日期：");
-        HSSFCell dateCell = row3.createCell((short) 7);
-        dateCell.setCellValue("2018/05/22");
+        sheet.addMergedRegion(new CellRangeAddress(2,2,6,7));
+        dateCellLabel.setCellValue("日期：" + "2018/05/22");
 
         // 设置第四行
         HSSFRow row4 = sheet.createRow(3);
         HSSFCell requireCodeLabel = row4.createCell((short) 0);
-        requireCodeLabel.setCellValue("生产需求编号：");
-        HSSFCell requireCode = row4.createCell((short) 1);
-        requireCode.setCellValue("PR20180522000144");
+        sheet.addMergedRegion(new CellRangeAddress(3,3,0,7));
+        requireCodeLabel.setCellValue("生产需求编号：" + "PR20180522000144");
 
         // 设置第五行
         HSSFRow row5 = sheet.createRow(4);
         HSSFCell soCellLabel = row5.createCell((short) 0);
-        soCellLabel.setCellValue("SO：");
-        HSSFCell soCell = row5.createCell((short) 1);
-        soCell.setCellValue("花花排合同");
+        sheet.addMergedRegion(new CellRangeAddress(4,4,0,7));
+        soCellLabel.setCellValue("SO：" + "花花排合同");
 
         // 设置生产资料
 
@@ -119,7 +116,7 @@ public class Test {
 
         // 生成二维码
         byte[] fileBytes = QRCodeUtils.createQrCodeByte("二维码测试", 400, 400);
-        fillPicture(row13.createCell(7), fileBytes, HSSFWorkbook.PICTURE_TYPE_PNG, 60, 80);
+        fillPicture(row13.createCell(7), fileBytes, HSSFWorkbook.PICTURE_TYPE_PNG, 100, 120);
 
         // 生产资料
         sheet.addMergedRegion(new CellRangeAddress(5,14,0,0));
@@ -207,6 +204,25 @@ public class Test {
         row24.createCell(4).setCellValue("制表：");
         sheet.addMergedRegion(new CellRangeAddress(23,23,6,7));
         row24.createCell(6).setCellValue("审核：");
+
+        // 设置默认样式
+        HSSFCellStyle defaultStyle = wb.createCellStyle();
+        HSSFFont defaultFont = wb.createFont();
+        defaultFont.setFontName("宋体");
+        defaultFont.setFontHeightInPoints((short) 14);
+        defaultStyle.setFont(defaultFont);
+
+        int lastRowNum = sheet.getLastRowNum();
+        for (int index = 1; index <= lastRowNum; index++) {
+            HSSFRow currentRow = sheet.getRow(index);
+            int lastCellNum = currentRow.getLastCellNum();
+            for (int colNum = 0; colNum < lastCellNum; colNum++) {
+                HSSFCell currentCell = currentRow.getCell(colNum);
+                if (currentCell != null) {
+                    currentCell.setCellStyle(defaultStyle);
+                }
+            }
+        }
 
         return wb;
     }
