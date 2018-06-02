@@ -1,13 +1,19 @@
 package com.whz.utils.email;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
 public class MailUtil {
+
+    private final static Logger LOGGER = Logger.getLogger(MailUtil.class);
 
     /**
      * 发送邮件
@@ -35,6 +41,23 @@ public class MailUtil {
      * @return 是否发送成功
      */
     public static boolean sendMail(String password, String host, String from, String to, String subject, String content, List<File> files) {
+        if (StringUtils.isBlank(password)) {
+            LOGGER.error("MailUtil.sendMail error, because password is empty");
+            return false;
+        }
+        if (StringUtils.isBlank(host)) {
+            LOGGER.error("MailUtil.sendMail error, because host is empty");
+            return false;
+        }
+        if (StringUtils.isBlank(from)) {
+            LOGGER.error("MailUtil.sendMail error, because from is empty");
+            return false;
+        }
+        if (StringUtils.isBlank(to)) {
+            LOGGER.error("MailUtil.sendMail error, because to is empty");
+            return false;
+        }
+
 
         Properties props = System.getProperties();
         props.put("mail.smtp.host", host);
@@ -85,6 +108,32 @@ public class MailUtil {
             return false;
         }
         return true;
+    }
+
+    public static void main(String[] args) {
+        String password = "ytawopltyjurecbd";
+        String host = "smtp.qq.com";
+        String from = "2321322661@qq.com";
+        String to = "1073305547@qq.com";
+        String subject = "输入邮件主题";
+
+        StringBuffer content = new StringBuffer();
+        content.append("<!DOCTYPE>" +
+                "<div style='border:1px solid #d9f4ee;font-size:14px;line-height:22px;color:#005aa0;padding-left:1px;padding-top:5px;padding-bottom:5px;'>" +
+                "<span style='font-weight:bold;'>温馨提示：</span>" +
+                "<div style='width:950px;font-family:arial;'>" +
+                "欢迎使用NET微活动，您的注册码为：<br/>" +
+                "<h2 style='color:green'>" + "测试..." + "</h2><br/>" +
+                "本邮件由系统自动发出，请勿回复。<br/>感谢您的使用。<br/>" +
+                "</div>" +
+                "</div>");
+        try {
+            List<File> files = new ArrayList();
+            files.add(new File("/Users/wanghongzhan/Documents/whz/temp/制造商型号-工单号-订单批量.xls"));
+            MailUtil.sendMail(password, host, from, to, subject, content.toString(), files);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
