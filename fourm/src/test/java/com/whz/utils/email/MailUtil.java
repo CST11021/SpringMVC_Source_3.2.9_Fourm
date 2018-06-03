@@ -111,10 +111,10 @@ public class MailUtil {
     }
 
     public static void main(String[] args) {
-        String password = "ytawopltyjurecbd";
+        String password = "ytawopltyjurec";
         String host = "smtp.qq.com";
-        String from = "2321322661@qq.com";
-        String to = "1073305547@qq.com";
+        String from = "2321***661@qq.com";
+        String to = "10733***47@qq.com";
         String subject = "输入邮件主题";
 
         StringBuffer content = new StringBuffer();
@@ -129,7 +129,7 @@ public class MailUtil {
                 "</div>");
         try {
             List<File> files = new ArrayList();
-            files.add(new File("/Users/wanghongzhan/Documents/whz/temp/制造商型号-工单号-订单批量.xls"));
+            files.add(new File("/Users/wanghongzhan/Documents/whz/temp/test.xls"));
             MailUtil.sendMail(password, host, from, to, subject, content.toString(), files);
         } catch (Exception e) {
             e.printStackTrace();
