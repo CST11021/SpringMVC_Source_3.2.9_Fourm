@@ -18,3 +18,4 @@ spring-web/target/
 spring-webmvc/src/main/resources/rebel-remote.xml
 spring-webmvc/target/
 target/
+rebel.xml
