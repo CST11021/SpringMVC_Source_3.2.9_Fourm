@@ -1,18 +1,13 @@
 package com.whz.es;
 
-import java.net.InetAddress;
-
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
-/**
- * ClassName:GetConnection Date: 2018年3月20日 下午8:12:07
- *
- * @author xbq
- * @since JDK 1.8
- */
+import java.net.InetAddress;
+
+
 public class GetConnection {
 
     public final static String HOST = "localhost";

@@ -20,15 +20,11 @@ import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
-/**
- * Created by xjk on 17-5-8.
- */
 public class Main {
     //定义index
     private static final String index = "store";
@@ -44,31 +40,29 @@ public class Main {
 
 
             //创建索引，有则先删除
-            recreateIndex(client);
+            // recreateIndex(client);
             //插入数据
-            doIndex(client);
-            //搜索全部数据
+            // doIndex(client);
+            // //搜索全部数据
             searchAll(client);
-            //搜索部分数据
-            searchRange(client);
-            //根据关键字搜索
-            searchKeyWord(client);
-            //高亮关键字
-            searchHightlight(client);
-            //排序
-            searchOrdered(client);
-            //根据id搜索
-            findById(client);
-            //更新
-            updateById(client);
-            //删除
-            deleteById(client);
+            // //搜索部分数据
+            // searchRange(client);
+            // //根据关键字搜索
+            // searchKeyWord(client);
+            // //高亮关键字
+            // searchHightlight(client);
+            // //排序
+            // searchOrdered(client);
+            // //根据id搜索
+            // findById(client);
+            // //更新
+            // updateById(client);
+            // //删除
+            // deleteById(client);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
-
 
     /**
      * 创建索引，有则先删除
@@ -89,12 +83,10 @@ public class Main {
         System.out.println(createIndexResponse);
     }
 
-
     /**
      * 插入数据
      * @param client
      */
-    @SuppressWarnings({"rawtypes", "unchecked"})
     private static void doIndex(final Client client) {
 
         Map s11 = new LinkedHashMap();
