@@ -3,6 +3,8 @@ package com.whz.utils.email;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.io.File;
@@ -90,10 +92,19 @@ public class MailUtil {
             // 附件
             if (files != null) {
                 for (File file : files) {
-                    MimeBodyPart filePart = new MimeBodyPart();
-                    filePart.attachFile(file);
-                    filePart.setFileName(MimeUtility.encodeText(file.getName()));
+                    // 这种方法会乱码的情况出现
+                    // MimeBodyPart filePart = new MimeBodyPart();
+                    // filePart.attachFile(file);
+                    // filePart.setFileName(MimeUtility.encodeText(file.getName()));
+                    // multipart.addBodyPart(filePart);
+
+                    BodyPart filePart = new MimeBodyPart();
+                    FileDataSource fileds = new FileDataSource(file.getCanonicalFile());
+                    filePart.setFileName(MimeUtility.encodeWord(file.getName()));
+                    filePart.setDataHandler(new DataHandler(fileds));
                     multipart.addBodyPart(filePart);
+
+
                 }
             }
 
