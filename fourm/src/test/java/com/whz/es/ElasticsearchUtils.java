@@ -29,10 +29,10 @@ import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -57,7 +57,7 @@ public class ElasticsearchUtils {
         client = new PreBuiltTransportClient(settings)
                 .addTransportAddresses(new TransportAddress(InetAddress.getByName("localhost"), 9300));
 
-        List<String> list = FileUtils.readLines(new File("/Users/wanghongzhan/Documents/whz/myProgram/elasticsearch-6.2.4/accounts.json"));
+        List<String> list = FileUtils.readLines(new ClassPathResource("accounts.json").getFile());
         for (int index = 0; index < list.size(); index+=2) {
             JSONObject jsonObject = JSON.parseObject(list.get(index));
             Map<String, String> map = (Map<String, String>) jsonObject.get("index");
