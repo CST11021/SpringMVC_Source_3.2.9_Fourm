@@ -61,20 +61,37 @@ package javax.servlet;
 import java.util.Enumeration;
 
 /**
- * A servlet configuration object used by a servlet container
- * to pass information to a servlet during initialization.
+ * A servlet configuration object used by a servlet container to pass information to a servlet during initialization.
+ * 在Servlet容器初始化Servlet时，Servlet容器将ServletConfig传给Servlet的init方法。ServletConfig封装可以通过@WebServlet或者不熟描述符传给一个Servlet的配置信息。
  */
-// 在Servlet容器初始化Servlet时，Servlet容器将ServletConfig传给Servlet的init方法。ServletConfig封装可以通过@WebServlet或
-// 者不熟描述符传给一个Servlet的配置信息。
 public interface ServletConfig {
 
-    // 返回这个Servlet的名字
+    /**
+     * 返回这个Servlet的名字
+     * @return
+     */
     public String getServletName();
 
+    /**
+     * 获取Servlet上下文
+     * @return
+     */
     public ServletContext getServletContext();
 
-    // 为了从一个Servlet内部获取某个初始参数的值，应该在由Servlet容器传给Servlet的init方法的ServletConfig中调用getInitParameter方法。
+    /**
+     *
+     * 为了从一个Servlet内部获取某个初始参数的值，应该在由Servlet容器传给Servlet的init方法的ServletConfig中调用getInitParameter方法。
+     *
+     * @param name  初始化参数名
+     * @return
+     */
     public String getInitParameter(String name);
+
+    /**
+     * 获取所有初始化参数
+     *
+     * @return
+     */
     public Enumeration<String> getInitParameterNames();
 
 }

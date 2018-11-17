@@ -79,7 +79,7 @@ import java.util.Map;
  */
 public class ServletRequestWrapper implements ServletRequest {
 
-    // 表示一个请求
+    /** 表示一个请求 */
     private ServletRequest request;
 
     public ServletRequestWrapper(ServletRequest request) {

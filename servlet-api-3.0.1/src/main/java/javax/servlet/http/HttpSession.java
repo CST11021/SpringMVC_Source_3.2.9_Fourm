@@ -58,8 +58,8 @@
 
 package javax.servlet.http;
 
-import java.util.Enumeration;
 import javax.servlet.ServletContext;
+import java.util.Enumeration;
 
 /**
  *
@@ -111,7 +111,6 @@ import javax.servlet.ServletContext;
  * @see 	HttpSessionBindingListener
  * @see 	HttpSessionContext
  */
-
 public interface HttpSession {
 
     /**
@@ -128,7 +127,6 @@ public interface HttpSession {
      *					invalidated session
      */
     public long getCreationTime();
-    
         
     /**
      * Returns a string containing the unique identifier assigned 
@@ -139,7 +137,6 @@ public interface HttpSession {
      *					assigned to this session
      */
     public String getId();
-    
 
     /**
      *
@@ -163,7 +160,6 @@ public interface HttpSession {
      */
     public long getLastAccessedTime();
     
-    
     /**
      * Returns the ServletContext to which this session belongs.
      *    
@@ -172,7 +168,6 @@ public interface HttpSession {
      */
     public ServletContext getServletContext();
 
-
     /**
      * Specifies the time, in seconds, between client requests before the 
      * servlet container will invalidate this session. 
@@ -180,11 +175,9 @@ public interface HttpSession {
      * <p>An <tt>interval</tt> value of zero or less indicates that the
      * session should never timeout.
      *
-     * @param interval		An integer specifying the number
-     * 				of seconds 
+     * @param interval		An integer specifying the number of seconds
      */    
     public void setMaxInactiveInterval(int interval);
-
 
     /**
      * Returns the maximum time interval, in seconds, that 
@@ -203,7 +196,6 @@ public interface HttpSession {
      * @see		#setMaxInactiveInterval
      */
     public int getMaxInactiveInterval();
-    
 
     /**
      *
@@ -214,7 +206,6 @@ public interface HttpSession {
      *
      */
     public HttpSessionContext getSessionContext();
-    
 
     /**
      * Returns the object bound with the specified name in this session, or
@@ -229,7 +220,6 @@ public interface HttpSession {
      */
     public Object getAttribute(String name);
     
-    
     /**
      * @deprecated 	As of Version 2.2, this method is
      * 			replaced by {@link #getAttribute}.
@@ -242,7 +232,6 @@ public interface HttpSession {
      *					invalidated session
      */
     public Object getValue(String name);
-        
 
     /**
      * Returns an <code>Enumeration</code> of <code>String</code> objects
@@ -257,7 +246,6 @@ public interface HttpSession {
      *					invalidated session
      */    
     public Enumeration<String> getAttributeNames();
-    
 
     /**
      * @deprecated 	As of Version 2.2, this method is
@@ -272,7 +260,6 @@ public interface HttpSession {
      *					invalidated session
      */
     public String[] getValueNames();
-    
 
     /**
      * Binds an object to this session, using the name specified.
@@ -303,7 +290,6 @@ public interface HttpSession {
      *					invalidated session
      */
     public void setAttribute(String name, Object value);
-    
 
     /**
      * @deprecated 	As of Version 2.2, this method is
@@ -318,7 +304,6 @@ public interface HttpSession {
      *					invalidated session
      */
     public void putValue(String name, Object value);
-
 
     /**
      * Removes the object bound with the specified name from
@@ -340,7 +325,6 @@ public interface HttpSession {
      */
     public void removeAttribute(String name);
 
-
     /**
      * @deprecated 	As of Version 2.2, this method is
      * 			replaced by {@link #removeAttribute}
@@ -353,7 +337,6 @@ public interface HttpSession {
      */
     public void removeValue(String name);
 
-
     /**
      * Invalidates this session then unbinds any objects bound
      * to it. 
@@ -362,7 +345,6 @@ public interface HttpSession {
      *					already invalidated session
      */
     public void invalidate();
-    
     
     /**
      * Returns <code>true</code> if the client does not yet know about the

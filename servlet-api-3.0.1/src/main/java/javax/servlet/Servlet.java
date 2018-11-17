@@ -62,42 +62,6 @@ import java.io.IOException;
 
 
 /**
- * Defines methods that all servlets must implement.
- *
- * <p>A servlet is a small Java program that runs within a Web server.
- * Servlets receive and respond to requests from Web clients,
- * usually across HTTP, the HyperText Transfer Protocol. 
- *
- * <p>To implement this interface, you can write a generic servlet
- * that extends
- * <code>javax.servlet.GenericServlet</code> or an HTTP servlet that
- * extends <code>javax.servlet.http.HttpServlet</code>.
- *
- * <p>This interface defines methods to initialize a servlet,
- * to service requests, and to remove a servlet from the server.
- * These are known as life-cycle methods and are called in the
- * following sequence:
- * <ol>
- * <li>The servlet is constructed, then initialized with the <code>init</code> method.
- * <li>Any calls from clients to the <code>service</code> method are handled.
- * <li>The servlet is taken out of service, then destroyed with the 
- * <code>destroy</code> method, then garbage collected and finalized.
- * </ol>
- *
- * <p>In addition to the life-cycle methods, this interface
- * provides the <code>getServletConfig</code> method, which the servlet 
- * can use to get any startup information, and the <code>getServletInfo</code>
- * method, which allows the servlet to return basic information about itself,
- * such as author, version, and copyright.
- *
- * @author 	Various
- *
- * @see 	GenericServlet
- * @see 	javax.servlet.http.HttpServlet
- *
- */
-
-/**
  什么是Servlet
      Servlet是一个基于Http协议用Java编写的程序，Servlet 是运行在 Web 服务器或应用服务器上的程序。
 
@@ -131,132 +95,45 @@ import java.io.IOException;
  */
 public interface Servlet {
 
+
     /**
-     * Called by the servlet container to indicate to a servlet that the
-     * servlet is being placed into service.
+     * 在servlet类创建后，servlet容器会调用Servlet的init方法，servlet容器只调用一次init方法，并且该方法必须在servlet接受请求之前
+     * 执行完毕。可以通过覆盖该方法来写只要运行一次的初始化代码，例如：数据库驱动,值初始化等，通常留空。在调用这个方法时，
+     * Servlet容器会传递一个ServletConfig。一般来说，会将ServletConfig赋给一个类级变量，以便Servlet类中的其他方法也可以使用这个对象。
      *
-     * <p>The servlet container calls the <code>init</code>
-     * method exactly once after instantiating the servlet.
-     * The <code>init</code> method must complete successfully
-     * before the servlet can receive any requests.
-     *
-     * <p>The servlet container cannot place the servlet into service
-     * if the <code>init</code> method
-     * <ol>
-     * <li>Throws a <code>ServletException</code>
-     * <li>Does not return within a time period defined by the Web server
-     * </ol>
-     *
-     *
-     * @param config			a <code>ServletConfig</code> object
-     *					containing the servlet's
-     * 					configuration and initialization parameters
-     *
-     * @exception ServletException 	if an exception has occurred that
-     *					interferes with the servlet's normal
-     *					operation
-     *
-     * @see 				UnavailableException
-     * @see 				#getServletConfig
-     *
+     * @param config
+     * @throws ServletException
      */
-    // 在servlet类初始化后，servlet容器调用init方法，servlet容器只调用一次init方法，并且该方法必须在servlet接受请求之前
-    // 执行完毕。可以通过覆盖该方法来写只要运行一次的初始化代码，例如：数据库驱动,值初始化等，通常留空。在调用这个方法时，
-    // Servlet容器会传递一个ServletConfig。一般来说，会将ServletConfig赋给一个类级变量，以便Servlet类中的其他方法也可以使
-    // 用这个对象。
     public void init(ServletConfig config) throws ServletException;
 
     /**
-     * Called by the servlet container to allow the servlet to respond to 
-     * a request.
+     * 当service方法在servlet请求时被容器调用并传递ServletRequest 和ServletResponse 对象，容器可以多次调用该方法。第一次请求Servlet时，
+     * Servlet容器会调用init方法和service方法。对于后续的请求，则只调用service方法。
      *
-     * <p>This method is only called after the servlet's <code>init()</code>
-     * method has completed successfully.
-     * 
-     * <p>  The status code of the response always should be set for a servlet 
-     * that throws or sends an error.
-     *
-     * 
-     * <p>Servlets typically run inside multithreaded servlet containers
-     * that can handle multiple requests concurrently. Developers must 
-     * be aware to synchronize access to any shared resources such as files,
-     * network connections, and as well as the servlet's class and instance 
-     * variables. 
-     * More information on multithreaded programming in Java is available in 
-     * <a href="http://java.sun.com/Series/Tutorial/java/threads/multithreaded.html">
-     * the Java tutorial on multi-threaded programming</a>.
-     *
-     *
-     * @param req 	the <code>ServletRequest</code> object that contains
-     *			the client's request
-     *
-     * @param res 	the <code>ServletResponse</code> object that contains
-     *			the servlet's response
-     *
-     * @exception ServletException 	if an exception occurs that interferes
-     *					with the servlet's normal operation 
-     *
-     * @exception IOException 		if an input or output exception occurs
-     *
+     * @param req
+     * @param res
+     * @throws ServletException
+     * @throws IOException
      */
-    // 当service方法在servlet请求时被容器调用并传递ServletRequest 和ServletResponse 对象，容器可以多次调用该方法。第一次
-    // 请求Servlet时，Servlet容器会调用init方法和service方法。对于后续的请求，则只调用service方法。
     public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException;
 
+
     /**
-     *
-     * Called by the servlet container to indicate to a servlet that the
-     * servlet is being taken out of service.  This method is
-     * only called once all threads within the servlet's
-     * <code>service</code> method have exited or after a timeout
-     * period has passed. After the servlet container calls this
-     * method, it will not call the <code>service</code> method again
-     * on this servlet.
-     *
-     * <p>This method gives the servlet an opportunity
-     * to clean up any resources that are being held (for example, memory,
-     * file handles, threads) and make sure that any persistent state is
-     * synchronized with the servlet's current state in memory.
-     *
+     * 当服务移除一个servlet实例的时候，servlet容器调用destroy方法。通常在servlet容器被关闭时或容器需要内容时被调用。一般来说，可以在这个方法编写一些资源清理相关的代码。
      */
-    // 当服务移除一个servlet实例的时候，servlet容器调用destroy方法。通常在servlet容器被关闭时或容器需要内容时被调用。一般
-    // 来说，可以在这个方法编写一些资源清理相关的代码。
     public void destroy();
 
     /**
-     * Returns information about the servlet, such
-     * as author, version, and copyright.
+     * 该方法返回有Servlet的描述。可以返回可能有用的任意字符串，甚至是null。
      *
-     * <p>The string that this method returns should
-     * be plain text and not markup of any kind (such as HTML, XML,
-     * etc.).
-     *
-     * @return 		a <code>String</code> containing servlet information
-     *
+     * @return
      */
-    // 该方法返回有Servlet的描述。可以返回可能有用的任意字符串，甚至是null。
     public String getServletInfo();
 
     /**
-     *
-     * Returns a {@link ServletConfig} object, which contains
-     * initialization and startup parameters for this servlet.
-     * The <code>ServletConfig</code> object returned is the one
-     * passed to the <code>init</code> method.
-     *
-     * <p>Implementations of this interface are responsible for storing the
-     * <code>ServletConfig</code> object so that this
-     * method can return it. The {@link GenericServlet}
-     * class, which implements this interface, already does this.
-     *
-     * @return		the <code>ServletConfig</code> object
-     *			that initializes this servlet
-     *
-     * @see 		#init
-     *
+     * 该方法返回有Servlet容器传给init方法的ServletConfig。但是，为了让getServletConfig返回非null值，你肯定已经为传给init方法的ServletConfig赋给了一个类级变量。
+     * @return
      */
-    // 该方法返回有Servlet容器传给init方法的ServletConfig。但是，为了让getServletConfig返回非null值，你肯定已经为传给init
-    // 方法的ServletConfig赋给了一个类级变量。
     public ServletConfig getServletConfig();
 
 

@@ -60,9 +60,11 @@ package javax.servlet;
 
 import java.util.EventListener;
 
-/** 
- * Interface for receiving notification events about ServletContext
- * lifecycle changes.
+/**
+ * ServletContext生命周期事件监听：
+ * 在Servlet API中有一个ServletContextListener接口，它能够监听 ServletContext 对象的生命周期，实际上就是监听 Web 应用的生命周期。
+ * 当Servlet 容器启动或终止Web应用时，会触发ServletContextEvent 事件，该事件由ServletContextListener来处理。在ServletContextListener
+ * 接口中定义了处理ServletContextEvent 事件的两个方法。
  *
  * <p>In order to receive these notification events, the implementation
  * class must be either declared in the deployment descriptor of the web
@@ -70,43 +72,27 @@ import java.util.EventListener;
  * or registered via one of the addListener methods defined on
  * {@link ServletContext}.
  *
- * <p>Implementations of this interface are invoked at their
- * {@link #contextInitialized} method in the order in which they have been
- * declared, and at their {@link #contextDestroyed} method in reverse
- * order.
- *
  * @see ServletContextEvent
  *
  * @since Servlet 2.3
  */
-// ServletContext生命周期事件监听
 public interface ServletContextListener extends EventListener {
 
     /**
-     * Receives notification that the web application initialization process is starting.
+     * 该方法在web应用启动后调用该方法，在调用完该方法之后，容器再对Filter初始化，并且对那些在Web应用启动时就需要被初始化的Servlet进行初始化。
+     * All ServletContextListeners are notified of context initialization before any filters or servlets in the web application are initialized.
      *
-     * <p>All ServletContextListeners are notified of context
-     * initialization before any filters or servlets in the web
-     * application are initialized.
-     *
-     * @param sce the ServletContextEvent containing the ServletContext
-     * that is being initialized
+     * @param sce 调用该方法时ServletContext已经被初始化，可以使用sce.getServletContext()获取到ServletContext上下文对象
      */
-    // 该方法在web应用启动后（也就是ServletContext启动之后，此时已经创建好了一个ServletContext实例），可以使用sce.getServletContext()获取到
     public void contextInitialized(ServletContextEvent sce);
 
     /**
-     * Receives notification that the ServletContext is about to be
-     * shut down.
      *
-     * <p>All servlets and filters will have been destroyed before any
-     * ServletContextListeners are notified of context
-     * destruction.
+     * 当Servlet容器终止Web应用前调用该方法，在调用该方法之前，容器会先销毁所有的Servlet和Filter过滤器。
+     * All servlets and filters will have been destroyed before any ServletContextListeners are notified of context destruction.
      *
-     * @param sce the ServletContextEvent containing the ServletContext
-     * that is being destroyed
+     * @param sce the ServletContextEvent containing the ServletContext that is being destroyed（调用该方法时，ServletContext已经被销毁）
      */
-    // 关闭web应用程序前被调用
     public void contextDestroyed(ServletContextEvent sce);
 }
 

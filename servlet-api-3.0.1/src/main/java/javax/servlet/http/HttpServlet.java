@@ -58,21 +58,15 @@
 
 package javax.servlet.http;
 
+import javax.servlet.*;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.Enumeration;
-import java.util.Locale;
 import java.util.ResourceBundle;
-
-import javax.servlet.GenericServlet;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 
 
 /**
@@ -116,7 +110,6 @@ import javax.servlet.ServletResponse;
  *
  * @author  Various
  */
-
 public abstract class HttpServlet extends GenericServlet {
     private static final String METHOD_DELETE = "DELETE";
     private static final String METHOD_HEAD = "HEAD";
@@ -140,20 +133,11 @@ public abstract class HttpServlet extends GenericServlet {
      * <code>service</code> method. There's no need to
      * override this method.
      *
-     * @param req   the {@link HttpServletRequest} object that
-     *                  contains the request the client made of
-     *                  the servlet
+     * @param req   the {@link HttpServletRequest} object that contains the request the client made of the servlet
+     * @param res   the {@link HttpServletResponse} object that contains the response the servlet returns to the client
      *
-     * @param res   the {@link HttpServletResponse} object that
-     *                  contains the response the servlet returns
-     *                  to the client
-     *
-     * @exception IOException   if an input or output error occurs
-     *                              while the servlet is handling the
-     *                              HTTP request
-     *
-     * @exception ServletException  if the HTTP request cannot
-     *                                  be handled
+     * @exception IOException   if an input or output error occurs while the servlet is handling the HTTP request
+     * @exception ServletException  if the HTTP request cannot be handled
      *
      * @see javax.servlet.Servlet#service
      */
@@ -179,20 +163,13 @@ public abstract class HttpServlet extends GenericServlet {
      * {@link javax.servlet.Servlet#service} method. There's no
      * need to override this method.
      *
-     * @param req   the {@link HttpServletRequest} object that
-     *                  contains the request the client made of
-     *                  the servlet
+     * @param req   the {@link HttpServletRequest} object that contains the request the client made of the servlet
      *
-     * @param resp  the {@link HttpServletResponse} object that
-     *                  contains the response the servlet returns
-     *                  to the client
+     * @param resp  the {@link HttpServletResponse} object that contains the response the servlet returns to the client
      *
-     * @exception IOException   if an input or output error occurs
-     *                              while the servlet is handling the
-     *                              HTTP request
+     * @exception IOException   if an input or output error occurs while the servlet is handling the HTTP request
      *
-     * @exception ServletException  if the HTTP request
-     *                                  cannot be handled
+     * @exception ServletException  if the HTTP request cannot be handled
      *
      * @see javax.servlet.Servlet#service
      */
@@ -669,13 +646,9 @@ public abstract class HttpServlet extends GenericServlet {
         Method[] thisMethods = c.getDeclaredMethods();
 
         if ((parentMethods != null) && (parentMethods.length > 0)) {
-            Method[] allMethods =
-                    new Method[parentMethods.length + thisMethods.length];
-            System.arraycopy(parentMethods, 0, allMethods, 0,
-                    parentMethods.length);
-            System.arraycopy(thisMethods, 0, allMethods, parentMethods.length,
-                    thisMethods.length);
-
+            Method[] allMethods = new Method[parentMethods.length + thisMethods.length];
+            System.arraycopy(parentMethods, 0, allMethods, 0, parentMethods.length);
+            System.arraycopy(thisMethods, 0, allMethods, parentMethods.length, thisMethods.length);
             thisMethods = allMethods;
         }
 
@@ -720,17 +693,15 @@ public abstract class HttpServlet extends GenericServlet {
             resp.setDateHeader(HEADER_LASTMOD, lastModified);
     }
 
-
 }
 
 
-/*
+/**
  * A response that includes no body, for use in (dumb) "HEAD" support.
  * This just swallows that body, counting the bytes in order to set
  * the content length appropriately.  All other methods delegate directly
  * to the wrapped HTTP Servlet Response object.
  */
-// file private
 class NoBodyResponse extends HttpServletResponseWrapper {
 
     private static final ResourceBundle lStrings = ResourceBundle.getBundle("javax.servlet.http.LocalStrings");
@@ -789,11 +760,9 @@ class NoBodyResponse extends HttpServletResponseWrapper {
     }
 }
 
-
-/*
+/**
  * Servlet output stream that gobbles up all its data.
  */
-// file private
 class NoBodyOutputStream extends ServletOutputStream {
 
     private static final String LSTRING_FILE = "javax.servlet.http.LocalStrings";
@@ -801,10 +770,8 @@ class NoBodyOutputStream extends ServletOutputStream {
 
     private int contentLength = 0;
 
-    // file private
     NoBodyOutputStream() {}
 
-    // file private
     int getContentLength() {
         return contentLength;
     }

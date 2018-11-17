@@ -47,7 +47,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Documented;
 
 /**
- * Annotation used to declare a servlet.
+ * Servlet声明注解，可以使用该注解来修饰类，表明该类是一个Servlet
  *
  * <p>This annotation is processed by the container at deployment time,
  * and the corresponding servlet made available at the specified URL
@@ -91,8 +91,7 @@ public @interface WebServlet {
      * Declares whether the servlet supports asynchronous operation mode.
      *
      * @see javax.servlet.ServletRequest#startAsync
-     * @see javax.servlet.ServletRequest#startAsync(ServletRequest,
-     * ServletResponse)
+     * @see javax.servlet.ServletRequest#startAsync(ServletRequest, ServletResponse)
      */
     boolean asyncSupported() default false;
     

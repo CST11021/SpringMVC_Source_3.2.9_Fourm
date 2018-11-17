@@ -47,6 +47,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 使用该注解来声明一个Web容器监听
  * This annotation is used to declare a WebListener.
  *
  * Any class annotated with WebListener must implement one or more of

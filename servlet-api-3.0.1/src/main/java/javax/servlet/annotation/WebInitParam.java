@@ -47,8 +47,7 @@ import java.lang.annotation.Target;
 import java.lang.annotation.Documented;
 
 /**
- * This annotation is used on a Servlet or Filter implementation class
- * to specify an initialization parameter.
+ * This annotation is used on a Servlet or Filter implementation class to specify an initialization parameter.
  * 
  * @since Servlet 3.0
  */

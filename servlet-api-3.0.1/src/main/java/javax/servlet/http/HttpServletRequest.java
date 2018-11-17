@@ -58,15 +58,15 @@
 
 package javax.servlet.http;
 
-import java.io.IOException;
-import java.util.*;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Enumeration;
 
 /**
- *
- * Extends the {@link javax.servlet.ServletRequest} interface
- * to provide request information for HTTP servlets. 
+ * HttpServletRequest对象代表客户端的请求，当客户端通过HTTP协议访问服务器时，HTTP请求头中的所有信息都封装在这个对象中，通过这个对象提供的方法，可以获得客户端请求的所有信息。
+ * Extends the {@link javax.servlet.ServletRequest} interface to provide request information for HTTP servlets.
  *
  * <p>The servlet container creates an <code>HttpServletRequest</code> 
  * object and passes it as an argument to the servlet's service
@@ -75,7 +75,6 @@ import javax.servlet.ServletRequest;
  *
  * @author 	Various
  */
-
 public interface HttpServletRequest extends ServletRequest {
 
     /** String identifier for Basic authentication. Value "BASIC" */
@@ -88,6 +87,8 @@ public interface HttpServletRequest extends ServletRequest {
     public static final String DIGEST_AUTH = "DIGEST";
 
     /**
+     * 返回用来保护servlet的authentication机制的名字, 所有的servlet支持basic, form和clientcertificate认证, 其他的支持digest认证, 如果servlet没有认证,将返回null.
+     *
      * Returns the name of the authentication scheme used to protect
      * the servlet. All servlet containers support basic, form and client 
      * certificate authentication, and may additionally support digest 
@@ -97,8 +98,7 @@ public interface HttpServletRequest extends ServletRequest {
      * <p>Same as the value of the CGI variable AUTH_TYPE.
      *
      *
-     * @return		one of the static members BASIC_AUTH, 
-     *			FORM_AUTH, CLIENT_CERT_AUTH, DIGEST_AUTH
+     * @return		one of the static members BASIC_AUTH, FORM_AUTH, CLIENT_CERT_AUTH, DIGEST_AUTH
      *			(suitable for == comparison) or
      *			the container-specific string indicating
      *			the authentication scheme, or
@@ -109,167 +109,45 @@ public interface HttpServletRequest extends ServletRequest {
     public String getAuthType();
 
     /**
+     * 返回客户端发送的Cookie，如果返回null，说明没有cookie
      *
-     * Returns an array containing all of the <code>Cookie</code>
-     * objects the client sent with this request.
-     * This method returns <code>null</code> if no cookies were sent.
-     *
-     * @return		an array of all the <code>Cookies</code>
-     *			included with this request, or <code>null</code>
-     *			if the request has no cookies
-     *
-     *
+     * @return
      */
     public Cookie[] getCookies();
 
+    // ---------------
+    // 从head头获取数据
+    // ---------------
+
     /**
+     * 返回以长整数的形式返回一个特定的请求头(request header),该长整数代表一个Date对象. 该方法可以用在包含时间信息的header中, 如: If-Modified-Since.
+     * header name是大小写敏感的.
      *
-     * Returns the value of the specified request header
-     * as a <code>long</code> value that represents a 
-     * <code>Date</code> object. Use this method with
-     * headers that contain dates, such as
-     * <code>If-Modified-Since</code>. 
+     * 如果请求没有一个特定名字的header,这个方法将返回-1, 如果header不能够被转化为date,那么该方法将抛出一个IllegalArgumentException.
      *
-     * <p>The date is returned as
-     * the number of milliseconds since January 1, 1970 GMT.
-     * The header name is case insensitive.
-     *
-     * <p>If the request did not have a header of the
-     * specified name, this method returns -1. If the header
-     * can't be converted to a date, the method throws
-     * an <code>IllegalArgumentException</code>.
-     *
-     * @param name		a <code>String</code> specifying the
-     *				name of the header
-     *
-     * @return			a <code>long</code> value
-     *				representing the date specified
-     *				in the header expressed as
-     *				the number of milliseconds
-     *				since January 1, 1970 GMT,
-     *				or -1 if the named header
-     *				was not included with the
-     *				request
-     *
-     * @exception	IllegalArgumentException	If the header value
-     *							can't be converted
-     *							to a date
-     *
+     * @param name 大小写敏感
+     * @return
      */
     public long getDateHeader(String name);
-
-    /**
-     *
-     * Returns the value of the specified request header
-     * as a <code>String</code>. If the request did not include a header
-     * of the specified name, this method returns <code>null</code>.
-     * If there are multiple headers with the same name, this method
-     * returns the first head in the request.
-     * The header name is case insensitive. You can use
-     * this method with any request header.
-     *
-     * @param name		a <code>String</code> specifying the
-     *				header name
-     *
-     * @return			a <code>String</code> containing the
-     *				value of the requested
-     *				header, or <code>null</code>
-     *				if the request does not
-     *				have a header of that name
-     *
-     */
     public String getHeader(String name);
-
-    /**
-     *
-     * Returns all the values of the specified request header
-     * as an <code>Enumeration</code> of <code>String</code> objects.
-     *
-     * <p>Some headers, such as <code>Accept-Language</code> can be sent
-     * by clients as several headers each with a different value rather than
-     * sending the header as a comma separated list.
-     *
-     * <p>If the request did not include any headers
-     * of the specified name, this method returns an empty
-     * <code>Enumeration</code>.
-     * The header name is case insensitive. You can use
-     * this method with any request header.
-     *
-     * @param name		a <code>String</code> specifying the
-     *				header name
-     *
-     * @return			an <code>Enumeration</code> containing
-     *                  	the values of the requested header. If
-     *                  	the request does not have any headers of
-     *                  	that name return an empty
-     *                  	enumeration. If 
-     *                  	the container does not allow access to
-     *                  	header information, return null
-     *
-     */
-    public Enumeration<String> getHeaders(String name); 
-
-    /**
-     *
-     * Returns an enumeration of all the header names
-     * this request contains. If the request has no
-     * headers, this method returns an empty enumeration.
-     *
-     * <p>Some servlet containers do not allow
-     * servlets to access headers using this method, in
-     * which case this method returns <code>null</code>
-     *
-     * @return			an enumeration of all the
-     *				header names sent with this
-     *				request; if the request has
-     *				no headers, an empty enumeration;
-     *				if the servlet container does not
-     *				allow servlets to use this method,
-     *				<code>null</code>
-     *				
-     *
-     */
+    public Enumeration<String> getHeaders(String name);
     public Enumeration<String> getHeaderNames();
-
-    /**
-     *
-     * Returns the value of the specified request header
-     * as an <code>int</code>. If the request does not have a header
-     * of the specified name, this method returns -1. If the
-     * header cannot be converted to an integer, this method
-     * throws a <code>NumberFormatException</code>.
-     *
-     * <p>The header name is case insensitive.
-     *
-     * @param name		a <code>String</code> specifying the name
-     *				of a request header
-     *
-     * @return			an integer expressing the value 
-     * 				of the request header or -1
-     *				if the request doesn't have a
-     *				header of this name
-     *
-     * @exception	NumberFormatException		If the header value
-     *							can't be converted
-     *							to an <code>int</code>
-     */
     public int getIntHeader(String name);
 
+
+
     /**
+     * 返回发送请求使用的方法, 如GET, POST, or PUT. 和CGI变量REQUEST_METHOD相同.
      *
-     * Returns the name of the HTTP method with which this 
-     * request was made, for example, GET, POST, or PUT.
+     * Returns the name of the HTTP method with which this request was made, for example, GET, POST, or PUT.
      * Same as the value of the CGI variable REQUEST_METHOD.
      *
-     * @return			a <code>String</code> 
-     *				specifying the name
-     *				of the method with which
-     *				this request was made
-     *
+     * @return      a <code>String</code> specifying the name of the method with which this request was made
      */
     public String getMethod();
 
     /**
+     * 返回客户端发送请求时使用URL的额外路径信息. 额外的路径信息是servlet后,查询子串前的部分,以"/"开头. 如果没有额外的路径信息,将返回null.
      *
      * Returns any extra path information associated with
      * the URL the client sent when it made this request.
@@ -318,6 +196,7 @@ public interface HttpServletRequest extends ServletRequest {
     public String getPathTranslated();
 
     /**
+     * 返回Servlet上下文的根路径
      *
      * Returns the portion of the request URI that indicates the context
      * of the request. The context path always comes first in a request
@@ -393,6 +272,7 @@ public interface HttpServletRequest extends ServletRequest {
     public boolean isUserInRole(String role);
 
     /**
+     * 返回一个java.security.Principal对象, 包含当前认证用户的用户名. 如果user没有认证, 这个方法将返回null.
      *
      * Returns a <code>java.security.Principal</code> object containing
      * the name of the current authenticated user. If the user has not been
@@ -502,7 +382,14 @@ public interface HttpServletRequest extends ServletRequest {
      */
     public String getServletPath();
 
+    // ---------------
+    // session相关
+    // ---------------
+
     /**
+     * 返回和当前请求相关的HttpSession对象, 如果当前没有session且create是true, 返回一个新的session.
+     * 如果create是false且当前的请求没有有效的HttpSession, 这个方法返回null.
+     * 为了确保session被正确的保持,你应该在提交响应之前调用本方法. 如果container使用cookies保持session的完整性, 且要求提交响应的时候产生新的session, 将抛出IllegalStateException.
      *
      * Returns the current <code>HttpSession</code>
      * associated with this request or, if there is no
@@ -538,7 +425,6 @@ public interface HttpServletRequest extends ServletRequest {
      *
      */
     public HttpSession getSession(boolean create);
-
     /**
      *
      * Returns the current session associated with this request,
@@ -551,7 +437,6 @@ public interface HttpServletRequest extends ServletRequest {
      *
      */
     public HttpSession getSession();
-
     /**
      *
      * Checks whether the requested session ID is still valid.
@@ -570,44 +455,33 @@ public interface HttpServletRequest extends ServletRequest {
      *
      */
     public boolean isRequestedSessionIdValid();
-
     /**
      *
      * Checks whether the requested session ID came in as a cookie.
      *
-     * @return			<code>true</code> if the session ID
-     *				came in as a
-     *				cookie; otherwise, <code>false</code>
-     *
-     *
+     * @return		<code>true</code> if the session ID came in as a cookie; otherwise, <code>false</code>
      * @see			#getSession
      *
      */
     public boolean isRequestedSessionIdFromCookie();
-
     /**
      *
-     * Checks whether the requested session ID came in as part of the 
-     * request URL.
+     * Checks whether the requested session ID came in as part of the request URL.
      *
-     * @return			<code>true</code> if the session ID
-     *				came in as part of a URL; otherwise,
+     * @return		<code>true</code> if the session ID came in as part of a URL; otherwise,
      *				<code>false</code>
-     *
      *
      * @see			#getSession
      *
      */
     public boolean isRequestedSessionIdFromURL();
-
     /**
-     *
-     * @deprecated		As of Version 2.1 of the Java Servlet
-     *				API, use {@link #isRequestedSessionIdFromURL}
-     *				instead.
-     *
+     * @deprecated  As of Version 2.1 of the Java Servlet API, use {@link #isRequestedSessionIdFromURL} instead.
      */
     public boolean isRequestedSessionIdFromUrl();
+
+
+
 
     /**
      * Use the container login mechanism configured for the 

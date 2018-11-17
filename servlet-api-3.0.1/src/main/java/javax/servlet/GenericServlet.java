@@ -63,9 +63,7 @@ import java.util.Enumeration;
 import java.util.ResourceBundle;
 
 /**
- * Defines a generic, protocol-independent
- * servlet. To write an HTTP servlet for use on the
- * Web, extend {@link javax.servlet.http.HttpServlet} instead.
+ * Defines a generic, protocol-independent servlet. To write an HTTP servlet for use on the Web, extend {@link javax.servlet.http.HttpServlet} instead.
  * <p>
  * <p><code>GenericServlet</code> implements the <code>Servlet</code>
  * and <code>ServletConfig</code> interfaces. <code>GenericServlet</code>
@@ -84,8 +82,6 @@ import java.util.ResourceBundle;
  *
  * @author Various
  */
-
-
 public abstract class GenericServlet implements Servlet, ServletConfig, java.io.Serializable {
 
     private static final String LSTRING_FILE = "javax.servlet.LocalStrings";
@@ -96,32 +92,18 @@ public abstract class GenericServlet implements Servlet, ServletConfig, java.io.
     public GenericServlet() {}
 
 
-    /**
-     * Called by the servlet container to indicate to a servlet that the
-     * servlet is being taken out of service.  See {@link Servlet#destroy}.
-     */
     public void destroy() {
     }
 
     /**
-     * Returns a <code>String</code> containing the value of the named
-     * initialization parameter, or <code>null</code> if the parameter does
-     * not exist.  See {@link ServletConfig#getInitParameter}.
-     * <p>
-     * <p>This method is supplied for convenience. It gets the
-     * value of the named parameter from the servlet's
-     * <code>ServletConfig</code> object.
-     *
-     * @param name a <code>String</code> specifying the name
-     *             of the initialization parameter
-     * @return String        a <code>String</code> containing the value
-     * of the initialization parameter
+     * 返回一个初始化参数对应的值，如果ServletConfig为null，则抛出异常
+     * @param name  初始化参数名
+     * @return
      */
     public String getInitParameter(String name) {
         ServletConfig sc = getServletConfig();
         if (sc == null) {
-            throw new IllegalStateException(
-                    lStrings.getString("err.servlet_config_not_initialized"));
+            throw new IllegalStateException(lStrings.getString("err.servlet_config_not_initialized"));
         }
 
         return sc.getInitParameter(name);
@@ -144,8 +126,7 @@ public abstract class GenericServlet implements Servlet, ServletConfig, java.io.
     public Enumeration<String> getInitParameterNames() {
         ServletConfig sc = getServletConfig();
         if (sc == null) {
-            throw new IllegalStateException(
-                    lStrings.getString("err.servlet_config_not_initialized"));
+            throw new IllegalStateException(lStrings.getString("err.servlet_config_not_initialized"));
         }
 
         return sc.getInitParameterNames();

@@ -21,8 +21,10 @@ public class ContextLoaderListener extends ContextLoader implements ServletConte
 		super(context);
 	}
 
-	//implements ServletContextListener ...
-	//该方法在web应用启动的时候被调用（也就是ServletContext启动之后被调用），并准备好处理客户端请求
+	/**
+	 * 该方法在web应用启动的时候被调用（也就是ServletContext启动之后被调用），并准备好处理客户端请求
+	 * @param event
+	 */
 	public void contextInitialized(ServletContextEvent event) {
 		this.contextLoader = createContextLoader();
 		if (this.contextLoader == null) {
