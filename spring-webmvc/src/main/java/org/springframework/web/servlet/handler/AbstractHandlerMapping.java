@@ -16,11 +16,6 @@
 
 package org.springframework.web.servlet.handler;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.core.Ordered;
@@ -33,6 +28,11 @@ import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UrlPathHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Abstract base class for {@link org.springframework.web.servlet.HandlerMapping}
@@ -55,11 +55,12 @@ import org.springframework.web.util.UrlPathHelper;
  * @see org.springframework.web.servlet.HandlerInterceptor
  */
 public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport implements HandlerMapping, Ordered {
-	// default: same as non-Ordered
+	// 该属性用于排序
 	private int order = Integer.MAX_VALUE;
 	// 表示HTTP请求默认对应的 Controller，当从HandlerMapping中找不到对应的控制器时，就会使用该对象作为Controller
 	// （该字段可能是字符串表示这个控制器Bean的BeanName，也可能就是控制器Bean本身）
 	private Object defaultHandler;
+
 	private UrlPathHelper urlPathHelper = new UrlPathHelper();
 	private PathMatcher pathMatcher = new AntPathMatcher();
 	private final List<Object> interceptors = new ArrayList<Object>();
@@ -68,20 +69,8 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	private final List<MappedInterceptor> mappedInterceptors = new ArrayList<MappedInterceptor>();
 
 
-	public final void setOrder(int order) {
-	  this.order = order;
-	}
-	public final int getOrder() {
-	  return this.order;
-	}
 
 
-	public void setDefaultHandler(Object defaultHandler) {
-		this.defaultHandler = defaultHandler;
-	}
-	public Object getDefaultHandler() {
-		return this.defaultHandler;
-	}
 
 	/**
 	 * Set if URL lookup should always use the full path within the current servlet
@@ -279,11 +268,25 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 		}
 		return getHandlerExecutionChain(handler, request);
 	}
-	// 获取request对应的控制器（即Controller），这里返回的可能是一个控制器Bean，或是控制器BeanName或者HandlerExecutionChain
+
+	/**
+	 * 获取request对应的控制器（即Controller），这里返回的可能是一个控制器Bean，或是控制器BeanName或者HandlerExecutionChain
+	 *
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
 	protected abstract Object getHandlerInternal(HttpServletRequest request) throws Exception;
 
-	// 将配置中对应的拦截器加入到执行链中，以保证这些拦截器可以有效地作用于目标对象
+	/**
+	 * 将配置中对应的拦截器加入到执行链中，以保证这些拦截器可以有效地作用于目标对象
+	 *
+	 * @param handler	表示对应的请求处理器（及Controller类）
+	 * @param request	表示本次请求
+	 * @return
+	 */
 	protected HandlerExecutionChain getHandlerExecutionChain(Object handler, HttpServletRequest request) {
+		// 将handler转为HandlerExecutionChain对象，并添加拦截器
 		HandlerExecutionChain chain = (handler instanceof HandlerExecutionChain ?
 				(HandlerExecutionChain) handler : new HandlerExecutionChain(handler));
 		chain.addInterceptors(getAdaptedInterceptors());
@@ -297,9 +300,31 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 
 		return chain;
 	}
+
+	/**
+	 * 获取所有配置的拦截器
+	 *
+	 * @return
+	 */
 	protected final HandlerInterceptor[] getAdaptedInterceptors() {
 		int count = this.adaptedInterceptors.size();
 		return (count > 0 ? this.adaptedInterceptors.toArray(new HandlerInterceptor[count]) : null);
+	}
+
+
+
+	// getter and setter ...
+	public final void setOrder(int order) {
+		this.order = order;
+	}
+	public final int getOrder() {
+		return this.order;
+	}
+	public void setDefaultHandler(Object defaultHandler) {
+		this.defaultHandler = defaultHandler;
+	}
+	public Object getDefaultHandler() {
+		return this.defaultHandler;
 	}
 
 }

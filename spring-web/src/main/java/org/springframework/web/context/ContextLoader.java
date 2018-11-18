@@ -16,17 +16,8 @@
 
 package org.springframework.web.context;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
-import javax.servlet.ServletContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
 import org.springframework.beans.factory.access.BeanFactoryReference;
@@ -45,10 +36,21 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-// ContextLoader 主要用来启动 Spring容器，并将 Spring容器 记录到ServletContext中，一次来完成Spring上下文（Spring容器）和Web上下文（Web容器）的融合
+import javax.servlet.ServletContext;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * ContextLoader 主要用来启动 Spring容器，并将 Spring容器 记录到ServletContext中，以此来完成Spring上下文（Spring容器）和Web上下文（Web容器）的融合
+ */
 public class ContextLoader {
 
 	// 以下参数表示可在web.xml中配置的初始化参数
+
 	public static final String CONTEXT_ID_PARAM = "contextId";
 	public static final String CONFIG_LOCATION_PARAM = "contextConfigLocation";
 	public static final String CONTEXT_CLASS_PARAM = "contextClass";
@@ -59,11 +61,11 @@ public class ContextLoader {
 	private static final String INIT_PARAM_DELIMITERS = ",; \t\n";
 
 
-	// 读取 ContextLoader.properties 文件，记录WebApplicationContext接口的实现类（org.springframework.web.context.support.XmlWebApplicationContext）
+	// 读取 ContextLoader.properties 文件，记录WebApplicationContext接口的实现类（默认是：org.springframework.web.context.support.XmlWebApplicationContext）
+
 	private static final Properties defaultStrategies;
 	private static final String DEFAULT_STRATEGIES_PATH = "ContextLoader.properties";
 	static {
-		// Load default strategy implementations from properties file. This is currently strictly internal and not meant to be customized by application developers.
 		try {
 			// 在初始化时，首先读取ContextLoader类的同目录下的属性文件 ContextLoader.properties ，
 			// 并根据其中的配置提取将要实现WebApplicationContext接口的实现类，并根据这个实现类通过反射的方式进行实例的创建。
@@ -76,17 +78,13 @@ public class ContextLoader {
 	}
 
 
-	// 注意这里使用了 volatile 表示该 currentContext 是线程间可见的
+	/** 注意这里使用了 volatile 表示该 currentContext 是线程间可见的 */
 	private static volatile WebApplicationContext currentContext;
-	// 用于映射当前的类加载器与创建的WebApplicationContextLoader实例，以便全局访问
+	/** 用于映射当前的类加载器与创建的WebApplicationContextLoader实例，以便全局访问 */
 	private static final Map<ClassLoader, WebApplicationContext> currentContextPerThread = new ConcurrentHashMap<ClassLoader, WebApplicationContext>(1);
-
-	// 表示这个 ContextLoader 要管理的 WebApplicationContext 实例
+	/** 表示这个 ContextLoader 要管理的 WebApplicationContext 实例 */
 	private WebApplicationContext context;
-
-
-
-	//* Holds BeanFactoryReference when loading parent factory via ContextSingletonBeanFactoryLocator.
+	/** Holds BeanFactoryReference when loading parent factory via ContextSingletonBeanFactoryLocator. */
 	private BeanFactoryReference parentContextRef;
 
 
@@ -98,8 +96,7 @@ public class ContextLoader {
 
 	/* --------------- 初始化一个 WebApplicationContext 容器 ------------------------------------------------------------------------------------------------ */
 
-	// 系统启动时调用该方法，并传入ServletContext,初始化完WebApplicationContext后，将WebApplicationContext实例存在
-	// servletContext中，以供全局访问
+	// 系统启动时调用该方法，并传入ServletContext,初始化完WebApplicationContext后，将WebApplicationContext实例保存在 servletContext中，以供全局访问
 	public WebApplicationContext initWebApplicationContext(ServletContext servletContext) {
 		// web.xml中存在多次ContextLoader定义时，则抛出异常（initWebApplicationContext方法是启动Spring容器的入口，我们不
 		// 允许在还没有加载Spring容器就已经存在了Spring容器实例）
@@ -120,6 +117,7 @@ public class ContextLoader {
 				//第一步：初始化一个 WebApplicationContext 对象（这里返回一个ConfigurableWebApplicationContext的实例）
 				this.context = createWebApplicationContext(servletContext);
 			}
+
 			if (this.context instanceof ConfigurableWebApplicationContext) {
 				ConfigurableWebApplicationContext cwac = (ConfigurableWebApplicationContext) this.context;
 				if (!cwac.isActive()) {
@@ -136,8 +134,7 @@ public class ContextLoader {
 				}
 			}
 
-			// 第二步：将context记录在servletContext中，以便于 DispatcherServlet 可以通过
-			// getServletContext().getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE) 来获取实例
+			// 第二步：将context记录在servletContext中，以便于 DispatcherServlet 可以通过getServletContext().getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE) 来获取实例
 			servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, this.context);
 
 			// 第三步：将Spring容器记录到全局变量中
@@ -146,8 +143,7 @@ public class ContextLoader {
 				// 一般情况下，程序会进入到这里
 				// 这里涉及到 “Thread.currentThread().getContextClassLoader()”与“ContextLoader.class.getClassLoader()”的区别的一个知识点
 				currentContext = this.context;
-			}
-			else if (ccl != null) {
+			} else if (ccl != null) {
 				currentContextPerThread.put(ccl, this.context);
 			}
 

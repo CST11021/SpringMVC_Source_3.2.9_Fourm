@@ -16,10 +16,10 @@
 
 package org.springframework.web.multipart;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 表示一个多文件上传的请求
@@ -49,10 +49,18 @@ import org.springframework.http.HttpMethod;
  */
 public interface MultipartHttpServletRequest extends HttpServletRequest, MultipartRequest {
 
-	// 返回这个请求的方法类型
+	/**
+	 * 返回这个请求的方法类型
+	 *
+	 * @return
+	 */
 	HttpMethod getRequestMethod();
 
-	// 返回请求头信息
+	/**
+	 * 返回请求头信息
+	 *
+	 * @return
+	 */
 	HttpHeaders getRequestHeaders();
 
 	/**

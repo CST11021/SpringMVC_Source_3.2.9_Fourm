@@ -16,18 +16,16 @@
 
 package org.springframework.web.multipart.support;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.Part;
-
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.MultipartResolver;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
+
 /**
- * Standard implementation of the {@link MultipartResolver} interface,
- * based on the Servlet 3.0 {@link javax.servlet.http.Part} API.
+ * Standard implementation of the {@link MultipartResolver} interface, based on the Servlet 3.0 {@link javax.servlet.http.Part} API.
  * To be added as "multipartResolver" bean to a Spring DispatcherServlet context,
  * without any extra configuration at the bean level (see below).
  *
@@ -60,7 +58,12 @@ public class StandardServletMultipartResolver implements MultipartResolver {
 	}
 
 
-	// 根据请求头的contentType属性是否包含“multipart/”为依据，判断该请求是否为文件上传的请求
+	/**
+	 * 根据请求头的contentType属性是否包含“multipart/”为依据，判断该请求是否为文件上传的请求
+	 *
+	 * @param request
+	 * @return
+	 */
 	@Override
 	public boolean isMultipart(HttpServletRequest request) {
 		// Same check as in Commons FileUpload...
@@ -71,12 +74,22 @@ public class StandardServletMultipartResolver implements MultipartResolver {
 		return (contentType != null && contentType.toLowerCase().startsWith("multipart/"));
 	}
 
-	// 如果这个request是一个文件上传的请求，则会将改request转为一个MultipartHttpServletRequest对象
+	/**
+	 * 如果这个request是一个文件上传的请求，则会将改request转为一个MultipartHttpServletRequest对象
+	 *
+	 * @param request
+	 * @return
+	 * @throws MultipartException
+	 */
 	public MultipartHttpServletRequest resolveMultipart(HttpServletRequest request) throws MultipartException {
 		return new StandardMultipartHttpServletRequest(request, this.resolveLazily);
 	}
 
-	// 释放 multiPartRequest 持有的所有资源
+	/**
+	 * 释放 multiPartRequest 持有的所有资源
+	 *
+	 * @param request
+	 */
 	public void cleanupMultipart(MultipartHttpServletRequest request) {
 		// To be on the safe side: explicitly delete the parts, but only actual file parts (for Resin compatibility)
 		try {

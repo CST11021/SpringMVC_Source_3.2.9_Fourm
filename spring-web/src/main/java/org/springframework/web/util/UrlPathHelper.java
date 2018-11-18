@@ -98,6 +98,7 @@ public class UrlPathHelper {
 	public String getLookupPathForRequest(HttpServletRequest request) {
 		// Always use full path within current servlet context?
 		if (this.alwaysUseFullPath) {
+			// 获取应用内部路径，比如：http://localhost:8080/forum/board/listBoardTopics-10.html，这里返回的是：/board/listBoardTopics-10.html
 			return getPathWithinApplication(request);
 		}
 		// Else, use path within current servlet mapping if applicable
@@ -363,6 +364,12 @@ public class UrlPathHelper {
 		return requestUri;
 	}
 
+	/**
+	 * 移除requestUri中的";jsessionid=xxx"串
+	 *
+	 * @param requestUri
+	 * @return
+	 */
 	private String removeJsessionid(String requestUri) {
 		int startIndex = requestUri.toLowerCase().indexOf(";jsessionid=");
 		if (startIndex != -1) {

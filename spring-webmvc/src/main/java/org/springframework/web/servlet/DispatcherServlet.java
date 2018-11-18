@@ -16,31 +16,12 @@
 
 package org.springframework.web.servlet;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.i18n.LocaleContext;
 import org.springframework.core.OrderComparator;
 import org.springframework.core.io.ClassPathResource;
@@ -57,6 +38,12 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.util.NestedServletException;
 import org.springframework.web.util.WebUtils;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Central dispatcher for HTTP request handlers/controllers, e.g. for web UI controllers or HTTP-based remote service
@@ -316,15 +303,14 @@ public class DispatcherServlet extends FrameworkServlet {
 	private boolean detectAllHandlerExceptionResolvers = true;
 	/** Detect all ViewResolvers or just expect "viewResolver" bean? */
 	private boolean detectAllViewResolvers = true;
-	//** Perform cleanup of request attributes after include request? */
+	/** Perform cleanup of request attributes after include request? */
 	private boolean cleanupAfterInclude = true;
-	// 表示会被dispatchcherServlet 用到的视图解析器
+	/** 表示会被dispatchcherServlet 用到的视图解析器 */
 	private List<ViewResolver> viewResolvers;
 
 
-	//--------这些属性将在web容器启动时调用initStrategies()方法进行初始化--------
+	// 以下这些属性将在web容器启动时调用initStrategies()方法进行初始化，这些属性大部分都定义为接口类型，这样可以灵活拓展，这就是所谓的对接口编程
 
-	//这些属性大部分都定义为接口类型，这样可以灵活拓展，这就是所谓的对接口编程
 	private MultipartResolver multipartResolver;
 	private LocaleResolver localeResolver;
 	private ThemeResolver themeResolver;
@@ -333,12 +319,10 @@ public class DispatcherServlet extends FrameworkServlet {
 	private List<HandlerExceptionResolver> handlerExceptionResolvers;
 	private RequestToViewNameTranslator viewNameTranslator;
 	private FlashMapManager flashMapManager;
-	//--------这些属性将在web容器启动时调用initStrategies()方法进行初始化--------
 
 
 
-
-
+	// 构造器
 
 	public DispatcherServlet() {
 		super();
@@ -347,28 +331,15 @@ public class DispatcherServlet extends FrameworkServlet {
 		super(webApplicationContext);
 	}
 
-	// ------- 一系列的setter 方法----------------------------------------------------------
-	public void setDetectAllHandlerMappings(boolean detectAllHandlerMappings) {
-		this.detectAllHandlerMappings = detectAllHandlerMappings;
-	}
-	public void setDetectAllHandlerAdapters(boolean detectAllHandlerAdapters) {
-		this.detectAllHandlerAdapters = detectAllHandlerAdapters;
-	}
-	public void setDetectAllHandlerExceptionResolvers(boolean detectAllHandlerExceptionResolvers) {
-		this.detectAllHandlerExceptionResolvers = detectAllHandlerExceptionResolvers;
-	}
-	public void setDetectAllViewResolvers(boolean detectAllViewResolvers) {
-		this.detectAllViewResolvers = detectAllViewResolvers;
-	}
-	public void setCleanupAfterInclude(boolean cleanupAfterInclude) {
-		this.cleanupAfterInclude = cleanupAfterInclude;
-	}
+
 
 
 	/* ----------------- 将Spring组件装配到DispatcherServlet中 ------------------- */
 
-	// onRefresh()方法将在WebApplicationContext初始化后自动执行，此时Spring上下文中的Bean已经初始化完毕。该方法的工作是通过反射机制查找并装配Spring容器中用户显示自定义的组件Bean，如果找不到在装配默认的组件实例。
+	// onRefresh()方法将在WebApplicationContext初始化后自动执行，此时Spring上下文中的Bean已经初始化完毕。该方法的工作是通过反射机制
+	// 查找并装配Spring容器中用户显示自定义的组件Bean，如果找不到在装配默认的组件实例。
 	// SpringMVC默认组件定义在org.springframework.web.servlet.jar包下的一个DispatcherServlet.properties配置文件
+
 	@Override
 	protected void onRefresh(ApplicationContext context) {
 		initStrategies(context);
@@ -591,8 +562,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 	private void initFlashMapManager(ApplicationContext context) {
 		try {
-			this.flashMapManager =
-					context.getBean(FLASH_MAP_MANAGER_BEAN_NAME, FlashMapManager.class);
+			this.flashMapManager = context.getBean(FLASH_MAP_MANAGER_BEAN_NAME, FlashMapManager.class);
 			if (logger.isDebugEnabled()) {
 				logger.debug("Using FlashMapManager [" + this.flashMapManager + "]");
 			}
@@ -651,6 +621,9 @@ public class DispatcherServlet extends FrameworkServlet {
 
 
 
+
+
+
 	/* ----------------- DispatcherServlet的请求转发处理----------------------------------------------------------------- */
 
 	//doService()方法用于处理所有的合法请求，它最终委托给doDispatch()方法来转发请求
@@ -661,7 +634,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			logger.debug("DispatcherServlet with name '" + getServletName() + "'" + resumed + " processing " + request.getMethod() + " request for [" + getRequestUri(request) + "]");
 		}
 
-		//1. 保存现场。保存request 熟悉的快照，以便能在必要时恢复。attributeSnapshot用于保存所有的Attribute信息
+		//1. 保存request快照，以便能在必要时恢复，attributeSnapshot用于保存本次请求的attribute信息
 		Map<String, Object> attributesSnapshot = null;
 		// 判断 request 是否包含"javax.servlet.include.request_uri"属性
 		if (WebUtils.isIncludeRequest(request)) {
@@ -725,8 +698,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 */
 	@SuppressWarnings("unchecked")
 	private void restoreAttributesAfterInclude(HttpServletRequest request, Map<?,?> attributesSnapshot) {
-		// Need to copy into separate Collection here, to avoid side effects
-		// on the Enumeration when removing attributes.
+		// attrsToCheck保存所有请求的所有attributeName，注意该request此时后服务端已经被处理了
 		Set<String> attrsToCheck = new HashSet<String>();
 		Enumeration<?> attrNames = request.getAttributeNames();
 		while (attrNames.hasMoreElements()) {
@@ -736,7 +708,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 		}
 
-		// Add attributes that may have been removed
+		// Add attributes that may have been removed（将之前处理request请求前的快照也加进来）
 		attrsToCheck.addAll((Set<String>) attributesSnapshot.keySet());
 
 		// Iterate over the attributes to check, restoring the original value
@@ -746,6 +718,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			if (attrValue == null){
 				request.removeAttribute(attrName);
 			}
+			// 将快照中的属性值和处理请求后的属性进行比较，返回客户端前将request中的所有attribute设置为和处理请求前的时候一样
 			else if (attrValue != request.getAttribute(attrName)) {
 				request.setAttribute(attrName, attrValue);
 			}
@@ -856,10 +829,13 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 		}
 	}
-
-	// 优先判断一下是不是文件上传的 request
-	// 对于请求的处理，Spring首先考虑的是对于Multipart的处理，如果是MultipartContent类型的Request，则转换request为
-	// MultipartHttpServletRequest类型的request
+	/**
+	 * 判断这个request对象是不是文件上传的request，如果是MultipartContent类型的Request，则转换request为MultipartHttpServletRequest
+	 * 类型的request，并返回一个HttpServletRequest对象
+	 * @param request
+	 * @return
+	 * @throws MultipartException
+	 */
 	protected HttpServletRequest checkMultipart(HttpServletRequest request) throws MultipartException {
 		if (this.multipartResolver != null && this.multipartResolver.isMultipart(request)) {
 			if (request instanceof MultipartHttpServletRequest) {
@@ -1048,6 +1024,11 @@ public class DispatcherServlet extends FrameworkServlet {
 
 
 
+
+
+
+
+
 	//-------------------- 用于springMVC请求分发时获取 HandlerExecutionChain ----------------------------------------------------------
 
 	//根据请求获取对应的处理
@@ -1123,4 +1104,28 @@ public class DispatcherServlet extends FrameworkServlet {
 		return uri;
 	}
 
+
+
+
+
+
+
+
+	// setter ...
+
+	public void setDetectAllHandlerMappings(boolean detectAllHandlerMappings) {
+		this.detectAllHandlerMappings = detectAllHandlerMappings;
+	}
+	public void setDetectAllHandlerAdapters(boolean detectAllHandlerAdapters) {
+		this.detectAllHandlerAdapters = detectAllHandlerAdapters;
+	}
+	public void setDetectAllHandlerExceptionResolvers(boolean detectAllHandlerExceptionResolvers) {
+		this.detectAllHandlerExceptionResolvers = detectAllHandlerExceptionResolvers;
+	}
+	public void setDetectAllViewResolvers(boolean detectAllViewResolvers) {
+		this.detectAllViewResolvers = detectAllViewResolvers;
+	}
+	public void setCleanupAfterInclude(boolean cleanupAfterInclude) {
+		this.cleanupAfterInclude = cleanupAfterInclude;
+	}
 }

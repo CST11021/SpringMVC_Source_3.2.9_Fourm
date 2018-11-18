@@ -87,22 +87,41 @@ import javax.servlet.http.HttpServletRequest;
  * @see org.springframework.web.multipart.support.StringMultipartFileEditor
  * @see org.springframework.web.servlet.DispatcherServlet
  *
- *
+
+
 从Spring3.1开始，Spring提供了两个MultipartResolver的实现用于处理multipart请求：
 	CommonsMultipartResolver使用commons Fileupload来处理multipart请求，所以在使用时，必须要引入相应的jar包；
 	StandardServletMultipartResolver是基于Servlet3.0来处理multipart请求的，所以不需要引用其他jar包，但是必须使用支持Servlet3.0的容器才可以。
 以tomcat为例，从Tomcat 7.0.x的版本开始就支持Servlet3.0了。
- *
+
+SpringMVC使用该接口时，需要手动配置这个Bean：
+	这个bean是在 dispatcherServlet 初始化的时候，通过启动参数<init-param> 读取Spring相关的配置，例如这样的一段 bean配置：
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" p:defaultEncoding="utf-8"/>
  */
 public interface MultipartResolver {
 
-	// 判断这个request是不是文件上传的请求
+	/**
+	 * 判断这个request是不是文件上传的请求
+	 *
+	 * @param request
+	 * @return
+	 */
 	boolean isMultipart(HttpServletRequest request);
 
-	// 如果这个request是一个文件上传的请求，则会将改request转为一个MultipartHttpServletRequest对象
+	/**
+	 * 如果这个request是一个文件上传的请求，则会将改request转为一个MultipartHttpServletRequest对象
+	 *
+	 * @param request
+	 * @return
+	 * @throws MultipartException
+	 */
 	MultipartHttpServletRequest resolveMultipart(HttpServletRequest request) throws MultipartException;
 
-	// 释放 multiPartRequest 持有的所有资源
+	/**
+	 * 释放 multiPartRequest 持有的所有资源
+	 *
+	 * @param request
+	 */
 	void cleanupMultipart(MultipartHttpServletRequest request);
 
 }

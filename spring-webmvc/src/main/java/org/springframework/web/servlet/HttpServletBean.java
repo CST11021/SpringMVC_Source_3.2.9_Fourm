@@ -1,23 +1,9 @@
 
 package org.springframework.web.servlet;
 
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.PropertyAccessorFactory;
-import org.springframework.beans.PropertyValue;
-import org.springframework.beans.PropertyValues;
+import org.springframework.beans.*;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
@@ -30,13 +16,23 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.context.support.ServletContextResourceLoader;
 import org.springframework.web.context.support.StandardServletEnvironment;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
+
 
 //EnvironmentCapable接口提供获取Envirionment的方法，EnvironmentAware接口提供设置Envirionment的方法
 @SuppressWarnings("serial")
 public abstract class HttpServletBean extends HttpServlet implements EnvironmentCapable, EnvironmentAware {
+
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	// 用于存放<init-param>中必须指定的参数，用户可以通过requiredProperties参数的初始化来强制验证某些属性的必要性，这样，在属性封装的过程中，一旦检测到 requiredProperties 中的属性没有指定初始值，就会抛出异常。
+	// 用于存放<init-param>中必须指定的参数，用户可以通过requiredProperties参数的初始化来强制验证某些属性的必要性，
+	// 这样，在属性封装的过程中，一旦检测到 requiredProperties 中的属性没有指定初始值，就会抛出异常。
 	private final Set<String> requiredProperties = new HashSet<String>();
 	private ConfigurableEnvironment environment;
 
@@ -68,8 +64,7 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 			initBeanWrapper(bw);
 			//属性注入
 			bw.setPropertyValues(pvs, true);
-		}
-		catch (BeansException ex) {
+		} catch (BeansException ex) {
 			logger.error("Failed to set bean properties on servlet '" + getServletName() + "'", ex);
 			throw ex;
 		}
@@ -110,7 +105,6 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 		Assert.isInstanceOf(ConfigurableEnvironment.class, environment);
 		this.environment = (ConfigurableEnvironment) environment;
 	}
-	//implements EnvironmentCapable 接口方法
 	public ConfigurableEnvironment getEnvironment() {
 		if (this.environment == null) {
 			this.environment = this.createEnvironment();
