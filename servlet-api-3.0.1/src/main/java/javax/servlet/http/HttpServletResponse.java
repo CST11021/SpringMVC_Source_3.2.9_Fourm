@@ -228,6 +228,28 @@ public interface HttpServletResponse extends ServletResponse {
      */
     public void sendRedirect(String location) throws IOException;
 
+
+
+
+
+
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // 头就是一个键值对，可能会存在一个头（一个名称，一个值），也可能会存在一个头（一个名称，多个值！）
+    // > setHeader(String name, String value)：适用于单值的响应头，例如：response.setHeader("aaa", "AAA");
+    // > addHeader(String name, String value)：适用于多值的响应头
+    //     response.addHeader("aaa", "A");
+    //     response.addHeader("aaa", "AA");
+    //     response.addHeader("aaa", "AAA");
+    // > setIntHeader(String name, int value)：适用于单值的int类型的响应头
+    //     response.setIntHeader("Content-Length", 888);
+    // > addIntHeader(String name, int value)：适用于多值的int类型的响应头
+    // > setDateHeader(String name, long value)：适用于单值的毫秒类型的响应头
+    //     response.setDateHeader("expires", 1000 * 60 * 60 * 24);
+    // > addDateHeader(String name, long value)：适用于多值的毫秒类型的响应头
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+
     /**
      * Sets a response header with the given name and
      * date-value.  The date is specified in terms of
@@ -242,7 +264,6 @@ public interface HttpServletResponse extends ServletResponse {
      * @see #addDateHeader
      */
     public void setDateHeader(String name, long date);
-
     /**
      * Adds a response header with the given name and
      * date-value.  The date is specified in terms of
@@ -254,7 +275,6 @@ public interface HttpServletResponse extends ServletResponse {
      * @see #setDateHeader
      */
     public void addDateHeader(String name, long date);
-
     /**
      * Sets a response header with the given name and value.
      * If the header had already been set, the new value overwrites the
@@ -270,7 +290,6 @@ public interface HttpServletResponse extends ServletResponse {
      * @see #addHeader
      */
     public void setHeader(String name, String value);
-
     /**
      * Adds a response header with the given name and value.
      * This method allows response headers to have multiple values.
@@ -283,7 +302,6 @@ public interface HttpServletResponse extends ServletResponse {
      * @see #setHeader
      */
     public void addHeader(String name, String value);
-
     /**
      * Sets a response header with the given name and
      * integer value.  If the header had already been set, the new value
@@ -297,7 +315,6 @@ public interface HttpServletResponse extends ServletResponse {
      * @see #addIntHeader
      */
     public void setIntHeader(String name, int value);
-
     /**
      * Adds a response header with the given name and
      * integer value.  This method allows response headers to have multiple
@@ -308,6 +325,12 @@ public interface HttpServletResponse extends ServletResponse {
      * @see #setIntHeader
      */
     public void addIntHeader(String name, int value);
+
+
+
+
+
+
 
     /**
      * Sets the status code for this response.

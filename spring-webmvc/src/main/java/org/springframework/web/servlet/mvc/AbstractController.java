@@ -99,12 +99,13 @@ import org.springframework.web.util.WebUtils;
  */
 public abstract class AbstractController extends WebContentGenerator implements Controller {
 
+	// whether controller execution should be synchronized on the session.
 	// 标识是否在会话中同步执行对应的处理器
 	private boolean synchronizeOnSession = false;
 
 	public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		// 委托给WebContentGenerator检查和准备
+		// 检查控制器是否支持相应的请求方法、检查请求是否需要session和检查是否设置HTTP的缓存机制
 		checkAndPrepare(request, response, this instanceof LastModified);
 
 		// 如果需要在同步块中执行handleRequestInternal()方法
@@ -147,7 +148,6 @@ public abstract class AbstractController extends WebContentGenerator implements 
 	public final void setSynchronizeOnSession(boolean synchronizeOnSession) {
 		this.synchronizeOnSession = synchronizeOnSession;
 	}
-	// Return whether controller execution should be synchronized on the session.
 	public final boolean isSynchronizeOnSession() {
 		return this.synchronizeOnSession;
 	}

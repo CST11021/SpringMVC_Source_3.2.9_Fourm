@@ -49,22 +49,20 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 
 	/** HTTP method "GET" */
 	public static final String METHOD_GET = "GET";
-
 	/** HTTP method "HEAD" */
 	public static final String METHOD_HEAD = "HEAD";
-
 	/** HTTP method "POST" */
 	public static final String METHOD_POST = "POST";
 
 
 	private static final String HEADER_PRAGMA = "Pragma";
 
+	// 关于Cache-Control和Expires的知识请参考：https://www.jianshu.com/p/f331d5f0b979
 	private static final String HEADER_EXPIRES = "Expires";
-
 	private static final String HEADER_CACHE_CONTROL = "Cache-Control";
 
 
-	/** Set of supported HTTP methods */
+	/** 表示该控制器支持的Http method，一个处理器可支持多种方法 */
 	private Set<String>	supportedMethods;
 
 	private boolean requireSession = false;
@@ -83,20 +81,10 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 	private boolean alwaysMustRevalidate = false;
 
 
-	/**
-	 * Create a new WebContentGenerator which supports
-	 * HTTP methods GET, HEAD and POST by default.
-	 */
+
 	public WebContentGenerator() {
 		this(true);
 	}
-
-	/**
-	 * Create a new WebContentGenerator.
-	 * @param restrictDefaultSupportedMethods {@code true} if this
-	 * generator should support HTTP methods GET, HEAD and POST by default,
-	 * or {@code false} if it should be unrestricted
-	 */
 	public WebContentGenerator(boolean restrictDefaultSupportedMethods) {
 		if (restrictDefaultSupportedMethods) {
 			this.supportedMethods = new HashSet<String>(4);
@@ -105,11 +93,6 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 			this.supportedMethods.add(METHOD_POST);
 		}
 	}
-
-	/**
-	 * Create a new WebContentGenerator.
-	 * @param supportedMethods the supported HTTP methods for this content generator
-	 */
 	public WebContentGenerator(String... supportedMethods) {
 		this.supportedMethods = new HashSet<String>(Arrays.asList(supportedMethods));
 	}
@@ -235,60 +218,65 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 	}
 
 
-	/**
-	 * Check and prepare the given request and response according to the settings
-	 * of this generator. Checks for supported methods and a required session,
-	 * and applies the number of cache seconds specified for this generator.
-	 * @param request current HTTP request
-	 * @param response current HTTP response
-	 * @param lastModified if the mapped handler provides Last-Modified support
-	 * @throws ServletException if the request cannot be handled because a check failed
-	 */
-	protected final void checkAndPrepare(
-			HttpServletRequest request, HttpServletResponse response, boolean lastModified)
-			throws ServletException {
 
+
+
+
+
+
+
+
+
+	// --------------- 检查控制器是否支持相应的请求方法、检查请求是否需要session和检查是否设置HTTP的缓存机制 ---------------
+
+	protected final void checkAndPrepare(HttpServletRequest request, HttpServletResponse response, boolean lastModified) throws ServletException {
 		checkAndPrepare(request, response, this.cacheSeconds, lastModified);
 	}
-
-	/**
-	 * Check and prepare the given request and response according to the settings
-	 * of this generator. Checks for supported methods and a required session,
-	 * and applies the given number of cache seconds.
-	 * @param request current HTTP request
-	 * @param response current HTTP response
-	 * @param cacheSeconds positive number of seconds into the future that the
-	 * response should be cacheable for, 0 to prevent caching
-	 * @param lastModified if the mapped handler provides Last-Modified support
-	 * @throws ServletException if the request cannot be handled because a check failed
-	 */
-	protected final void checkAndPrepare(
-			HttpServletRequest request, HttpServletResponse response, int cacheSeconds, boolean lastModified)
-			throws ServletException {
-
-		// Check whether we should support the request method.
+	protected final void checkAndPrepare(HttpServletRequest request, HttpServletResponse response, int cacheSeconds, boolean lastModified) throws ServletException {
+		// 检查是否支持该请求方法
 		String method = request.getMethod();
 		if (this.supportedMethods != null && !this.supportedMethods.contains(method)) {
-			throw new HttpRequestMethodNotSupportedException(
-					method, StringUtils.toStringArray(this.supportedMethods));
+			throw new HttpRequestMethodNotSupportedException(method, StringUtils.toStringArray(this.supportedMethods));
 		}
 
-		// Check whether a session is required.
+		// 检查该请求是否一定需要session
 		if (this.requireSession) {
 			if (request.getSession(false) == null) {
 				throw new HttpSessionRequiredException("Pre-existing session required but none found");
 			}
 		}
 
-		// Do declarative cache control.
-		// Revalidate if the controller supports last-modified.
+		// 执行声明式缓存控制。
+		// 重新验证控制器是否支持last-modified。
 		applyCacheSeconds(response, cacheSeconds, lastModified);
 	}
-
-	/**
-	 * Prevent the response from being cached.
-	 * See {@code http://www.mnot.net/cache_docs}.
-	 */
+	// 设置HTTP请求的缓存机制
+	protected final void applyCacheSeconds(HttpServletResponse response, int seconds, boolean mustRevalidate) {
+		if (seconds > 0) {
+			cacheForSeconds(response, seconds, mustRevalidate);
+		}
+		else if (seconds == 0) {
+			preventCaching(response);
+		}
+		// Leave caching to the client otherwise.
+	}
+	// 设置请求的Cache-Control和Expires头信息
+	protected final void cacheForSeconds(HttpServletResponse response, int seconds, boolean mustRevalidate) {
+		if (this.useExpiresHeader) {
+			// HTTP 1.0 header
+			// 关于Cache-Control和Expires的知识请参考：https://www.jianshu.com/p/f331d5f0b979
+			response.setDateHeader(HEADER_EXPIRES, System.currentTimeMillis() + seconds * 1000L);
+		}
+		if (this.useCacheControlHeader) {
+			// HTTP 1.1 header
+			String headerValue = "max-age=" + seconds;
+			if (mustRevalidate || this.alwaysMustRevalidate) {
+				headerValue += ", must-revalidate";
+			}
+			response.setHeader(HEADER_CACHE_CONTROL, headerValue);
+		}
+	}
+	// 防止响应被缓存。
 	protected final void preventCaching(HttpServletResponse response) {
 		response.setHeader(HEADER_PRAGMA, "no-cache");
 		if (this.useExpiresHeader) {
@@ -304,7 +292,6 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 			}
 		}
 	}
-
 	/**
 	 * Set HTTP headers to allow caching for the given number of seconds.
 	 * Does not tell the browser to revalidate the resource.
@@ -316,32 +303,6 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 	protected final void cacheForSeconds(HttpServletResponse response, int seconds) {
 		cacheForSeconds(response, seconds, false);
 	}
-
-	/**
-	 * Set HTTP headers to allow caching for the given number of seconds.
-	 * Tells the browser to revalidate the resource if mustRevalidate is
-	 * {@code true}.
-	 * @param response the current HTTP response
-	 * @param seconds number of seconds into the future that the response
-	 * should be cacheable for
-	 * @param mustRevalidate whether the client should revalidate the resource
-	 * (typically only necessary for controllers with last-modified support)
-	 */
-	protected final void cacheForSeconds(HttpServletResponse response, int seconds, boolean mustRevalidate) {
-		if (this.useExpiresHeader) {
-			// HTTP 1.0 header
-			response.setDateHeader(HEADER_EXPIRES, System.currentTimeMillis() + seconds * 1000L);
-		}
-		if (this.useCacheControlHeader) {
-			// HTTP 1.1 header
-			String headerValue = "max-age=" + seconds;
-			if (mustRevalidate || this.alwaysMustRevalidate) {
-				headerValue += ", must-revalidate";
-			}
-			response.setHeader(HEADER_CACHE_CONTROL, headerValue);
-		}
-	}
-
 	/**
 	 * Apply the given cache seconds and generate corresponding HTTP headers,
 	 * i.e. allow caching for the given number of seconds in case of a positive
@@ -356,26 +317,6 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 		applyCacheSeconds(response, seconds, false);
 	}
 
-	/**
-	 * Apply the given cache seconds and generate respective HTTP headers.
-	 * <p>That is, allow caching for the given number of seconds in the
-	 * case of a positive value, prevent caching if given a 0 value, else
-	 * do nothing (i.e. leave caching to the client).
-	 * @param response the current HTTP response
-	 * @param seconds the (positive) number of seconds into the future that
-	 * the response should be cacheable for; 0 to prevent caching; and
-	 * a negative value to leave caching to the client.
-	 * @param mustRevalidate whether the client should revalidate the resource
-	 * (typically only necessary for controllers with last-modified support)
-	 */
-	protected final void applyCacheSeconds(HttpServletResponse response, int seconds, boolean mustRevalidate) {
-		if (seconds > 0) {
-			cacheForSeconds(response, seconds, mustRevalidate);
-		}
-		else if (seconds == 0) {
-			preventCaching(response);
-		}
-		// Leave caching to the client otherwise.
-	}
+
 
 }

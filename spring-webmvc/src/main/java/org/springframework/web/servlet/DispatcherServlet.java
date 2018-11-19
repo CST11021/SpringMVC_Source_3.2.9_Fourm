@@ -195,88 +195,40 @@ import java.util.*;
 @SuppressWarnings("serial")
 public class DispatcherServlet extends FrameworkServlet {
 
-	// 多文件上传处理器Bean的BeanName
+	/** 多文件上传处理器Bean的BeanName */
+
 	public static final String MULTIPART_RESOLVER_BEAN_NAME = "multipartResolver";
-	/** Well-known name for the LocaleResolver object in the bean factory for this namespace. */
 	public static final String LOCALE_RESOLVER_BEAN_NAME = "localeResolver";
-	/** Well-known name for the ThemeResolver object in the bean factory for this namespace. */
 	public static final String THEME_RESOLVER_BEAN_NAME = "themeResolver";
-	/**
-	 * Well-known name for the HandlerMapping object in the bean factory for this namespace.
-	 * Only used when "detectAllHandlerMappings" is turned off.
-	 * @see #setDetectAllHandlerMappings
-	 */
 	public static final String HANDLER_MAPPING_BEAN_NAME = "handlerMapping";
-	/**
-	 * Well-known name for the HandlerAdapter object in the bean factory for this namespace.
-	 * Only used when "detectAllHandlerAdapters" is turned off.
-	 * @see #setDetectAllHandlerAdapters
-	 */
 	public static final String HANDLER_ADAPTER_BEAN_NAME = "handlerAdapter";
-	/**
-	 * Well-known name for the HandlerExceptionResolver object in the bean factory for this namespace.
-	 * Only used when "detectAllHandlerExceptionResolvers" is turned off.
-	 * @see #setDetectAllHandlerExceptionResolvers
-	 */
 	public static final String HANDLER_EXCEPTION_RESOLVER_BEAN_NAME = "handlerExceptionResolver";
-	/**
-	 * Well-known name for the RequestToViewNameTranslator object in the bean factory for this namespace.
-	 */
 	public static final String REQUEST_TO_VIEW_NAME_TRANSLATOR_BEAN_NAME = "viewNameTranslator";
-	/**
-	 * Well-known name for the ViewResolver object in the bean factory for this namespace.
-	 * Only used when "detectAllViewResolvers" is turned off.
-	 * @see #setDetectAllViewResolvers
-	 */
 	public static final String VIEW_RESOLVER_BEAN_NAME = "viewResolver";
-	/**
-	 * Well-known name for the FlashMapManager object in the bean factory for this namespace.
-	 */
 	public static final String FLASH_MAP_MANAGER_BEAN_NAME = "flashMapManager";
+
 	/**
+	 * 表示一个Request的attribute的name，该name可以从request中获取Spring容器
+	 *
 	 * Request attribute to hold the current web application context.
 	 * Otherwise only the global web app context is obtainable by tags etc.
 	 * @see org.springframework.web.servlet.support.RequestContextUtils#getWebApplicationContext
 	 */
 	public static final String WEB_APPLICATION_CONTEXT_ATTRIBUTE = DispatcherServlet.class.getName() + ".CONTEXT";
-	/**
-	 * Request attribute to hold the current LocaleResolver, retrievable by views.
-	 * @see org.springframework.web.servlet.support.RequestContextUtils#getLocaleResolver
-	 */
+
+	// 保存在request对象中的一系列Bean所对应的attributeName
+
 	public static final String LOCALE_RESOLVER_ATTRIBUTE = DispatcherServlet.class.getName() + ".LOCALE_RESOLVER";
-	/**
-	 * Request attribute to hold the current ThemeResolver, retrievable by views.
-	 * @see org.springframework.web.servlet.support.RequestContextUtils#getThemeResolver
-	 */
 	public static final String THEME_RESOLVER_ATTRIBUTE = DispatcherServlet.class.getName() + ".THEME_RESOLVER";
-	/**
-	 * Request attribute to hold the current ThemeSource, retrievable by views.
-	 * @see org.springframework.web.servlet.support.RequestContextUtils#getThemeSource
-	 */
 	public static final String THEME_SOURCE_ATTRIBUTE = DispatcherServlet.class.getName() + ".THEME_SOURCE";
-	/**
-	 * Name of request attribute that holds a read-only {@code Map<String,?>}
-	 * with "input" flash attributes saved by a previous request, if any.
-	 * @see org.springframework.web.servlet.support.RequestContextUtils#getInputFlashMap(HttpServletRequest)
-	 */
 	public static final String INPUT_FLASH_MAP_ATTRIBUTE = DispatcherServlet.class.getName() + ".INPUT_FLASH_MAP";
-	/**
-	 * Name of request attribute that holds the "output" {@link FlashMap} with
-	 * attributes to save for a subsequent request.
-	 * @see org.springframework.web.servlet.support.RequestContextUtils#getOutputFlashMap(HttpServletRequest)
-	 */
 	public static final String OUTPUT_FLASH_MAP_ATTRIBUTE = DispatcherServlet.class.getName() + ".OUTPUT_FLASH_MAP";
-	/**
-	 * Name of request attribute that holds the {@link FlashMapManager}.
-	 * @see org.springframework.web.servlet.support.RequestContextUtils#getFlashMapManager(HttpServletRequest)
-	 */
 	public static final String FLASH_MAP_MANAGER_ATTRIBUTE = DispatcherServlet.class.getName() + ".FLASH_MAP_MANAGER";
+
 	/** Log category to use when no mapped handler is found for a request. */
 	public static final String PAGE_NOT_FOUND_LOG_CATEGORY = "org.springframework.web.servlet.PageNotFound";
-	/**
-	 * Name of the class path resource (relative to the DispatcherServlet class)
-	 * that defines DispatcherServlet's default strategy names.
-	 */
+
+	/** 用于配置SpringMVC默认加载的Bean */
 	private static final String DEFAULT_STRATEGIES_PATH = "DispatcherServlet.properties";
 	/** Additional logger to use when no mapped handler is found for a request. */
 	protected static final Log pageNotFoundLogger = LogFactory.getLog(PAGE_NOT_FOUND_LOG_CATEGORY);
@@ -305,8 +257,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	private boolean detectAllViewResolvers = true;
 	/** Perform cleanup of request attributes after include request? */
 	private boolean cleanupAfterInclude = true;
-	/** 表示会被dispatchcherServlet 用到的视图解析器 */
-	private List<ViewResolver> viewResolvers;
+
 
 
 	// 以下这些属性将在web容器启动时调用initStrategies()方法进行初始化，这些属性大部分都定义为接口类型，这样可以灵活拓展，这就是所谓的对接口编程
@@ -318,6 +269,8 @@ public class DispatcherServlet extends FrameworkServlet {
 	private List<HandlerAdapter> handlerAdapters;
 	private List<HandlerExceptionResolver> handlerExceptionResolvers;
 	private RequestToViewNameTranslator viewNameTranslator;
+	/** 表示会被dispatchcherServlet 用到的视图解析器 */
+	private List<ViewResolver> viewResolvers;
 	private FlashMapManager flashMapManager;
 
 

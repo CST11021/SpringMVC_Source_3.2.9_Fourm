@@ -19,6 +19,8 @@ package org.springframework.web.servlet.mvc;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -109,8 +111,15 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public interface Controller {
 
-	// DispatcherServlet 接收到请求后会根据 HandlerMapping 中注册的请求映射关系，将请求转发到相应的handler（即请求处理器，
-	// 请求处理器都会实现Controller接口，而该接口的方法handleRequest就是用来处理该请求的）
+	/**
+	 * DispatcherServlet 接收到请求后会根据 HandlerMapping 中注册的请求映射关系，将请求转发到相应的handler（即请求处理器，请求处理器
+	 * 都会实现Controller接口，而该接口的方法handleRequest就是用来处理该请求的）
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
 }

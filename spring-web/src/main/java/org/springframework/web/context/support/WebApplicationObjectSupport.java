@@ -36,6 +36,7 @@ import org.springframework.web.util.WebUtils;
  */
 public abstract class WebApplicationObjectSupport extends ApplicationObjectSupport implements ServletContextAware {
 
+	/** Servlet上下文对象 */
 	private ServletContext servletContext;
 
 	protected void initServletContext(ServletContext servletContext) {}
@@ -87,7 +88,12 @@ public abstract class WebApplicationObjectSupport extends ApplicationObjectSuppo
 	}
 
 
-	// 返回当前web应用程序的临时目录，由servlet容器提供
+	/**
+	 * 返回当前web应用程序的临时目录，由servlet容器提供
+	 *
+	 * @return
+	 * @throws IllegalStateException
+	 */
 	protected final File getTempDir() throws IllegalStateException {
 		return WebUtils.getTempDir(getServletContext());
 	}

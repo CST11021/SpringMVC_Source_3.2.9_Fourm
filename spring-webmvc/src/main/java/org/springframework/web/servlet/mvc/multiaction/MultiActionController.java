@@ -142,7 +142,6 @@ public class MultiActionController extends AbstractController implements LastMod
 	 */
 	public static final String PAGE_NOT_FOUND_LOG_CATEGORY = "org.springframework.web.servlet.PageNotFound";
 
-
 	/**
 	 * Additional logger to use when no mapped handler is found for a request.
 	 * @see #PAGE_NOT_FOUND_LOG_CATEGORY
@@ -171,22 +170,11 @@ public class MultiActionController extends AbstractController implements LastMod
 	private final Map<Class, Method> exceptionHandlerMap = new HashMap<Class, Method>();
 
 
-	/**
-	 * Constructor for {@code MultiActionController} that looks for
-	 * handler methods in the present subclass.
-	 */
 	public MultiActionController() {
 		this.delegate = this;
 		registerHandlerMethods(this.delegate);
 		// We'll accept no handler methods found here - a delegate might be set later on.
 	}
-
-	/**
-	 * Constructor for {@code MultiActionController} that looks for
-	 * handler methods in delegate, rather than a subclass of this class.
-	 * @param delegate handler object. This does not need to implement any
-	 * particular interface, as everything is done using reflection.
-	 */
 	public MultiActionController(Object delegate) {
 		setDelegate(delegate);
 	}
@@ -401,8 +389,7 @@ public class MultiActionController extends AbstractController implements LastMod
 	 * @see #handleNoSuchRequestHandlingMethod
 	 */
 	@Override
-	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		try {
 			String methodName = this.methodNameResolver.getHandlerMethodName(request);
 			return invokeNamedMethod(methodName, request, response);
@@ -423,9 +410,7 @@ public class MultiActionController extends AbstractController implements LastMod
 	 * @return a ModelAndView to render, or {@code null} if handled directly
 	 * @throws Exception an Exception that should be thrown as result of the servlet request
 	 */
-	protected ModelAndView handleNoSuchRequestHandlingMethod(
-			NoSuchRequestHandlingMethodException ex, HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	protected ModelAndView handleNoSuchRequestHandlingMethod(NoSuchRequestHandlingMethodException ex, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		pageNotFoundLogger.warn(ex.getMessage());
 		response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -437,8 +422,7 @@ public class MultiActionController extends AbstractController implements LastMod
 	 * <p>Uses a custom exception handler if possible; otherwise, throw an
 	 * unchecked exception; wrap a checked exception or Throwable.
 	 */
-	protected final ModelAndView invokeNamedMethod(
-			String methodName, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	protected final ModelAndView invokeNamedMethod(String methodName, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		Method method = this.handlerMethodMap.get(methodName);
 		if (method == null) {
@@ -503,7 +487,6 @@ public class MultiActionController extends AbstractController implements LastMod
 			return null;
 		}
 	}
-
 
 	/**
 	 * Create a new command object of the given class.
@@ -594,7 +577,6 @@ public class MultiActionController extends AbstractController implements LastMod
 		}
 	}
 
-
 	/**
 	 * Determine the exception handler method for the given exception.
 	 * <p>Can return {@code null} if not found.
@@ -625,8 +607,7 @@ public class MultiActionController extends AbstractController implements LastMod
 	 * @param ex the exception that got thrown
 	 * @return a ModelAndView to render the response
 	 */
-	private ModelAndView handleException(HttpServletRequest request, HttpServletResponse response, Throwable ex)
-			throws Exception {
+	private ModelAndView handleException(HttpServletRequest request, HttpServletResponse response, Throwable ex) throws Exception {
 
 		Method handler = getExceptionHandler(ex);
 		if (handler != null) {

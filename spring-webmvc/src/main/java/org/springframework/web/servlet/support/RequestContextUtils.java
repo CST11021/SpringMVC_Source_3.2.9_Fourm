@@ -33,6 +33,8 @@ import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ThemeResolver;
 
 /**
+ * 用于从HttpServletRequest中获取一系列Bean的工具类型
+ *
  * Utility class for easy access to request-specific state which has been
  * set by the {@link org.springframework.web.servlet.DispatcherServlet}.
  *
@@ -48,33 +50,26 @@ import org.springframework.web.servlet.ThemeResolver;
 public abstract class RequestContextUtils {
 
 	/**
-	 * Look for the WebApplicationContext associated with the DispatcherServlet
-	 * that has initiated request processing.
-	 * @param request current HTTP request
+	 * 从request对象中获取WebApplicationContext容器
+	 *
+	 * @param request 当前的HTTP请求
 	 * @return the request-specific web application context
 	 * @throws IllegalStateException if no servlet-specific context has been found
 	 */
-	public static WebApplicationContext getWebApplicationContext(ServletRequest request)
-		throws IllegalStateException {
+	public static WebApplicationContext getWebApplicationContext(ServletRequest request) throws IllegalStateException {
 
 		return getWebApplicationContext(request, null);
 	}
 
 	/**
-	 * Look for the WebApplicationContext associated with the DispatcherServlet
-	 * that has initiated request processing, and for the global context if none
-	 * was found associated with the current request. This method is useful to
-	 * allow components outside the framework, such as JSP tag handlers,
-	 * to access the most specific application context available.
-	 * @param request current HTTP request
-	 * @param servletContext current servlet context
-	 * @return the request-specific WebApplicationContext, or the global one
-	 * if no request-specific context has been found
-	 * @throws IllegalStateException if neither a servlet-specific nor a
-	 * global context has been found
+	 * 从request对象或servletContext对象中获取WebApplicationContext容器
+	 *
+	 * @param request
+	 * @param servletContext
+	 * @return
+	 * @throws IllegalStateException
 	 */
-	public static WebApplicationContext getWebApplicationContext(
-			ServletRequest request, ServletContext servletContext) throws IllegalStateException {
+	public static WebApplicationContext getWebApplicationContext(ServletRequest request, ServletContext servletContext) throws IllegalStateException {
 
 		WebApplicationContext webApplicationContext = (WebApplicationContext) request.getAttribute(
 				DispatcherServlet.WEB_APPLICATION_CONTEXT_ATTRIBUTE);

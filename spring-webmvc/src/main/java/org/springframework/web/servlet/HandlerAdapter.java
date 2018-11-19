@@ -23,15 +23,34 @@ import javax.servlet.http.HttpServletResponse;
 //
 // DispatcherServlet中根据HandlerMapping找到对应的handler method后，首先检查当前工程中注册的所有可用的handlerAdapter，根据handlerAdapter中的supports方法找到可以使用的handlerAdapter。
 // 通过调用handlerAdapter中的handler方法来处理及准备handler method的参数及annotation(这就是spring mvc如何将request中的参数变成handle method中的输入参数的地方)，最终调用实际的handler method。
+
 public interface HandlerAdapter {
 
-	//support方法的作用是判断处理适配器是不是支持该Handler
+	/**
+	 * 用于判断当前的处理适配器是不是支持该Handler（即Controller类）
+	 *
+	 * @param handler
+	 * @return
+	 */
 	boolean supports(Object handler);
 
-	//hanle方法，调用对应的Handler中适配到的方法，并返回一个ModelAndView
+	/**
+	 * hanle方法，调用对应的Handler中适配到的方法，并返回一个ModelAndView
+	 *
+	 * @param request
+	 * @param response
+	 * @param handler
+	 * @return
+	 * @throws Exception
+	 */
 	ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception;
 
 	/**
+	 * HTTP响应消息头有一个Last-Modified字段，这个字段表示服务器内容最新修改时间。根据这个方法的返回值来决定是否要调用doGet方法
+	 * 和生成Last-Modified头字段。当getLastModified返回-1时，service方法总会调用doGet方法。
+	 * 如果handler实现了LastModified接口，可反射调用lastModified方法，然后返回-1；否则直接返回-1。
+	 *
+	 *
 	 * Same contract as for HttpServlet's {@code getLastModified} method.
 	 * Can simply return -1 if there's no support in the handler class.
 	 * @param request current HTTP request

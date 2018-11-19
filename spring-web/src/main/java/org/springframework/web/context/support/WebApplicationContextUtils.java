@@ -62,8 +62,8 @@ import org.springframework.web.context.request.WebRequest;
  */
 public abstract class WebApplicationContextUtils {
 
-	private static final boolean jsfPresent =
-			ClassUtils.isPresent("javax.faces.context.FacesContext", RequestContextHolder.class.getClassLoader());
+	private static final boolean jsfPresent = ClassUtils.isPresent(
+			"javax.faces.context.FacesContext", RequestContextHolder.class.getClassLoader());
 
 
 	/**
@@ -76,8 +76,7 @@ public abstract class WebApplicationContextUtils {
 	 * @throws IllegalStateException if the root WebApplicationContext could not be found
 	 * @see org.springframework.web.context.WebApplicationContext#ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE
 	 */
-	public static WebApplicationContext getRequiredWebApplicationContext(ServletContext sc)
-			throws IllegalStateException {
+	public static WebApplicationContext getRequiredWebApplicationContext(ServletContext sc) throws IllegalStateException {
 
 		WebApplicationContext wac = getWebApplicationContext(sc);
 		if (wac == null) {
@@ -125,7 +124,6 @@ public abstract class WebApplicationContextUtils {
 		}
 		return (WebApplicationContext) attr;
 	}
-
 
 	/**
 	 * Register web-specific scopes ("request", "session", "globalSession")
@@ -178,8 +176,7 @@ public abstract class WebApplicationContextUtils {
 	 * @param sc the ServletContext that we're running within
 	 * @param config the ServletConfig of the containing Portlet
 	 */
-	public static void registerEnvironmentBeans(
-			ConfigurableListableBeanFactory bf, ServletContext sc, ServletConfig config) {
+	public static void registerEnvironmentBeans(ConfigurableListableBeanFactory bf, ServletContext sc, ServletConfig config) {
 
 		if (sc != null && !bf.containsBean(WebApplicationContext.SERVLET_CONTEXT_BEAN_NAME)) {
 			bf.registerSingleton(WebApplicationContext.SERVLET_CONTEXT_BEAN_NAME, sc);
@@ -229,8 +226,7 @@ public abstract class WebApplicationContextUtils {
 	 * {@link ServletConfig} parameter.
 	 * @see #initServletPropertySources(MutablePropertySources, ServletContext, ServletConfig)
 	 */
-	public static void initServletPropertySources(
-			MutablePropertySources propertySources, ServletContext servletContext) {
+	public static void initServletPropertySources(MutablePropertySources propertySources, ServletContext servletContext) {
 
 		initServletPropertySources(propertySources, servletContext, null);
 	}
@@ -253,8 +249,7 @@ public abstract class WebApplicationContextUtils {
 	 * @see org.springframework.core.env.PropertySource.StubPropertySource
 	 * @see org.springframework.core.env.ConfigurableEnvironment#getPropertySources()
 	 */
-	public static void initServletPropertySources(
-			MutablePropertySources propertySources, ServletContext servletContext, ServletConfig servletConfig) {
+	public static void initServletPropertySources(MutablePropertySources propertySources, ServletContext servletContext, ServletConfig servletConfig) {
 
 		Assert.notNull(propertySources, "propertySources must not be null");
 		if (servletContext != null && propertySources.contains(StandardServletEnvironment.SERVLET_CONTEXT_PROPERTY_SOURCE_NAME) &&
@@ -282,6 +277,12 @@ public abstract class WebApplicationContextUtils {
 	}
 
 
+
+
+
+
+
+
 	/**
 	 * Factory that exposes the current request object on demand.
 	 */
@@ -297,7 +298,6 @@ public abstract class WebApplicationContextUtils {
 			return "Current HttpServletRequest";
 		}
 	}
-
 
 	/**
 	 * Factory that exposes the current session object on demand.
@@ -315,7 +315,6 @@ public abstract class WebApplicationContextUtils {
 		}
 	}
 
-
 	/**
 	 * Factory that exposes the current WebRequest object on demand.
 	 */
@@ -331,7 +330,6 @@ public abstract class WebApplicationContextUtils {
 			return "Current ServletWebRequest";
 		}
 	}
-
 
 	/**
 	 * Inner class to avoid hard-coded JSF dependency.

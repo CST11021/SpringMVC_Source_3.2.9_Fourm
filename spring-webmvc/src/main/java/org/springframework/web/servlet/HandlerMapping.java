@@ -15,6 +15,15 @@ import javax.servlet.http.HttpServletRequest;
 提供的除了Controller之外的次级控制器类型，或者第三方Web开发框架中的Page Controller组件（如Struts的Action），而所有这些次
 级控制器类型，在SpringMVC中都称作Handler。HandlerMapping要处理的也就是Web请求到相应Handler之间的映射关系。如果你接触过
 Struts框架的话，可以将HandlerMapping与Struts框架的ActionMapping概念进行类比。
+
+
+实现类如下：
+ RequestMappingHandlerMapping：
+ ControllerBeanNameHandlerMapping：
+ ControllerClassNameHandlerMapping：
+ BeanNameUrlHandlerMapping：
+ DefaultAnnotationHandlerMapping：
+ SimpleUrlHandlerMapping：
 */
 
 public interface HandlerMapping {
