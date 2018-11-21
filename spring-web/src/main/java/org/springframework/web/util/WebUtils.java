@@ -428,7 +428,12 @@ public abstract class WebUtils {
 	}
 
 
-	// 判断 request 是否包含"javax.servlet.include.request_uri"属性，表示页面嵌套
+	/**
+	 * 判断 request 是否包含"javax.servlet.include.request_uri"属性，表示页面嵌套
+	 *
+	 * @param request
+	 * @return
+	 */
 	public static boolean isIncludeRequest(ServletRequest request) {
 		return (request.getAttribute(INCLUDE_REQUEST_URI_ATTRIBUTE) != null);
 	}

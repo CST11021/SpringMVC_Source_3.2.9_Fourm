@@ -97,17 +97,12 @@ import org.springframework.web.util.WebUtils;
 	ServletWrappingController不同的是，ServletForwardingController将所有的HTTP请求转发给一个在web.xml中定义的Servlet。
 	Web容器会对这个定义在web.xml的标准Servlet进行初始化和析构。
  */
+
 public class ServletForwardingController extends AbstractController implements BeanNameAware {
 
 	private String servletName;
 	private String beanName;
 
-
-	/**
-	 * Set the name of the servlet to forward to,
-	 * i.e. the "servlet-name" of the target servlet in web.xml.
-	 * <p>Default is the bean name of this controller.
-	 */
 	public void setServletName(String servletName) {
 		this.servletName = servletName;
 	}
@@ -122,10 +117,12 @@ public class ServletForwardingController extends AbstractController implements B
 	@Override
 	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
+		// 获取对应的Servlet
 		RequestDispatcher rd = getServletContext().getNamedDispatcher(this.servletName);
 		if (rd == null) {
 			throw new ServletException("No servlet with name '" + this.servletName + "' defined in web.xml");
 		}
+
 		// If already included, include again, else forward.
 		if (useInclude(request, response)) {
 			rd.include(request, response);

@@ -42,16 +42,13 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 	 * Constant identifying the {@link String} prefixed to the name of a
 	 * destruction callback when it is stored in a {@link HttpSession}.
 	 */
-	public static final String DESTRUCTION_CALLBACK_NAME_PREFIX =
-			ServletRequestAttributes.class.getName() + ".DESTRUCTION_CALLBACK.";
-
+	public static final String DESTRUCTION_CALLBACK_NAME_PREFIX = ServletRequestAttributes.class.getName() + ".DESTRUCTION_CALLBACK.";
 
 	private final HttpServletRequest request;
 
 	private volatile HttpSession session;
 
 	private final Map<String, Object> sessionAttributesToUpdate = new ConcurrentHashMap<String, Object>(1);
-
 
 	/**
 	 * Create a new ServletRequestAttributes instance for the given request.
@@ -61,7 +58,6 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 		Assert.notNull(request, "Request must not be null");
 		this.request = request;
 	}
-
 
 	/**
 	 * Exposes the native {@link HttpServletRequest} that we're wrapping.
@@ -87,7 +83,6 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 			return this.session;
 		}
 	}
-
 
 	public Object getAttribute(String name, int scope) {
 		if (scope == SCOPE_REQUEST) {
@@ -204,7 +199,6 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 		return WebUtils.getSessionMutex(getSession(true));
 	}
 
-
 	/**
 	 * Update all accessed session attributes through {@code session.setAttribute}
 	 * calls, explicitly indicating to the container that they might have been modified.
@@ -244,7 +238,6 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 		session.setAttribute(DESTRUCTION_CALLBACK_NAME_PREFIX + name,
 				new DestructionCallbackBindingListener(callback));
 	}
-
 
 	@Override
 	public String toString() {

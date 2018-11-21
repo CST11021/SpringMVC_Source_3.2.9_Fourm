@@ -62,7 +62,7 @@ import java.io.IOException;
 
 /**
  * Defines an object that receives requests from the client
- * and sends them to any resource (such as a servlet, 
+ * and sends them to any resource (such as a servlet,
  * HTML file, or JSP file) on the server. The servlet
  * container creates the <code>RequestDispatcher</code> object,
  * which is used as a wrapper around a server resource located
@@ -73,80 +73,93 @@ import java.io.IOException;
  * objects to wrap any type of resource.
  *
  * @author Various
- *
  * @see ServletContext#getRequestDispatcher(java.lang.String)
  * @see ServletContext#getNamedDispatcher(java.lang.String)
  * @see ServletRequest#getRequestDispatcher(java.lang.String)
  */
- 
+/*
+RequestDispatcher 代表请求的派发者。它有2个动作：forward 和 include 。客户端对于任何一个请求，可以根据业务逻辑需要，选择不同的处理办法：
+
+forward:
+    这个方法将请求从一个 Servlet or JSP目标资源 上 转发到服务器上的另一个资源（servlet、JSP 文件或 HTML 文件，这些资源必须是当前Web上下文中的），
+    让其它的资源去生成响应数据。例如用户请求的是目标资源A，A接受到请求后，转发到B，真正产生响应数据是被转发的资源B，而A只是起个引导转发作用。
+    浏览器的地址栏不会变，依然是A的URL。这个方法可以允许被请求的目标资源做一些准备工作后，再让转发的资源去响应请求。
+
+include:
+    此方法用于包含响应中某个资源（servlet、JSP 页面和 HTML 文件）的内容。调用者指定一个被包含的资源，将这个包含的资源（JSP,Servlet，HTML）
+    的响应数据包含到自己的响应体中。被包含的数据是在服务器上经过运行产生的，因此是动态包含，而不同于JSP中的include指令，它是JSP转译期的静
+    态包含，类似于C语言中的宏一样。这个过程实质是用一个相同的Request再请求一次被包含的资源，将被包含的资源的响应数据包含到原本的资源中去，
+    构成它的响应数据的一部分。
+ */
+
 public interface RequestDispatcher {
 
     /**
      * The name of the request attribute under which the original
-     * request URI is made available to the target of a 
-     * {@link #forward(ServletRequest,ServletResponse) forward}
+     * request URI is made available to the target of a
+     * {@link #forward(ServletRequest, ServletResponse) forward}
      */
     static final String FORWARD_REQUEST_URI = "javax.servlet.forward.request_uri";
 
     /**
      * The name of the request attribute under which the original
-     * context path is made available to the target of a 
-     * {@link #forward(ServletRequest,ServletResponse) forward}
+     * context path is made available to the target of a
+     * {@link #forward(ServletRequest, ServletResponse) forward}
      */
     static final String FORWARD_CONTEXT_PATH = "javax.servlet.forward.context_path";
 
     /**
      * The name of the request attribute under which the original
-     * path info is made available to the target of a 
-     * {@link #forward(ServletRequest,ServletResponse) forward}
+     * path info is made available to the target of a
+     * {@link #forward(ServletRequest, ServletResponse) forward}
      */
     static final String FORWARD_PATH_INFO = "javax.servlet.forward.path_info";
 
     /**
      * The name of the request attribute under which the original
-     * servlet path is made available to the target of a 
-     * {@link #forward(ServletRequest,ServletResponse) forward}
+     * servlet path is made available to the target of a
+     * {@link #forward(ServletRequest, ServletResponse) forward}
      */
     static final String FORWARD_SERVLET_PATH = "javax.servlet.forward.servlet_path";
 
     /**
      * The name of the request attribute under which the original
-     * query string is made available to the target of a 
-     * {@link #forward(ServletRequest,ServletResponse) forward}
+     * query string is made available to the target of a
+     * {@link #forward(ServletRequest, ServletResponse) forward}
      */
     static final String FORWARD_QUERY_STRING = "javax.servlet.forward.query_string";
 
     /**
      * The name of the request attribute under which the request URI
-     * of the target of an {@link #include(ServletRequest,ServletResponse)
+     * of the target of an {@link #include(ServletRequest, ServletResponse)
      * include} is stored
      */
     static final String INCLUDE_REQUEST_URI = "javax.servlet.include.request_uri";
 
     /**
      * The name of the request attribute under which the context path
-     * of the target of an {@link #include(ServletRequest,ServletResponse)
+     * of the target of an {@link #include(ServletRequest, ServletResponse)
      * include} is stored
      */
     static final String INCLUDE_CONTEXT_PATH = "javax.servlet.include.context_path";
 
     /**
      * The name of the request attribute under which the path info
-     * of the target of an {@link #include(ServletRequest,ServletResponse)
+     * of the target of an {@link #include(ServletRequest, ServletResponse)
      * include} is stored
      */
     static final String INCLUDE_PATH_INFO = "javax.servlet.include.path_info";
 
     /**
      * The name of the request attribute under which the servlet path
-     * of the target of an {@link #include(ServletRequest,ServletResponse)
+     * of the target of an {@link #include(ServletRequest, ServletResponse)
      * include} is stored
      */
     static final String INCLUDE_SERVLET_PATH = "javax.servlet.include.servlet_path";
 
     /**
      * The name of the request attribute under which the query string
-     * of the target of an {@link #include(ServletRequest,ServletResponse)
+     * of the target of an {@link #include(ServletRequest, ServletResponse)
      * include} is stored
      */
     static final String INCLUDE_QUERY_STRING = "javax.servlet.include.query_string";
@@ -197,16 +210,16 @@ public interface RequestDispatcher {
      * a request and another resource to generate
      * the response.
      *
-     * <p>For a <code>RequestDispatcher</code> obtained via 
-     * <code>getRequestDispatcher()</code>, the <code>ServletRequest</code> 
+     * <p>For a <code>RequestDispatcher</code> obtained via
+     * <code>getRequestDispatcher()</code>, the <code>ServletRequest</code>
      * object has its path elements and parameters adjusted to match
      * the path of the target resource.
      *
-     * <p><code>forward</code> should be called before the response has been 
-     * committed to the client (before response body output has been flushed). 
+     * <p><code>forward</code> should be called before the response has been
+     * committed to the client (before response body output has been flushed).
      * If the response already has been committed, this method throws
      * an <code>IllegalStateException</code>.
-     * Uncommitted output in the response buffer is automatically cleared 
+     * Uncommitted output in the response buffer is automatically cleared
      * before the forward.
      *
      * <p>The request and response parameters must be either the same
@@ -218,27 +231,20 @@ public interface RequestDispatcher {
      * <p>This method sets the dispatcher type of the given request to
      * <code>DispatcherType.FORWARD</code>.
      *
-     * @param request a {@link ServletRequest} object that represents the
-     * request the client makes of the servlet
-     *
+     * @param request  a {@link ServletRequest} object that represents the
+     *                 request the client makes of the servlet
      * @param response a {@link ServletResponse} object that represents
-     * the response the servlet returns to the client
-     *
-     * @throws ServletException if the target resource throws this exception
-     *
-     * @throws IOException if the target resource throws this exception
-     *
+     *                 the response the servlet returns to the client
+     * @throws ServletException      if the target resource throws this exception
+     * @throws IOException           if the target resource throws this exception
      * @throws IllegalStateException if the response was already committed
-     *
      * @see ServletRequest#getDispatcherType
      */
-    public void forward(ServletRequest request, ServletResponse response)
-        throws ServletException, IOException;
+    public void forward(ServletRequest request, ServletResponse response) throws ServletException, IOException;
 
     /**
-     *
      * Includes the content of a resource (servlet, JSP page,
-     * HTML file) in the response. In essence, this method enables 
+     * HTML file) in the response. In essence, this method enables
      * programmatic server-side includes.
      *
      * <p>The {@link ServletResponse} object has its path elements
@@ -254,21 +260,16 @@ public interface RequestDispatcher {
      * <p>This method sets the dispatcher type of the given request to
      * <code>DispatcherType.INCLUDE</code>.
      *
-     * @param request a {@link ServletRequest} object that contains the
-     * client's request
-     *
+     * @param request  a {@link ServletRequest} object that contains the
+     *                 client's request
      * @param response a {@link ServletResponse} object that contains the
-     * servlet's response
-     *
+     *                 servlet's response
      * @throws ServletException if the included resource throws this
-     * exception
-     *
-     * @throws IOException if the included resource throws this exception
-     *
+     *                          exception
+     * @throws IOException      if the included resource throws this exception
      * @see ServletRequest#getDispatcherType
      */
-    public void include(ServletRequest request, ServletResponse response)
-        throws ServletException, IOException;
+    public void include(ServletRequest request, ServletResponse response) throws ServletException, IOException;
 }
 
 

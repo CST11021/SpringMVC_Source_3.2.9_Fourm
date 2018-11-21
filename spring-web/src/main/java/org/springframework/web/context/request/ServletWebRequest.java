@@ -98,7 +98,6 @@ public class ServletWebRequest extends ServletRequestAttributes implements Nativ
 		return WebUtils.getNativeResponse(getResponse(), requiredType);
 	}
 
-
 	public String getHeader(String headerName) {
 		return getRequest().getHeader(headerName);
 	}

@@ -51,19 +51,16 @@ import org.springframework.web.servlet.HandlerMapping;
 	将请求的URL路径转换为逻辑视图名并返回的转换控制器，即不需要功能处理，直接根据URL计算出逻辑视图名，并选择具体视图进行展示：
 
 	根据请求URL路径计算逻辑视图名，如：
-	<bean name="/index1/*"
-	class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
-	<bean name="/index2/**"
-	class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
-	<bean name="/*.html"
-	class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
-	<bean name="/index3/*.html"
-	class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
+	<bean name="/index1/*" class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
+	<bean name="/index2/**" class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
+	<bean name="/*.html" class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
+	<bean name="/index3/*.html" class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
 	/index1/*：可以匹配/index1/demo，但不匹配/index1/demo/demo，如/index1/demo逻辑视图名为demo；
 	/index2/**：可以匹配/index2路径下的所有子路径，如匹配/index2/demo，或/index2/demo/demo，“/index2/demo”的逻辑视图名为demo，而“/index2/demo/demo”逻辑视图名为demo/demo；
 	/*.html：可以匹配如/abc.html，逻辑视图名为abc，后缀会被删除（不仅仅可以是html）；
 	/index3/*.html：可以匹配/index3/abc.html，逻辑视图名也是abc;
  */
+
 public class UrlFilenameViewController extends AbstractUrlViewController {
 
 	private String prefix = "";
