@@ -52,7 +52,38 @@ import java.util.EventListener;
  */
 // 用于异步操作的监听器
 public interface AsyncListener extends EventListener {
-    
+
+    /**
+     * Notifies this AsyncListener that a new asynchronous cycle is being
+     * initiated via a call to one of the {@link ServletRequest#startAsync}
+     * methods.
+     *
+     * <p>The {@link AsyncContext} corresponding to the asynchronous
+     * operation that is being reinitialized may be obtained by calling
+     * {@link AsyncEvent#getAsyncContext getAsyncContext} on the given
+     * <tt>event</tt>.
+     *
+     * <p>In addition, if this AsyncListener had been registered via a call
+     * to {@link AsyncContext#addListener(AsyncListener,
+     * ServletRequest, ServletResponse)}, the supplied ServletRequest and
+     * ServletResponse objects may be retrieved by calling
+     * {@link AsyncEvent#getSuppliedRequest getSuppliedRequest} and
+     * {@link AsyncEvent#getSuppliedResponse getSuppliedResponse},
+     * respectively, on the given <tt>event</tt>.
+     *
+     * <p>This AsyncListener will not receive any events related to the
+     * new asynchronous cycle unless it registers itself (via a call
+     * to {@link AsyncContext#addListener}) with the AsyncContext that
+     * is delivered as part of the given AsyncEvent.
+     *
+     * @param event the AsyncEvent indicating that a new asynchronous
+     * cycle is being initiated
+     *
+     * @throws IOException if an I/O related error has occurred during the
+     * processing of the given AsyncEvent
+     */
+    public void onStartAsync(AsyncEvent event) throws IOException;
+
     /**
      * Notifies this AsyncListener that an asynchronous operation
      * has been completed.
@@ -77,7 +108,6 @@ public interface AsyncListener extends EventListener {
      * processing of the given AsyncEvent
      */
     public void onComplete(AsyncEvent event) throws IOException;
-
 
     /**
      * Notifies this AsyncListener that an asynchronous operation
@@ -104,7 +134,6 @@ public interface AsyncListener extends EventListener {
      */
     public void onTimeout(AsyncEvent event) throws IOException;
 
-
     /**
      * Notifies this AsyncListener that an asynchronous operation 
      * has failed to complete.
@@ -129,37 +158,5 @@ public interface AsyncListener extends EventListener {
      * processing of the given AsyncEvent
      */
     public void onError(AsyncEvent event) throws IOException;
-
-
-    /**
-     * Notifies this AsyncListener that a new asynchronous cycle is being
-     * initiated via a call to one of the {@link ServletRequest#startAsync}
-     * methods.
-     *
-     * <p>The {@link AsyncContext} corresponding to the asynchronous
-     * operation that is being reinitialized may be obtained by calling
-     * {@link AsyncEvent#getAsyncContext getAsyncContext} on the given
-     * <tt>event</tt>.
-     * 
-     * <p>In addition, if this AsyncListener had been registered via a call
-     * to {@link AsyncContext#addListener(AsyncListener,
-     * ServletRequest, ServletResponse)}, the supplied ServletRequest and
-     * ServletResponse objects may be retrieved by calling
-     * {@link AsyncEvent#getSuppliedRequest getSuppliedRequest} and
-     * {@link AsyncEvent#getSuppliedResponse getSuppliedResponse},
-     * respectively, on the given <tt>event</tt>.
-     *
-     * <p>This AsyncListener will not receive any events related to the
-     * new asynchronous cycle unless it registers itself (via a call
-     * to {@link AsyncContext#addListener}) with the AsyncContext that
-     * is delivered as part of the given AsyncEvent.
-     *
-     * @param event the AsyncEvent indicating that a new asynchronous
-     * cycle is being initiated
-     *
-     * @throws IOException if an I/O related error has occurred during the
-     * processing of the given AsyncEvent
-     */
-    public void onStartAsync(AsyncEvent event) throws IOException;     
 
 }

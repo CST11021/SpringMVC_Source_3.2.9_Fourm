@@ -87,9 +87,9 @@ package javax.servlet;
  如果使用web.xml设置Servlet，则可以在<servlet>中设置<async-supported>标签为true：
  ...
  <servlet>
- <servlet-name>AsyncServlet</servlet-name>
- <servlet-class>cc.openhome.AsyncServlet</servlet-class>
- <async-supported>true</async-supported>
+     <servlet-name>AsyncServlet</servlet-name>
+     <servlet-class>cc.openhome.AsyncServlet</servlet-class>
+     <async-supported>true</async-supported>
  </servlet>
  ...
 
@@ -102,9 +102,9 @@ package javax.servlet;
  如果使用web.xml设置过滤器，则可以设置<async-supported>标签为true：
  ...
  <filter>
- <filter-name>AsyncFilter</filter-name>
- <filter-class>cc.openhome.AsyncFilter</filter-class>
- <async-supported>true</async-supported>
+     <filter-name>AsyncFilter</filter-name>
+     <filter-class>cc.openhome.AsyncFilter</filter-class>
+     <async-supported>true</async-supported>
  </filter>
  ...
  */

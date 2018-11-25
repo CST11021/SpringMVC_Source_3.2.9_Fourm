@@ -56,49 +56,17 @@ public class HttpConstraintElement {
     private TransportGuarantee transportGuarantee;
     private String[] rolesAllowed;
 
-    /**
-     * Constructs a default HTTP constraint element
-     */
+
     public HttpConstraintElement() {
         this(EmptyRoleSemantic.PERMIT);
     }
-
-    /**
-     * Convenience constructor to establish <tt>EmptyRoleSemantic.DENY</tt>
-     *
-     * @param semantic should be EmptyRoleSemantic.DENY
-     */
     public HttpConstraintElement(EmptyRoleSemantic semantic) {
         this(semantic, TransportGuarantee.NONE, new String[0]);
     }
-
-    /**
-     * Constructor to establish non-empty getRolesAllowed and/or
-     * <tt>TransportGuarantee.CONFIDENTIAL</tt>.
-     *
-     * @param guarantee <tt>TransportGuarantee.NONE</tt> or
-     * <tt>TransportGuarantee.CONFIDENTIAL</tt>
-     * @param roleNames the names of the roles that are to be
-     * allowed access
-     */
-    public HttpConstraintElement(TransportGuarantee guarantee,
-            String... roleNames) {
+    public HttpConstraintElement(TransportGuarantee guarantee, String... roleNames) {
         this(EmptyRoleSemantic.PERMIT, guarantee, roleNames);
     }
-
-    /**
-     * Constructor to establish all of getEmptyRoleSemantic,
-     * getRolesAllowed, and getTransportGuarantee.
-     *
-     * @param semantic <tt>EmptyRoleSemantic.DENY</tt> or
-     * <tt>EmptyRoleSemantic.PERMIT</tt>
-     * @param guarantee <tt>TransportGuarantee.NONE</tt> or
-     * <tt>TransportGuarantee.CONFIDENTIAL<tt>
-     * @param roleNames the names of the roles that are to be allowed
-     * access, or missing if the semantic is <tt>EmptyRoleSemantic.DENY</tt>
-     */
-    public HttpConstraintElement(EmptyRoleSemantic semantic,
-            TransportGuarantee guarantee, String... roleNames) {
+    public HttpConstraintElement(EmptyRoleSemantic semantic, TransportGuarantee guarantee, String... roleNames) {
         if (semantic == EmptyRoleSemantic.DENY && roleNames.length > 0) {
             throw new IllegalArgumentException(
                 "Deny semantic with rolesAllowed");
@@ -107,6 +75,7 @@ public class HttpConstraintElement {
         this.transportGuarantee = guarantee;
         this.rolesAllowed = roleNames;
     }
+
 
     /**
      * Gets the default authorization semantic.

@@ -41,7 +41,7 @@
 package javax.servlet;
 
 /**
- * Class that may be used to configure various properties of cookies 
+ * Class that may be used to configure various properties of cookies
  * used for session tracking purposes.
  *
  * <p>An instance of this class is acquired by a call to
@@ -63,13 +63,11 @@ public interface SessionCookieConfig {
      * and therefore should only be done cautiously.
      *
      * @param name the cookie name to use
-     *
      * @throws IllegalStateException if the <tt>ServletContext</tt>
-     * from which this <tt>SessionCookieConfig</tt> was acquired has
-     * already been initialized
+     *                               from which this <tt>SessionCookieConfig</tt> was acquired has
+     *                               already been initialized
      */
     public void setName(String name);
-
 
     /**
      * Gets the name that will be assigned to any session tracking
@@ -81,11 +79,9 @@ public interface SessionCookieConfig {
      *
      * @return the cookie name set via {@link #setName}, or
      * <tt>null</tt> if {@link #setName} was never called
-     *
      * @see javax.servlet.http.Cookie#getName()
      */
     public String getName();
-
 
     /**
      * Sets the domain name that will be assigned to any session tracking
@@ -94,15 +90,12 @@ public interface SessionCookieConfig {
      * was acquired.
      *
      * @param domain the cookie domain to use
-     *
      * @throws IllegalStateException if the <tt>ServletContext</tt>
-     * from which this <tt>SessionCookieConfig</tt> was acquired has
-     * already been initialized
-     *
+     *                               from which this <tt>SessionCookieConfig</tt> was acquired has
+     *                               already been initialized
      * @see javax.servlet.http.Cookie#setDomain(String)
      */
     public void setDomain(String domain);
-
 
     /**
      * Gets the domain name that will be assigned to any session tracking
@@ -112,11 +105,9 @@ public interface SessionCookieConfig {
      *
      * @return the cookie domain set via {@link #setDomain}, or
      * <tt>null</tt> if {@link #setDomain} was never called
-     *
      * @see javax.servlet.http.Cookie#getDomain()
      */
     public String getDomain();
-
 
     /**
      * Sets the path that will be assigned to any session tracking
@@ -125,15 +116,12 @@ public interface SessionCookieConfig {
      * was acquired.
      *
      * @param path the cookie path to use
-     *
      * @throws IllegalStateException if the <tt>ServletContext</tt>
-     * from which this <tt>SessionCookieConfig</tt> was acquired has
-     * already been initialized
-     *
+     *                               from which this <tt>SessionCookieConfig</tt> was acquired has
+     *                               already been initialized
      * @see javax.servlet.http.Cookie#setPath(String)
      */
     public void setPath(String path);
-
 
     /**
      * Gets the path that will be assigned to any session tracking
@@ -147,11 +135,9 @@ public interface SessionCookieConfig {
      *
      * @return the cookie path set via {@link #setPath}, or <tt>null</tt>
      * if {@link #setPath} was never called
-     *
      * @see javax.servlet.http.Cookie#getPath()
      */
     public String getPath();
-
 
     /**
      * Sets the comment that will be assigned to any session tracking
@@ -162,18 +148,15 @@ public interface SessionCookieConfig {
      * <p>As a side effect of this call, the session tracking cookies
      * will be marked with a <code>Version</code> attribute equal to
      * <code>1</code>.
-     * 
+     *
      * @param comment the cookie comment to use
-     *
      * @throws IllegalStateException if the <tt>ServletContext</tt>
-     * from which this <tt>SessionCookieConfig</tt> was acquired has
-     * already been initialized
-     *
+     *                               from which this <tt>SessionCookieConfig</tt> was acquired has
+     *                               already been initialized
      * @see javax.servlet.http.Cookie#setComment(String)
      * @see javax.servlet.http.Cookie#getVersion
      */
     public void setComment(String comment);
-
 
     /**
      * Gets the comment that will be assigned to any session tracking
@@ -183,11 +166,9 @@ public interface SessionCookieConfig {
      *
      * @return the cookie comment set via {@link #setComment}, or
      * <tt>null</tt> if {@link #setComment} was never called
-     *
      * @see javax.servlet.http.Cookie#getComment()
      */
     public String getComment();
-
 
     /**
      * Marks or unmarks the session tracking cookies created on behalf
@@ -202,18 +183,15 @@ public interface SessionCookieConfig {
      * attacks.
      *
      * @param httpOnly true if the session tracking cookies created
-     * on behalf of the application represented by the
-     * <tt>ServletContext</tt> from which this <tt>SessionCookieConfig</tt>
-     * was acquired shall be marked as <i>HttpOnly</i>, false otherwise
-     *
+     *                 on behalf of the application represented by the
+     *                 <tt>ServletContext</tt> from which this <tt>SessionCookieConfig</tt>
+     *                 was acquired shall be marked as <i>HttpOnly</i>, false otherwise
      * @throws IllegalStateException if the <tt>ServletContext</tt>
-     * from which this <tt>SessionCookieConfig</tt> was acquired has
-     * already been initialized
-     *
+     *                               from which this <tt>SessionCookieConfig</tt> was acquired has
+     *                               already been initialized
      * @see javax.servlet.http.Cookie#setHttpOnly(boolean)
      */
     public void setHttpOnly(boolean httpOnly);
-
 
     /**
      * Checks if the session tracking cookies created on behalf of the
@@ -225,11 +203,9 @@ public interface SessionCookieConfig {
      * the application represented by the <tt>ServletContext</tt> from
      * which this <tt>SessionCookieConfig</tt> was acquired will be marked
      * as <i>HttpOnly</i>, false otherwise
-     *
      * @see javax.servlet.http.Cookie#isHttpOnly()
      */
     public boolean isHttpOnly();
-
 
     /**
      * Marks or unmarks the session tracking cookies created on behalf of
@@ -242,25 +218,22 @@ public interface SessionCookieConfig {
      * front-ended by an SSL offloading load balancer.
      * In this case, the traffic between the client and the load balancer
      * will be over HTTPS, whereas the traffic between the load balancer
-     * and the web container will be over HTTP.  
+     * and the web container will be over HTTP.
      *
      * @param secure true if the session tracking cookies created on
-     * behalf of the application represented by the <tt>ServletContext</tt>
-     * from which this <tt>SessionCookieConfig</tt> was acquired shall be
-     * marked as <i>secure</i> even if the request that initiated the
-     * corresponding session is using plain HTTP instead of HTTPS, and false
-     * if they shall be marked as <i>secure</i> only if the request that
-     * initiated the corresponding session was also secure
-     *
+     *               behalf of the application represented by the <tt>ServletContext</tt>
+     *               from which this <tt>SessionCookieConfig</tt> was acquired shall be
+     *               marked as <i>secure</i> even if the request that initiated the
+     *               corresponding session is using plain HTTP instead of HTTPS, and false
+     *               if they shall be marked as <i>secure</i> only if the request that
+     *               initiated the corresponding session was also secure
      * @throws IllegalStateException if the <tt>ServletContext</tt>
-     * from which this <tt>SessionCookieConfig</tt> was acquired has
-     * already been initialized
-     *
+     *                               from which this <tt>SessionCookieConfig</tt> was acquired has
+     *                               already been initialized
      * @see javax.servlet.http.Cookie#setSecure(boolean)
      * @see ServletRequest#isSecure()
      */
     public void setSecure(boolean secure);
-
 
     /**
      * Checks if the session tracking cookies created on behalf of the
@@ -276,12 +249,10 @@ public interface SessionCookieConfig {
      * session is using plain HTTP instead of HTTPS, and false if they will
      * be marked as <i>secure</i> only if the request that initiated the
      * corresponding session was also secure
-     *
      * @see javax.servlet.http.Cookie#getSecure()
      * @see ServletRequest#isSecure()
      */
     public boolean isSecure();
-
 
     /**
      * Sets the lifetime (in seconds) for the session tracking cookies
@@ -290,18 +261,15 @@ public interface SessionCookieConfig {
      * was acquired.
      *
      * @param maxAge the lifetime (in seconds) of the session tracking
-     * cookies created on behalf of the application represented by the
-     * <tt>ServletContext</tt> from which this <tt>SessionCookieConfig</tt>
-     * was acquired.
-     *
+     *               cookies created on behalf of the application represented by the
+     *               <tt>ServletContext</tt> from which this <tt>SessionCookieConfig</tt>
+     *               was acquired.
      * @throws IllegalStateException if the <tt>ServletContext</tt>
-     * from which this <tt>SessionCookieConfig</tt> was acquired has
-     * already been initialized
-     *
+     *                               from which this <tt>SessionCookieConfig</tt> was acquired has
+     *                               already been initialized
      * @see javax.servlet.http.Cookie#setMaxAge
      */
     public void setMaxAge(int maxAge);
-
 
     /**
      * Gets the lifetime (in seconds) of the session tracking cookies
@@ -315,7 +283,6 @@ public interface SessionCookieConfig {
      * cookies created on behalf of the application represented by the
      * <tt>ServletContext</tt> from which this <tt>SessionCookieConfig</tt>
      * was acquired, or <tt>-1</tt> (the default)
-     *
      * @see javax.servlet.http.Cookie#getMaxAge
      */
     public int getMaxAge();

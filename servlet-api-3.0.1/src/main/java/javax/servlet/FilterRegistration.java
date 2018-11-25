@@ -77,9 +77,7 @@ public interface FilterRegistration extends Registration {
      * @throws IllegalStateException if the ServletContext from which this
      * FilterRegistration was obtained has already been initialized
      */
-    public void addMappingForServletNames(
-        EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
-        String... servletNames);
+    public void addMappingForServletNames(EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter, String... servletNames);
 
     /**
      * Gets the currently available servlet name mappings
@@ -122,9 +120,7 @@ public interface FilterRegistration extends Registration {
      * @throws IllegalStateException if the ServletContext from which this
      * FilterRegistration was obtained has already been initialized
      */
-    public void addMappingForUrlPatterns(
-        EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
-        String... urlPatterns);
+    public void addMappingForUrlPatterns(EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter, String... urlPatterns);
 
     /**
      * Gets the currently available URL pattern mappings of the Filter
