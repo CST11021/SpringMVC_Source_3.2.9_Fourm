@@ -156,6 +156,7 @@ public class ServletWebRequest extends ServletRequestAttributes implements Nativ
 		if (lastModifiedTimestamp >= 0 && !this.notModified &&
 				(this.response == null || !this.response.containsHeader(HEADER_LAST_MODIFIED))) {
 			long ifModifiedSince = -1;
+
 			try {
 				ifModifiedSince = getRequest().getDateHeader(HEADER_IF_MODIFIED_SINCE);
 			}
@@ -173,6 +174,7 @@ public class ServletWebRequest extends ServletRequestAttributes implements Nativ
 					}
 				}
 			}
+
 			this.notModified = (ifModifiedSince >= (lastModifiedTimestamp / 1000 * 1000));
 			if (this.response != null) {
 				if (this.notModified && supportsNotModifiedStatus()) {
@@ -204,6 +206,10 @@ public class ServletWebRequest extends ServletRequestAttributes implements Nativ
 		return this.notModified;
 	}
 
+	/**
+	 * 判断是否为get请求或head请求
+	 * @return
+	 */
 	private boolean supportsNotModifiedStatus() {
 		String method = getRequest().getMethod();
 		return (METHOD_GET.equals(method) || METHOD_HEAD.equals(method));

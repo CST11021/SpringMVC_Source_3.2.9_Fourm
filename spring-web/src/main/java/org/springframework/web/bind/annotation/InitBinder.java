@@ -42,20 +42,23 @@ import java.lang.annotation.Target;
  * @see org.springframework.web.bind.WebDataBinder
  * @see org.springframework.web.context.request.WebRequest
  */
+/*
+在使用SpringMVC的时候，经常会遇到表单中的日期字符串和JavaBean的Date类型的转换，而SpringMVC默认不支持这个格式的转换，所以需要手动配置，自定义数据的绑定才能解决这个问题。
+在需要日期转换的Controller中使用SpringMVC的注解@initbinder和Spring自带的WebDateBinder类来操作。
+WebDataBinder是用来绑定请求参数到指定的属性编辑器.由于前台传到controller里的值是String类型的，当往Model里Set这个值的时候，如果set的这个属性是个对象，Spring就会去找到对应的editor进行转换，然后再SET进去。
+
+1、由@InitBinder表示的方法，可以对WebDataBinder对象进行初始化。WebDataBinder是DataBinder的子类，用于完成由表单到JavaBean属性的绑定。
+2、@InitBinder方法不能有返回值，它必须盛名为void。
+3、@InitBinder方法的参数通常是WebDataBinder，@InitBinder可以对WebDataBinder进行初始化。
+
+ */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface InitBinder {
 
-	/**
-	 * The names of command/form attributes and/or request parameters
-	 * that this init-binder method is supposed to apply to.
-	 * <p>Default is to apply to all command/form attributes and all request parameters
-	 * processed by the annotated handler class. Specifying model attribute names or
-	 * request parameter names here restricts the init-binder method to those specific
-	 * attributes/parameters, with different init-binder methods typically applying to
-	 * different groups of attributes or parameters.
-	 */
+	// 此处使用@InitBinder() 中间的value，用于指定命令/表单属性或请求参数的名字，符合该名字的将使用此处的DataBinder，
+	// 如我们的@ModelAttribute("user1") User user1 将使用@InitBinder("user1")指定的DataBinder绑定；如果不指定value值，那么所有的都将使用。
 	String[] value() default {};
 
 }

@@ -51,19 +51,23 @@ import org.springframework.ui.Model;
  * @author Juergen Hoeller
  * @since 2.5
  */
+/*
+在Spring mvc中，注解@ModelAttribute是一个非常常用的注解，其功能主要在两方面：
+
+1、运用在参数上，会将客户端传递过来的参数按名称注入到指定对象中，并且会将这个对象自动加入ModelMap中，便于View层使用；
+2、运用在方法上，会在每一个@RequestMapping标注的方法前执行，如果有返回值，则自动将该返回值加入到ModelMap中；
+
+一般开发中，第一种用法居多，本次我将使用第二种用法以期节省controller层的一些代码
+
+ */
 @Target({ElementType.PARAMETER, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface ModelAttribute {
 
-	/**
-	 * The name of the model attribute to bind to.
-	 * <p>The default model attribute name is inferred from the declared
-	 * attribute type (i.e. the method parameter type or method return type),
-	 * based on the non-qualified class name:
-	 * e.g. "orderAddress" for class "mypackage.OrderAddress",
-	 * or "orderAddressList" for "List&lt;mypackage.OrderAddress&gt;".
-	 */
+	// 要绑定的model属性的名称。
+	// 默认模型属性名称是根据声明的属性类型（即方法参数类型或方法返回类型）推断的，
+	// 基于非限定类名称：例如类“mypackage.OrderAddress”的“orderAddress”，或“List<mypackage.OrderAddress>”的“orderAddressList”。
 	String value() default "";
 
 }

@@ -148,8 +148,10 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator implemen
 
 	public static final String PAGE_NOT_FOUND_LOG_CATEGORY = "org.springframework.web.servlet.PageNotFound";
 	protected static final Log pageNotFoundLogger = LogFactory.getLog(PAGE_NOT_FOUND_LOG_CATEGORY);
+
 	private UrlPathHelper urlPathHelper = new UrlPathHelper();
 	private PathMatcher pathMatcher = new AntPathMatcher();
+	// 用于确定一个能处理请求的方法名
 	private MethodNameResolver methodNameResolver = new InternalPathMethodNameResolver();
 	private WebBindingInitializer webBindingInitializer;
 	private SessionAttributeStore sessionAttributeStore = new DefaultSessionAttributeStore();
@@ -160,9 +162,11 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator implemen
 	private ModelAndViewResolver[] customModelAndViewResolvers;
 	// HTTP消息转换器，在构造器中初始化
 	private HttpMessageConverter<?>[] messageConverters;
+	// 表示HandlerAdapter的顺序
 	private int order = Ordered.LOWEST_PRECEDENCE;
 	private ConfigurableBeanFactory beanFactory;
 	private BeanExpressionContext expressionContext;
+	// Map<请求处理器类型, 方法处理器>：用于缓存请求控制器和请求处理方法的映射关系
 	private final Map<Class<?>, ServletHandlerMethodResolver> methodResolverCache = new ConcurrentHashMap<Class<?>, ServletHandlerMethodResolver>(64);
 	private final Map<Class<?>, Boolean> sessionAnnotatedClassesCache = new ConcurrentHashMap<Class<?>, Boolean>(64);
 
@@ -347,25 +351,8 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator implemen
 		return messageConverters;
 	}
 
-	/**
-	 * Specify the order value for this HandlerAdapter bean.
-	 * <p>Default value is {@code Integer.MAX_VALUE}, meaning that it's non-ordered.
-	 * @see org.springframework.core.Ordered#getOrder()
-	 */
-	public void setOrder(int order) {
-		this.order = order;
-	}
 
-	public int getOrder() {
-		return this.order;
-	}
 
-	public void setBeanFactory(BeanFactory beanFactory) {
-		if (beanFactory instanceof ConfigurableBeanFactory) {
-			this.beanFactory = (ConfigurableBeanFactory) beanFactory;
-			this.expressionContext = new BeanExpressionContext(this.beanFactory, new RequestScope());
-		}
-	}
 
 	public boolean supports(Object handler) {
 		return getMethodResolver(handler).hasHandlerMethods();
@@ -433,6 +420,9 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator implemen
 
 	/**
 	 * Build a HandlerMethodResolver for the given handler type.
+	 *
+	 * @param handler	表示请求控制器，即Controller类
+	 * @return
 	 */
 	private ServletHandlerMethodResolver getMethodResolver(Object handler) {
 		Class handlerClass = ClassUtils.getUserClass(handler);
@@ -491,8 +481,29 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator implemen
 	}
 
 
+
+
+
+	public void setOrder(int order) {
+		this.order = order;
+	}
+	public int getOrder() {
+		return this.order;
+	}
+	public void setBeanFactory(BeanFactory beanFactory) {
+		if (beanFactory instanceof ConfigurableBeanFactory) {
+			this.beanFactory = (ConfigurableBeanFactory) beanFactory;
+			this.expressionContext = new BeanExpressionContext(this.beanFactory, new RequestScope());
+		}
+	}
+
+
+
+
+
+
 	/**
-	 * Servlet-specific subclass of {@link HandlerMethodResolver}.
+	 * 方法处理器类：用于
 	 */
 	private class ServletHandlerMethodResolver extends HandlerMethodResolver {
 
@@ -502,6 +513,12 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator implemen
 			init(handlerType);
 		}
 
+		/**
+		 *
+		 *
+		 * @param method	表示Controller类方法
+		 * @return
+		 */
 		@Override
 		protected boolean isHandlerMethod(Method method) {
 			if (this.mappings.containsKey(method)) {
@@ -513,6 +530,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator implemen
 				RequestMethod[] methods = new RequestMethod[0];
 				String[] params = new String[0];
 				String[] headers = new String[0];
+
 				if (!hasTypeLevelMapping() || !Arrays.equals(mapping.method(), getTypeLevelMapping().method())) {
 					methods = mapping.method();
 				}
@@ -522,6 +540,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator implemen
 				if (!hasTypeLevelMapping() || !Arrays.equals(mapping.headers(), getTypeLevelMapping().headers())) {
 					headers = mapping.headers();
 				}
+
 				RequestMappingInfo mappingInfo = new RequestMappingInfo(patterns, methods, params, headers);
 				this.mappings.put(method, mappingInfo);
 				return true;
@@ -1052,39 +1071,30 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator implemen
 		public boolean hasPatterns() {
 			return patterns.length > 0;
 		}
-
 		public String[] getPatterns() {
 			return patterns;
 		}
-
 		public int getMethodCount() {
 			return methods.length;
 		}
-
 		public int getParamCount() {
 			return params.length;
 		}
-
 		public int getHeaderCount() {
 			return headers.length;
 		}
-
 		public boolean matches(HttpServletRequest request) {
 			return matchesRequestMethod(request) && matchesParameters(request) && matchesHeaders(request);
 		}
-
 		public boolean matchesHeaders(HttpServletRequest request) {
 			return ServletAnnotationMappingUtils.checkHeaders(this.headers, request);
 		}
-
 		public boolean matchesParameters(HttpServletRequest request) {
 			return ServletAnnotationMappingUtils.checkParameters(this.params, request);
 		}
-
 		public boolean matchesRequestMethod(HttpServletRequest request) {
 			return ServletAnnotationMappingUtils.checkRequestMethod(this.methods, request);
 		}
-
 		public Set<String> methodNames() {
 			Set<String> methodNames = new LinkedHashSet<String>(methods.length);
 			for (RequestMethod method : methods) {
@@ -1099,13 +1109,11 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator implemen
 			return (Arrays.equals(this.patterns, other.patterns) && Arrays.equals(this.methods, other.methods) &&
 					Arrays.equals(this.params, other.params) && Arrays.equals(this.headers, other.headers));
 		}
-
 		@Override
 		public int hashCode() {
 			return (Arrays.hashCode(this.patterns) * 23 + Arrays.hashCode(this.methods) * 29 +
 					Arrays.hashCode(this.params) * 31 + Arrays.hashCode(this.headers));
 		}
-
 		@Override
 		public String toString() {
 			StringBuilder builder = new StringBuilder();

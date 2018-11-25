@@ -32,11 +32,11 @@ import javax.servlet.http.HttpServletRequest;
 public interface MethodNameResolver {
 
 	/**
-	 * Return a method name that can handle this request. Such
-	 * mappings are typically, but not necessarily, based on URL.
+	 * 返回能处理该请求的方法名
+	 * Return a method name that can handle this request. Such mappings are typically, but not necessarily, based on URL.
+	 *
 	 * @param request current HTTP request
-	 * @return a method name that can handle this request.
-	 * Never returns {@code null}; throws exception if not resolvable.
+	 * @return 返回能处理该请求的方法名
 	 * @throws NoSuchRequestHandlingMethodException if no handler method
 	 * can be found for the given request
 	 */

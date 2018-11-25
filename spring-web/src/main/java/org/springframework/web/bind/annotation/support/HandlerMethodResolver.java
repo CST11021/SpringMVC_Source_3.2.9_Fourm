@@ -51,18 +51,21 @@ import org.springframework.web.bind.annotation.SessionAttributes;
  */
 public class HandlerMethodResolver {
 
+	// 用于保存请求处理器类的所有请求处理器方法
 	private final Set<Method> handlerMethods = new LinkedHashSet<Method>();
-
+	// 用于保存请求处理器类的所有initBinder方法
 	private final Set<Method> initBinderMethods = new LinkedHashSet<Method>();
-
+	// 用于保存请求处理器类的所有modelAttribute方法
 	private final Set<Method> modelAttributeMethods = new LinkedHashSet<Method>();
 
+	// 表示对应的请求处理器的@RequestMapping注解
 	private RequestMapping typeLevelMapping;
 
+	// 用于标识请求处理器是否有@SessionAttributes注解
 	private boolean sessionAttributesFound;
-
+	// 用于保存请求处理器@SessionAttributes注解的value值
 	private final Set<String> sessionAttributeNames = new HashSet<String>();
-
+	// 用于保存请求处理器@SessionAttributes注解的type值
 	private final Set<Class> sessionAttributeTypes = new HashSet<Class>();
 
 	// using a ConcurrentHashMap as a Set
@@ -70,8 +73,9 @@ public class HandlerMethodResolver {
 
 
 	/**
-	 * Initialize a new HandlerMethodResolver for the specified handler type.
-	 * @param handlerType the handler class to introspect
+	 * 当new一个HandlerMethodResolver对象时，会调用该初始化方法
+	 *
+	 * @param handlerType 表示请求处理器，即Controller类的类型
 	 */
 	public void init(final Class<?> handlerType) {
 		Set<Class<?>> handlerTypes = new LinkedHashSet<Class<?>>();
@@ -80,9 +84,12 @@ public class HandlerMethodResolver {
 			handlerTypes.add(handlerType);
 			specificHandlerType = handlerType;
 		}
+
 		handlerTypes.addAll(Arrays.asList(handlerType.getInterfaces()));
 		for (Class<?> currentHandlerType : handlerTypes) {
+
 			final Class<?> targetClass = (specificHandlerType != null ? specificHandlerType : currentHandlerType);
+
 			ReflectionUtils.doWithMethods(currentHandlerType, new ReflectionUtils.MethodCallback() {
 				public void doWith(Method method) {
 					Method specificMethod = ClassUtils.getMostSpecificMethod(method, targetClass);
@@ -102,7 +109,10 @@ public class HandlerMethodResolver {
 				}
 			}, ReflectionUtils.USER_DECLARED_METHODS);
 		}
+
+		// 获取请求处理的@RequestMapping注解对象
 		this.typeLevelMapping = AnnotationUtils.findAnnotation(handlerType, RequestMapping.class);
+		// 获取请求处理的@SessionAttributes注解对象
 		SessionAttributes sessionAttributes = AnnotationUtils.findAnnotation(handlerType, SessionAttributes.class);
 		this.sessionAttributesFound = (sessionAttributes != null);
 		if (this.sessionAttributesFound) {
@@ -110,15 +120,30 @@ public class HandlerMethodResolver {
 			this.sessionAttributeTypes.addAll(Arrays.asList(sessionAttributes.types()));
 		}
 	}
-
+	/**
+	 * 判断该方法是否带有@RequestMapping注解
+	 *
+	 * @param method	表示Controller类方法
+	 * @return
+	 */
 	protected boolean isHandlerMethod(Method method) {
 		return AnnotationUtils.findAnnotation(method, RequestMapping.class) != null;
 	}
-
+	/**
+	 * 判读该方法是否带有@InitBinder注解
+	 *
+	 * @param method	表示Controller类方法
+	 * @return
+	 */
 	protected boolean isInitBinderMethod(Method method) {
 		return AnnotationUtils.findAnnotation(method, InitBinder.class) != null;
 	}
-
+	/**
+	 * 判读该方法是否带有@ModelAttribute注解
+	 *
+	 * @param method	表示Controller类方法
+	 * @return
+	 */
 	protected boolean isModelAttributeMethod(Method method) {
 		return AnnotationUtils.findAnnotation(method, ModelAttribute.class) != null;
 	}
@@ -127,31 +152,24 @@ public class HandlerMethodResolver {
 	public final boolean hasHandlerMethods() {
 		return !this.handlerMethods.isEmpty();
 	}
-
 	public final Set<Method> getHandlerMethods() {
 		return this.handlerMethods;
 	}
-
 	public final Set<Method> getInitBinderMethods() {
 		return this.initBinderMethods;
 	}
-
 	public final Set<Method> getModelAttributeMethods() {
 		return this.modelAttributeMethods;
 	}
-
 	public boolean hasTypeLevelMapping() {
 		return (this.typeLevelMapping != null);
 	}
-
 	public RequestMapping getTypeLevelMapping() {
 		return this.typeLevelMapping;
 	}
-
 	public boolean hasSessionAttributes() {
 		return this.sessionAttributesFound;
 	}
-
 	public boolean isSessionAttribute(String attrName, Class attrType) {
 		if (this.sessionAttributeNames.contains(attrName) || this.sessionAttributeTypes.contains(attrType)) {
 			this.actualSessionAttributeNames.put(attrName, Boolean.TRUE);
@@ -161,7 +179,6 @@ public class HandlerMethodResolver {
 			return false;
 		}
 	}
-
 	public Set<String> getActualSessionAttributeNames() {
 		return this.actualSessionAttributeNames.keySet();
 	}

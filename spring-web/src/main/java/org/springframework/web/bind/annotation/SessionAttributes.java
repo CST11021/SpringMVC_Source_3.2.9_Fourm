@@ -51,6 +51,43 @@ import java.lang.annotation.Target;
  * @author Juergen Hoeller
  * @since 2.5
  */
+/*
+@sessionattributes注解应用到Controller上面，可以将Model中的属性同步到session当中。
+
+先看一个最基本的方法:
+@Controller
+@RequestMapping("/Demo.do")
+@SessionAttributes(value={"attr1","attr2"})
+public class Demo {
+
+    @RequestMapping(params="method=index")
+    public ModelAndView index() {
+        ModelAndView mav = new ModelAndView("index.jsp");
+        mav.addObject("attr1", "attr1Value");
+        mav.addObject("attr2", "attr2Value");
+        return mav;
+    }
+
+    @RequestMapping(params="method=index2")
+    public ModelAndView index2(@ModelAttribute("attr1")String attr1, @ModelAttribute("attr2")String attr2) {
+        ModelAndView mav = new ModelAndView("success.jsp");
+        return mav;
+    }
+}
+
+index方法返回一个ModelAndView 其中包括视图index.jsp 和 两个键值放入model当中，在没有加入@sessionattributes注解的时候，放入model当中的键值是request级别的。
+现在因为在Controller上面标记了@SessionAttributes(value={"attr1","attr2"}) 那么model中的attr1,attr2会同步到session中，这样当你访问index 然后在去访问index2的时候也会获取这俩个属性的值。
+当需要清除session当中的值得时候，我们只需要在controller的方法中传入一个SessionStatus的类型对象 通过调用setComplete方法就可以清除了。
+
+
+@RequestMapping(params="method=index3")
+public ModelAndView index4(SessionStatus status) {
+　　ModelAndView mav = new ModelAndView("success.jsp");
+　　status.setComplete();
+　　return mav;
+}
+
+ */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
