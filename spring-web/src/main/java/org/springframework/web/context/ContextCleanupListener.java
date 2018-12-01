@@ -26,16 +26,7 @@ import javax.servlet.ServletContextListener;
 import java.util.Enumeration;
 
 /**
- * Web application listener that cleans up remaining disposable attributes
- * in the ServletContext, i.e. attributes which implement {@link DisposableBean}
- * and haven't been removed before. This is typically used for destroying objects
- * in "application" scope, for which the lifecycle implies destruction at the
- * very end of the web application's shutdown phase.
- *
- * @author Juergen Hoeller
- * @since 3.0
- * @see org.springframework.web.context.support.ServletContextScope
- * @see ContextLoaderListener
+ * 容器关闭时删除所有实现了DisposableBean的bean
  */
 public class ContextCleanupListener implements ServletContextListener {
 
@@ -50,9 +41,8 @@ public class ContextCleanupListener implements ServletContextListener {
 
 
 	/**
-	 * Find all ServletContext attributes which implement {@link DisposableBean}
-	 * and destroy them, removing all affected ServletContext attributes eventually.
-	 * @param sc the ServletContext to check
+	 * 找到实现{@link DisposableBean}的所有ServletContext属性并销毁它们，最终删除对应的ServletContext属性
+	 * @param sc
 	 */
 	static void cleanupAttributes(ServletContext sc) {
 		Enumeration attrNames = sc.getAttributeNames();
