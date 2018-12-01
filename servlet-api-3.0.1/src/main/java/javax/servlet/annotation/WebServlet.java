@@ -62,29 +62,19 @@ import java.lang.annotation.Documented;
 @Documented
 public @interface WebServlet {
     
-    /**
-     * The name of the servlet
-     */
+    /** The name of the servlet */
     String name() default "";
     
-    /**
-     * The URL patterns of the servlet
-     */
+    /** The URL patterns of the servlet */
     String[] value() default {};
 
-    /**
-     * The URL patterns of the servlet
-     */
+    /** The URL patterns of the servlet */
     String[] urlPatterns() default {};
     
-    /**
-     * The load-on-startup order of the servlet 
-     */
+    /** The load-on-startup order of the servlet */
     int loadOnStartup() default -1;
     
-    /**
-     * The init parameters of the servlet
-     */
+    /** The init parameters of the servlet */
     WebInitParam [] initParams() default {};
     
     /**
@@ -105,14 +95,10 @@ public @interface WebServlet {
       */
     String largeIcon() default "";
 
-    /**
-     * The description of the servlet
-     */
+    /** The description of the servlet */
     String description() default "";
 
-    /**
-     * The display name of the servlet
-     */
+    /** The display name of the servlet */
     String displayName() default "";
 
 }

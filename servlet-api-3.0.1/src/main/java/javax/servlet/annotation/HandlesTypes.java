@@ -54,6 +54,7 @@ import java.lang.annotation.RetentionPolicy;
  *
  * @since Servlet 3.0
  */
+// 该注解的使用参考spring-web包中的SpringServletContainerInitializer类
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface HandlesTypes {

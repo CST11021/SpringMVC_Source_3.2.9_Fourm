@@ -16,17 +16,17 @@
 
 package org.springframework.web;
 
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
+
+import javax.servlet.ServletContainerInitializer;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.HandlesTypes;
 import java.lang.reflect.Modifier;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
-import javax.servlet.ServletContainerInitializer;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.HandlesTypes;
-
-import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 
 /**
  * Servlet 3.0 {@link ServletContainerInitializer} designed to support code-based
@@ -103,76 +103,120 @@ import org.springframework.core.annotation.AnnotationAwareOrderComparator;
  * @author Chris Beams
  * @author Juergen Hoeller
  * @author Rossen Stoyanchev
- * @since 3.1
  * @see #onStartup(Set, ServletContext)
  * @see WebApplicationInitializer
+ * @since 3.1
  */
+
+/**
+    Tomcat先是从调用WebConfig()函数.这个函数的主要的动作就是读取web.xml配置文件，函数webConfig()的执行动作的流程:
+1、读取web-fragment.xml和各个jar模块
+2、排序所有读取到的fragments
+3、查找所有的ServletContainerInitializer(SCIs)
+4、处理WEB-INF/Classes文件夹下面的
+5、处理所有的注解配置类和，并缓存
+6、将所有的web-fragment.xml合并
+7、转换所有的JSP代码成Java代码
+8、将Web.xml配置转变成代码式的配置
+9、查找静态资源默认文件夹 WEB-INF/classes/META-INF/resources
+10、将所有的实现ServletContainerInitializers的类添加到StandardContext的initializers集合中
+我们在这里重点关注 第三步和第十步，webConfig()中会调用processServletContainerInitializers()这个方法即为加载所有的经过 @HandlesTypes注解的类。
+
+protected void webConfig() {
+
+        ....
+
+        // Step 3. 查找ServletContainerInitializers
+        if (ok) {
+            processServletContainerInitializers();
+        }
+
+
+       ......
+
+        // Step 11. ServletContainerInitializer 交给StandardContext去处理！在这里即为我们的应用所在的容器
+        if (ok) {
+            for (Map.Entry<ServletContainerInitializer,
+                    Set<Class<?>>> entry :
+                        initializerClassMap.entrySet()) {
+                if (entry.getValue().isEmpty()) {
+                    context.addServletContainerInitializer(
+                            entry.getKey(), null);
+                } else {
+                    context.addServletContainerInitializer(
+                            entry.getKey(), entry.getValue());
+                }
+            }
+        }
+    }
+
+我们去StandardContext里面去看一下它是怎么处理这个集合属性的。在StandardContext类里面的startInternel()方法，就是启动这个：
+
+@Override
+    protected synchronized void startInternal() throws LifecycleException {
+            ....
+            // Call ServletContainerInitializers,启动这些
+            for (Map.Entry<ServletContainerInitializer, Set<Class<?>>> entry :
+                initializers.entrySet()) {
+                try {
+          //启动所有的ServletContainerInitializer
+                    entry.getKey().onStartup(entry.getValue(),
+                            getServletContext());
+                } catch (ServletException e) {
+                    log.error(sm.getString("standardContext.sciFail"), e);
+                    ok = false;
+                    break;
+                }
+            }
+            ...
+    }
+
+即: 通过内部启动时，它会通知所有正在监听的 ServletContainerInitializers,这样，即完成了Web应用的加载和初始化的配置！
+
+
+ */
+
 @HandlesTypes(WebApplicationInitializer.class)
 public class SpringServletContainerInitializer implements ServletContainerInitializer {
 
-	/**
-	 * Delegate the {@code ServletContext} to any {@link WebApplicationInitializer}
-	 * implementations present on the application classpath.
-	 *
-	 * <p>Because this class declares @{@code HandlesTypes(WebApplicationInitializer.class)},
-	 * Servlet 3.0+ containers will automatically scan the classpath for implementations
-	 * of Spring's {@code WebApplicationInitializer} interface and provide the set of all
-	 * such types to the {@code webAppInitializerClasses} parameter of this method.
-	 *
-	 * <p>If no {@code WebApplicationInitializer} implementations are found on the
-	 * classpath, this method is effectively a no-op. An INFO-level log message will be
-	 * issued notifying the user that the {@code ServletContainerInitializer} has indeed
-	 * been invoked but that no {@code WebApplicationInitializer} implementations were
-	 * found.
-	 *
-	 * <p>Assuming that one or more {@code WebApplicationInitializer} types are detected,
-	 * they will be instantiated (and <em>sorted</em> if the @{@link
-	 * org.springframework.core.annotation.Order @Order} annotation is present or
-	 * the {@link org.springframework.core.Ordered Ordered} interface has been
-	 * implemented). Then the {@link WebApplicationInitializer#onStartup(ServletContext)}
-	 * method will be invoked on each instance, delegating the {@code ServletContext} such
-	 * that each instance may register and configure servlets such as Spring's
-	 * {@code DispatcherServlet}, listeners such as Spring's {@code ContextLoaderListener},
-	 * or any other Servlet API componentry such as filters.
-	 *
-	 * @param webAppInitializerClasses all implementations of
-	 * {@link WebApplicationInitializer} found on the application classpath
-	 * @param servletContext the servlet context to be initialized
-	 * @see WebApplicationInitializer#onStartup(ServletContext)
-	 * @see AnnotationAwareOrderComparator
-	 */
-	public void onStartup(Set<Class<?>> webAppInitializerClasses, ServletContext servletContext)
-			throws ServletException {
+    /**
+     * Tomcat启动时会调用所有实现ServletContainerInitializer接口的onStartup方法
+     *
+     * @param webAppInitializerClasses 通过@HandlesTypes注解将所有实现了WebApplicationInitializer接口的类注入进来
+     * @param servletContext           已经被初始化的ServletContext
+     *
+     * @see WebApplicationInitializer#onStartup(ServletContext)
+     * @see AnnotationAwareOrderComparator
+     */
+    public void onStartup(Set<Class<?>> webAppInitializerClasses, ServletContext servletContext) throws ServletException {
 
-		List<WebApplicationInitializer> initializers = new LinkedList<WebApplicationInitializer>();
+        List<WebApplicationInitializer> initializers = new LinkedList<WebApplicationInitializer>();
 
-		if (webAppInitializerClasses != null) {
-			for (Class<?> waiClass : webAppInitializerClasses) {
-				// Be defensive: Some servlet containers provide us with invalid classes,
-				// no matter what @HandlesTypes says...
-				if (!waiClass.isInterface() && !Modifier.isAbstract(waiClass.getModifiers()) &&
-						WebApplicationInitializer.class.isAssignableFrom(waiClass)) {
-					try {
-						initializers.add((WebApplicationInitializer) waiClass.newInstance());
-					}
-					catch (Throwable ex) {
-						throw new ServletException("Failed to instantiate WebApplicationInitializer class", ex);
-					}
-				}
-			}
-		}
+        if (webAppInitializerClasses != null) {
+            for (Class<?> waiClass : webAppInitializerClasses) {
+                // Be defensive: Some servlet containers provide us with invalid classes, no matter what @HandlesTypes says...
+                if (!waiClass.isInterface() && !Modifier.isAbstract(waiClass.getModifiers()) &&
+                        WebApplicationInitializer.class.isAssignableFrom(waiClass)) {
+                    try {
+                        initializers.add((WebApplicationInitializer) waiClass.newInstance());
+                    } catch (Throwable ex) {
+                        throw new ServletException("Failed to instantiate WebApplicationInitializer class", ex);
+                    }
+                }
+            }
+        }
 
-		if (initializers.isEmpty()) {
-			servletContext.log("No Spring WebApplicationInitializer types detected on classpath");
-			return;
-		}
+        if (initializers.isEmpty()) {
+            servletContext.log("No Spring WebApplicationInitializer types detected on classpath");
+            return;
+        }
 
-		AnnotationAwareOrderComparator.sort(initializers);
-		servletContext.log("Spring WebApplicationInitializers detected on classpath: " + initializers);
+        AnnotationAwareOrderComparator.sort(initializers);
+        servletContext.log("Spring WebApplicationInitializers detected on classpath: " + initializers);
 
-		for (WebApplicationInitializer initializer : initializers) {
-			initializer.onStartup(servletContext);
-		}
-	}
+        for (WebApplicationInitializer initializer : initializers) {
+            initializer.onStartup(servletContext);
+        }
+    }
 
 }

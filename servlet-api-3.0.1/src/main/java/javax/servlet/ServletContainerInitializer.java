@@ -142,6 +142,5 @@ public interface ServletContainerInitializer {
      *
      * @throws ServletException if an error has occurred
      */
-    public void onStartup(Set<Class<?>> c, ServletContext ctx)
-        throws ServletException; 
+    public void onStartup(Set<Class<?>> c, ServletContext ctx) throws ServletException;
 }

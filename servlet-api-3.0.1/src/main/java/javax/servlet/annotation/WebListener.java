@@ -64,9 +64,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface WebListener {
-    /**
-     * Description of the listener
-     */
+    /** Description of the listener */
     String value() default "";
 }
     
