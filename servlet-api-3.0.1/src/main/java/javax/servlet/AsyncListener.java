@@ -173,6 +173,47 @@ import java.util.EventListener;
         executor.execute(new MyAsyncService(actx));
     }
 
+
+七、异步Servlet与AJAX的区别与联系：https://blog.csdn.net/yiifaa/article/details/76642305
+
+    在WEB应用程序的开发中，前端可以通过AJAX提供异步操作解决用户请求阻塞的问题，从而解决界面响应速度较慢的问题，既然如此，为何我们还需要后端
+    的异步Servlet呢，这两个功能是否存在重复设计？
+
+    其实对于前端来说，根本不区分后端处理请求是异步的行为还是同步的行为，但对于后端来说，对于用户的每一个请求（是的，你没有看错，不是每一个用户，
+    而是每一个请求），都会启动一个独立的线程来处理任务，这样在短时间内会造成大量的线程创建与销毁，服务器将不堪重负。
+
+    为了解决上述的问题，几乎所有的WEB服务器都会以线程池的方式来处理用户请求，那么问题来了，如果有的任务耗时较长，如NP问题，那么它占领的线程
+    资源将一直得不到释放，从而导致后续大量的请求因为得不到线程资源而堵塞，服务器的吞吐量直线下降，因此我们需要一种新的机制提高服务器的处理能
+    力，这也是异步Servlet的诞生原因，提高请求线程池的处理效率。
+
+    @WebServlet(asyncSupported = true, urlPatterns = { "/sleep" })
+    public class SleepServlet extends HttpServlet {
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+            response.setContentType("application/json;charset=UTF-8");
+            final AsyncContext context = request.startAsync();
+            context.start(() -> {
+                try {
+                //  任务消耗的时间很长
+                    Thread.sleep(1000 * 10);
+                    ServletResponse resp = context.getResponse();
+                    resp.getWriter().println("{\"state\": \"complete\"}");
+                    context.complete();
+                } catch (InterruptedException | IOException e) {
+                    e.printStackTrace();
+                }
+            });
+            System.out.println("Request Completed!");
+        }
+
+    }
+
+    此时发送AJAX请求，查看后台信息，发现Request请求已处理完成，控制台输出“Request Completed!”，但监测网络状况，Rquest Headers提示如下信息，见下图：
+    Provisional headers are shown
+
+    说明前端还在等待响应，继续等待10秒，后端的异步任务处理完毕，前端的AJAX请求也处理完毕。
+    结论：AJAX与异步Servlet都能解决阻塞的问题，但面向的对象与应用的场景都不一样，对于服务器耗时较长的任务，光用AJAX只能解决页面响应的问题，不能解决多用户并发的拥堵问题，而异步Servlet则可以在长任务的场景下，提高服务器的并发数量。
+
  */
 
 // 用于异步操作的监听器
