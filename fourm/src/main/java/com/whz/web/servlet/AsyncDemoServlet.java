@@ -1,6 +1,8 @@
 package com.whz.web.servlet;
 
 import javax.servlet.AsyncContext;
+import javax.servlet.AsyncEvent;
+import javax.servlet.AsyncListener;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -24,14 +26,40 @@ public class AsyncDemoServlet extends HttpServlet {
 
         //在子线程中执行业务调用，并由其负责输出响应，主线程退出  
         AsyncContext ctx = req.startAsync();
-        new Thread(new Executor(ctx)).start();
+        ctx.addListener(new AsyncListener() {
+            @Override
+            public void onStartAsync(AsyncEvent event) throws IOException {
+                System.out.println("onStartAsync");
+            }
+
+            @Override
+            public void onComplete(AsyncEvent event) throws IOException {
+                System.out.println("onComplete");
+            }
+
+            @Override
+            public void onTimeout(AsyncEvent event) throws IOException {
+                System.out.println("onTimeout");
+            }
+
+            @Override
+            public void onError(AsyncEvent event) throws IOException {
+                System.out.println("onError");
+            }
+        });
+        // 方式一：
+        new Executor(ctx).start();
+
+        // 方式二：
+        // ctx.start(new Executor(ctx));
 
         out.println("结束Servlet的时间：" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date()) + ".<br/>");
         out.flush();
     }
 
-    class Executor implements Runnable {
-        private AsyncContext ctx = null;
+    class Executor extends Thread {
+
+        private AsyncContext ctx;
 
         public Executor(AsyncContext ctx) {
             this.ctx = ctx;
