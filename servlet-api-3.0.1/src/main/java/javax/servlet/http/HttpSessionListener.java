@@ -82,14 +82,14 @@ import java.util.EventListener;
 public interface HttpSessionListener extends EventListener {
     
     /** 
-     * Receives notification that a session has been created.
+     * 当session被创建后，触发该监听方法
      *
      * @param se the HttpSessionEvent containing the session
      */
     public void sessionCreated(HttpSessionEvent se);
     
     /** 
-     * Receives notification that a session is about to be invalidated.
+     * 当session被删除前触发该监听方法
      *
      * @param se the HttpSessionEvent containing the session
      */

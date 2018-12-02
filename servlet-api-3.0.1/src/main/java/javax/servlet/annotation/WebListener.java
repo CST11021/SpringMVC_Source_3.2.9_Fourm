@@ -47,8 +47,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 使用该注解来声明一个Web容器监听
- * This annotation is used to declare a WebListener.
+ * 该注解用于将类声明为监听器，被 @WebListener 标注的类必须实现以下至少一个接口：
+ *
+ * 　　ServletContextListener
+ * 　　ServletContextAttributeListener
+ * 　　ServletRequestListener
+ * 　　ServletRequestAttributeListener
+ * 　　HttpSessionListener
+ * 　　HttpSessionAttributeListener
  *
  * Any class annotated with WebListener must implement one or more of
  * the {@link javax.servlet.ServletContextListener}, 

@@ -82,24 +82,23 @@ import java.util.EventListener;
  *
  * @since Servlet 2.4
  */
-// 这对ServletRequest的创建和删除做出响应的监听器
+
+// 对ServletRequest的创建和删除做出响应的监听器
+
 public interface ServletRequestListener extends EventListener {
 
     /**
-     * Receives notification that a ServletRequest is about to go out
-     * of scope of the web application.
+     * 当请求被创建时调用该监听方法
      *
-     * @param sre the ServletRequestEvent containing the ServletRequest
-     * and the ServletContext representing the web application
+     * @param sre 包含了ServletContext和ServletRequest对象的监听事件
+     */
+    public void requestInitialized(ServletRequestEvent sre);
+
+    /**
+     * 当ServletRequest被销毁时调用该监听方法
+     *
+     * @param sre 包含了ServletContext和ServletRequest对象的监听事件
      */
     public void requestDestroyed(ServletRequestEvent sre);
 
-    /**
-     * Receives notification that a ServletRequest is about to come
-     * into scope of the web application.
-     *
-     * @param sre the ServletRequestEvent containing the ServletRequest
-     * and the ServletContext representing the web application
-     */
-    public void requestInitialized(ServletRequestEvent sre);
 }

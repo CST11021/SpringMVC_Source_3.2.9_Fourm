@@ -67,7 +67,9 @@ package javax.servlet;
  */
 public class ServletContextAttributeEvent extends ServletContextEvent {
 
+    /** ServletContext属性变更对应的name */
     private String name;
+    /** ServletContext属性变更对应的value */
     private Object value;
 
     public ServletContextAttributeEvent(ServletContext source, String name, Object value) {

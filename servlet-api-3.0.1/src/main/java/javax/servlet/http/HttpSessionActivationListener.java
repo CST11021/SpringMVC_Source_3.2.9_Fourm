@@ -70,7 +70,9 @@ import java.util.EventListener;
  *
  * @since Servlet 2.3
  */
+
 // 这是在打开和关闭某个HttpSession时被调用的监听器
+
 public interface HttpSessionActivationListener extends EventListener {
 
     /**

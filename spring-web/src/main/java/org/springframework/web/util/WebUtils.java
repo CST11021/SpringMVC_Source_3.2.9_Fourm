@@ -135,14 +135,8 @@ public abstract class WebUtils {
 
 
 	/**
-	 * Set a system property to the web application root directory.
-	 * The key of the system property can be defined with the "webAppRootKey"
-	 * context-param in {@code web.xml}. Default is "webapp.root".
-	 * <p>Can be used for tools that support substition with {@code System.getProperty}
-	 * values, like log4j's "${key}" syntax within log file locations.
-	 * @param servletContext the servlet context of the web application
-	 * @throws IllegalStateException if the system property is already set,
-	 * or if the WAR file is not expanded
+	 * 设置一个指向web应用根目录的的系统属性，这个系统属性可通过在web.xml中配置一个key为"webAppRootKey"的context-param，默认为"webapp.root"
+	 *
 	 * @see #WEB_APP_ROOT_KEY_PARAM
 	 * @see #DEFAULT_WEB_APP_ROOT_KEY
 	 * @see WebAppRootListener
@@ -152,8 +146,7 @@ public abstract class WebUtils {
 		Assert.notNull(servletContext, "ServletContext must not be null");
 		String root = servletContext.getRealPath("/");
 		if (root == null) {
-			throw new IllegalStateException(
-				"Cannot set web app root system property when WAR file is not expanded");
+			throw new IllegalStateException("Cannot set web app root system property when WAR file is not expanded");
 		}
 		String param = servletContext.getInitParameter(WEB_APP_ROOT_KEY_PARAM);
 		String key = (param != null ? param : DEFAULT_WEB_APP_ROOT_KEY);
@@ -169,8 +162,8 @@ public abstract class WebUtils {
 	}
 
 	/**
-	 * Remove the system property that points to the web app root directory.
-	 * To be called on shutdown of the web application.
+	 * 移除指向web应用根目录的系统属性，该方法在web应用关闭时被调用
+	 *
 	 * @param servletContext the servlet context of the web application
 	 * @see #setWebAppRootSystemProperty
 	 */

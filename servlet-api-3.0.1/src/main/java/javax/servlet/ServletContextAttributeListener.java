@@ -77,36 +77,29 @@ import java.util.EventListener;
  *
  * @since Servlet 2.3
  */
-// 这是在创建、移除或替换Servlet上下文属性时响应的监听器
+
+// 用于监听ServletContext的属性变更
+
 public interface ServletContextAttributeListener extends EventListener {
 
     /**
-     * Receives notification that an attribute has been added to the
-     * ServletContext.
+     * 当ServletContext添加attribute后，触发该方法
      *
-     * @param event the ServletContextAttributeEvent containing the
-     * ServletContext to which the attribute was added, along with the
-     * attribute name and value
+     * @param event 表示ServletContext属性变更的事件
      */
     public void attributeAdded(ServletContextAttributeEvent event);
 
     /**
-     * Receives notification that an attribute has been removed
-     * from the ServletContext.
+     * 当ServletContext移除attribute后，触发该方法
      *
-     * @param event the ServletContextAttributeEvent containing the
-     * ServletContext from which the attribute was removed, along with
-     * the attribute name and value
+     * @param event 表示ServletContext属性变更的事件
      */
     public void attributeRemoved(ServletContextAttributeEvent event);
 
     /**
-     * Receives notification that an attribute has been replaced
-     * in the ServletContext.
+     * 当ServletContext更新attribute前，触发该方法
      *
-     * @param event the ServletContextAttributeEvent containing the
-     * ServletContext in which the attribute was replaced, along with
-     * the attribute name and its old value
+     * @param event 表示ServletContext属性变更的事件
      */
     public void attributeReplaced(ServletContextAttributeEvent event);
 }

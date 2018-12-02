@@ -75,7 +75,9 @@ import java.util.EventListener;
  *
  * @since Servlet 2.3
  */
+
 // 这是在创建、移除或替换某个session上下文属性时响应的监听器
+
 public interface HttpSessionAttributeListener extends EventListener {
 
     /**
