@@ -163,7 +163,7 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 	}
 
 
-	// 根据bean的 type 判断是否是一个Controller，即请求处理器
+
 	@Override
 	protected boolean isHandler(Class<?> beanType) {
 		return ((AnnotationUtils.findAnnotation(beanType, Controller.class) != null) ||

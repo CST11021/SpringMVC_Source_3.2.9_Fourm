@@ -260,19 +260,11 @@ import java.util.concurrent.Callable;
 @Mapping
 public @interface RequestMapping {
 
-	/**
-	 * The primary mapping expressed by this annotation.
-	 * <p>In a Servlet environment: the path mapping URIs (e.g. "/myPath.do").
-	 * Ant-style path patterns are also supported (e.g. "/myPath/*.do").
-	 * At the method level, relative paths (e.g. "edit.do") are supported
-	 * within the primary mapping expressed at the type level.
-	 * Path mapping URIs may contain placeholders (e.g. "/${connect}")
-	 * <p>In a Portlet environment: the mapped portlet modes
-	 * (i.e. "EDIT", "VIEW", "HELP" or any custom modes).
-	 * <p><b>Supported at the type level as well as at the method level!</b>
-	 * When used at the type level, all method-level mappings inherit
-	 * this primary mapping, narrowing it for a specific handler method.
-	 */
+	// 在Servlet环境中：路径映射URI（例如“/myPath.do”）。 也支持Ant风格的路径模式（例如“/myPath/*.do”）。
+	// 在方法级别，在类型级别表示的主映射内支持相对路径（例如“edit.do”）。 路径映射URI可以包含占位符（例如“/ $ {connect}”）
+	//
+	// 在Portlet环境中：映射的portlet模式*（即“EDIT”，“VIEW”，“HELP”或任何自定义模式）。
+	// 在类型级别和方法级别受支持！在类型级别使用时，所有方法级别映射都继承此主映射，将其缩小为特定的处理程序方法。
 	String[] value() default {};
 
 	/**
@@ -284,6 +276,7 @@ public @interface RequestMapping {
 	 * gets checked before the handler method is even resolved).
 	 * <p>Supported for Servlet environments as well as Portlet 2.0 environments.
 	 */
+	// 用于限制请求的方法类型
 	RequestMethod[] method() default {};
 
 	/**
@@ -308,6 +301,7 @@ public @interface RequestMapping {
 	 * conditions uniquely identify the target handler. Different handlers may be
 	 * mapped onto the same portlet mode, as long as their parameter mappings differ.
 	 */
+	// 用于参数限制，例如：@RequestMapping(value = "/test", params = {"param1=myValue", "param2!=myValue"})
 	String[] params() default {};
 
 	/**
@@ -333,6 +327,7 @@ public @interface RequestMapping {
 	 * and against PortletRequest properties in a Portlet 2.0 environment.
 	 * @see org.springframework.http.MediaType
 	 */
+	// 请求头限制
 	String[] headers() default {};
 
 	/**
@@ -352,6 +347,10 @@ public @interface RequestMapping {
 	 * @see org.springframework.http.MediaType
 	 * @see javax.servlet.http.HttpServletRequest#getContentType()
 	 */
+	// 映射请求的可消耗媒体类型，缩小主映射。格式是单一媒体类型或媒体类型序列，仅当{@code Content-Type}与其中一种媒体类型匹配时才会映射请求。
+	// 示例：consume =“text/plain” consumes = {“text/plain”，“application/*”}
+	// 使用“！”可以取消表达式。运算符，如“！text/plain”，它匹配除“text/plain”之外的{@code Content-Type}的所有请求。
+	// 在类型级别和方法级别受支持！在类型级别使用时，所有方法级别映射都会覆盖此消耗限制。
 	String[] consumes() default {};
 
 	/**
@@ -370,6 +369,10 @@ public @interface RequestMapping {
 	 * this consumes restriction.
 	 * @see org.springframework.http.MediaType
 	 */
+	// 映射请求的可生成媒体类型，缩小主映射。 格式是单一媒体类型或媒体类型序列，仅当{@code Accept}与其中一种媒体类型匹配时才会映射请求。
+	// 示例：produce =“text/plain” produce = {“text/plain”，“application/*”}
+	// 使用“！”可以取消表达式。运算符，如“！text/plain”，它将所有请求与{@code Accept}匹配，而不是“text/plain”。
+	// 在类型级别和方法级别受支持！在类型级别使用时，所有方法级别映射都会覆盖此消耗限制。
 	String[] produces() default {};
 
 }

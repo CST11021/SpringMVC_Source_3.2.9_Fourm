@@ -34,12 +34,26 @@ import org.springframework.web.util.WebUtils;
  * @since 28.08.2003
  * @see SpringBeanAutowiringSupport
  */
+
+// WebApplication的一个支持类：封装了 ServletContext 和 ApplicationContext
+
 public abstract class WebApplicationObjectSupport extends ApplicationObjectSupport implements ServletContextAware {
 
 	/** Servlet上下文对象 */
 	private ServletContext servletContext;
 
+	/**
+	 * 用于初始化ServletContext，当{@link #servletContext}被注入时，该方法被调用
+	 *
+	 * @param servletContext
+	 */
 	protected void initServletContext(ServletContext servletContext) {}
+
+	/**
+	 * 自动注册ServletContext
+	 *
+	 * @param servletContext
+	 */
 	public final void setServletContext(ServletContext servletContext) {
 		if (servletContext != this.servletContext) {
 			this.servletContext = servletContext;
@@ -82,6 +96,11 @@ public abstract class WebApplicationObjectSupport extends ApplicationObjectSuppo
 		}
 	}
 
+	/**
+	 * 表示注入{@link #servletContext}时，是否必须不为null
+	 *
+	 * @return
+	 */
 	@Override
 	protected boolean isContextRequired() {
 		return true;

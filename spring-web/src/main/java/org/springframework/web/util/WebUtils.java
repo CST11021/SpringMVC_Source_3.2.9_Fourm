@@ -107,8 +107,8 @@ public abstract class WebUtils {
 	public static final String DEFAULT_CHARACTER_ENCODING = "ISO-8859-1";
 
 	/**
-	 * Standard Servlet spec context attribute that specifies a temporary
-	 * directory for the current web application, of type {@code java.io.File}.
+	 * 每一个servlet上下文都需要一个临时存储目录。Servlet容器必须为每一个servlet上下文提供一个私有的临时目录，并且使它可以通过
+	 * javax.servlet.context.tempdir上下文属性可用。这些属性关联的对象必须是java.io.File类型
 	 */
 	public static final String TEMP_DIR_CONTEXT_ATTRIBUTE = "javax.servlet.context.tempdir";
 
@@ -208,31 +208,24 @@ public abstract class WebUtils {
 	}
 
 	/**
-	 * Return the temporary directory for the current web application,
-	 * as provided by the servlet container.
-	 * @param servletContext the servlet context of the web application
-	 * @return the File representing the temporary directory
+	 * 返回ServletContext的临时存储目录
+	 *
+	 * @param servletContext
+	 * @return
 	 */
-	// 获取 ServletContex 对应的临时文件地址，它以 File 对象的形式返回。
 	public static File getTempDir(ServletContext servletContext) {
 		Assert.notNull(servletContext, "ServletContext must not be null");
 		return (File) servletContext.getAttribute(TEMP_DIR_CONTEXT_ATTRIBUTE);
 	}
 
 	/**
-	 * Return the real path of the given path within the web application,
-	 * as provided by the servlet container.
-	 * <p>Prepends a slash if the path does not already start with a slash,
-	 * and throws a FileNotFoundException if the path cannot be resolved to
-	 * a resource (in contrast to ServletContext's {@code getRealPath},
-	 * which returns null).
-	 * @param servletContext the servlet context of the web application
-	 * @param path the path within the web application
-	 * @return the corresponding real path
-	 * @throws FileNotFoundException if the path cannot be resolved to a resource
-	 * @see javax.servlet.ServletContext#getRealPath
+	 * 获取相对路径对应文件系统的真实文件路径
+	 *
+	 * @param servletContext		ServletContext
+	 * @param path					相对路径
+	 * @return
+	 * @throws FileNotFoundException
 	 */
-	// 获取相对路径对应文件系统的真实文件路径
 	public static String getRealPath(ServletContext servletContext, String path) throws FileNotFoundException {
 		Assert.notNull(servletContext, "ServletContext must not be null");
 		// Interpret location as relative to the web application root directory.

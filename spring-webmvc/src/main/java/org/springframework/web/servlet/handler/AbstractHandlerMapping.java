@@ -55,117 +55,39 @@ import java.util.List;
  * @see org.springframework.web.servlet.HandlerInterceptor
  */
 public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport implements HandlerMapping, Ordered {
-	// 该属性用于排序
+	/** 该属性用于排序 */
 	private int order = Integer.MAX_VALUE;
-	// 表示HTTP请求默认对应的 Controller，当从HandlerMapping中找不到对应的控制器时，就会使用该对象作为Controller
-	// （该字段可能是字符串表示这个控制器Bean的BeanName，也可能就是控制器Bean本身）
+	/**
+	 * 表示HTTP请求默认对应的 Controller，当从HandlerMapping中找不到对应的控制器时，就会使用该对象作为Controller
+	 * （该字段可能是字符串表示这个控制器Bean的BeanName，也可能就是控制器Bean本身）
+	 */
 	private Object defaultHandler;
 
 	private UrlPathHelper urlPathHelper = new UrlPathHelper();
 	private PathMatcher pathMatcher = new AntPathMatcher();
+	/** 表示该HandleMapping的拦截器,该拦截器类型包括：HandlerInterceptor，WebRequestInterceptor和MappedInterceptor */
 	private final List<Object> interceptors = new ArrayList<Object>();
-	// 表示请求的拦截器，当请求被控制器处理器前，可能会经过多个拦截器进行处理
+	/** 表示请求的拦截器，当请求被控制器处理器前，可能会经过多个拦截器进行处理 */
 	private final List<HandlerInterceptor> adaptedInterceptors = new ArrayList<HandlerInterceptor>();
 	private final List<MappedInterceptor> mappedInterceptors = new ArrayList<MappedInterceptor>();
 
 
-
-
-
-	/**
-	 * Set if URL lookup should always use the full path within the current servlet
-	 * context. Else, the path within the current servlet mapping is used if applicable
-	 * (that is, in the case of a ".../*" servlet mapping in web.xml).
-	 * <p>Default is "false".
-	 * @see org.springframework.web.util.UrlPathHelper#setAlwaysUseFullPath
-	 */
-	public void setAlwaysUseFullPath(boolean alwaysUseFullPath) {
-		this.urlPathHelper.setAlwaysUseFullPath(alwaysUseFullPath);
-	}
-
-	/**
-	 * Set if context path and request URI should be URL-decoded. Both are returned
-	 * <i>undecoded</i> by the Servlet API, in contrast to the servlet path.
-	 * <p>Uses either the request encoding or the default encoding according
-	 * to the Servlet spec (ISO-8859-1).
-	 * @see org.springframework.web.util.UrlPathHelper#setUrlDecode
-	 */
-	public void setUrlDecode(boolean urlDecode) {
-		this.urlPathHelper.setUrlDecode(urlDecode);
-	}
-
-	/**
-	 * Set if ";" (semicolon) content should be stripped from the request URI.
-	 * <p>The default value is {@code true}.
-	 * @see org.springframework.web.util.UrlPathHelper#setRemoveSemicolonContent(boolean)
-	 */
-	public void setRemoveSemicolonContent(boolean removeSemicolonContent) {
-		this.urlPathHelper.setRemoveSemicolonContent(removeSemicolonContent);
-	}
-
-	/**
-	 * Set the UrlPathHelper to use for resolution of lookup paths.
-	 * <p>Use this to override the default UrlPathHelper with a custom subclass,
-	 * or to share common UrlPathHelper settings across multiple HandlerMappings
-	 * and MethodNameResolvers.
-	 */
-	public void setUrlPathHelper(UrlPathHelper urlPathHelper) {
-		Assert.notNull(urlPathHelper, "UrlPathHelper must not be null");
-		this.urlPathHelper = urlPathHelper;
-	}
-
-	/**
-	 * Return the UrlPathHelper implementation to use for resolution of lookup paths.
-	 */
-	public UrlPathHelper getUrlPathHelper() {
-		return urlPathHelper;
-	}
-
-	/**
-	 * Set the PathMatcher implementation to use for matching URL paths
-	 * against registered URL patterns. Default is AntPathMatcher.
-	 * @see org.springframework.util.AntPathMatcher
-	 */
-	public void setPathMatcher(PathMatcher pathMatcher) {
-		Assert.notNull(pathMatcher, "PathMatcher must not be null");
-		this.pathMatcher = pathMatcher;
-	}
-
-	/**
-	 * Return the PathMatcher implementation to use for matching URL paths
-	 * against registered URL patterns.
-	 */
-	public PathMatcher getPathMatcher() {
-		return this.pathMatcher;
-	}
-
-	/**
-	 * Set the interceptors to apply for all handlers mapped by this handler mapping.
-	 * <p>Supported interceptor types are HandlerInterceptor, WebRequestInterceptor, and MappedInterceptor.
-	 * Mapped interceptors apply only to request URLs that match its path patterns.
-	 * Mapped interceptor beans are also detected by type during initialization.
-	 * @param interceptors array of handler interceptors, or {@code null} if none
-	 * @see #adaptInterceptor
-	 * @see org.springframework.web.servlet.HandlerInterceptor
-	 * @see org.springframework.web.context.request.WebRequestInterceptor
-	 */
 	public void setInterceptors(Object[] interceptors) {
 		this.interceptors.addAll(Arrays.asList(interceptors));
 	}
 
 
-	/**
-	 * Initializes the interceptors.
-	 * @see #extendInterceptors(java.util.List)
-	 * @see #initInterceptors()
-	 */
+
+	// -------------
+	// 初始化拦截器
+	// -------------
+
 	@Override
 	protected void initApplicationContext() throws BeansException {
 		extendInterceptors(this.interceptors);
 		detectMappedInterceptors(this.mappedInterceptors);
 		initInterceptors();
 	}
-
 	/**
 	 * Extension hook that subclasses can override to register additional interceptors,
 	 * given the configured interceptors (see {@link #setInterceptors}).
@@ -177,7 +99,6 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	 */
 	protected void extendInterceptors(List<Object> interceptors) {
 	}
-
 	/**
 	 * Detect beans of type {@link MappedInterceptor} and add them to the list of mapped interceptors.
 	 * <p>This is called in addition to any {@link MappedInterceptor}s that may have been provided
@@ -190,7 +111,6 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 				BeanFactoryUtils.beansOfTypeIncludingAncestors(
 						getApplicationContext(), MappedInterceptor.class, true, false).values());
 	}
-
 	/**
 	 * Initialize the specified interceptors, checking for {@link MappedInterceptor}s and
 	 * adapting {@link HandlerInterceptor}s and {@link WebRequestInterceptor}s if necessary.
@@ -213,7 +133,6 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 			}
 		}
 	}
-
 	/**
 	 * Adapt the given interceptor object to the {@link HandlerInterceptor} interface.
 	 * <p>By default, the supported interceptor types are {@link HandlerInterceptor}
@@ -240,16 +159,9 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 
 
 
-
-	/**
-	 * Return all configured {@link MappedInterceptor}s as an array.
-	 * @return the array of {@link MappedInterceptor}s, or {@code null} if none
-	 */
-	protected final MappedInterceptor[] getMappedInterceptors() {
-		int count = this.mappedInterceptors.size();
-		return (count > 0 ? this.mappedInterceptors.toArray(new MappedInterceptor[count]) : null);
-	}
-
+	// -------------
+	// getHandler
+	// -------------
 
 	public final HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
 	    // 获取控制器对象
@@ -268,7 +180,6 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 		}
 		return getHandlerExecutionChain(handler, request);
 	}
-
 	/**
 	 * 获取request对应的控制器（即Controller），这里返回的可能是一个控制器Bean，或是控制器BeanName或者HandlerExecutionChain
 	 *
@@ -277,7 +188,6 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	 * @throws Exception
 	 */
 	protected abstract Object getHandlerInternal(HttpServletRequest request) throws Exception;
-
 	/**
 	 * 将配置中对应的拦截器加入到执行链中，以保证这些拦截器可以有效地作用于目标对象
 	 *
@@ -300,7 +210,6 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 
 		return chain;
 	}
-
 	/**
 	 * 获取所有配置的拦截器
 	 *
@@ -309,6 +218,41 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	protected final HandlerInterceptor[] getAdaptedInterceptors() {
 		int count = this.adaptedInterceptors.size();
 		return (count > 0 ? this.adaptedInterceptors.toArray(new HandlerInterceptor[count]) : null);
+	}
+
+
+
+	// -------------
+	// UrlPathHelper
+	// -------------
+
+	/**
+	 * Set if URL lookup should always use the full path within the current servlet
+	 * context. Else, the path within the current servlet mapping is used if applicable
+	 * (that is, in the case of a ".../*" servlet mapping in web.xml).
+	 * <p>Default is "false".
+	 * @see org.springframework.web.util.UrlPathHelper#setAlwaysUseFullPath
+	 */
+	public void setAlwaysUseFullPath(boolean alwaysUseFullPath) {
+		this.urlPathHelper.setAlwaysUseFullPath(alwaysUseFullPath);
+	}
+	/**
+	 * Set if context path and request URI should be URL-decoded. Both are returned
+	 * <i>undecoded</i> by the Servlet API, in contrast to the servlet path.
+	 * <p>Uses either the request encoding or the default encoding according
+	 * to the Servlet spec (ISO-8859-1).
+	 * @see org.springframework.web.util.UrlPathHelper#setUrlDecode
+	 */
+	public void setUrlDecode(boolean urlDecode) {
+		this.urlPathHelper.setUrlDecode(urlDecode);
+	}
+	/**
+	 * Set if ";" (semicolon) content should be stripped from the request URI.
+	 * <p>The default value is {@code true}.
+	 * @see org.springframework.web.util.UrlPathHelper#setRemoveSemicolonContent(boolean)
+	 */
+	public void setRemoveSemicolonContent(boolean removeSemicolonContent) {
+		this.urlPathHelper.setRemoveSemicolonContent(removeSemicolonContent);
 	}
 
 
@@ -325,6 +269,24 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	}
 	public Object getDefaultHandler() {
 		return this.defaultHandler;
+	}
+	public void setUrlPathHelper(UrlPathHelper urlPathHelper) {
+		Assert.notNull(urlPathHelper, "UrlPathHelper must not be null");
+		this.urlPathHelper = urlPathHelper;
+	}
+	public UrlPathHelper getUrlPathHelper() {
+		return urlPathHelper;
+	}
+	public void setPathMatcher(PathMatcher pathMatcher) {
+		Assert.notNull(pathMatcher, "PathMatcher must not be null");
+		this.pathMatcher = pathMatcher;
+	}
+	public PathMatcher getPathMatcher() {
+		return this.pathMatcher;
+	}
+	protected final MappedInterceptor[] getMappedInterceptors() {
+		int count = this.mappedInterceptors.size();
+		return (count > 0 ? this.mappedInterceptors.toArray(new MappedInterceptor[count]) : null);
 	}
 
 }

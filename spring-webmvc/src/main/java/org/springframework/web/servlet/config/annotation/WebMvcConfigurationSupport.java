@@ -169,17 +169,10 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 	private List<HttpMessageConverter<?>> messageConverters;
 
 
-	/**
-	 * Set the {@link javax.servlet.ServletContext}, e.g. for resource handling,
-	 * looking up file extensions, etc.
-	 */
+
 	public void setServletContext(ServletContext servletContext) {
 		this.servletContext = servletContext;
 	}
-
-	/**
-	 * Set the Spring {@link ApplicationContext}, e.g. for resource loading.
-	 */
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 	}

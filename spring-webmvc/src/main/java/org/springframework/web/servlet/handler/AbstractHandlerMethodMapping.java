@@ -106,9 +106,10 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	}
 
 	/**
-	 * Whether the given type is a handler with handler methods.
-	 * @param beanType the type of the bean being checked
-	 * @return "true" if this a handler type, "false" otherwise.
+	 * 根据bean的 type 判断是否是一个Controller，即请求处理器
+	 *
+	 * @param beanType
+	 * @return
 	 */
 	protected abstract boolean isHandler(Class<?> beanType);
 
