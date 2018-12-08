@@ -51,51 +51,23 @@ import org.springframework.web.servlet.HandlerMapping;
  * @author Arjen Poutsma
  * @since 16.04.2003
  */
+
+// 与AbstractHandlerMethodMapping不同, AbstractUrlHandlerMapping.getHandlerInternal 返回的是个 Object(PS: 这里的Object有可能
+// 是 ApplicationContext 中的 BeanName, 或直接是个 Bean), 而且其中完成了 URI 与 handler 的注册流程 registerHandler(urlPath, beanName)
+
 public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping {
 
+	// 表示处理"/"请求的控制器
 	private Object rootHandler;
 
+	// 是否延迟初始化控制器
 	private boolean lazyInitHandlers = false;
 
+	// 用来注册uri与Handler的对应关系
 	private final Map<String, Object> handlerMap = new LinkedHashMap<String, Object>();
 
 
-	/**
-	 * Set the root handler for this handler mapping, that is,
-	 * the handler to be registered for the root path ("/").
-	 * <p>Default is {@code null}, indicating no root handler.
-	 */
-	public void setRootHandler(Object rootHandler) {
-		this.rootHandler = rootHandler;
-	}
 
-	/**
-	 * Return the root handler for this handler mapping (registered for "/"),
-	 * or {@code null} if none.
-	 */
-	public Object getRootHandler() {
-		return this.rootHandler;
-	}
-
-	/**
-	 * Set whether to lazily initialize handlers. Only applicable to
-	 * singleton handlers, as prototypes are always lazily initialized.
-	 * Default is "false", as eager initialization allows for more efficiency
-	 * through referencing the controller objects directly.
-	 * <p>If you want to allow your controllers to be lazily initialized,
-	 * make them "lazy-init" and set this flag to true. Just making them
-	 * "lazy-init" will not work, as they are initialized through the
-	 * references from the handler mapping in this case.
-	 */
-	public void setLazyInitHandlers(boolean lazyInitHandlers) {
-		this.lazyInitHandlers = lazyInitHandlers;
-	}
-
-	/**
-	 * Look up a handler for the URL path of the given request.
-	 * @param request current HTTP request
-	 * @return the handler instance, or {@code null} if none found
-	 */
 	@Override
 	protected Object getHandlerInternal(HttpServletRequest request) throws Exception {
 		//截取用于匹配的url有效路径，比如：/test.html
@@ -134,20 +106,6 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping {
 		}
 		return handler;
 	}
-
-	/**
-	 * Look up a handler instance for the given URL path.
-	 * <p>Supports direct matches, e.g. a registered "/test" matches "/test",
-	 * and various Ant-style pattern matches, e.g. a registered "/t*" matches
-	 * both "/test" and "/team". For details, see the AntPathMatcher class.
-	 * <p>Looks for the most exact pattern, where most exact is defined as
-	 * the longest path pattern.
-	 * @param urlPath URL the bean is mapped to
-	 * @param request current HTTP request (to expose the path within the mapping to)
-	 * @return the associated handler instance, or {@code null} if not found
-	 * @see #exposePathWithinMapping
-	 * @see org.springframework.util.AntPathMatcher
-	 */
 	protected Object lookupHandler(String urlPath, HttpServletRequest request) throws Exception {
 		// Direct match?
 		//“直接匹配”情况的处理
@@ -158,13 +116,16 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping {
 				String handlerName = (String) handler;
 				handler = getApplicationContext().getBean(handlerName);
 			}
+			// 模板方法 校验 hanlder 是否合法, 比如 DefaultAnnotationHandlerMapping 中校验类上面是否有 @RequestMapping 注解
 			validateHandler(handler, request);
+			// 将 rawHandler HandlerInterceptor 包装到 chain 中 <- 其中涉及到 暴露 URI 模版变量 <-- 就是 www.baidu.com/{gropuId}/{userId}/{pageNo} <-- 中 groupId, userId, pageNo 的值, 其实就是 @PathVariable 这个注解解析时用到的值
 			return buildPathExposingHandler(handler, urlPath, urlPath, null);
 		}
 		// Pattern match?
 		//“通配符匹配”情况的处理
 		List<String> matchingPatterns = new ArrayList<String>();
 		for (String registeredPattern : this.handlerMap.keySet()) {
+			// 通过 AntPathMatcher 来进行匹配 <-- 正则匹配
 			if (getPathMatcher().match(registeredPattern, urlPath)) {
 				matchingPatterns.add(registeredPattern);
 			}
@@ -206,7 +167,6 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping {
 		// No handler found...
 		return null;
 	}
-
 	/**
 	 * Validate the given handler against the current request.
 	 * <p>The default implementation is empty. Can be overridden in subclasses,
@@ -217,7 +177,6 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping {
 	 */
 	protected void validateHandler(Object handler, HttpServletRequest request) throws Exception {
 	}
-
 	//将Handler 封装成 HandlerExecutionChain 类型
 	protected Object buildPathExposingHandler(Object rawHandler, String bestMatchingPattern, String pathWithinMapping, Map<String, String> uriTemplateVariables) {
 
@@ -250,28 +209,15 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping {
 		request.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, uriTemplateVariables);
 	}
 
-	/**
-	 * Register the specified handler for the given URL paths.
-	 * @param urlPaths the URLs that the bean should be mapped to
-	 * @param beanName the name of the handler bean
-	 * @throws BeansException if the handler couldn't be registered
-	 * @throws IllegalStateException if there is a conflicting handler registered
-	 */
+
+
+	// 注册请求映射关系
 	protected void registerHandler(String[] urlPaths, String beanName) throws BeansException, IllegalStateException {
 		Assert.notNull(urlPaths, "URL path array must not be null");
 		for (String urlPath : urlPaths) {
 			registerHandler(urlPath, beanName);
 		}
 	}
-
-	/**
-	 * Register the specified handler for the given URL path.
-	 * @param urlPath the URL the bean should be mapped to
-	 * @param handler the handler instance or handler bean name String
-	 * (a bean name will automatically be resolved into the corresponding handler bean)
-	 * @throws BeansException if the handler couldn't be registered
-	 * @throws IllegalStateException if there is a conflicting handler registered
-	 */
 	protected void registerHandler(String urlPath, Object handler) throws BeansException, IllegalStateException {
 		Assert.notNull(urlPath, "URL path must not be null");
 		Assert.notNull(handler, "Handler object must not be null");
@@ -314,27 +260,33 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping {
 			}
 		}
 	}
-
 	private String getHandlerDescription(Object handler) {
 		return "handler " + (handler instanceof String ? "'" + handler + "'" : "of type [" + handler.getClass() + "]");
 	}
 
 
-	/**
-	 * Return the registered handlers as an unmodifiable Map, with the registered path
-	 * as key and the handler object (or handler bean name in case of a lazy-init handler)
-	 * as value.
-	 * @see #getDefaultHandler()
-	 */
-	public final Map<String, Object> getHandlerMap() {
-		return Collections.unmodifiableMap(this.handlerMap);
-	}
 
 	/**
 	 * Indicates whether this handler mapping support type-level mappings. Default to {@code false}.
 	 */
 	protected boolean supportsTypeLevelMappings() {
 		return false;
+	}
+
+
+
+	// getter and setter...
+	public void setRootHandler(Object rootHandler) {
+		this.rootHandler = rootHandler;
+	}
+	public Object getRootHandler() {
+		return this.rootHandler;
+	}
+	public void setLazyInitHandlers(boolean lazyInitHandlers) {
+		this.lazyInitHandlers = lazyInitHandlers;
+	}
+	public final Map<String, Object> getHandlerMap() {
+		return Collections.unmodifiableMap(this.handlerMap);
 	}
 
 

@@ -17,7 +17,7 @@
         <property name="servletName" value="forwarding"/>
     </bean>
 
-    <!-- 自定义的Handler -->
+    <!-- 自定义的控制器类，一个控制器处理一个请求 -->
     <bean id="testAbstractController" class="com.whz.web.controller.test.TestAbstractController"/>
 
     <!-- 配置 multiActionController 一个控制器类可以处理多个请求 -->

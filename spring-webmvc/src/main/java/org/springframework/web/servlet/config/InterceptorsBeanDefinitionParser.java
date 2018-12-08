@@ -39,6 +39,15 @@ import org.springframework.web.servlet.handler.MappedInterceptor;
  */
 class InterceptorsBeanDefinitionParser implements BeanDefinitionParser {
 
+	// 		<mvc:interceptors>
+	//         <mvc:interceptor>
+	//             <!-- 进行拦截：/**表示拦截所有Controller，注意不拦截那些不是Controller处理的请求-->
+	//             <mvc:mapping path="/**" />
+	//             <!-- 不进行拦截 -->
+	//             <mvc:exclude-mapping path="/test.html"/>
+	//             <bean class="com.whz.web.filter.TestInterceptor" />
+	//         </mvc:interceptor>
+	//     </mvc:interceptors>
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
 		CompositeComponentDefinition compDefinition = new CompositeComponentDefinition(element.getTagName(), parserContext.extractSource(element));
 		parserContext.pushContainingComponent(compDefinition);
