@@ -78,9 +78,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 
 
 
-	// -------------
-	// 初始化拦截器
-	// -------------
+	// 1、初始化拦截器----------------------------------------------------------------------------------------------------
 
 	@Override
 	protected void initApplicationContext() throws BeansException {
@@ -159,9 +157,8 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 
 
 
-	// -------------
-	// getHandler
-	// -------------
+
+	// 2、根据请求获取对应的HandlerExecutionChain执行链--------------------------------------------------------------------
 
 	public final HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
 	    // 获取控制器对象
@@ -222,9 +219,8 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 
 
 
-	// -------------
-	// UrlPathHelper
-	// -------------
+
+	// 3、UrlPathHelper-------------------------------------------------------------------------------------------------
 
 	/**
 	 * Set if URL lookup should always use the full path within the current servlet

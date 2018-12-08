@@ -43,7 +43,12 @@ import org.springframework.web.servlet.mvc.condition.RequestMethodsRequestCondit
  * @author Rossen Stoyanchev
  * @since 3.1
  */
+
+// 用于封装请求映射的信息
+
 public final class RequestMappingInfo implements RequestCondition<RequestMappingInfo> {
+
+	// 以下对象封装了@RequestMapping注解的中的配置信息
 
 	private final PatternsRequestCondition patternsCondition;
 	private final RequestMethodsRequestCondition methodsCondition;
@@ -54,13 +59,7 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 	private final RequestConditionHolder customConditionHolder;
 
 
-	public RequestMappingInfo(PatternsRequestCondition patterns,
-							  RequestMethodsRequestCondition methods,
-							  ParamsRequestCondition params,
-							  HeadersRequestCondition headers,
-							  ConsumesRequestCondition consumes,
-							  ProducesRequestCondition produces,
-							  RequestCondition<?> custom) {
+	public RequestMappingInfo(PatternsRequestCondition patterns, RequestMethodsRequestCondition methods, ParamsRequestCondition params, HeadersRequestCondition headers, ConsumesRequestCondition consumes, ProducesRequestCondition produces, RequestCondition<?> custom) {
 
 		this.patternsCondition = (patterns != null ? patterns : new PatternsRequestCondition());
 		this.methodsCondition = (methods != null ? methods : new RequestMethodsRequestCondition());
@@ -76,60 +75,7 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 	}
 
 
-	/**
-	 * Returns the URL patterns of this {@link RequestMappingInfo};
-	 * or instance with 0 patterns, never {@code null}.
-	 */
-	public PatternsRequestCondition getPatternsCondition() {
-		return this.patternsCondition;
-	}
 
-	/**
-	 * Returns the HTTP request methods of this {@link RequestMappingInfo};
-	 * or instance with 0 request methods, never {@code null}.
-	 */
-	public RequestMethodsRequestCondition getMethodsCondition() {
-		return this.methodsCondition;
-	}
-
-	/**
-	 * Returns the "parameters" condition of this {@link RequestMappingInfo};
-	 * or instance with 0 parameter expressions, never {@code null}.
-	 */
-	public ParamsRequestCondition getParamsCondition() {
-		return this.paramsCondition;
-	}
-
-	/**
-	 * Returns the "headers" condition of this {@link RequestMappingInfo};
-	 * or instance with 0 header expressions, never {@code null}.
-	 */
-	public HeadersRequestCondition getHeadersCondition() {
-		return this.headersCondition;
-	}
-
-	/**
-	 * Returns the "consumes" condition of this {@link RequestMappingInfo};
-	 * or instance with 0 consumes expressions, never {@code null}.
-	 */
-	public ConsumesRequestCondition getConsumesCondition() {
-		return this.consumesCondition;
-	}
-
-	/**
-	 * Returns the "produces" condition of this {@link RequestMappingInfo};
-	 * or instance with 0 produces expressions, never {@code null}.
-	 */
-	public ProducesRequestCondition getProducesCondition() {
-		return this.producesCondition;
-	}
-
-	/**
-	 * Returns the "custom" condition of this {@link RequestMappingInfo}; or {@code null}.
-	 */
-	public RequestCondition<?> getCustomCondition() {
-		return this.customConditionHolder.getCondition();
-	}
 
 
 	/**
@@ -180,13 +126,6 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 		return new RequestMappingInfo(patterns, methods, params, headers, consumes, produces, custom.getCondition());
 	}
 
-
-	/**
-	 * Compares "this" info (i.e. the current instance) with another info in the context of a request.
-	 * <p>Note: It is assumed both instances have been obtained via
-	 * {@link #getMatchingCondition(HttpServletRequest)} to ensure they have conditions with
-	 * content relevant to current request.
-	 */
 	public int compareTo(RequestMappingInfo other, HttpServletRequest request) {
 		int result = this.patternsCondition.compareTo(other.getPatternsCondition(), request);
 		if (result != 0) {
@@ -218,6 +157,34 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 		}
 		return 0;
 	}
+
+
+
+
+	// getter...
+
+	public PatternsRequestCondition getPatternsCondition() {
+		return this.patternsCondition;
+	}
+	public RequestMethodsRequestCondition getMethodsCondition() {
+		return this.methodsCondition;
+	}
+	public ParamsRequestCondition getParamsCondition() {
+		return this.paramsCondition;
+	}
+	public HeadersRequestCondition getHeadersCondition() {
+		return this.headersCondition;
+	}
+	public ConsumesRequestCondition getConsumesCondition() {
+		return this.consumesCondition;
+	}
+	public ProducesRequestCondition getProducesCondition() {
+		return this.producesCondition;
+	}
+	public RequestCondition<?> getCustomCondition() {
+		return this.customConditionHolder.getCondition();
+	}
+
 
 	@Override
 	public boolean equals(Object obj) {

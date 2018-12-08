@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 public final class HeadersRequestCondition extends AbstractRequestCondition<HeadersRequestCondition> {
 
+	// 对应@RequestMapping注解的head配置
 	private final Set<HeaderExpression> expressions;
 
 

@@ -129,8 +129,7 @@ public abstract class RequestMappingInfoHandlerMapping extends AbstractHandlerMe
 		return !getUrlPathHelper().shouldRemoveSemicolonContent();
 	}
 
-	private Map<String, MultiValueMap<String, String>> extractMatrixVariables(
-			HttpServletRequest request, Map<String, String> uriVariables) {
+	private Map<String, MultiValueMap<String, String>> extractMatrixVariables(HttpServletRequest request, Map<String, String> uriVariables) {
 
 		Map<String, MultiValueMap<String, String>> result = new LinkedHashMap<String, MultiValueMap<String, String>>();
 		for (Entry<String, String> uriVar : uriVariables.entrySet()) {
@@ -167,8 +166,7 @@ public abstract class RequestMappingInfoHandlerMapping extends AbstractHandlerMe
 	 * but not by consumable/producible media types
 	 */
 	@Override
-	protected HandlerMethod handleNoMatch(Set<RequestMappingInfo> requestMappingInfos,
-			String lookupPath, HttpServletRequest request) throws ServletException {
+	protected HandlerMethod handleNoMatch(Set<RequestMappingInfo> requestMappingInfos, String lookupPath, HttpServletRequest request) throws ServletException {
 
 		Set<String> allowedMethods = new LinkedHashSet<String>(4);
 

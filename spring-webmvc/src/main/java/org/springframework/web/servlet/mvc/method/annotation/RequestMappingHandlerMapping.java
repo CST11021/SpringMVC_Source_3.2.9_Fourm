@@ -125,8 +125,6 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 		super.afterPropertiesSet();
 	}
 
-
-
 	/**
 	 * Whether to use suffix pattern matching.
 	 */
@@ -163,21 +161,17 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 	}
 
 
-
 	@Override
 	protected boolean isHandler(Class<?> beanType) {
 		return ((AnnotationUtils.findAnnotation(beanType, Controller.class) != null) ||
 				(AnnotationUtils.findAnnotation(beanType, RequestMapping.class) != null));
 	}
 
-	/**
-	 * Uses method and type-level @{@link RequestMapping} annotations to create
-	 * the RequestMappingInfo.
-	 * @return the created RequestMappingInfo, or {@code null} if the method
-	 * does not have a {@code @RequestMapping} annotation.
-	 * @see #getCustomMethodCondition(Method)
-	 * @see #getCustomTypeCondition(Class)
-	 */
+
+	// 返回一个RequestMappingInfo实例，表示@RequestMapping中的配置信息------------------------------------------------------
+
+
+	// 判断这个方法是否为@RequestMapping方法，如果是返回请求映射的信息
 	@Override
 	protected RequestMappingInfo getMappingForMethod(Method method, Class<?> handlerType) {
 		RequestMappingInfo info = null;
@@ -193,45 +187,19 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 		}
 		return info;
 	}
-
-	/**
-	 * Provide a custom type-level request condition.
-	 * The custom {@link RequestCondition} can be of any type so long as the
-	 * same condition type is returned from all calls to this method in order
-	 * to ensure custom request conditions can be combined and compared.
-	 * <p>Consider extending {@link AbstractRequestCondition} for custom
-	 * condition types and using {@link CompositeRequestCondition} to provide
-	 * multiple custom conditions.
-	 * @param handlerType the handler type for which to create the condition
-	 * @return the condition, or {@code null}
-	 */
+	// 自定义的请求条件配置，这个返回null，留给子类扩展
 	protected RequestCondition<?> getCustomTypeCondition(Class<?> handlerType) {
 		return null;
 	}
-
-	/**
-	 * Provide a custom method-level request condition.
-	 * The custom {@link RequestCondition} can be of any type so long as the
-	 * same condition type is returned from all calls to this method in order
-	 * to ensure custom request conditions can be combined and compared.
-	 * <p>Consider extending {@link AbstractRequestCondition} for custom
-	 * condition types and using {@link CompositeRequestCondition} to provide
-	 * multiple custom conditions.
-	 * @param method the handler method for which to create the condition
-	 * @return the condition, or {@code null}
-	 */
+	// 自定义的请求方法条件过滤，这个返回null，留给子类扩展
 	protected RequestCondition<?> getCustomMethodCondition(Method method) {
 		return null;
 	}
-
-	/**
-	 * Created a RequestMappingInfo from a RequestMapping annotation.
-	 */
+	// 根据@RequestMapping注解配置和自定义的配置条件，创建一个RequestMappingInfo实例
 	protected RequestMappingInfo createRequestMappingInfo(RequestMapping annotation, RequestCondition<?> customCondition) {
 		String[] patterns = resolveEmbeddedValuesInPatterns(annotation.value());
 		return new RequestMappingInfo(
-				new PatternsRequestCondition(patterns, getUrlPathHelper(), getPathMatcher(),
-						this.useSuffixPatternMatch, this.useTrailingSlashMatch, this.fileExtensions),
+				new PatternsRequestCondition(patterns, getUrlPathHelper(), getPathMatcher(), this.useSuffixPatternMatch, this.useTrailingSlashMatch, this.fileExtensions),
 				new RequestMethodsRequestCondition(annotation.method()),
 				new ParamsRequestCondition(annotation.params()),
 				new HeadersRequestCondition(annotation.headers()),
@@ -239,11 +207,7 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 				new ProducesRequestCondition(annotation.produces(), annotation.headers(), getContentNegotiationManager()),
 				customCondition);
 	}
-
-	/**
-	 * Resolve placeholder values in the given array of patterns.
-	 * @return a new array with updated patterns
-	 */
+	// 返回@RequestMapping注解中的value信息，value可以配置多个
 	protected String[] resolveEmbeddedValuesInPatterns(String[] patterns) {
 		if (this.embeddedValueResolver == null) {
 			return patterns;

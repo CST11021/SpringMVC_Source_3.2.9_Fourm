@@ -39,8 +39,12 @@ import org.springframework.web.util.UrlPathHelper;
  * @author Rossen Stoyanchev
  * @since 3.1
  */
+
+// 用于封装请求的URL信息，对应@RequestMapping
+
 public final class PatternsRequestCondition extends AbstractRequestCondition<PatternsRequestCondition> {
 
+	// 对应@RequestMapping注解的value配置
 	private final Set<String> patterns;
 
 	private final UrlPathHelper pathHelper;
@@ -54,53 +58,19 @@ public final class PatternsRequestCondition extends AbstractRequestCondition<Pat
 	private final List<String> fileExtensions = new ArrayList<String>();
 
 
-	/**
-	 * Creates a new instance with the given URL patterns.
-	 * Each pattern that is not empty and does not start with "/" is prepended with "/".
-	 * @param patterns 0 or more URL patterns; if 0 the condition will match to every request.
-	 */
+
 	public PatternsRequestCondition(String... patterns) {
 		this(asList(patterns), null, null, true, true, null);
 	}
-
-	/**
-	 * Additional constructor with flags for using suffix pattern (.*) and
-	 * trailing slash matches.
-	 * @param patterns the URL patterns to use; if 0, the condition will match to every request.
-	 * @param urlPathHelper for determining the lookup path of a request
-	 * @param pathMatcher for path matching with patterns
-	 * @param useSuffixPatternMatch whether to enable matching by suffix (".*")
-	 * @param useTrailingSlashMatch whether to match irrespective of a trailing slash
-	 */
-	public PatternsRequestCondition(String[] patterns, UrlPathHelper urlPathHelper, PathMatcher pathMatcher,
-			boolean useSuffixPatternMatch, boolean useTrailingSlashMatch) {
+	public PatternsRequestCondition(String[] patterns, UrlPathHelper urlPathHelper, PathMatcher pathMatcher, boolean useSuffixPatternMatch, boolean useTrailingSlashMatch) {
 
 		this(asList(patterns), urlPathHelper, pathMatcher, useSuffixPatternMatch, useTrailingSlashMatch, null);
 	}
-
-	/**
-	 * Creates a new instance with the given URL patterns.
-	 * Each pattern that is not empty and does not start with "/" is pre-pended with "/".
-	 * @param patterns the URL patterns to use; if 0, the condition will match to every request.
-	 * @param urlPathHelper a {@link UrlPathHelper} for determining the lookup path for a request
-	 * @param pathMatcher a {@link PathMatcher} for pattern path matching
-	 * @param useSuffixPatternMatch whether to enable matching by suffix (".*")
-	 * @param useTrailingSlashMatch whether to match irrespective of a trailing slash
-	 * @param fileExtensions a list of file extensions to consider for path matching
-	 */
-	public PatternsRequestCondition(String[] patterns, UrlPathHelper urlPathHelper,
-			PathMatcher pathMatcher, boolean useSuffixPatternMatch, boolean useTrailingSlashMatch,
-			List<String> fileExtensions) {
+	public PatternsRequestCondition(String[] patterns, UrlPathHelper urlPathHelper, PathMatcher pathMatcher, boolean useSuffixPatternMatch, boolean useTrailingSlashMatch, List<String> fileExtensions) {
 
 		this(asList(patterns), urlPathHelper, pathMatcher, useSuffixPatternMatch, useTrailingSlashMatch, fileExtensions);
 	}
-
-	/**
-	 * Private constructor accepting a collection of patterns.
-	 */
-	private PatternsRequestCondition(Collection<String> patterns, UrlPathHelper urlPathHelper,
-			PathMatcher pathMatcher, boolean useSuffixPatternMatch, boolean useTrailingSlashMatch,
-			List<String> fileExtensions) {
+	private PatternsRequestCondition(Collection<String> patterns, UrlPathHelper urlPathHelper, PathMatcher pathMatcher, boolean useSuffixPatternMatch, boolean useTrailingSlashMatch, List<String> fileExtensions) {
 
 		this.patterns = Collections.unmodifiableSet(prependLeadingSlash(patterns));
 		this.pathHelper = urlPathHelper != null ? urlPathHelper : new UrlPathHelper();

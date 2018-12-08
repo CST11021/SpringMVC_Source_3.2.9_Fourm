@@ -34,6 +34,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @author Arjen Poutsma
  * @since 3.1
  */
+
+// 请求条件接口：该
+
 public interface RequestCondition<T> {
 
 	/**

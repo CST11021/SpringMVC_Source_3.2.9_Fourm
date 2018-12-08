@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  */
 public final class RequestMethodsRequestCondition extends AbstractRequestCondition<RequestMethodsRequestCondition> {
 
+	// 对应@RequestMapping注解的methods配置
 	private final Set<RequestMethod> methods;
 
 

@@ -45,9 +45,9 @@ import org.springframework.web.servlet.mvc.condition.HeadersRequestCondition.Hea
  */
 public final class ProducesRequestCondition extends AbstractRequestCondition<ProducesRequestCondition> {
 
-	private final List<ProduceMediaTypeExpression> MEDIA_TYPE_ALL_LIST =
-			Collections.singletonList(new ProduceMediaTypeExpression("*/*"));
+	private final List<ProduceMediaTypeExpression> MEDIA_TYPE_ALL_LIST = Collections.singletonList(new ProduceMediaTypeExpression("*/*"));
 
+	// 对应@RequestMapping注解的produce配置
 	private final List<ProduceMediaTypeExpression> expressions;
 
 	private final ContentNegotiationManager contentNegotiationManager;

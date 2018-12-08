@@ -47,11 +47,14 @@ import org.springframework.util.ClassUtils;
 public class HandlerMethod {
 
 	protected final Log logger = LogFactory.getLog(HandlerMethod.class);
+
+	private final BeanFactory beanFactory;
+
 	// 表示该请求对应处理方法的所在控制器Bean
 	private final Object bean;
-	private final BeanFactory beanFactory;
 	// 表示该请求对应的处理方法
 	private final Method method;
+	// 表示该请求对应的处理方法(用于处理泛型方法)
 	private final Method bridgedMethod;
 	// 表示该请求对应处理方法的入参
 	private final MethodParameter[] parameters;
@@ -114,77 +117,23 @@ public class HandlerMethod {
 		}
 		return result;
 	}
-
-	/**
-	 * Returns the bean for this handler method.
-	 */
-	public Object getBean() {
-		return this.bean;
-	}
-
-	/**
-	 * Returns the method for this handler method.
-	 */
-	public Method getMethod() {
-		return this.method;
-	}
-
-	/**
-	 * Returns the type of the handler for this handler method.
-	 * Note that if the bean type is a CGLIB-generated class, the original, user-defined class is returned.
-	 */
 	public Class<?> getBeanType() {
 		Class<?> clazz = (this.bean instanceof String ?
 				this.beanFactory.getType((String) this.bean) : this.bean.getClass());
 		return ClassUtils.getUserClass(clazz);
 	}
-
-	/**
-	 * If the bean method is a bridge method, this method returns the bridged (user-defined) method.
-	 * Otherwise it returns the same method as {@link #getMethod()}.
-	 */
-	protected Method getBridgedMethod() {
-		return this.bridgedMethod;
-	}
-
-	/**
-	 * Returns the method parameters for this handler method.
-	 */
-	public MethodParameter[] getMethodParameters() {
-		return this.parameters;
-	}
-
-	/**
-	 * Return the HandlerMethod return type.
-	 */
 	public MethodParameter getReturnType() {
 		return new HandlerMethodParameter(-1);
 	}
-
-	/**
-	 * Return the actual return value type.
-	 */
 	public MethodParameter getReturnValueType(Object returnValue) {
 		return new ReturnValueMethodParameter(returnValue);
 	}
-
-	/**
-	 * Returns {@code true} if the method return type is void, {@code false} otherwise.
-	 */
 	public boolean isVoid() {
 		return Void.TYPE.equals(getReturnType().getParameterType());
 	}
-
-	/**
-	 * Returns a single annotation on the underlying method traversing its super methods if no
-	 * annotation can be found on the given method itself.
-	 * @param annotationType the type of annotation to introspect the method for.
-	 * @return the annotation, or {@code null} if none found
-	 */
 	public <A extends Annotation> A getMethodAnnotation(Class<A> annotationType) {
 		return AnnotationUtils.findAnnotation(this.method, annotationType);
 	}
-
 	/**
 	 * If the provided instance contains a bean name rather than an object instance, the bean name is resolved
 	 * before a {@link HandlerMethod} is created and returned.
@@ -197,6 +146,23 @@ public class HandlerMethod {
 		}
 		return new HandlerMethod(this, handler);
 	}
+
+
+	// getter ...
+
+	public Object getBean() {
+		return this.bean;
+	}
+	public Method getMethod() {
+		return this.method;
+	}
+	protected Method getBridgedMethod() {
+		return this.bridgedMethod;
+	}
+	public MethodParameter[] getMethodParameters() {
+		return this.parameters;
+	}
+
 
 
 	@Override
@@ -221,7 +187,7 @@ public class HandlerMethod {
 
 
 	/**
-	 * A MethodParameter with HandlerMethod-specific behavior.
+	 * 表示方法的入参
 	 */
 	private class HandlerMethodParameter extends MethodParameter {
 
@@ -241,7 +207,7 @@ public class HandlerMethod {
 	}
 
 	/**
-	 * A MethodParameter for a HandlerMethod return type based on an actual return value.
+	 * 表示方法的返回值
 	 */
 	private class ReturnValueMethodParameter extends HandlerMethodParameter {
 

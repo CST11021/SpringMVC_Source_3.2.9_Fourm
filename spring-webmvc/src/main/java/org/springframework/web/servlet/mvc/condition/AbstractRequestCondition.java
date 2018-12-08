@@ -28,6 +28,19 @@ import java.util.Iterator;
  */
 public abstract class AbstractRequestCondition<T extends AbstractRequestCondition<T>> implements RequestCondition<T> {
 
+	/**
+	 * Return the discrete items a request condition is composed of.
+	 * For example URL patterns, HTTP request methods, param expressions, etc.
+	 * @return a collection of objects, never {@code null}
+	 */
+	protected abstract Collection<?> getContent();
+
+	/**
+	 * The notation to use when printing discrete items of content.
+	 * For example " || " for URL patterns or " && " for param expressions.
+	 */
+	protected abstract String getToStringInfix();
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -58,19 +71,5 @@ public abstract class AbstractRequestCondition<T extends AbstractRequestConditio
 		builder.append("]");
 		return builder.toString();
 	}
-
-
-	/**
-	 * Return the discrete items a request condition is composed of.
-	 * For example URL patterns, HTTP request methods, param expressions, etc.
-	 * @return a collection of objects, never {@code null}
-	 */
-	protected abstract Collection<?> getContent();
-
-	/**
-	 * The notation to use when printing discrete items of content.
-	 * For example " || " for URL patterns or " && " for param expressions.
-	 */
-	protected abstract String getToStringInfix();
 
 }

@@ -35,6 +35,7 @@ import org.springframework.web.util.WebUtils;
  */
 public final class ParamsRequestCondition extends AbstractRequestCondition<ParamsRequestCondition> {
 
+	// 对应的@RequestMapping注解的param配置
 	private final Set<ParamExpression> expressions;
 
 

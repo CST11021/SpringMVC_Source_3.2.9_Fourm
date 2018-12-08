@@ -45,6 +45,9 @@ import org.springframework.util.StringUtils;
  * @author Rossen Stoyanchev
  * @since 14.01.2004
  */
+
+// URL帮助类，比如通过Request返回对应的uri
+
 public class UrlPathHelper {
 
 	private static final Log logger = LogFactory.getLog(UrlPathHelper.class);
@@ -65,27 +68,6 @@ public class UrlPathHelper {
 	private String defaultEncoding = WebUtils.DEFAULT_CHARACTER_ENCODING;
 
 
-
-	public void setAlwaysUseFullPath(boolean alwaysUseFullPath) {
-		this.alwaysUseFullPath = alwaysUseFullPath;
-	}
-	public void setUrlDecode(boolean urlDecode) {
-		this.urlDecode = urlDecode;
-	}
-	public void setRemoveSemicolonContent(boolean removeSemicolonContent) {
-		this.removeSemicolonContent = removeSemicolonContent;
-	}
-	public boolean shouldRemoveSemicolonContent() {
-		return this.removeSemicolonContent;
-	}
-	public void setDefaultEncoding(String defaultEncoding) {
-		this.defaultEncoding = defaultEncoding;
-	}
-	protected String getDefaultEncoding() {
-		return this.defaultEncoding;
-	}
-
-
 	/**
 	 * Return the mapping lookup path for the given request, within the current
 	 * servlet mapping if applicable, else within the web application.
@@ -96,11 +78,11 @@ public class UrlPathHelper {
 	 * @see #getPathWithinServletMapping
 	 */
 	public String getLookupPathForRequest(HttpServletRequest request) {
-		// Always use full path within current servlet context?
 		if (this.alwaysUseFullPath) {
 			// 获取应用内部路径，比如：http://localhost:8080/forum/board/listBoardTopics-10.html，这里返回的是：/board/listBoardTopics-10.html
 			return getPathWithinApplication(request);
 		}
+
 		// Else, use path within current servlet mapping if applicable
 		String rest = getPathWithinServletMapping(request);
 		if (!"".equals(rest)) {
@@ -268,7 +250,6 @@ public class UrlPathHelper {
 		return servletPath;
 	}
 
-
 	/**
 	 * Return the request URI for the given request. If this is a forwarded request,
 	 * correctly resolves to the request URI of the original request.
@@ -349,8 +330,7 @@ public class UrlPathHelper {
 	 * @return the updated URI string
 	 */
 	public String removeSemicolonContent(String requestUri) {
-		return this.removeSemicolonContent ?
-				removeSemicolonContentInternal(requestUri) : removeJsessionid(requestUri);
+		return this.removeSemicolonContent ? removeSemicolonContentInternal(requestUri) : removeJsessionid(requestUri);
 	}
 
 	private String removeSemicolonContentInternal(String requestUri) {
@@ -459,5 +439,35 @@ public class UrlPathHelper {
 		// However, if it is not compliant, do remove the improper trailing slash!
 		return !websphereComplianceFlag;
 	}
+
+
+
+
+
+
+
+
+
+	// getter and setter ...
+
+	public void setAlwaysUseFullPath(boolean alwaysUseFullPath) {
+		this.alwaysUseFullPath = alwaysUseFullPath;
+	}
+	public void setUrlDecode(boolean urlDecode) {
+		this.urlDecode = urlDecode;
+	}
+	public void setRemoveSemicolonContent(boolean removeSemicolonContent) {
+		this.removeSemicolonContent = removeSemicolonContent;
+	}
+	public boolean shouldRemoveSemicolonContent() {
+		return this.removeSemicolonContent;
+	}
+	public void setDefaultEncoding(String defaultEncoding) {
+		this.defaultEncoding = defaultEncoding;
+	}
+	protected String getDefaultEncoding() {
+		return this.defaultEncoding;
+	}
+
 
 }

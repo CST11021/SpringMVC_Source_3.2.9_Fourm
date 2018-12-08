@@ -45,6 +45,7 @@ import org.springframework.web.servlet.mvc.condition.HeadersRequestCondition.Hea
  */
 public final class ConsumesRequestCondition extends AbstractRequestCondition<ConsumesRequestCondition> {
 
+	// 对应@RequestMapping注解的consumes配置
 	private final List<ConsumeMediaTypeExpression> expressions;
 
 
