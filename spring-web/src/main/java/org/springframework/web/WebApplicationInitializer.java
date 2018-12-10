@@ -175,6 +175,9 @@ import javax.servlet.ServletException;
  * @see org.springframework.web.servlet.support.AbstractDispatcherServletInitializer
  * @see org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer
  */
+
+// Tomcat启动后，会依次执行WebApplicationInitializer接口的Bean实例，该接口的执行时间先于ServletContextListener#contextInitialized
+
 public interface WebApplicationInitializer {
 
 	/**

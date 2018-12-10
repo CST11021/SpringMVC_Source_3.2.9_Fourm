@@ -100,7 +100,6 @@ public abstract class AbstractRefreshableWebApplicationContext extends AbstractR
 	public void setServletContext(ServletContext servletContext) {
 		this.servletContext = servletContext;
 	}
-
 	public ServletContext getServletContext() {
 		return this.servletContext;
 	}
@@ -111,7 +110,6 @@ public abstract class AbstractRefreshableWebApplicationContext extends AbstractR
 			setServletContext(servletConfig.getServletContext());
 		}
 	}
-
 	public ServletConfig getServletConfig() {
 		return this.servletConfig;
 	}
@@ -122,10 +120,10 @@ public abstract class AbstractRefreshableWebApplicationContext extends AbstractR
 			setDisplayName("WebApplicationContext for namespace '" + namespace + "'");
 		}
 	}
-
 	public String getNamespace() {
 		return this.namespace;
 	}
+
 
 	@Override
 	public String[] getConfigLocations() {

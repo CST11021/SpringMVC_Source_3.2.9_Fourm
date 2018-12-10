@@ -38,7 +38,6 @@ import org.springframework.web.WebApplicationInitializer;
  */
 public abstract class AbstractContextLoaderInitializer implements WebApplicationInitializer {
 
-	/** Logger available to subclasses */
 	protected final Log logger = LogFactory.getLog(getClass());
 
 
@@ -46,12 +45,7 @@ public abstract class AbstractContextLoaderInitializer implements WebApplication
 		registerContextLoaderListener(servletContext);
 	}
 
-	/**
-	 * Register a {@link ContextLoaderListener} against the given servlet context. The
-	 * {@code ContextLoaderListener} is initialized with the application context returned
-	 * from the {@link #createRootApplicationContext()} template method.
-	 * @param servletContext the servlet context to register the listener against
-	 */
+	// 注册ContextLoaderListener监听
 	protected void registerContextLoaderListener(ServletContext servletContext) {
 		WebApplicationContext rootAppContext = createRootApplicationContext();
 		if (rootAppContext != null) {

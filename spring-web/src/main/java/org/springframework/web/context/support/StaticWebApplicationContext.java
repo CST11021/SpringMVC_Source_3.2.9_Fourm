@@ -53,8 +53,7 @@ import org.springframework.web.context.ServletContextAware;
  * @author Juergen Hoeller
  * @see org.springframework.ui.context.ThemeSource
  */
-public class StaticWebApplicationContext extends StaticApplicationContext
-		implements ConfigurableWebApplicationContext, ThemeSource {
+public class StaticWebApplicationContext extends StaticApplicationContext implements ConfigurableWebApplicationContext, ThemeSource {
 
 	private ServletContext servletContext;
 
@@ -70,13 +69,10 @@ public class StaticWebApplicationContext extends StaticApplicationContext
 	}
 
 
-	/**
-	 * Set the ServletContext that this WebApplicationContext runs in.
-	 */
+
 	public void setServletContext(ServletContext servletContext) {
 		this.servletContext = servletContext;
 	}
-
 	public ServletContext getServletContext() {
 		return this.servletContext;
 	}
@@ -87,7 +83,6 @@ public class StaticWebApplicationContext extends StaticApplicationContext
 			this.servletContext = servletConfig.getServletContext();
 		}
 	}
-
 	public ServletConfig getServletConfig() {
 		return this.servletConfig;
 	}
@@ -98,7 +93,6 @@ public class StaticWebApplicationContext extends StaticApplicationContext
 			setDisplayName("WebApplicationContext for namespace '" + namespace + "'");
 		}
 	}
-
 	public String getNamespace() {
 		return this.namespace;
 	}
@@ -112,7 +106,6 @@ public class StaticWebApplicationContext extends StaticApplicationContext
 			throw new UnsupportedOperationException("StaticWebApplicationContext does not support config locations");
 		}
 	}
-
 	/**
 	 * The {@link StaticWebApplicationContext} class does not support this method.
 	 * @throws UnsupportedOperationException <b>always</b>

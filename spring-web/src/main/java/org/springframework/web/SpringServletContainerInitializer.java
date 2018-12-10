@@ -183,7 +183,7 @@ public class SpringServletContainerInitializer implements ServletContainerInitia
      * Tomcat启动时会调用所有实现ServletContainerInitializer接口的onStartup方法
      *
      * @param webAppInitializerClasses 通过@HandlesTypes注解将所有实现了WebApplicationInitializer接口的类注入进来
-     * @param servletContext           已经被初始化的ServletContext
+     * @param servletContext           已经被初始化的ServletContext，注意，该ServletContext还没有执行ServletContextListener#contextInitialized()监听方法
      *
      * @see WebApplicationInitializer#onStartup(ServletContext)
      * @see AnnotationAwareOrderComparator
@@ -194,9 +194,8 @@ public class SpringServletContainerInitializer implements ServletContainerInitia
 
         if (webAppInitializerClasses != null) {
             for (Class<?> waiClass : webAppInitializerClasses) {
-                // Be defensive: Some servlet containers provide us with invalid classes, no matter what @HandlesTypes says...
-                if (!waiClass.isInterface() && !Modifier.isAbstract(waiClass.getModifiers()) &&
-                        WebApplicationInitializer.class.isAssignableFrom(waiClass)) {
+                // 检查是不是WebApplicationInitializer接口的实例
+                if (!waiClass.isInterface() && !Modifier.isAbstract(waiClass.getModifiers()) && WebApplicationInitializer.class.isAssignableFrom(waiClass)) {
                     try {
                         initializers.add((WebApplicationInitializer) waiClass.newInstance());
                     } catch (Throwable ex) {

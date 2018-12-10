@@ -36,8 +36,7 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
  * @author Chris Beams
  * @since 3.2
  */
-public abstract class AbstractAnnotationConfigDispatcherServletInitializer
-		extends AbstractDispatcherServletInitializer {
+public abstract class AbstractAnnotationConfigDispatcherServletInitializer extends AbstractDispatcherServletInitializer {
 
 	/**
 	 * {@inheritDoc}

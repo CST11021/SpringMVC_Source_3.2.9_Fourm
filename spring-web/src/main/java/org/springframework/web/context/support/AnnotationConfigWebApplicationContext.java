@@ -90,45 +90,6 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 
 
 	/**
-	 * Set a custom {@link BeanNameGenerator} for use with {@link AnnotatedBeanDefinitionReader}
-	 * and/or {@link ClassPathBeanDefinitionScanner}.
-	 * <p>Default is {@link org.springframework.context.annotation.AnnotationBeanNameGenerator}.
-	 * @see AnnotatedBeanDefinitionReader#setBeanNameGenerator
-	 * @see ClassPathBeanDefinitionScanner#setBeanNameGenerator
-	 */
-	public void setBeanNameGenerator(BeanNameGenerator beanNameGenerator) {
-		this.beanNameGenerator = beanNameGenerator;
-	}
-
-	/**
-	 * Return the custom {@link BeanNameGenerator} for use with {@link AnnotatedBeanDefinitionReader}
-	 * and/or {@link ClassPathBeanDefinitionScanner}, if any.
-	 */
-	protected BeanNameGenerator getBeanNameGenerator() {
-		return this.beanNameGenerator;
-	}
-
-	/**
-	 * Set a custom {@link ScopeMetadataResolver} for use with {@link AnnotatedBeanDefinitionReader}
-	 * and/or {@link ClassPathBeanDefinitionScanner}.
-	 * <p>Default is an {@link org.springframework.context.annotation.AnnotationScopeMetadataResolver}.
-	 * @see AnnotatedBeanDefinitionReader#setScopeMetadataResolver
-	 * @see ClassPathBeanDefinitionScanner#setScopeMetadataResolver
-	 */
-	public void setScopeMetadataResolver(ScopeMetadataResolver scopeMetadataResolver) {
-		this.scopeMetadataResolver = scopeMetadataResolver;
-	}
-
-	/**
-	 * Return the custom {@link ScopeMetadataResolver} for use with {@link AnnotatedBeanDefinitionReader}
-	 * and/or {@link ClassPathBeanDefinitionScanner}, if any.
-	 */
-	protected ScopeMetadataResolver getScopeMetadataResolver() {
-		return this.scopeMetadataResolver;
-	}
-
-
-	/**
 	 * Register one or more annotated classes to be processed.
 	 * Note that {@link #refresh()} must be called in order for the context
 	 * to fully process the new class.
@@ -160,7 +121,6 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
 		this.basePackages.addAll(Arrays.asList(basePackages));
 	}
-
 
 	/**
 	 * Register a {@link org.springframework.beans.factory.config.BeanDefinition} for
@@ -246,6 +206,25 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 				}
 			}
 		}
+	}
+
+
+
+
+
+	// getter and setter ...
+
+	public void setBeanNameGenerator(BeanNameGenerator beanNameGenerator) {
+		this.beanNameGenerator = beanNameGenerator;
+	}
+	protected BeanNameGenerator getBeanNameGenerator() {
+		return this.beanNameGenerator;
+	}
+	public void setScopeMetadataResolver(ScopeMetadataResolver scopeMetadataResolver) {
+		this.scopeMetadataResolver = scopeMetadataResolver;
+	}
+	protected ScopeMetadataResolver getScopeMetadataResolver() {
+		return this.scopeMetadataResolver;
 	}
 
 }
