@@ -15,7 +15,7 @@ public class Test {
     public void testFactoryBean() {
         DefaultListableBeanFactory appFactory = new DefaultListableBeanFactory();
         BeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(appFactory);
-        beanDefinitionReader.loadBeanDefinitions(new ClassPathResource("spring-factoryBeanTest.xml"));
+        beanDefinitionReader.loadBeanDefinitions(new ClassPathResource("com/whz/beanfactory/spring-factoryBeanTest.xml"));
         System.out.println(appFactory.getBeansOfType(Object.class));
     }
 
