@@ -62,31 +62,10 @@ public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
 	private final ResourceLoader resourceLoader;
 
 
-	/**
-	 * Create a new ResourceEditorRegistrar for the given {@link ResourceLoader}
-	 * using a {@link StandardEnvironment}.
-	 * @param resourceLoader the ResourceLoader (or ResourcePatternResolver)
-	 * to create editors for (usually an ApplicationContext)
-	 * @see org.springframework.core.io.support.ResourcePatternResolver
-	 * @see org.springframework.context.ApplicationContext
-	 * @deprecated as of Spring 3.1 in favor of
-	 * {@link #ResourceEditorRegistrar(ResourceLoader, PropertyResolver)}
-	 */
 	@Deprecated
 	public ResourceEditorRegistrar(ResourceLoader resourceLoader) {
 		this(resourceLoader, new StandardEnvironment());
 	}
-
-	/**
-	 * Create a new ResourceEditorRegistrar for the given {@link ResourceLoader}
-	 * and {@link PropertyResolver}.
-	 * @param resourceLoader the ResourceLoader (or ResourcePatternResolver)
-	 * to create editors for (usually an ApplicationContext)
-	 * @param propertyResolver the PropertyResolver (usually an Environment)
-	 * @see org.springframework.core.env.Environment
-	 * @see org.springframework.core.io.support.ResourcePatternResolver
-	 * @see org.springframework.context.ApplicationContext
-	 */
 	public ResourceEditorRegistrar(ResourceLoader resourceLoader, PropertyResolver propertyResolver) {
 		this.resourceLoader = resourceLoader;
 		this.propertyResolver = propertyResolver;

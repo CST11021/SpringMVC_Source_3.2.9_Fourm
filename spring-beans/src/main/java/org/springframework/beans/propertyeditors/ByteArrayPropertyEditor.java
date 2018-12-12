@@ -18,14 +18,8 @@ package org.springframework.beans.propertyeditors;
 
 import java.beans.PropertyEditorSupport;
 
-/**
- * Editor for byte arrays. Strings will simply be converted to
- * their corresponding byte representations.
- *
- * @author Juergen Hoeller
- * @since 1.0.1
- * @see java.lang.String#getBytes
- */
+// 字节转换编辑器
+
 public class ByteArrayPropertyEditor extends PropertyEditorSupport {
 
 	@Override

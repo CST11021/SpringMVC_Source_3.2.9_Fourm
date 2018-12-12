@@ -39,68 +39,20 @@ import org.springframework.util.ReflectionUtils;
  */
 public class ArgumentConvertingMethodInvoker extends MethodInvoker {
 
+	// 类型转换器
 	private TypeConverter typeConverter;
 
+	// 表示是否使用默认是类型转换器
 	private boolean useDefaultConverter = true;
 
-
-	/**
-	 * Set a TypeConverter to use for argument type conversion.
-	 * <p>Default is a {@link org.springframework.beans.SimpleTypeConverter}.
-	 * Can be overridden with any TypeConverter implementation, typically
-	 * a pre-configured SimpleTypeConverter or a BeanWrapperImpl instance.
-	 * @see org.springframework.beans.SimpleTypeConverter
-	 * @see org.springframework.beans.BeanWrapperImpl
-	 */
-	public void setTypeConverter(TypeConverter typeConverter) {
-		this.typeConverter = typeConverter;
-		this.useDefaultConverter = false;
-	}
-
-	/**
-	 * Return the TypeConverter used for argument type conversion.
-	 * <p>Can be cast to {@link org.springframework.beans.PropertyEditorRegistry}
-	 * if direct access to the underlying PropertyEditors is desired
-	 * (provided that the present TypeConverter actually implements the
-	 * PropertyEditorRegistry interface).
-	 */
-	public TypeConverter getTypeConverter() {
-		if (this.typeConverter == null && this.useDefaultConverter) {
-			this.typeConverter = getDefaultTypeConverter();
-		}
-		return this.typeConverter;
-	}
-
-	/**
-	 * Obtain the default TypeConverter for this method invoker.
-	 * <p>Called if no explicit TypeConverter has been specified.
-	 * The default implementation builds a
-	 * {@link org.springframework.beans.SimpleTypeConverter}.
-	 * Can be overridden in subclasses.
-	 */
-	protected TypeConverter getDefaultTypeConverter() {
-		return new SimpleTypeConverter();
-	}
-
-	/**
-	 * Register the given custom property editor for all properties of the given type.
-	 * <p>Typically used in conjunction with the default
-	 * {@link org.springframework.beans.SimpleTypeConverter}; will work with any
-	 * TypeConverter that implements the PropertyEditorRegistry interface as well.
-	 * @param requiredType type of the property
-	 * @param propertyEditor editor to register
-	 * @see #setTypeConverter
-	 * @see org.springframework.beans.PropertyEditorRegistry#registerCustomEditor
-	 */
+	// 注册自定义的属性编辑器：requiredType表示属性类型、propertyEditor表示自定义的属性编辑器
 	public void registerCustomEditor(Class requiredType, PropertyEditor propertyEditor) {
 		TypeConverter converter = getTypeConverter();
 		if (!(converter instanceof PropertyEditorRegistry)) {
-			throw new IllegalStateException(
-					"TypeConverter does not implement PropertyEditorRegistry interface: " + converter);
+			throw new IllegalStateException("TypeConverter does not implement PropertyEditorRegistry interface: " + converter);
 		}
 		((PropertyEditorRegistry) converter).registerCustomEditor(requiredType, propertyEditor);
 	}
-
 
 	/**
 	 * This implementation looks for a method with matching parameter types.
@@ -170,6 +122,22 @@ public class ArgumentConvertingMethodInvoker extends MethodInvoker {
 			}
 		}
 		return null;
+	}
+
+
+	// getter and setter ...
+	public void setTypeConverter(TypeConverter typeConverter) {
+		this.typeConverter = typeConverter;
+		this.useDefaultConverter = false;
+	}
+	public TypeConverter getTypeConverter() {
+		if (this.typeConverter == null && this.useDefaultConverter) {
+			this.typeConverter = getDefaultTypeConverter();
+		}
+		return this.typeConverter;
+	}
+	protected TypeConverter getDefaultTypeConverter() {
+		return new SimpleTypeConverter();
 	}
 
 }

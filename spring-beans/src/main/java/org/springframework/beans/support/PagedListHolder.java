@@ -24,8 +24,7 @@ import java.util.List;
 import org.springframework.util.Assert;
 
 /**
- * PagedListHolder is a simple state holder for handling lists of objects,
- * separating them into pages. Page numbering starts with 0.
+ * PagedListHolder is a simple state holder for handling lists of objects, separating them into pages. Page numbering starts with 0.
  *
  * <p>This is mainly targetted at usage in web UIs. Typically, an instance will be
  * instantiated with a list of beans, put into the session, and exported as model.
@@ -47,6 +46,9 @@ import org.springframework.util.Assert;
  * @see #getPageList()
  * @see org.springframework.beans.support.MutableSortDefinition
  */
+
+
+// PagedListHolder是一个简单的状态持有者，用于处理对象列表，将它们分成页面。页码编号从0开始
 @SuppressWarnings("serial")
 public class PagedListHolder<E> implements Serializable {
 
@@ -54,11 +56,12 @@ public class PagedListHolder<E> implements Serializable {
 
 	public static final int DEFAULT_MAX_LINKED_PAGES = 10;
 
-
+	// 表示一个列表元素
 	private List<E> source;
 
 	private Date refreshDate;
 
+	// 排序实现
 	private SortDefinition sort;
 
 	private SortDefinition sortUsed;
@@ -72,49 +75,25 @@ public class PagedListHolder<E> implements Serializable {
 	private int maxLinkedPages = DEFAULT_MAX_LINKED_PAGES;
 
 
-	/**
-	 * Create a new holder instance.
-	 * You'll need to set a source list to be able to use the holder.
-	 * @see #setSource
-	 */
 	public PagedListHolder() {
 		this(new ArrayList<E>(0));
 	}
-
-	/**
-	 * Create a new holder instance with the given source list, starting with
-	 * a default sort definition (with "toggleAscendingOnProperty" activated).
-	 * @param source the source List
-	 * @see MutableSortDefinition#setToggleAscendingOnProperty
-	 */
 	public PagedListHolder(List<E> source) {
 		this(source, new MutableSortDefinition(true));
 	}
-
-	/**
-	 * Create a new holder instance with the given source list.
-	 * @param source the source List
-	 * @param sort the SortDefinition to start with
-	 */
 	public PagedListHolder(List<E> source, SortDefinition sort) {
 		setSource(source);
 		setSort(sort);
 	}
 
 
-	/**
-	 * Set the source list for this holder.
-	 */
+
 	public void setSource(List<E> source) {
 		Assert.notNull(source, "Source List must not be null");
 		this.source = source;
 		this.refreshDate = new Date();
 		this.sortUsed = null;
 	}
-
-	/**
-	 * Return the source list for this holder.
-	 */
 	public List<E> getSource() {
 		return this.source;
 	}
@@ -126,27 +105,15 @@ public class PagedListHolder<E> implements Serializable {
 		return this.refreshDate;
 	}
 
-	/**
-	 * Set the sort definition for this holder.
-	 * Typically an instance of MutableSortDefinition.
-	 * @see org.springframework.beans.support.MutableSortDefinition
-	 */
+
 	public void setSort(SortDefinition sort) {
 		this.sort = sort;
 	}
-
-	/**
-	 * Return the sort definition for this holder.
-	 */
 	public SortDefinition getSort() {
 		return this.sort;
 	}
 
-	/**
-	 * Set the current page size.
-	 * Resets the current page number if changed.
-	 * <p>Default value is 10.
-	 */
+
 	public void setPageSize(int pageSize) {
 		if (pageSize != this.pageSize) {
 			this.pageSize = pageSize;
@@ -155,27 +122,14 @@ public class PagedListHolder<E> implements Serializable {
 			}
 		}
 	}
-
-	/**
-	 * Return the current page size.
-	 */
 	public int getPageSize() {
 		return this.pageSize;
 	}
 
-	/**
-	 * Set the current page number.
-	 * Page numbering starts with 0.
-	 */
 	public void setPage(int page) {
 		this.page = page;
 		this.newPageSet = true;
 	}
-
-	/**
-	 * Return the current page number.
-	 * Page numbering starts with 0.
-	 */
 	public int getPage() {
 		this.newPageSet = false;
 		if (this.page >= getPageCount()) {
@@ -184,113 +138,73 @@ public class PagedListHolder<E> implements Serializable {
 		return this.page;
 	}
 
-	/**
-	 * Set the maximum number of page links to a few pages around the current one.
-	 */
 	public void setMaxLinkedPages(int maxLinkedPages) {
 		this.maxLinkedPages = maxLinkedPages;
 	}
-
-	/**
-	 * Return the maximum number of page links to a few pages around the current one.
-	 */
 	public int getMaxLinkedPages() {
 		return this.maxLinkedPages;
 	}
 
 
-	/**
-	 * Return the number of pages for the current source list.
-	 */
 	public int getPageCount() {
 		float nrOfPages = (float) getNrOfElements() / getPageSize();
 		return (int) ((nrOfPages > (int) nrOfPages || nrOfPages == 0.0) ? nrOfPages + 1 : nrOfPages);
 	}
 
-	/**
-	 * Return if the current page is the first one.
-	 */
 	public boolean isFirstPage() {
 		return getPage() == 0;
 	}
-
-	/**
-	 * Return if the current page is the last one.
-	 */
 	public boolean isLastPage() {
 		return getPage() == getPageCount() -1;
 	}
 
-	/**
-	 * Switch to previous page.
-	 * Will stay on first page if already on first page.
-	 */
 	public void previousPage() {
 		if (!isFirstPage()) {
 			this.page--;
 		}
 	}
-
-	/**
-	 * Switch to next page.
-	 * Will stay on last page if already on last page.
-	 */
 	public void nextPage() {
 		if (!isLastPage()) {
 			this.page++;
 		}
 	}
 
-	/**
-	 * Return the total number of elements in the source list.
-	 */
+
+	// 返回列表的总数
 	public int getNrOfElements() {
 		return getSource().size();
 	}
 
-	/**
-	 * Return the element index of the first element on the current page.
-	 * Element numbering starts with 0.
-	 */
+	// 返回当前页面上第一个元素的元素索引。元素编号从0开始
 	public int getFirstElementOnPage() {
 		return (getPageSize() * getPage());
 	}
 
-	/**
-	 * Return the element index of the last element on the current page.
-	 * Element numbering starts with 0.
-	 */
+	// 返回当前页面上最后一个元素的元素索引。元素编号从0开始。
 	public int getLastElementOnPage() {
 		int endIndex = getPageSize() * (getPage() + 1);
 		int size = getNrOfElements();
 		return (endIndex > size ? size : endIndex) - 1;
 	}
 
-	/**
-	 * Return a sub-list representing the current page.
-	 */
+	// 返回表示当前页面的子列表。
 	public List<E> getPageList() {
 		return getSource().subList(getFirstElementOnPage(), getLastElementOnPage() + 1);
 	}
 
-	/**
-	 * Return the first page to which create a link around the current page.
-	 */
+	// 返回在当前页面周围创建链接的第一页。
 	public int getFirstLinkedPage() {
 		return Math.max(0, getPage() - (getMaxLinkedPages() / 2));
 	}
 
-	/**
-	 * Return the last page to which create a link around the current page.
-	 */
+	// 返回在当前页面周围创建链接的最后一页。
 	public int getLastLinkedPage() {
 		return Math.min(getFirstLinkedPage() + getMaxLinkedPages() - 1, getPageCount() - 1);
 	}
 
 
 	/**
-	 * Resort the list if necessary, i.e. if the current {@code sort} instance
-	 * isn't equal to the backed-up {@code sortUsed} instance.
+	 * Resort the list if necessary, i.e. if the current {@code sort} instance isn't equal to the backed-up {@code sortUsed} instance.
 	 * <p>Calls {@code doSort} to trigger actual sorting.
 	 * @see #doSort
 	 */
@@ -304,8 +218,7 @@ public class PagedListHolder<E> implements Serializable {
 	}
 
 	/**
-	 * Create a deep copy of the given sort definition,
-	 * for use as state holder to compare a modified sort definition against.
+	 * Create a deep copy of the given sort definition, for use as state holder to compare a modified sort definition against.
 	 * <p>Default implementation creates a MutableSortDefinition instance.
 	 * Can be overridden in subclasses, in particular in case of custom
 	 * extensions to the SortDefinition interface. Is allowed to return
@@ -319,13 +232,7 @@ public class PagedListHolder<E> implements Serializable {
 		return new MutableSortDefinition(sort);
 	}
 
-	/**
-	 * Actually perform sorting of the given source list, according to
-	 * the given sort definition.
-	 * <p>The default implementation uses Spring's PropertyComparator.
-	 * Can be overridden in subclasses.
-	 * @see PropertyComparator#sort(java.util.List, SortDefinition)
-	 */
+	// 实际上根据给定的排序定义执行给定源列表的排序。默认实现使用Spring的PropertyComparator。可以在子类中重写
 	protected void doSort(List<E> source, SortDefinition sort) {
 		PropertyComparator.sort(source, sort);
 	}

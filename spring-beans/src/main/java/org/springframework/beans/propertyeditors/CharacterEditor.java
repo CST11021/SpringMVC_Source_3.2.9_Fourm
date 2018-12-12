@@ -41,29 +41,16 @@ import org.springframework.util.StringUtils;
  */
 public class CharacterEditor extends PropertyEditorSupport {
 
-	/**
-	 * The prefix that identifies a string as being a Unicode character sequence.
-	 */
+	// 表示将字符串标识为unicode字符序列的前缀
 	private static final String UNICODE_PREFIX = "\\u";
 
-	/**
-	 * The length of a Unicode character sequence.
-	 */
+	// 表示Unicode字符序列的长度
 	private static final int UNICODE_LENGTH = 6;
 
-
+	// 表示是否允许空值
 	private final boolean allowEmpty;
 
 
-	/**
-	 * Create a new CharacterEditor instance.
-	 * <p>The "allowEmpty" parameter controls whether an empty String is
-	 * to be allowed in parsing, i.e. be interpreted as the {@code null}
-	 * value when {@link #setAsText(String) text is being converted}. If
-	 * {@code false}, an {@link IllegalArgumentException} will be thrown
-	 * at that time.
-	 * @param allowEmpty if empty strings are to be allowed
-	 */
 	public CharacterEditor(boolean allowEmpty) {
 		this.allowEmpty = allowEmpty;
 	}
@@ -96,11 +83,12 @@ public class CharacterEditor extends PropertyEditorSupport {
 		return (value != null ? value.toString() : "");
 	}
 
-
+	// 判断该sequence是否为Unicode字符序列
 	private boolean isUnicodeCharacterSequence(String sequence) {
 		return (sequence.startsWith(UNICODE_PREFIX) && sequence.length() == UNICODE_LENGTH);
 	}
 
+	// 将text转为Unicode字符
 	private void setAsUnicode(String text) {
 		int code = Integer.parseInt(text.substring(UNICODE_PREFIX.length()), 16);
 		setValue(new Character((char) code));

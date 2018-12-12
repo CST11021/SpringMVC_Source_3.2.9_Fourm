@@ -28,15 +28,7 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.util.StringUtils;
 
-/**
- * PropertyComparator performs a comparison of two beans,
- * evaluating the specified bean property via a BeanWrapper.
- *
- * @author Juergen Hoeller
- * @author Jean-Pierre Pawlak
- * @since 19.05.2003
- * @see org.springframework.beans.BeanWrapper
- */
+// PropertyComparator执行两个bean的比较，通过BeanWrapper评估指定的bean属性
 public class PropertyComparator implements Comparator {
 
 	protected final Log logger = LogFactory.getLog(getClass());
@@ -46,27 +38,15 @@ public class PropertyComparator implements Comparator {
 	private final BeanWrapperImpl beanWrapper = new BeanWrapperImpl(false);
 
 
-	/**
-	 * Create a new PropertyComparator for the given SortDefinition.
-	 * @see MutableSortDefinition
-	 */
+
 	public PropertyComparator(SortDefinition sortDefinition) {
 		this.sortDefinition = sortDefinition;
 	}
-
-	/**
-	 * Create a PropertyComparator for the given settings.
-	 * @param property the property to compare
-	 * @param ignoreCase whether upper and lower case in String values should be ignored
-	 * @param ascending whether to sort ascending (true) or descending (false)
-	 */
 	public PropertyComparator(String property, boolean ignoreCase, boolean ascending) {
 		this.sortDefinition = new MutableSortDefinition(property, ignoreCase, ascending);
 	}
 
-	/**
-	 * Return the SortDefinition that this comparator uses.
-	 */
+
 	public final SortDefinition getSortDefinition() {
 		return this.sortDefinition;
 	}
@@ -121,28 +101,12 @@ public class PropertyComparator implements Comparator {
 	}
 
 
-	/**
-	 * Sort the given List according to the given sort definition.
-	 * <p>Note: Contained objects have to provide the given property
-	 * in the form of a bean property, i.e. a getXXX method.
-	 * @param source the input List
-	 * @param sortDefinition the parameters to sort by
-	 * @throws java.lang.IllegalArgumentException in case of a missing propertyName
-	 */
+	// 根据给定的排序定义对给定的List进行排序。
 	public static void sort(List source, SortDefinition sortDefinition) throws BeansException {
 		if (StringUtils.hasText(sortDefinition.getProperty())) {
 			Collections.sort(source, new PropertyComparator(sortDefinition));
 		}
 	}
-
-	/**
-	 * Sort the given source according to the given sort definition.
-	 * <p>Note: Contained objects have to provide the given property
-	 * in the form of a bean property, i.e. a getXXX method.
-	 * @param source input source
-	 * @param sortDefinition the parameters to sort by
-	 * @throws java.lang.IllegalArgumentException in case of a missing propertyName
-	 */
 	public static void sort(Object[] source, SortDefinition sortDefinition) throws BeansException {
 		if (StringUtils.hasText(sortDefinition.getProperty())) {
 			Arrays.sort(source, new PropertyComparator(sortDefinition));
