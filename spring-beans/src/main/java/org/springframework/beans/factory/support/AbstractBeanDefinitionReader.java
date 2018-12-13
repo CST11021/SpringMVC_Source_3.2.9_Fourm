@@ -20,10 +20,14 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	// BeanDefinition注册表
 	private final BeanDefinitionRegistry registry;
+	// 用于加载配置文件
 	private ResourceLoader resourceLoader;
+	// 用于获取Bean示例的类加载器
 	private ClassLoader beanClassLoader;
 	private Environment environment;
+	// BeanName生成器
 	private BeanNameGenerator beanNameGenerator = new DefaultBeanNameGenerator();
 
 	// 实例化一个 BeanDefinitionReader 必须指定一个BeanDefinition注册表，然后给这个 BeanDefinitionReader 指定一个ResourceLoader实现和一个Environment实现
@@ -49,40 +53,7 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 	}
 
 
-	public final BeanDefinitionRegistry getBeanFactory() {
-		return this.registry;
-	}
-	public final BeanDefinitionRegistry getRegistry() {
-		return this.registry;
-	}
 
-	public void setResourceLoader(ResourceLoader resourceLoader) {
-		this.resourceLoader = resourceLoader;
-	}
-	public ResourceLoader getResourceLoader() {
-		return this.resourceLoader;
-	}
-
-	public void setBeanClassLoader(ClassLoader beanClassLoader) {
-		this.beanClassLoader = beanClassLoader;
-	}
-	public ClassLoader getBeanClassLoader() {
-		return this.beanClassLoader;
-	}
-
-	public void setEnvironment(Environment environment) {
-		this.environment = environment;
-	}
-	public Environment getEnvironment() {
-		return this.environment;
-	}
-
-	public void setBeanNameGenerator(BeanNameGenerator beanNameGenerator) {
-		this.beanNameGenerator = (beanNameGenerator != null ? beanNameGenerator : new DefaultBeanNameGenerator());
-	}
-	public BeanNameGenerator getBeanNameGenerator() {
-		return this.beanNameGenerator;
-	}
 
 	// 根据配置文件或配置文件路径去解析和加载bean
 	public int loadBeanDefinitions(Resource... resources) throws BeanDefinitionStoreException {
@@ -96,8 +67,16 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 	public int loadBeanDefinitions(String location) throws BeanDefinitionStoreException {
 		return loadBeanDefinitions(location, null);
 	}
+	public int loadBeanDefinitions(String... locations) throws BeanDefinitionStoreException {
+		Assert.notNull(locations, "Location array must not be null");
+		int counter = 0;
+		for (String location : locations) {
+			counter += loadBeanDefinitions(location);
+		}
+		return counter;
+	}
+	// actualResources 用来保存 根据路径解析后的Resource，可能location是一个相对路径，该路径对应了多个配置文件
 	public int loadBeanDefinitions(String location, Set<Resource> actualResources) throws BeanDefinitionStoreException {
-		// actualResources 用来保存 根据路径解析后的Resource，可能location是一个相对路径，该路径对应了多个配置文件
 
 		// 首先获取一个 ResourceLoader 用来根据文件路径来获取 Resource
 		ResourceLoader resourceLoader = getResourceLoader();
@@ -140,13 +119,42 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 			return loadCount;
 		}
 	}
-	public int loadBeanDefinitions(String... locations) throws BeanDefinitionStoreException {
-		Assert.notNull(locations, "Location array must not be null");
-		int counter = 0;
-		for (String location : locations) {
-			counter += loadBeanDefinitions(location);
-		}
-		return counter;
+
+
+	// getter and setter ...
+
+	public final BeanDefinitionRegistry getBeanFactory() {
+		return this.registry;
+	}
+	public final BeanDefinitionRegistry getRegistry() {
+		return this.registry;
 	}
 
+	public void setResourceLoader(ResourceLoader resourceLoader) {
+		this.resourceLoader = resourceLoader;
+	}
+	public ResourceLoader getResourceLoader() {
+		return this.resourceLoader;
+	}
+
+	public void setBeanClassLoader(ClassLoader beanClassLoader) {
+		this.beanClassLoader = beanClassLoader;
+	}
+	public ClassLoader getBeanClassLoader() {
+		return this.beanClassLoader;
+	}
+
+	public void setEnvironment(Environment environment) {
+		this.environment = environment;
+	}
+	public Environment getEnvironment() {
+		return this.environment;
+	}
+
+	public void setBeanNameGenerator(BeanNameGenerator beanNameGenerator) {
+		this.beanNameGenerator = (beanNameGenerator != null ? beanNameGenerator : new DefaultBeanNameGenerator());
+	}
+	public BeanNameGenerator getBeanNameGenerator() {
+		return this.beanNameGenerator;
+	}
 }

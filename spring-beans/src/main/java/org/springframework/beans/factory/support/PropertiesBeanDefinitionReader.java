@@ -73,6 +73,9 @@ import org.springframework.util.StringUtils;
  * @since 26.11.2003
  * @see DefaultListableBeanFactory
  */
+
+// 用于解析.property的Bean配置文件，对应xml解析类是XmlBeanDefinitionReader
+
 public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 	/**

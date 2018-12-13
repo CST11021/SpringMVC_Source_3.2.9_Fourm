@@ -9,8 +9,12 @@ public class ReaderContext {
 
 	// 表示一个要解析的配置文件
 	private final Resource resource;
+	// SPI接口：允许工具和其他外部进程处理bean定义解析过程中报告的错误和警告。
 	private final ProblemReporter problemReporter;
+	// 在读取BeanDefinition进程中注册组件、别名、import时的回调接口
 	private final ReaderEventListener eventListener;
+	// 资源提取器：SourceExtractor 这是个提取解析document后返回的原生bean定义，如果你需要则可以实现这个接口，spring提供了
+	// NullSourceExtractor空实现，PassThroughSourceExtractor简单实现返回了对象资源。
 	private final SourceExtractor sourceExtractor;
 
 

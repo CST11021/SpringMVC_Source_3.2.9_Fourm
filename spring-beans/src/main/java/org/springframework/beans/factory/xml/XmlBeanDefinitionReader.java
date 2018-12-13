@@ -62,7 +62,9 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	private NamespaceHandlerResolver namespaceHandlerResolver;
 	// 通过DocumentLoad来将Resource转换Document
 	private DocumentLoader documentLoader = new DefaultDocumentLoader();
+	// sax节点解析器
 	private EntityResolver entityResolver;
+	// sax解析的错误处理器
 	private ErrorHandler errorHandler = new SimpleSaxErrorHandler(logger);
 
 	// Xml验证模式的委托器
