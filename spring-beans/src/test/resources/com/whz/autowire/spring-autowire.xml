@@ -7,8 +7,18 @@
     <bean class="com.whz.autowire.Car"/>
     <bean id="address" class="com.whz.autowire.Address" p:city="厦门" p:street="思明区"/>
     <bean id="car" class="com.whz.autowire.Car" p:brand="奥迪" p:price="300000"/>
-    <bean id="person" class="com.whz.autowire.Person">
+    <bean id="person" class="com.whz.autowire.Person"/>
 
-    </bean>
+
+    <!--<bean id="1" abstract="false" autowire="default" class="" autowire-candidate="default"-->
+          <!--depends-on="" destroy-method="" factory-bean="" factory-method="" init-method="" lazy-init=""-->
+          <!--name="" parent="" primary="" scope="">-->
+        <!--<property name="t">-->
+            <!--<value></value>-->
+        <!--</property>-->
+
+    <!--</bean>-->
+
+
 
 </beans>

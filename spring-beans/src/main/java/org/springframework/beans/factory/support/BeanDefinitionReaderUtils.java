@@ -18,7 +18,7 @@ public class BeanDefinitionReaderUtils {
 
 	// 创建 GenericBeanDefinition 实例
 	public static AbstractBeanDefinition createBeanDefinition(String parentName, String className, ClassLoader classLoader) throws ClassNotFoundException {
-
+		// GenericBeanDefinition是一个泛型的Bean定义
 		GenericBeanDefinition bd = new GenericBeanDefinition();
 		bd.setParentName(parentName);
 		if (className != null) {

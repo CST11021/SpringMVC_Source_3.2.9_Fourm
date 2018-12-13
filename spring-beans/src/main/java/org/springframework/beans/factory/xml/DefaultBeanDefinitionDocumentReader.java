@@ -131,11 +131,11 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	}
 	// 解析默认命名空间，分别对import、alias、bean和beans进行处理
 	private void parseDefaultElement(Element ele, BeanDefinitionParserDelegate delegate) {
-		// 处理import标签
+		// 处理import标签：处理方式是直接解析配置文件，解析完后再回来继续解析下一个标签
 		if (delegate.nodeNameEquals(ele, IMPORT_ELEMENT)) {
 			importBeanDefinitionResource(ele);
 		}
-		// 处理alias别名标签
+		// 处理alias别名标签：处理方式是将别名注册到bean别名的注册表里，别名注册表本质就是一个 alias--> beanName 的 key-value 集合
 		else if (delegate.nodeNameEquals(ele, ALIAS_ELEMENT)) {
 			processAliasRegistration(ele);
 		}
@@ -145,7 +145,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		}
 		// 处理beans标签
 		else if (delegate.nodeNameEquals(ele, NESTED_BEANS_ELEMENT)) {
-			// recurse
+			// 如果是beans标签，则递归调用下
 			doRegisterBeanDefinitions(ele);
 		}
 	}
@@ -175,6 +175,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		// 如果是绝对URI则直接根据地址加载对应的配置文件，解析，并完成bean注册
 		if (absoluteLocation) {
 			try {
+				// 如果配置了resource文件，则会直接解析配置文件里的内容
 				int importCount = getReaderContext().getReader().loadBeanDefinitions(location, actualResources);
 				if (logger.isDebugEnabled()) {
 					logger.debug("Imported " + importCount + " bean definitions from URL location [" + location + "]");
@@ -221,6 +222,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		/**
 		 在对bean进行定义时，除了使用id属性来指定名称之外，为了提供多个名称，可以使用alias标签来指定。而所有的这些名称都指向同一个bean，在某些情况下提供别名非常有用，
 		 比如为了让应用的每一个组件能更容易的对公共组件进行引用。然而，在定义bean时就指定所有的别名并不是总是恰当的。有时我们期望能在当前位置为那些在别处定义的bean引入别名。
+
 		 在XML配置文件中，可用单独的<alias/>元素来完成bean别名的定义。如：
 		 配置文件中定义了一个JavaBean
 		 <bean id="some" class="src.com.Some"/>
@@ -229,6 +231,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		 <alias name="some" alias="someJava,oneBean,twoBean"/>
 		 或者是用name属性来指定，如：
 		 <bean id="some" name="oneBean,twoBean,threeBean" class="src.com.Some"/>
+
 		 考虑一个更为具体的例子，组件A在XML配置文件中定义了一个名为componentA-dataSource的DataSource bean。但组件B却想在其XML文件中以componentB-dataSource的名字来引用此bean。
 		 而且在主程序MyApp的XML配置文件中，希望以myApp-dataSource的名字来引用此bean。最后容器加载三个XML文件来生成最终的ApplicationContext，在此情形下，
 		 可通过在MyApp XML文件中添加下列alias元素来实现：

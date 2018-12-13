@@ -62,55 +62,45 @@ public class BeanDefinitionParserDelegate {
 	public static final String MULTI_VALUE_ATTRIBUTE_DELIMITERS = ",; ";
 	@Deprecated
 	public static final String BEAN_NAME_DELIMITERS = MULTI_VALUE_ATTRIBUTE_DELIMITERS;
+
+	// 通用可选值
 	public static final String TRUE_VALUE = "true";
 	public static final String FALSE_VALUE = "false";
 	public static final String DEFAULT_VALUE = "default";
-	public static final String DESCRIPTION_ELEMENT = "description";
+
+
+	// <bean>标签的 autowire 属性的可选值
 	public static final String AUTOWIRE_NO_VALUE = "no";
 	public static final String AUTOWIRE_BY_NAME_VALUE = "byName";
 	public static final String AUTOWIRE_BY_TYPE_VALUE = "byType";
 	public static final String AUTOWIRE_CONSTRUCTOR_VALUE = "constructor";
 	public static final String AUTOWIRE_AUTODETECT_VALUE = "autodetect";
+
+
 	public static final String DEPENDENCY_CHECK_ALL_ATTRIBUTE_VALUE = "all";
 	public static final String DEPENDENCY_CHECK_SIMPLE_ATTRIBUTE_VALUE = "simple";
 	public static final String DEPENDENCY_CHECK_OBJECTS_ATTRIBUTE_VALUE = "objects";
-	public static final String NAME_ATTRIBUTE = "name";
-	public static final String BEAN_ELEMENT = "bean";
-	public static final String META_ELEMENT = "meta";
-	public static final String ID_ATTRIBUTE = "id";
-	public static final String PARENT_ATTRIBUTE = "parent";
-	public static final String CLASS_ATTRIBUTE = "class";
-	public static final String ABSTRACT_ATTRIBUTE = "abstract";
-	public static final String SCOPE_ATTRIBUTE = "scope";
-	public static final String SINGLETON_ATTRIBUTE = "singleton";
-	public static final String LAZY_INIT_ATTRIBUTE = "lazy-init";
-	public static final String AUTOWIRE_ATTRIBUTE = "autowire";
-	public static final String AUTOWIRE_CANDIDATE_ATTRIBUTE = "autowire-candidate";
-	public static final String PRIMARY_ATTRIBUTE = "primary";
-	public static final String DEPENDENCY_CHECK_ATTRIBUTE = "dependency-check";
-	public static final String DEPENDS_ON_ATTRIBUTE = "depends-on";
-	public static final String INIT_METHOD_ATTRIBUTE = "init-method";
-	public static final String DESTROY_METHOD_ATTRIBUTE = "destroy-method";
-	public static final String FACTORY_METHOD_ATTRIBUTE = "factory-method";
-	public static final String FACTORY_BEAN_ATTRIBUTE = "factory-bean";
+
+
+
+
+
+
+	// 所有可配置的标签名-------------------------------------------------------------------------------------------------
+
+	// 以下是<bean>标签下可配置的标签
 	public static final String CONSTRUCTOR_ARG_ELEMENT = "constructor-arg";
-	public static final String INDEX_ATTRIBUTE = "index";
-	public static final String TYPE_ATTRIBUTE = "type";
-	public static final String VALUE_TYPE_ATTRIBUTE = "value-type";
-	public static final String KEY_TYPE_ATTRIBUTE = "key-type";
 	public static final String PROPERTY_ELEMENT = "property";
-	public static final String REF_ATTRIBUTE = "ref";
-	public static final String VALUE_ATTRIBUTE = "value";
 	public static final String LOOKUP_METHOD_ELEMENT = "lookup-method";
 	public static final String REPLACED_METHOD_ELEMENT = "replaced-method";
-	public static final String REPLACER_ATTRIBUTE = "replacer";
-	public static final String ARG_TYPE_ELEMENT = "arg-type";
-	public static final String ARG_TYPE_MATCH_ATTRIBUTE = "match";
-	public static final String REF_ELEMENT = "ref";
+	public static final String QUALIFIER_ELEMENT = "qualifier";
+	public static final String META_ELEMENT = "meta";
+	public static final String DESCRIPTION_ELEMENT = "description";
+
+	public static final String BEAN_ELEMENT = "bean";
 	public static final String IDREF_ELEMENT = "idref";
-	public static final String BEAN_REF_ATTRIBUTE = "bean";
-	public static final String LOCAL_REF_ATTRIBUTE = "local";
-	public static final String PARENT_REF_ATTRIBUTE = "parent";
+	public static final String REF_ELEMENT = "ref";
+	public static final String ARG_TYPE_ELEMENT = "arg-type";
 	public static final String VALUE_ELEMENT = "value";
 	public static final String NULL_ELEMENT = "null";
 	public static final String ARRAY_ELEMENT = "array";
@@ -119,14 +109,55 @@ public class BeanDefinitionParserDelegate {
 	public static final String MAP_ELEMENT = "map";
 	public static final String ENTRY_ELEMENT = "entry";
 	public static final String KEY_ELEMENT = "key";
+	public static final String PROPS_ELEMENT = "props";
+	public static final String PROP_ELEMENT = "prop";
+	public static final String QUALIFIER_ATTRIBUTE_ELEMENT = "attribute";
+	// -----------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+	// 所有可配置的标签属性-----------------------------------------------------------------------------------------------
+
+	// 以下<bean>标签的属性
+
+	public static final String NAME_ATTRIBUTE = "name";// <bean>标签的 name 属性，表示bean的名称
+	public static final String ID_ATTRIBUTE = "id";// <bean>标签的 id 属性，表示bean的id
+	public static final String PARENT_ATTRIBUTE = "parent";// <bean>标签的 parent 属性，表示bean继承的父bean
+	public static final String CLASS_ATTRIBUTE = "class";// <bean>标签的 class 属性，表示bean的类型
+	public static final String ABSTRACT_ATTRIBUTE = "abstract";// <bean>标签的 abstract 属性，表示该bean是否为抽象bean
+	public static final String SCOPE_ATTRIBUTE = "scope";// <bean>标签的 scope 属性
+	public static final String LAZY_INIT_ATTRIBUTE = "lazy-init";// <bean>标签的 lazy-init 属性
+	public static final String AUTOWIRE_ATTRIBUTE = "autowire";// <bean>标签的 autowire 属性
+	public static final String AUTOWIRE_CANDIDATE_ATTRIBUTE = "autowire-candidate";// <bean>标签的 autowire-candidate 属性
+	public static final String PRIMARY_ATTRIBUTE = "primary";// <bean>标签的 primary 属性
+	public static final String DEPENDENCY_CHECK_ATTRIBUTE = "dependency-check";
+	public static final String DEPENDS_ON_ATTRIBUTE = "depends-on";// <bean>标签的 depends-on 属性
+	public static final String INIT_METHOD_ATTRIBUTE = "init-method";// <bean>标签的 init-method 属性
+	public static final String DESTROY_METHOD_ATTRIBUTE = "destroy-method";// <bean>标签的 destroy-method 属性
+	public static final String FACTORY_METHOD_ATTRIBUTE = "factory-method";// <bean>标签的 factory-method 属性
+	public static final String FACTORY_BEAN_ATTRIBUTE = "factory-bean";// <bean>标签的 factory-bean 属性
+
+	// 标签的其他属性
+
+	public static final String SINGLETON_ATTRIBUTE = "singleton";
+	public static final String INDEX_ATTRIBUTE = "index";
+	public static final String TYPE_ATTRIBUTE = "type";
+	public static final String VALUE_TYPE_ATTRIBUTE = "value-type";
+	public static final String KEY_TYPE_ATTRIBUTE = "key-type";
+	public static final String REF_ATTRIBUTE = "ref";
+	public static final String VALUE_ATTRIBUTE = "value";
+	public static final String REPLACER_ATTRIBUTE = "replacer";
+	public static final String ARG_TYPE_MATCH_ATTRIBUTE = "match";
+	public static final String BEAN_REF_ATTRIBUTE = "bean";
+	public static final String LOCAL_REF_ATTRIBUTE = "local";
+	public static final String PARENT_REF_ATTRIBUTE = "parent";
 	public static final String KEY_ATTRIBUTE = "key";
 	public static final String KEY_REF_ATTRIBUTE = "key-ref";
 	public static final String VALUE_REF_ATTRIBUTE = "value-ref";
-	public static final String PROPS_ELEMENT = "props";
-	public static final String PROP_ELEMENT = "prop";
 	public static final String MERGE_ATTRIBUTE = "merge";
-	public static final String QUALIFIER_ELEMENT = "qualifier";
-	public static final String QUALIFIER_ATTRIBUTE_ELEMENT = "attribute";
 	public static final String DEFAULT_LAZY_INIT_ATTRIBUTE = "default-lazy-init";
 	public static final String DEFAULT_MERGE_ATTRIBUTE = "default-merge";
 	public static final String DEFAULT_AUTOWIRE_ATTRIBUTE = "default-autowire";
@@ -135,8 +166,20 @@ public class BeanDefinitionParserDelegate {
 	public static final String DEFAULT_INIT_METHOD_ATTRIBUTE = "default-init-method";
 	public static final String DEFAULT_DESTROY_METHOD_ATTRIBUTE = "default-destroy-method";
 
+	// ----------------------------------------------------------------------------------------------------------------
+
+
+
+
 	protected final Log logger = LogFactory.getLog(getClass());
 
+
+
+
+
+
+
+	// 解析xml的上下文
 	private final XmlReaderContext readerContext;
 	// 该对象封装了 Bean 中哪些有默认值的属性
 	private final DocumentDefaultsDefinition defaults = new DocumentDefaultsDefinition();
@@ -269,7 +312,8 @@ public class BeanDefinitionParserDelegate {
 			}
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
 
-			// 解析这个bean的scope、singleton、abstract、lazy-init、autowire、dependency-check、depends-on、primary、init-method、destory-method、factory-create、factory-bean 属性
+			// 解析这个bean的scope、singleton、abstract、lazy-init、autowire、dependency-check、depends-on、primary、init-method、
+			// destory-method、factory-create、factory-bean 属性
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
 			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
 
@@ -321,6 +365,7 @@ public class BeanDefinitionParserDelegate {
 				error("Specify either 'scope' or 'singleton', not both", ele);
 			}
 		}
+
 		// singleton
 		else if (ele.hasAttribute(SINGLETON_ATTRIBUTE)) {
 			// Spring 1.x "singleton" attribute
@@ -414,6 +459,7 @@ public class BeanDefinitionParserDelegate {
 		return bd;
 	}
 
+	// 解析<meta>子元素
 	public void parseMetaElements(Element ele, BeanMetadataAttributeAccessor attributeAccessor) {
 		// 返回 ele 元素的所有子节点
 		NodeList nl = ele.getChildNodes();

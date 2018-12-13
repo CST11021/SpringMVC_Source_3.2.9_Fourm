@@ -50,6 +50,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	public static final String INFER_METHOD = "(inferred)";
 
 
+	// 表示这个bean的Class类型，注意是Class<T>类型，而不是实例
 	private volatile Object beanClass;
 	private String scope = SCOPE_DEFAULT;
 	private boolean singleton = true;
@@ -88,6 +89,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	private boolean synthetic = false;
 	private int role = BeanDefinition.ROLE_APPLICATION;
 	private String description;
+	// 表示这个BeanDefinition来自于哪个配置文件
 	private Resource resource;
 
 

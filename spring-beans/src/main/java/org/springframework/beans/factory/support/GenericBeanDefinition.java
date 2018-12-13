@@ -3,6 +3,7 @@ package org.springframework.beans.factory.support;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 
+// 泛型的Bean定义：
 // GenericBeanDefinition是一站式的标准bean definition，除了具有指定类、可选的构造参数值和属性参数这些其它bean definition
 // 一样的特性外，它还具有通过parenetName属性来灵活设置parent bean definition。通常，GenericBeanDefinition用来注册用户可见
 // 的bean definition(可见的bean definition意味着可以在该类bean definition上定义post-processor来对bean进行操作，甚至为配置
