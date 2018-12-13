@@ -22,12 +22,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.whz.web.controller.TestController;
-import org.jruby.RubyProcess;
-import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * {@link AnnotationMetadata} implementation that uses standard reflection
@@ -181,53 +176,53 @@ public class StandardAnnotationMetadata extends StandardClassMetadata implements
 	}
 
 	// 测试
-	public static void main(String[] args){
-		RequestMapping requestMapping = new RequestMapping(){
-
-			@Override
-			public Class<? extends Annotation> annotationType() {
-				return RequestMapping.class;
-			}
-
-			@Override
-			public String[] value() {
-				return new String[0];
-			}
-
-			@Override
-			public RequestMethod[] method() {
-				return new RequestMethod[0];
-			}
-
-			@Override
-			public String[] params() {
-				return new String[0];
-			}
-
-			@Override
-			public String[] headers() {
-				return new String[0];
-			}
-
-			@Override
-			public String[] consumes() {
-				return new String[0];
-			}
-
-			@Override
-			public String[] produces() {
-				return new String[0];
-			}
-		};
-
-		StandardAnnotationMetadata metadata = new StandardAnnotationMetadata(requestMapping.getClass());
-		StandardAnnotationMetadata metadata1 = new StandardAnnotationMetadata(TestController.class);
-		String ann = "org.springframework.stereotype.Controller";
-		String ann1 = "org.springframework.stereotype.Service";
-		String ann2 = "java.lang.annotation.Target";
-		String ann3 = "org.springframework.web.bind.annotation.RequestMapping";
-		metadata1.hasAnnotatedMethods(ann3);
-		System.out.println();
-
-	}
+	// public static void main(String[] args){
+	// 	RequestMapping requestMapping = new RequestMapping(){
+	//
+	// 		@Override
+	// 		public Class<? extends Annotation> annotationType() {
+	// 			return RequestMapping.class;
+	// 		}
+	//
+	// 		@Override
+	// 		public String[] value() {
+	// 			return new String[0];
+	// 		}
+	//
+	// 		@Override
+	// 		public RequestMethod[] method() {
+	// 			return new RequestMethod[0];
+	// 		}
+	//
+	// 		@Override
+	// 		public String[] params() {
+	// 			return new String[0];
+	// 		}
+	//
+	// 		@Override
+	// 		public String[] headers() {
+	// 			return new String[0];
+	// 		}
+	//
+	// 		@Override
+	// 		public String[] consumes() {
+	// 			return new String[0];
+	// 		}
+	//
+	// 		@Override
+	// 		public String[] produces() {
+	// 			return new String[0];
+	// 		}
+	// 	};
+	//
+	// 	StandardAnnotationMetadata metadata = new StandardAnnotationMetadata(requestMapping.getClass());
+	// 	StandardAnnotationMetadata metadata1 = new StandardAnnotationMetadata(TestController.class);
+	// 	String ann = "org.springframework.stereotype.Controller";
+	// 	String ann1 = "org.springframework.stereotype.Service";
+	// 	String ann2 = "java.lang.annotation.Target";
+	// 	String ann3 = "org.springframework.web.bind.annotation.RequestMapping";
+	// 	metadata1.hasAnnotatedMethods(ann3);
+	// 	System.out.println();
+	//
+	// }
 }

@@ -8,7 +8,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 
@@ -171,11 +170,11 @@ public class Constants {
 		return parsedPrefix.toString();
 	}
 
-	public static void main(String[] args) {
-
-		Constants constants = new Constants(XmlBeanDefinitionReader.class);
-
-		System.out.println();
-	}
+	// public static void main(String[] args) {
+	//
+	// 	Constants constants = new Constants(XmlBeanDefinitionReader.class);
+	//
+	// 	System.out.println();
+	// }
 
 }
