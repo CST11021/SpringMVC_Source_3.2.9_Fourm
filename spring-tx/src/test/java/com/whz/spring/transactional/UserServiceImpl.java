@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
      *
      * 1、不要在接口上声明@Transactional，而要再具体类的方法上使用@Transactional注解，否则注解可能无效；
      *
-     * 2、不要讲@Transactional放置在类级别的声明中，放在类声明，会使得所有方法都有事务。故@Transactional应该放在方法级别，
+     * 2、不要在@Transactional放置在类级别的声明中，放在类声明，会使得所有方法都有事务。故@Transactional应该放在方法级别，
      * 不需要使用事务的方法，就不要放置事务，比如查询方法，否则对性能是有影响的；
      *
      * 3、使用@Transactional方法，对同一个类里面的方法调用，@Transactional无效。比如有一个类Test，它的一个方法A，A再调用

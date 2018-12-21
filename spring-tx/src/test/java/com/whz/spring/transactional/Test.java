@@ -26,7 +26,7 @@ public class Test {
     // 不使用事务管理
     @org.junit.Test
     public void testSaveWithoutTransaction() throws Exception {
-        ApplicationContext app = new ClassPathXmlApplicationContext("/com/whz/spring/transactional/spring-dataSource.xml");
+        ApplicationContext app = new ClassPathXmlApplicationContext("/com.whz.spring.transactional/spring-dataSource.xml");
         UserService userService = (UserService) app.getBean("userService");
         // 执行出错了，但是数据仍然会保持到数据库中
         userService.saveWithoutTransaction(zhangsanUser);
@@ -81,7 +81,7 @@ public class Test {
     @org.junit.Test
     public void testSaveByDefaultTransactionDefinition() throws Exception {
 
-        ApplicationContext app = new ClassPathXmlApplicationContext("/com/whz/spring/transactional/spring-dataSource.xml");
+        ApplicationContext app = new ClassPathXmlApplicationContext("/com.whz.spring.transactional/spring-dataSource.xml");
         UserService userService = (UserService) app.getBean("userService");
         DataSource datasource = (DataSource) app.getBean("dataSource");
 
@@ -100,7 +100,7 @@ public class Test {
     // 使用Spring的编程式事务操作：使用 TransactionTemplate 实现
     @org.junit.Test
     public void testSaveByTransactionTemplate() {
-        ApplicationContext app = new ClassPathXmlApplicationContext("/com/whz/spring/transactional/spring-dataSource.xml");
+        ApplicationContext app = new ClassPathXmlApplicationContext("/com.whz.spring.transactional/spring-dataSource.xml");
         UserService userService = (UserService) app.getBean("userService");
         DataSource datasource = (DataSource) app.getBean("dataSource");
 
@@ -130,7 +130,7 @@ public class Test {
     @org.junit.Test
     public void testSaveBySpringTransaction() throws Exception {
         // 将事务的模板类代码抽到出来交由Spring配置实现
-        ApplicationContext app = new ClassPathXmlApplicationContext("/com/whz/spring/transactional/spring-annoTransaction.xml");
+        ApplicationContext app = new ClassPathXmlApplicationContext("/com.whz.spring.transactional/spring-annoTransaction.xml");
         UserService userService = (UserService) app.getBean("userService");
         userService.saveByAnno(zhangsanUser);
     }
@@ -138,7 +138,7 @@ public class Test {
     @org.junit.Test
     public void testSaveBySpringTransaction1() throws Exception {
         // 将事务的模板类代码抽到出来交由Spring配置实现
-        ApplicationContext app = new ClassPathXmlApplicationContext("/com/whz/spring/transactional/spring-xmlTransaction.xml");
+        ApplicationContext app = new ClassPathXmlApplicationContext("/com.whz.spring.transactional/spring-xmlTransaction.xml");
         UserService userService = (UserService) app.getBean("userServiceTarget");
         userService.saveByConfg1(zhangsanUser);
     }
@@ -146,7 +146,7 @@ public class Test {
     @org.junit.Test
     public void testSaveBySpringTransaction2() throws Exception {
         // 将事务的模板类代码抽到出来交由Spring配置实现
-        ApplicationContext app = new ClassPathXmlApplicationContext("/com/whz/spring/transactional/spring-xmlTransaction.xml");
+        ApplicationContext app = new ClassPathXmlApplicationContext("/com.whz.spring.transactional/spring-xmlTransaction.xml");
         UserService userService = (UserService) app.getBean("userServiceTarget");
         userService.saveByConfg2(zhangsanUser);
     }
