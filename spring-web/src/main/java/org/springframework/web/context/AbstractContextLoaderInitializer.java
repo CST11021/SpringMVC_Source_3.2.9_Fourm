@@ -41,17 +41,12 @@ public abstract class AbstractContextLoaderInitializer implements WebApplication
 	/** Logger available to subclasses */
 	protected final Log logger = LogFactory.getLog(getClass());
 
-
+	// web容器启动后，会调用该方法，将ServletContext传进来
 	public void onStartup(ServletContext servletContext) throws ServletException {
 		registerContextLoaderListener(servletContext);
 	}
 
-	/**
-	 * Register a {@link ContextLoaderListener} against the given servlet context. The
-	 * {@code ContextLoaderListener} is initialized with the application context returned
-	 * from the {@link #createRootApplicationContext()} template method.
-	 * @param servletContext the servlet context to register the listener against
-	 */
+	// 创建一个WebApplicationContext容器，并监听 ServletContext 的上下文事件
 	protected void registerContextLoaderListener(ServletContext servletContext) {
 		WebApplicationContext rootAppContext = createRootApplicationContext();
 		if (rootAppContext != null) {
@@ -63,17 +58,7 @@ public abstract class AbstractContextLoaderInitializer implements WebApplication
 		}
 	}
 
-	/**
-	 * Create the "<strong>root</strong>" application context to be provided to the
-	 * {@code ContextLoaderListener}.
-	 * <p>The returned context is delegated to
-	 * {@link ContextLoaderListener#ContextLoaderListener(WebApplicationContext)} and will
-	 * be established as the parent context for any {@code DispatcherServlet} application
-	 * contexts. As such, it typically contains middle-tier services, data sources, etc.
-	 * @return the root application context, or {@code null} if a root context is not
-	 * desired
-	 * @see org.springframework.web.servlet.support.AbstractDispatcherServletInitializer
-	 */
+	// 子类扩展，创建一个WebApplicationContext容器
 	protected abstract WebApplicationContext createRootApplicationContext();
 
 }

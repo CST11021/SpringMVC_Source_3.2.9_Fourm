@@ -21,8 +21,7 @@ import javax.servlet.ServletContext;
 import org.springframework.context.ApplicationContext;
 
 /**
- * Interface to provide configuration for a web application. This is read-only while
- * the application is running, but may be reloaded if the implementation supports this.
+ * 提供Web应用程序配置的界面。在应用程序运行时，它是只读的，但是如果实现支持，则可以重新加载。
  *
  * <p>This interface adds a {@code getServletContext()} method to the generic
  * ApplicationContext interface, and defines a well-known application attribute name
