@@ -99,8 +99,9 @@ import java.util.Set;
     中的SpringServletContainerInitializer对接口ServletContainerInitializer的实现中,是可以直接获取到这些类的)
 
 
-三、Tomcat调用SCI的时机：
-    现在还有一个疑问, 就是 ServletContainerInitializer 的调用时机?, 因为servlet容器除了会回调SCI之外, 还有回调诸如servlet, listener等.
+三、Tomcat调用ServletContainerInitializer的时机：
+    现在还有一个疑问, 就是 ServletContainerInitializer 的调用时机?, 因为servlet容器除了会回调ServletContainerInitializer之外,
+    还有回调诸如servlet, listener等.
     搞清楚这些先后顺序可以帮助我们快速定位和理解某些奇怪的问题.
 
     这里我们就以Tomcat举例, 以下逻辑总结于Tomcat7.x, 有兴趣的读者可以去StandardContext类中对startInternal的实现中(第5608行 —— 第5618行,

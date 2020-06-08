@@ -80,7 +80,7 @@ public interface ServletContextListener extends EventListener {
 
     /**
      * 该方法在web应用启动后调用该方法，在调用完该方法之后，容器再对Filter初始化，并且对那些在Web应用启动时就需要被初始化的Servlet进行初始化。
-     * All ServletContextListeners are notified of context initialization before any filters or servlets in the web application are initialized.
+     * 在初始化Web应用程序中的任何过滤器或Servlet之前，所有ServletContextListener都会收到上下文初始化通知。
      *
      * @param sce 调用该方法时ServletContext已经被初始化，可以使用sce.getServletContext()获取到ServletContext上下文对象
      */
@@ -89,7 +89,7 @@ public interface ServletContextListener extends EventListener {
     /**
      *
      * 当Servlet容器终止Web应用前调用该方法，在调用该方法之前，容器会先销毁所有的Servlet和Filter过滤器。
-     * All servlets and filters will have been destroyed before any ServletContextListeners are notified of context destruction.
+     * 在通知任何ServletContextListener上下文破坏之前，所有Servlet和过滤器都将被破坏。
      *
      * @param sce the ServletContextEvent containing the ServletContext that is being destroyed（调用该方法时，ServletContext已经被销毁）
      */

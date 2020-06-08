@@ -76,12 +76,12 @@ import java.util.EventListener;
 public interface HttpSessionActivationListener extends EventListener {
 
     /**
-     * Notification that the session is about to be passivated.
+     * Session对象钝化之前执行：钝化：就是序列化，把对象转化为字节序列，把Session对象从内存保存到硬盘里。（持久化操作）
      */
     public void sessionWillPassivate(HttpSessionEvent se);
 
     /**
-     * Notification that the session has just been activated.
+     * Session对象活化后执行：活化：就是反序列化，把字节序列转化为对象，把Session对象从硬盘再读回内存。
      */
     public void sessionDidActivate(HttpSessionEvent se);
 } 
