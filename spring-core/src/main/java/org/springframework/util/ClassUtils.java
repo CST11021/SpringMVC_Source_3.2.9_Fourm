@@ -66,7 +66,10 @@ public abstract class ClassUtils {
 	// for example: int.class -> Integer.class.
 	private static final Map<Class<?>, Class<?>> primitiveTypeToWrapperMap = new HashMap<Class<?>, Class<?>>(8);
 
-	// "int" -> "int.class".
+	// primitiveTypeNameMap的value包含的17个值如下：
+	// 8个基础类型：boolean.class, byte.class, char.class, double.class, float.class, int.class, long.class, short.class，
+	// 8个基础包装类：boolean[].class, byte[].class, char[].class, double[].class, float[].class, int[].class, long[].class, short[].class
+	// 还一个void：void.class
 	private static final Map<String, Class<?>> primitiveTypeNameMap = new HashMap<String, Class<?>>(32);
 	// “java.lang”包下类名到相应的Class 映射
 	private static final Map<String, Class<?>> commonClassCache = new HashMap<String, Class<?>>(32);
@@ -87,14 +90,22 @@ public abstract class ClassUtils {
 		}
 
 		Set<Class<?>> primitiveTypes = new HashSet<Class<?>>(32);
+		// boolean.class, byte.class, char.class, double.class, float.class, int.class, long.class, short.class
 		primitiveTypes.addAll(primitiveWrapperTypeMap.values());
-		primitiveTypes.addAll(Arrays.asList(new Class<?>[] {
-				boolean[].class, byte[].class, char[].class, double[].class,
-				float[].class, int[].class, long[].class, short[].class}));
+		// boolean[].class, byte[].class, char[].class, double[].class, float[].class, int[].class, long[].class, short[].class
+		primitiveTypes.addAll(
+				Arrays.asList(
+						new Class<?>[] {
+							boolean[].class, byte[].class, char[].class, double[].class, float[].class, int[].class, long[].class, short[].class
+						}
+				)
+		);
 		primitiveTypes.add(void.class);
 		for (Class<?> primitiveType : primitiveTypes) {
 			primitiveTypeNameMap.put(primitiveType.getName(), primitiveType);
 		}
+
+
 
 		registerCommonClasses(Boolean[].class, Byte[].class, Character[].class, Double[].class,
 				Float[].class, Integer[].class, Long[].class, Short[].class);
@@ -574,31 +585,107 @@ public abstract class ClassUtils {
 		}
 	}
 
+
+
+
 	// 判断是否为原始类型
+
+	/**
+	 * 判断是否为8个基础类型的包装类：
+	 * Boolean.class
+	 * Byte.class
+	 * Character.class
+	 * Double.class
+	 * Float.class
+	 * Integer.class
+	 * Long.class
+	 * Short.class
+	 *
+	 * @param clazz
+	 * @return
+	 */
 	public static boolean isPrimitiveWrapper(Class<?> clazz) {
 		Assert.notNull(clazz, "Class must not be null");
 		return primitiveWrapperTypeMap.containsKey(clazz);
 	}
+
+	/**
+	 * 判断是否为8个基础类型类型，包括8个基础的和对应的包装类，即如下的16个类型：
+	 *
+	 * Boolean.class
+	 * boolean.class
+	 * Byte.class
+	 * byte.class
+	 * Character.class
+	 * char.class
+	 * Double.class
+	 * double.class
+	 * Float.class
+	 * float.class
+	 * Integer.class
+	 * int.class
+	 * Long.class
+	 * long.class
+	 * Short.class
+	 * short.class
+	 *
+	 *
+	 * @param clazz
+	 * @return
+	 */
 	public static boolean isPrimitiveOrWrapper(Class<?> clazz) {
 		Assert.notNull(clazz, "Class must not be null");
+		// clazz.isPrimitive()：此方法主要用来判断Class是否为原始类型（boolean、char、byte、short、int、long、float、double），注意不包括包装类
 		return (clazz.isPrimitive() || isPrimitiveWrapper(clazz));
 	}
 	// 原始类型的数组形式
+
+	/**
+	 * 判断是否为8个基础数据类型对应的数组类型，如：
+	 * boolean[].class,
+	 * byte[].class,
+	 * char[].class,
+	 * double[].class,
+	 * float[].class,
+	 * int[].class,
+	 * long[].class,
+	 * short[].class
+	 *
+	 * @param clazz
+	 * @return
+	 */
 	public static boolean isPrimitiveArray(Class<?> clazz) {
 		Assert.notNull(clazz, "Class must not be null");
 		return (clazz.isArray() && clazz.getComponentType().isPrimitive());
 	}
+
+	/**
+	 * 判断是否为8个基础数据包装类型对应的数组类型，如：
+	 * Boolean[].class
+	 * Byte[].class
+	 * Character[].class
+	 * Double[].class
+	 * Float[].class
+	 * Integer[].class
+	 * Long[].class
+	 * Short[].class
+	 *
+	 * @param clazz
+	 * @return
+	 */
 	public static boolean isPrimitiveWrapperArray(Class<?> clazz) {
 		Assert.notNull(clazz, "Class must not be null");
 		return (clazz.isArray() && isPrimitiveWrapper(clazz.getComponentType()));
 	}
-
 	// 如果是原始类型，则返回原始类型对象，如：Integer.class
 	public static Class<?> resolvePrimitiveIfNecessary(Class<?> clazz) {
 		Assert.notNull(clazz, "Class must not be null");
 		// isPrimitive():判断class是否表示一个基本类型，有9个预定义的基本类型，包括八种原始类型和 void。
 		return (clazz.isPrimitive() && clazz != void.class? primitiveTypeToWrapperMap.get(clazz) : clazz);
 	}
+
+
+
 
 	/**
 	 * Check if the right-hand side type may be assigned to the left-hand side
@@ -781,29 +868,59 @@ public abstract class ClassUtils {
 		return ancestor;
 	}
 
-	// 检查给定的类在给定的类加载器是否可见
+	/**
+	 * 检查给定的类在给定的类加载器是否可见
+	 *
+	 * @param clazz
+	 * @param classLoader
+	 * @return
+	 */
 	public static boolean isVisible(Class<?> clazz, ClassLoader classLoader) {
 		if (classLoader == null) {
 			return true;
 		}
+
 		try {
 			Class<?> actualClass = classLoader.loadClass(clazz.getName());
 			return (clazz == actualClass);
 			// Else: different interface class found...
-		}
-		catch (ClassNotFoundException ex) {
+		} catch (ClassNotFoundException ex) {
 			// No interface class found...
 			return false;
 		}
 	}
 
-	// 判断是否为CGLIB生成的代理类，如果是CGLIB生成的，className必定包含$$
+
+
+
+	// ------------------ 判断是否为CGLIB生成的代理类，如果是CGLIB生成的，className必定包含$$
+
+	/**
+	 * 判断该对象实例是否为CGLIB生成的对象
+	 *
+	 * @param object
+	 * @return
+	 */
 	public static boolean isCglibProxy(Object object) {
 		return ClassUtils.isCglibProxyClass(object.getClass());
 	}
+
+	/**
+	 * 判断该Class<?>是否为CGLIB生成的
+	 *
+	 * @param clazz
+	 * @return
+	 */
 	public static boolean isCglibProxyClass(Class<?> clazz) {
 		return (clazz != null && isCglibProxyClassName(clazz.getName()));
 	}
+
+	/**
+	 * 判断该雷鸣是否包含"$$"字符串，如果是的话说明该类是CGLIB生成的
+	 *
+	 * @param className
+	 * @return
+	 */
 	public static boolean isCglibProxyClassName(String className) {
 		return (className != null && className.contains(CGLIB_CLASS_SEPARATOR));
 	}
